@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
-  
+
 <head>
- <meta charset="UTF-8" />
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Shop Subscription App</title>
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
@@ -148,10 +148,10 @@
     </div>
 
     <div id="subscriptionSection" style="display:none;">
-      <p class="info">Subscribe monthly to receive special in-store discounts and offers.</p>
+      <p class="info">Get any 1 shirt + any 1 Pant at ₹1099 per month <br> for unlimited times</p>
       <form class="form-section" id="subscriptionForm">
         <input type="text" id="name" placeholder="Your Name" required />
-        <button type="submit">Subscribe for $4.99/month</button>
+        <button type="submit">Subscribe at ₹19 / month </button>
       </form>
       <div class="confirmation" id="confirmationMessage"></div>
       <p class="form-section">
@@ -160,7 +160,7 @@
     </div>
 
     <div id="productsPage">
-      <h1>Products</h1>
+      <h1>Monster Monthly <br>Mega Offer</h1>
       <div class="product-list" id="productList">
         <div class="product-item">
           <h3>Classic Denim Jacket</h3>
@@ -169,10 +169,6 @@
         <div class="product-item">
           <h3>Graphic T-Shirt</h3>
           <p>Stylish and comfortable t-shirt with unique prints.</p>
-        </div>
-        <div class="product-item">
-          <h3>Chino Pants</h3>
-          <p>Versatile chinos suitable for both office and casual wear.</p>
         </div>
       </div>
       <p class="form-section" id="logoutProductsBtn"><button id="backToSubscription">Logout</button></p>
@@ -223,11 +219,11 @@
       if (subscribed) {
         subscriptionSection.style.display = "none";
         productsPage.style.display = "block";
-        document.getElementById("title").textContent = "Our Products";
+        document.getElementById("title").textContent = "";
       } else {
         subscriptionSection.style.display = "block";
         productsPage.style.display = "none";
-        document.getElementById("title").textContent = "Join Our Discount Club!";
+        document.getElementById("title").textContent = "Premium Membership";
       }
       loginSection.style.display = "none";
       signupSection.style.display = "none";
@@ -250,7 +246,7 @@
 
       const options = {
         key: 'rzp_live_0M0qHSpzByvZAr',
-        amount: 1 * 100,
+        amount: 19 * 100,
         currency: 'INR',
         name: 'Monster Mens Collection',
         description: 'Monthly Subscription',
@@ -300,7 +296,7 @@
           if (error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
             statusMessage.textContent = "Incorrect email or password. Please try again.";
           } else {
-            statusMessage.textContent = error.message;
+            statusMessage.textContent = "Incorrect email or password. Please try again.";
           }
         });
     });
