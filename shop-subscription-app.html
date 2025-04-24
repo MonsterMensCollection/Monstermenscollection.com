@@ -11,6 +11,7 @@
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <style>
      * {
+      
       box-sizing: border-box;
       margin:0;
       padding: 0;
@@ -18,7 +19,7 @@
     }
 
     body {
-      margin-top:150px;
+      margin-top:200px;
       background-color: #f9f9f9;
       padding: 20px;
     }
@@ -192,6 +193,7 @@
       <input type="email" id="email" placeholder="Email" />
       <input type="password" id="password" placeholder="Password" />
       <button id="emailLoginBtn">Login</button>
+      <button id="googleLoginBtn" style="background-color:#db4437;">Login with Google</button>
       <a href="#" id="forgotPasswordLink">Forgot Password?</a>
       <div id="statusMessage" class="status-message"></div>
       <p class="toggle-link" onclick="toggleForm()">Don't have an account? Sign Up</p>
@@ -247,7 +249,7 @@
         <center>Monstermenscollection@gmail.com
         </div>
         <h2><center>Address:</h2>
-        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d243.9928148729519!2d79.75464282113771!3d11.913088231976015!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a536197b55718a3%3A0xb1d567dddfc2f85c!2sMonster%20Men&#39;s%20Collection!5e0!3m2!1sen!2sin!4v1745178755178!5m2!1sen!2sin"width="265" height="265" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d243.9928148729519!2d79.75464282113771!3d11.913088231976015!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a536197b55718a3%3A0xb1d567dddfc2f85c!2sMonster%20Men&#39;s%20Collection!5e0!3m2!1sen!2sin!4v1745178755178!5m2!1sen!2sin" width="415" height="300" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
       </div>
       <p class="form-section" id="logoutProductsBtn"><button id="backToSubscription">Logout</button></p>
     </div>
@@ -258,7 +260,7 @@
     </div>
   </div>
 
-  <script>
+ <script>
     const firebaseConfig = {
       apiKey: "AIzaSyDzW8XuqrxM47W42HcIUXifa_X8tnfrLkY",
       authDomain: "monster-mens-collection.firebaseapp.com",
@@ -282,6 +284,17 @@
     const adminControls = document.getElementById("adminControls");
 
     const adminEmails = ["youremail@example.com"];
+
+    document.getElementById("googleLoginBtn").addEventListener("click", () => {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider)
+        .then(result => {
+          updatePageForUser(result.user);
+        })
+        .catch(error => {
+          statusMessage.textContent = error.message;
+        });
+    })
 
     async function checkSubscription(uid) {
       const doc = await db.collection("subscriptions").doc(uid).get();
