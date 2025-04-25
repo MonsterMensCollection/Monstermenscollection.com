@@ -292,6 +292,13 @@
     }
 
     async function updatePageForUser(user) {
+      await user.reload();
+      if (!user.emailVerified) {
+        alert("Please verify your email address before continuing.");
+        auth.signOut();
+        return;
+      }
+
       const subscribed = await checkSubscription(user.uid);
       if (subscribed) {
         subscriptionSection.style.display = "none";
@@ -370,11 +377,7 @@
       const password = document.getElementById("password").value;
       auth.signInWithEmailAndPassword(email, password)
         .catch((error) => {
-          if (error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
-            statusMessage.textContent = "Incorrect email or password. Please try again.";
-          } else {
-            statusMessage.textContent = "Incorrect email or password. Please try again.";
-          }
+          statusMessage.textContent = "Incorrect email or password. Please try again.";
         });
     });
 
@@ -382,6 +385,14 @@
       const email = document.getElementById("signupEmail").value;
       const password = document.getElementById("signupPassword").value;
       auth.createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+          const user = userCredential.user;
+          user.sendEmailVerification().then(() => {
+            alert("Verification email sent! Please check your inbox and verify before logging in.");
+            auth.signOut();
+            toggleForm();
+          });
+        })
         .catch((error) => {
           if (error.code === 'auth/email-already-in-use') {
             statusMessage.textContent = "This email is already in use. Please login instead.";
