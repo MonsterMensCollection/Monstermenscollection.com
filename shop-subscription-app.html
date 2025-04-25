@@ -12,13 +12,12 @@
   <style>
      * {
       box-sizing: border-box;
-      margin: 0;
+      margin:2;
       padding: 0;
       font-family: Arial, sans-serif;
     }
 
     body {
-      margin-top: 0px;
       background-color: #f9f9f9;
       padding: 20px;
     }
@@ -162,7 +161,7 @@
         90%{transform: transulateX(0%);}
         100%{transform: transulateX(0%);}
     }
-        .admin-controls {
+    .admin-controls {
       margin-top: 20px;
       padding: 10px;
       border: 1px solid #ccc;
@@ -177,6 +176,7 @@
     .product-item.hidden {
       display: none;
     }
+
     #logoutProductsBtn {
       margin-top: 30px;
     }
@@ -204,10 +204,10 @@
     </div>
 
     <div id="subscriptionSection" style="display:none;">
-      <p class="info">Subscribe monthly to receive special in-store discounts and offers.</p>
+      <p class="info">Get any 1 shirt + any 1 Pant at ₹1099 per month <br> for unlimited times</p>
       <form class="form-section" id="subscriptionForm">
         <input type="text" id="name" placeholder="Your Name" required />
-        <button type="submit">Subscribe for $4.99/month</button>
+        <button type="submit">Subscribe at ₹19 / month </button>
       </form>
       <div class="confirmation" id="confirmationMessage"></div>
       <p class="form-section">
@@ -215,7 +215,7 @@
       </p>
     </div>
 
-<div id="productsPage">
+    <div id="productsPage">
       <h1>Monster Monthly<br>Mega Offer</h1>
       <div class="slider-wrapper">
           <div class="slider">
@@ -246,7 +246,7 @@
         <center>Monstermenscollection@gmail.com
         </div>
         <h2><center>Address:</h2>
-        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d243.9928148729519!2d79.75464282113771!3d11.913088231976015!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a536197b55718a3%3A0xb1d567dddfc2f85c!2sMonster%20Men&#39;s%20Collection!5e0!3m2!1sen!2sin!4v1745178755178!5m2!1sen!2sin" width="415" height="300" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d243.9928148729519!2d79.75464282113771!3d11.913088231976015!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a536197b55718a3%3A0xb1d567dddfc2f85c!2sMonster%20Men&#39;s%20Collection!5e0!3m2!1sen!2sin!4v1745178755178!5m2!1sen!2sin"width="265" height="265" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
       </div>
       <p class="form-section" id="logoutProductsBtn"><button id="backToSubscription">Logout</button></p>
     </div>
@@ -258,195 +258,167 @@
   </div>
 
   <script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyDzW8XuqrxM47W42HcIUXifa_X8tnfrLkY",
-    authDomain: "monster-mens-collection.firebaseapp.com",
-    projectId: "monster-mens-collection",
-    storageBucket: "monster-mens-collection.appspot.com",
-    messagingSenderId: "21161410221",
-    appId: "1:21161410221:web:3f4c777d4b5c8db20a9024",
-    measurementId: "G-5WFHV50M9Z"
-  };
-
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.firestore();
-
-  const loginSection = document.getElementById("loginSection");
-  const signupSection = document.getElementById("signupSection");
-  const subscriptionSection = document.getElementById("subscriptionSection");
-  const productsPage = document.getElementById("productsPage");
-  const logoutBtn = document.getElementById("logoutBtn");
-  const statusMessage = document.getElementById("statusMessage");
-  const adminControls = document.getElementById("adminControls");
-
-  const adminEmails = ["youremail@example.com"];
-
-  async function checkSubscription(uid) {
-    const doc = await db.collection("subscriptions").doc(uid).get();
-    if (!doc.exists) return false;
-    const data = doc.data();
-    const now = new Date();
-    const expiryDate = data.expiryDate?.toDate?.() || new Date(data.expiryDate);
-    return expiryDate > now;
-  }
-
-  async function updatePageForUser(user) {
-    const subscribed = await checkSubscription(user.uid);
-    if (subscribed) {
-      subscriptionSection.style.display = "none";
-      productsPage.style.display = "block";
-      document.getElementById("title").textContent = "Our Products";
-    } else {
-      subscriptionSection.style.display = "block";
-      productsPage.style.display = "none";
-      document.getElementById("title").textContent = "Join Our Discount Club!";
-    }
-    loginSection.style.display = "none";
-    signupSection.style.display = "none";
-    adminControls.style.display = adminEmails.includes(user.email) ? "block" : "none";
-  }
-
-  async function saveSubscription(uid) {
-    const expiry = new Date();
-    expiry.setMonth(expiry.getMonth() + 1);
-    await db.collection("subscriptions").doc(uid).set({
-      expiryDate: expiry,
-      createdAt: new Date()
-    });
-  }
-
-  document.getElementById("subscriptionForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const name = document.getElementById("name").value;
-    const email = auth.currentUser?.email || '';
-
-    const options = {
-      key: 'rzp_live_0M0qHSpzByvZAr',
-      amount: 1 * 100,
-      currency: 'INR',
-      name: 'Monster Mens Collection',
-      description: 'Monthly Subscription',
-      handler: async function (response) {
-        alert('Payment successful! Payment ID: ' + response.razorpay_payment_id);
-        await saveSubscription(auth.currentUser.uid);
-        await updatePageForUser(auth.currentUser);
-        document.getElementById("confirmationMessage").textContent = `Thank you, ${name || 'Subscriber'}! You are subscribed.`;
-      },
-      prefill: {
-        email: email,
-        name: name || 'Guest'
-      },
-      theme: {
-        color: "#007bff"
-      }
+    const firebaseConfig = {
+      apiKey: "AIzaSyDzW8XuqrxM47W42HcIUXifa_X8tnfrLkY",
+      authDomain: "monster-mens-collection.firebaseapp.com",
+      projectId: "monster-mens-collection",
+      storageBucket: "monster-mens-collection.appspot.com",
+      messagingSenderId: "21161410221",
+      appId: "1:21161410221:web:3f4c777d4b5c8db20a9024",
+      measurementId: "G-5WFHV50M9Z"
     };
 
-    const rzp = new Razorpay(options);
-    rzp.open();
-  });
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
 
-  logoutBtn.addEventListener("click", () => {
-    auth.signOut();
-  });
+    const loginSection = document.getElementById("loginSection");
+    const signupSection = document.getElementById("signupSection");
+    const subscriptionSection = document.getElementById("subscriptionSection");
+    const productsPage = document.getElementById("productsPage");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const statusMessage = document.getElementById("statusMessage");
+    const adminControls = document.getElementById("adminControls");
 
-  auth.onAuthStateChanged(async (user) => {
-    if (user) {
-      if (!user.emailVerified) {
-        statusMessage.textContent = "Please verify your email address before continuing. A link has been sent to your email.";
-        await auth.signOut();
+    const adminEmails = ["youremail@example.com"];
+
+    async function checkSubscription(uid) {
+      const doc = await db.collection("subscriptions").doc(uid).get();
+      if (!doc.exists) return false;
+      const data = doc.data();
+      const now = new Date();
+      const expiryDate = data.expiryDate?.toDate?.() || new Date(data.expiryDate);
+      return expiryDate > now;
+    }
+
+    async function updatePageForUser(user) {
+      const subscribed = await checkSubscription(user.uid);
+      if (subscribed) {
+        subscriptionSection.style.display = "none";
+        productsPage.style.display = "block";
+        document.getElementById("title").textContent = "";
+      } else {
+        subscriptionSection.style.display = "block";
+        productsPage.style.display = "none";
+        document.getElementById("title").textContent = "Premium Membership";
+      }
+      loginSection.style.display = "none";
+      signupSection.style.display = "none";
+      adminControls.style.display = adminEmails.includes(user.email) ? "block" : "none";
+    }
+
+    async function saveSubscription(uid) {
+      const expiry = new Date();
+      expiry.setMonth(expiry.getMonth() + 1);
+      await db.collection("subscriptions").doc(uid).set({
+        expiryDate: expiry,
+        createdAt: new Date()
+      });
+    }
+
+    document.getElementById("subscriptionForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const name = document.getElementById("name").value;
+      const email = auth.currentUser?.email || '';
+
+      const options = {
+        key: 'rzp_live_0M0qHSpzByvZAr',
+        amount: 19 * 100,
+        currency: 'INR',
+        name: 'Monster Mens Collection',
+        description: 'Monthly Subscription',
+        handler: async function (response) {
+          alert('Payment successful! Payment ID: ' + response.razorpay_payment_id);
+          await saveSubscription(auth.currentUser.uid);
+          await updatePageForUser(auth.currentUser);
+          document.getElementById("confirmationMessage").textContent = `Thank you, ${name || 'Subscriber'}! You are subscribed.`;
+        },
+        prefill: {
+          email: email,
+          name: name || 'Guest'
+        },
+        theme: {
+          color: "#007bff"
+        }
+      };
+
+      const rzp = new Razorpay(options);
+      rzp.open();
+    });
+
+    logoutBtn.addEventListener("click", () => {
+      auth.signOut();
+    });
+
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        await updatePageForUser(user);
+      } else {
+        subscriptionSection.style.display = "none";
+        productsPage.style.display = "none";
+        loginSection.style.display = "flex";
+        signupSection.style.display = "none";
+        document.getElementById("title").textContent = "Login";
+        document.getElementById("confirmationMessage").textContent = "";
+        statusMessage.textContent = "";
+        adminControls.style.display = "none";
+      }
+    });
+
+    document.getElementById("emailLoginBtn").addEventListener("click", () => {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      auth.signInWithEmailAndPassword(email, password)
+        .catch((error) => {
+          if (error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
+            statusMessage.textContent = "Incorrect email or password. Please try again.";
+          } else {
+            statusMessage.textContent = "Incorrect email or password. Please try again.";
+          }
+        });
+    });
+
+    document.getElementById("emailSignupBtn").addEventListener("click", () => {
+      const email = document.getElementById("signupEmail").value;
+      const password = document.getElementById("signupPassword").value;
+      auth.createUserWithEmailAndPassword(email, password)
+        .catch((error) => {
+          if (error.code === 'auth/email-already-in-use') {
+            statusMessage.textContent = "This email is already in use. Please login instead.";
+            toggleForm();
+          } else {
+            statusMessage.textContent = error.message;
+          }
+        });
+    });
+
+    document.getElementById("forgotPasswordLink").addEventListener("click", () => {
+      const email = document.getElementById("email").value;
+      if (!email) {
+        statusMessage.textContent = "Please enter your email address first.";
         return;
       }
-      await updatePageForUser(user);
-    } else {
-      subscriptionSection.style.display = "none";
-      productsPage.style.display = "none";
-      loginSection.style.display = "flex";
-      signupSection.style.display = "none";
-      document.getElementById("title").textContent = "Login";
-      document.getElementById("confirmationMessage").textContent = "";
-      statusMessage.textContent = "";
-      adminControls.style.display = "none";
-    }
-  });
-
-  document.getElementById("emailLoginBtn").addEventListener("click", () => {
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
-
-  auth.signInWithEmailAndPassword(email, password)
-    .then((userCredential) => {
-      if (!userCredential.user.emailVerified) {
-        statusMessage.textContent = "Please verify your email before logging in. A new link has been sent.";
-        userCredential.user.sendEmailVerification();
-        auth.signOut();
-      }
-    })
-    .catch((error) => {
-      if (error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
-        statusMessage.textContent = "Incorrect email or password. Please try again.";
-      } else {
-        statusMessage.textContent = error.message;
-      }
-    });
-});
-
-
-  document.getElementById("emailSignupBtn").addEventListener("click", () => {
-  const email = document.getElementById("signupEmail").value;
-  const password = document.getElementById("signupPassword").value;
-
-  auth.createUserWithEmailAndPassword(email, password)
-    .then((userCredential) => {
-      const user = userCredential.user;
-      user.sendEmailVerification()
+      auth.sendPasswordResetEmail(email)
         .then(() => {
-          statusMessage.textContent = `A verification email has been sent to ${email}. Please verify before logging in.`;
-          auth.signOut();
+          statusMessage.textContent = `A password reset link has been sent to ${email}. Please check your inbox.`;
         })
         .catch((error) => {
-          statusMessage.textContent = "Error sending verification email: " + error.message;
+          statusMessage.textContent = error.message;
         });
-    })
-    .catch((error) => {
-      if (error.code === 'auth/email-already-in-use') {
-        statusMessage.textContent = "This email is already in use. Please login instead.";
-        toggleForm();
-      } else {
-        statusMessage.textContent = error.message;
-      }
     });
-});
 
-
-  document.getElementById("forgotPasswordLink").addEventListener("click", () => {
-    const email = document.getElementById("email").value;
-    if (!email) {
-      statusMessage.textContent = "Please enter your email address first.";
-      return;
+    function toggleForm() {
+      const isLoginVisible = loginSection.style.display !== "none";
+      loginSection.style.display = isLoginVisible ? "none" : "flex";
+      signupSection.style.display = isLoginVisible ? "flex" : "none";
+      document.getElementById("title").textContent = isLoginVisible ? "Sign Up" : "Login";
+      statusMessage.textContent = "";
     }
-    auth.sendPasswordResetEmail(email)
-      .then(() => {
-        statusMessage.textContent = `A password reset link has been sent to ${email}. Please check your inbox.`;
-      })
-      .catch((error) => {
-        statusMessage.textContent = error.message;
-      });
-  });
 
-  function toggleForm() {
-    const isLoginVisible = loginSection.style.display !== "none";
-    loginSection.style.display = isLoginVisible ? "none" : "flex";
-    signupSection.style.display = isLoginVisible ? "flex" : "none";
-    document.getElementById("title").textContent = isLoginVisible ? "Sign Up" : "Login";
-    statusMessage.textContent = "";
-  }
-
-  document.getElementById("backToSubscription").addEventListener("click", () => {
-    firebase.auth().signOut();
-  });
-</script>
-
+    document.getElementById("backToSubscription").addEventListener("click", () => {
+      firebase.auth().signOut();
+    });
+  </script>
 </body>
 
 </html>
