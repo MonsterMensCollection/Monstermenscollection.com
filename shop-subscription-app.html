@@ -371,41 +371,53 @@
   });
 
   document.getElementById("emailLoginBtn").addEventListener("click", () => {
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-    auth.signInWithEmailAndPassword(email, password)
-      .catch((error) => {
-        if (error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
-          statusMessage.textContent = "Incorrect email or password. Please try again.";
-        } else {
-          statusMessage.textContent = error.message;
-        }
-      });
-  });
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  auth.signInWithEmailAndPassword(email, password)
+    .then((userCredential) => {
+      if (!userCredential.user.emailVerified) {
+        statusMessage.textContent = "Please verify your email before logging in. A new link has been sent.";
+        userCredential.user.sendEmailVerification();
+        auth.signOut();
+      }
+    })
+    .catch((error) => {
+      if (error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
+        statusMessage.textContent = "Incorrect email or password. Please try again.";
+      } else {
+        statusMessage.textContent = error.message;
+      }
+    });
+});
+
 
   document.getElementById("emailSignupBtn").addEventListener("click", () => {
-    const email = document.getElementById("signupEmail").value;
-    const password = document.getElementById("signupPassword").value;
-    auth.createUserWithEmailAndPassword(email, password)
-      .then((userCredential) => {
-        userCredential.user.sendEmailVerification()
-          .then(() => {
-            statusMessage.textContent = "Verification email sent. Please check your inbox.";
-            auth.signOut(); // Sign out immediately after registration
-          })
-          .catch((error) => {
-            statusMessage.textContent = "Failed to send verification email: " + error.message;
-          });
-      })
-      .catch((error) => {
-        if (error.code === 'auth/email-already-in-use') {
-          statusMessage.textContent = "This email is already in use. Please login instead.";
-          toggleForm();
-        } else {
-          statusMessage.textContent = error.message;
-        }
-      });
-  });
+  const email = document.getElementById("signupEmail").value;
+  const password = document.getElementById("signupPassword").value;
+
+  auth.createUserWithEmailAndPassword(email, password)
+    .then((userCredential) => {
+      const user = userCredential.user;
+      user.sendEmailVerification()
+        .then(() => {
+          statusMessage.textContent = `A verification email has been sent to ${email}. Please verify before logging in.`;
+          auth.signOut();
+        })
+        .catch((error) => {
+          statusMessage.textContent = "Error sending verification email: " + error.message;
+        });
+    })
+    .catch((error) => {
+      if (error.code === 'auth/email-already-in-use') {
+        statusMessage.textContent = "This email is already in use. Please login instead.";
+        toggleForm();
+      } else {
+        statusMessage.textContent = error.message;
+      }
+    });
+});
+
 
   document.getElementById("forgotPasswordLink").addEventListener("click", () => {
     const email = document.getElementById("email").value;
