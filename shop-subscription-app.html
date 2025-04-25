@@ -290,15 +290,17 @@
       auth.signInWithRedirect(provider);
     });
     
-     auth.getRedirectResult()
-      .then(result => {
-        if (result.user) {
-          updatePageForUser(result.user);
-        }
-      })
-      .catch(error => {
-        statusMessage.textContent = error.message;
-      });
+  document.getElementById("googleLoginBtn").addEventListener("click", () => {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(provider)
+    .then((result) => {
+      updatePageForUser(result.user);
+    })
+    .catch((error) => {
+      statusMessage.textContent = error.message;
+    });
+});
+
 
     async function checkSubscription(uid) {
       const doc = await db.collection("subscriptions").doc(uid).get();
