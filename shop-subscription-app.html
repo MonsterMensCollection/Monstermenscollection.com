@@ -382,26 +382,36 @@
     });
 
     document.getElementById("emailSignupBtn").addEventListener("click", () => {
-      const email = document.getElementById("signupEmail").value;
-      const password = document.getElementById("signupPassword").value;
-      auth.createUserWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-          const user = userCredential.user;
-          user.sendEmailVerification().then(() => {
-            alert("Verification email sent! Please check your inbox and verify before logging in.");
-            auth.signOut();
-            toggleForm();
-          });
+  const email = document.getElementById("signupEmail").value;
+  const password = document.getElementById("signupPassword").value;
+
+  auth.createUserWithEmailAndPassword(email, password)
+    .then((userCredential) => {
+      const user = userCredential.user;
+
+      user.sendEmailVerification()
+        .then(() => {
+          statusMessage.textContent = `A verification email has been sent to ${email}. Please verify before logging in.`;
+          signupSection.style.display = "none";
+          loginSection.style.display = "flex";
+          document.getElementById("title").textContent = "Login";
         })
         .catch((error) => {
-          if (error.code === 'auth/email-already-in-use') {
-            statusMessage.textContent = "This email is already in use. Please login instead.";
-            toggleForm();
-          } else {
-            statusMessage.textContent = error.message;
-          }
+          statusMessage.textContent = "Failed to send verification email: " + error.message;
         });
+
+      auth.signOut(); // Log out after sending email
+    })
+    .catch((error) => {
+      if (error.code === 'auth/email-already-in-use') {
+        statusMessage.textContent = "This email is already in use. Please login instead.";
+        toggleForm();
+      } else {
+        statusMessage.textContent = error.message;
+      }
     });
+});
+
 
     document.getElementById("forgotPasswordLink").addEventListener("click", () => {
       const email = document.getElementById("email").value;
