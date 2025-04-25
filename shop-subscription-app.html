@@ -18,6 +18,7 @@
     }
 
     body {
+      margin-top:200px;
       background-color: #f9f9f9;
       padding: 20px;
     }
@@ -104,8 +105,64 @@
     #productsPage {
       display: none;
     }
-
-    .admin-controls {
+    .container{
+        padding: 2rem;
+    }
+    .slider-wrapper{
+        position:relative;
+        max-width:48rem;
+        margin: 0 auto;
+        
+    }
+    .slider{
+        display: flex;
+        aspect-ratio: 1 / 1;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        scroll-behavior: smooth;
+        box-shadow: 0 1.5rem 3rem -0.75rem hsla(0,0%,0%,0.25);
+        border-radius: 0.5rem;
+    }
+    .slider img{
+        flex:1 0 100%;
+        scroll-snap-align: start;
+        object-fit: cover;
+    }
+    .slider-nav {
+        display: flex;
+        column-gap: 1rem;
+        position: absolute;
+        bottom: 1.25rem;
+        left: 50%;
+        transform: transulateX(-50%);
+        z-index: 1;
+        animation: slider 30s ease-in-out infinite alternate;
+    }
+    .slide-nav a {
+        width: 0.5rem;
+        height: 0.5rem;
+        border-radius: 50%;
+        background-color: #fff;
+        opacity: 0.75;
+        transition: opacity ease 250ms;
+    }
+    .slide-nav a:hover {
+        opacity: 1;
+    }
+    @keyframes slider{
+        0%{transform: transulateX(0%);}
+        10%{transform: transulateX(-100%);}
+        20%{transform: transulateX(-100%);}
+        30%{transform: transulateX(-200%);}
+        40%{transform: transulateX(-200%);}
+        50%{transform: transulateX(-200%);}
+        60%{transform: transulateX(-300%);}
+        70%{transform: transulateX(-300%);}
+        80%{transform: transulateX(-300%);}
+        90%{transform: transulateX(0%);}
+        100%{transform: transulateX(0%);}
+    }
+        .admin-controls {
       margin-top: 20px;
       padding: 10px;
       border: 1px solid #ccc;
@@ -120,7 +177,6 @@
     .product-item.hidden {
       display: none;
     }
-
     #logoutProductsBtn {
       margin-top: 30px;
     }
@@ -159,8 +215,22 @@
       </p>
     </div>
 
-    <div id="productsPage">
-      <h1>Products</h1>
+<div id="productsPage">
+      <h1>Monster Monthly<br>Mega Offer</h1>
+      <div class="slider-wrapper">
+          <div class="slider">
+            <img id="slide-1" src="https://images.pexels.com/photos/31300187/pexels-photo-31300187/free-photo-of-curious-meerkat-on-rocky-perch-at-zoo.jpeg" alt="3D rendering of an words"/>  
+            <img id="slide-2" src="https://images.pexels.com/photos/31300187/pexels-photo-31300187/free-photo-of-curious-meerkat-on-rocky-perch-at-zoo.jpeg" alt="3D rendering of an words"/> 
+            <img id="slide-3" src="https://images.pexels.com/photos/31300187/pexels-photo-31300187/free-photo-of-curious-meerkat-on-rocky-perch-at-zoo.jpeg" alt="3D rendering of an words"/> 
+            <img id="slide-4" src="https://images.pexels.com/photos/31300187/pexels-photo-31300187/free-photo-of-curious-meerkat-on-rocky-perch-at-zoo.jpeg" alt="3D rendering of an words"/> 
+          </div>
+          <div class="slider-nav">
+           <a href="#slide-1"></a>
+           <a href="#slide-2"></a> 
+           <a href="#slide-3"></a> 
+           <a href="#slide-4"></a> 
+          </div>
+      </div>
       <div class="product-list" id="productList">
         <div class="product-item">
           <h3>Classic Denim Jacket</h3>
@@ -170,10 +240,13 @@
           <h3>Graphic T-Shirt</h3>
           <p>Stylish and comfortable t-shirt with unique prints.</p>
         </div>
-        <div class="product-item">
-          <h3>Chino Pants</h3>
-          <p>Versatile chinos suitable for both office and casual wear.</p>
+        <div>
+        <h2><center>Contact:</h2>
+        <center>6380900310
+        <center>Monstermenscollection@gmail.com
         </div>
+        <h2><center>Address:</h2>
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d243.9928148729519!2d79.75464282113771!3d11.913088231976015!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a536197b55718a3%3A0xb1d567dddfc2f85c!2sMonster%20Men&#39;s%20Collection!5e0!3m2!1sen!2sin!4v1745178755178!5m2!1sen!2sin" width="415" height="300" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
       </div>
       <p class="form-section" id="logoutProductsBtn"><button id="backToSubscription">Logout</button></p>
     </div>
