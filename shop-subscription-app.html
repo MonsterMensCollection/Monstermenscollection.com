@@ -11,15 +11,13 @@
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <style>
      * {
-      
       box-sizing: border-box;
-      margin:0;
+      margin: 0;
       padding: 0;
       font-family: Arial, sans-serif;
     }
 
     body {
-      margin-top:200px;
       background-color: #f9f9f9;
       padding: 20px;
     }
@@ -43,7 +41,7 @@
     .confirmation,
     .status-message {
       text-align: center;
-      margin-bottom: 0px;
+      margin-bottom: 20px;
       font-size: 1rem;
       color: #555;
     }
@@ -106,63 +104,7 @@
     #productsPage {
       display: none;
     }
-    .container{
-        padding: 2rem;
-    }
-    .slider-wrapper{
-        position:relative;
-        max-width:48rem;
-        margin: 0 auto;
-        
-    }
-    .slider{
-        display: flex;
-        aspect-ratio: 1 / 1;
-        overflow-x: auto;
-        scroll-snap-type: x mandatory;
-        scroll-behavior: smooth;
-        box-shadow: 0 1.5rem 3rem -0.75rem hsla(0,0%,0%,0.25);
-        border-radius: 0.5rem;
-    }
-    .slider img{
-        flex:1 0 100%;
-        scroll-snap-align: start;
-        object-fit: cover;
-    }
-    .slider-nav {
-        display: flex;
-        column-gap: 1rem;
-        position: absolute;
-        bottom: 1.25rem;
-        left: 50%;
-        transform: transulateX(-50%);
-        z-index: 1;
-        animation: slider 30s ease-in-out infinite alternate;
-    }
-    .slide-nav a {
-        width: 0.5rem;
-        height: 0.5rem;
-        border-radius: 50%;
-        background-color: #fff;
-        opacity: 0.75;
-        transition: opacity ease 250ms;
-    }
-    .slide-nav a:hover {
-        opacity: 1;
-    }
-    @keyframes slider{
-        0%{transform: transulateX(0%);}
-        10%{transform: transulateX(-100%);}
-        20%{transform: transulateX(-100%);}
-        30%{transform: transulateX(-200%);}
-        40%{transform: transulateX(-200%);}
-        50%{transform: transulateX(-200%);}
-        60%{transform: transulateX(-300%);}
-        70%{transform: transulateX(-300%);}
-        80%{transform: transulateX(-300%);}
-        90%{transform: transulateX(0%);}
-        100%{transform: transulateX(0%);}
-    }
+
     .admin-controls {
       margin-top: 20px;
       padding: 10px;
@@ -206,10 +148,10 @@
     </div>
 
     <div id="subscriptionSection" style="display:none;">
-      <p class="info">Get any 1 shirt + any 1 Pant at ₹1099 per month <br> for unlimited times</p>
+      <p class="info">Subscribe monthly to receive special in-store discounts and offers.</p>
       <form class="form-section" id="subscriptionForm">
         <input type="text" id="name" placeholder="Your Name" required />
-        <button type="submit">Subscribe at ₹19 / month </button>
+        <button type="submit">Subscribe for $4.99/month</button>
       </form>
       <div class="confirmation" id="confirmationMessage"></div>
       <p class="form-section">
@@ -218,21 +160,7 @@
     </div>
 
     <div id="productsPage">
-      <h1>Monster Monthly<br>Mega Offer</h1>
-      <div class="slider-wrapper">
-          <div class="slider">
-            <img id="slide-1" src="https://images.pexels.com/photos/31300187/pexels-photo-31300187/free-photo-of-curious-meerkat-on-rocky-perch-at-zoo.jpeg" alt="3D rendering of an words"/>  
-            <img id="slide-2" src="https://images.pexels.com/photos/31300187/pexels-photo-31300187/free-photo-of-curious-meerkat-on-rocky-perch-at-zoo.jpeg" alt="3D rendering of an words"/> 
-            <img id="slide-3" src="https://images.pexels.com/photos/31300187/pexels-photo-31300187/free-photo-of-curious-meerkat-on-rocky-perch-at-zoo.jpeg" alt="3D rendering of an words"/> 
-            <img id="slide-4" src="https://images.pexels.com/photos/31300187/pexels-photo-31300187/free-photo-of-curious-meerkat-on-rocky-perch-at-zoo.jpeg" alt="3D rendering of an words"/> 
-          </div>
-          <div class="slider-nav">
-           <a href="#slide-1"></a>
-           <a href="#slide-2"></a> 
-           <a href="#slide-3"></a> 
-           <a href="#slide-4"></a> 
-          </div>
-      </div>
+      <h1>Products</h1>
       <div class="product-list" id="productList">
         <div class="product-item">
           <h3>Classic Denim Jacket</h3>
@@ -242,13 +170,10 @@
           <h3>Graphic T-Shirt</h3>
           <p>Stylish and comfortable t-shirt with unique prints.</p>
         </div>
-        <div>
-        <h2><center>Contact:</h2>
-        <center>6380900310
-        <center>Monstermenscollection@gmail.com
+        <div class="product-item">
+          <h3>Chino Pants</h3>
+          <p>Versatile chinos suitable for both office and casual wear.</p>
         </div>
-        <h2><center>Address:</h2>
-        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d243.9928148729519!2d79.75464282113771!3d11.913088231976015!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a536197b55718a3%3A0xb1d567dddfc2f85c!2sMonster%20Men&#39;s%20Collection!5e0!3m2!1sen!2sin!4v1745178755178!5m2!1sen!2sin" width="415" height="300" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
       </div>
       <p class="form-section" id="logoutProductsBtn"><button id="backToSubscription">Logout</button></p>
     </div>
@@ -259,7 +184,7 @@
     </div>
   </div>
 
- <script>
+  <script>
     const firebaseConfig = {
       apiKey: "AIzaSyDzW8XuqrxM47W42HcIUXifa_X8tnfrLkY",
       authDomain: "monster-mens-collection.firebaseapp.com",
@@ -284,23 +209,6 @@
 
     const adminEmails = ["youremail@example.com"];
 
-    document.getElementById("googleLoginBtn").addEventListener("click", () => {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      auth.signInWithRedirect(provider);
-    });
-    
-  document.getElementById("googleLoginBtn").addEventListener("click", () => {
-  const provider = new firebase.auth.GoogleAuthProvider();
-  auth.signInWithPopup(provider)
-    .then((result) => {
-      updatePageForUser(result.user);
-    })
-    .catch((error) => {
-      statusMessage.textContent = error.message;
-    });
-});
-
-
     async function checkSubscription(uid) {
       const doc = await db.collection("subscriptions").doc(uid).get();
       if (!doc.exists) return false;
@@ -315,11 +223,11 @@
       if (subscribed) {
         subscriptionSection.style.display = "none";
         productsPage.style.display = "block";
-        document.getElementById("title").textContent = "";
+        document.getElementById("title").textContent = "Our Products";
       } else {
         subscriptionSection.style.display = "block";
         productsPage.style.display = "none";
-        document.getElementById("title").textContent = "Premium Membership";
+        document.getElementById("title").textContent = "Join Our Discount Club!";
       }
       loginSection.style.display = "none";
       signupSection.style.display = "none";
@@ -342,7 +250,7 @@
 
       const options = {
         key: 'rzp_live_0M0qHSpzByvZAr',
-        amount: 19 * 100,
+        amount: 1 * 100,
         currency: 'INR',
         name: 'Monster Mens Collection',
         description: 'Monthly Subscription',
@@ -392,7 +300,7 @@
           if (error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
             statusMessage.textContent = "Incorrect email or password. Please try again.";
           } else {
-            statusMessage.textContent = "Incorrect email or password. Please try again.";
+            statusMessage.textContent = error.message;
           }
         });
     });
