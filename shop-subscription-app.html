@@ -1,6 +1,5 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -10,7 +9,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-firestore-compat.js"></script>
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <style>
-     * {
+    * {
       box-sizing: border-box;
       margin:2;
       padding: 0;
@@ -192,15 +191,19 @@
     }
   </style>
 </head>
-
 <body>
   <div class="container">
     <h1 id="title">Login</h1>
-
     <div id="loginSection" class="form-section">
       <input type="email" id="email" placeholder="Email" />
       <input type="password" id="password" placeholder="Password" />
       <button id="emailLoginBtn">Login</button>
+
+      <!-- Google Login Button -->
+      <button id="googleLoginBtn" style="background-color: #db4437; color: white;">
+        Login with Google
+      </button>
+
       <a href="#" id="forgotPasswordLink">Forgot Password?</a>
       <div id="statusMessage" class="status-message"></div>
       <p class="toggle-link" onclick="toggleForm()">Don't have an account? Sign Up</p>
@@ -213,7 +216,7 @@
       <p class="toggle-link" onclick="toggleForm()">Already have an account? Login</p>
     </div>
 
-    <div id="subscriptionSection" style="display:none;">
+ <div id="subscriptionSection" style="display:none;">
       <p class="info">Get any 1 Shirt + any 1 Pant at ₹999 <br><h3><center>UNLIMITED</h3></p>
       <form class="form-section" id="subscriptionForm">
         <input type="text" id="name" placeholder="Your Name" required />
@@ -258,6 +261,7 @@
       <h3>Admin Panel</h3>
       <button onclick="location.href='admin-dashboard.html'">Go to Dashboard</button>
     </div>
+
   </div>
 
   <script>
@@ -282,7 +286,6 @@
     const logoutBtn = document.getElementById("logoutBtn");
     const statusMessage = document.getElementById("statusMessage");
     const adminControls = document.getElementById("adminControls");
-
     const adminEmails = ["youremail@example.com"];
 
     async function checkSubscription(uid) {
@@ -296,7 +299,7 @@
 
     async function updatePageForUser(user) {
       await user.reload();
-      if (!user.emailVerified) {
+      if (!user.emailVerified && !user.providerData.some(p => p.providerId === 'google.com')) {
         alert("Please verify your email address before continuing.");
         auth.signOut();
         return;
@@ -326,7 +329,7 @@
       });
     }
 
-    document.getElementById("subscriptionForm").addEventListener("submit", async (e) => {
+    document.getElementById("subscriptionForm")?.addEventListener("submit", async (e) => {
       e.preventDefault();
       const name = document.getElementById("name").value;
       const email = auth.currentUser?.email || '';
@@ -357,7 +360,7 @@
       rzp.open();
     });
 
-    logoutBtn.addEventListener("click", () => {
+    logoutBtn?.addEventListener("click", () => {
       auth.signOut();
     });
 
@@ -386,36 +389,34 @@
     });
 
     document.getElementById("emailSignupBtn").addEventListener("click", () => {
-  const email = document.getElementById("signupEmail").value;
-  const password = document.getElementById("signupPassword").value;
+      const email = document.getElementById("signupEmail").value;
+      const password = document.getElementById("signupPassword").value;
 
-  auth.createUserWithEmailAndPassword(email, password)
-    .then((userCredential) => {
-      const user = userCredential.user;
+      auth.createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+          const user = userCredential.user;
+          user.sendEmailVerification()
+            .then(() => {
+              statusMessage.textContent = `A verification email has been sent to ${email}. Please verify before logging in.`;
+              signupSection.style.display = "none";
+              loginSection.style.display = "flex";
+              document.getElementById("title").textContent = "Login";
+            })
+            .catch((error) => {
+              statusMessage.textContent = "Failed to send verification email: " + error.message;
+            });
 
-      user.sendEmailVerification()
-        .then(() => {
-          statusMessage.textContent = `A verification email has been sent to ${email}. Please verify before logging in.`;
-          signupSection.style.display = "none";
-          loginSection.style.display = "flex";
-          document.getElementById("title").textContent = "Login";
+          auth.signOut(); // Log out after sending email
         })
         .catch((error) => {
-          statusMessage.textContent = "Failed to send verification email: " + error.message;
+          if (error.code === 'auth/email-already-in-use') {
+            statusMessage.textContent = "This email is already in use. Please login instead.";
+            toggleForm();
+          } else {
+            statusMessage.textContent = error.message;
+          }
         });
-
-      auth.signOut(); // Log out after sending email
-    })
-    .catch((error) => {
-      if (error.code === 'auth/email-already-in-use') {
-        statusMessage.textContent = "This email is already in use. Please login instead.";
-        toggleForm();
-      } else {
-        statusMessage.textContent = error.message;
-      }
     });
-});
-
 
     document.getElementById("forgotPasswordLink").addEventListener("click", () => {
       const email = document.getElementById("email").value;
@@ -432,6 +433,22 @@
         });
     });
 
+    document.getElementById("googleLoginBtn").addEventListener("click", () => {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithRedirect(provider);
+    });
+
+    auth.getRedirectResult()
+      .then(async (result) => {
+        if (result.user) {
+          await updatePageForUser(result.user);
+        }
+      })
+      .catch((error) => {
+        console.error("Google sign-in failed", error);
+        statusMessage.textContent = "Google sign-in failed: " + error.message;
+      });
+
     function toggleForm() {
       const isLoginVisible = loginSection.style.display !== "none";
       loginSection.style.display = isLoginVisible ? "none" : "flex";
@@ -440,10 +457,9 @@
       statusMessage.textContent = "";
     }
 
-    document.getElementById("backToSubscription").addEventListener("click", () => {
+    document.getElementById("backToSubscription")?.addEventListener("click", () => {
       firebase.auth().signOut();
     });
   </script>
 </body>
-
 </html>
