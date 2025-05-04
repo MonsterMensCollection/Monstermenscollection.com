@@ -18,7 +18,7 @@
     }
 
     body {
-      background-color: #f9f9f9;
+      background-color: #ffffff;
       padding: 20px;
     }
 
@@ -190,6 +190,11 @@
     iframe{
       border-radius: 10px;
     }
+    .no-box {
+  box-shadow: none !important;
+  background: transparent !important;
+  border-radius: 0 !important;
+}
   </style>
 </head>
 
@@ -301,17 +306,20 @@
         auth.signOut();
         return;
       }
-
       const subscribed = await checkSubscription(user.uid);
-      if (subscribed) {
-        subscriptionSection.style.display = "none";
-        productsPage.style.display = "block";
-        document.getElementById("title").textContent = "";
-      } else {
-        subscriptionSection.style.display = "block";
-        productsPage.style.display = "none";
-        document.getElementById("title").textContent = "PREMIUM MEMBERSHIP";
-      }
+      const container = document.querySelector(".container");
+
+if (subscribed) {
+  subscriptionSection.style.display = "none";
+  productsPage.style.display = "block";
+  document.getElementById("title").textContent = "";
+  container.classList.add("no-box");
+} else {
+  subscriptionSection.style.display = "block";
+  productsPage.style.display = "none";
+  document.getElementById("title").textContent = "PREMIUM MEMBERSHIP";
+  container.classList.remove("no-box");
+}
       loginSection.style.display = "none";
       signupSection.style.display = "none";
       adminControls.style.display = adminEmails.includes(user.email) ? "block" : "none";
