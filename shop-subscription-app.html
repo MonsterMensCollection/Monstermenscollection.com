@@ -192,6 +192,18 @@
   background: transparent !important;
   border-radius: 0 !important;
 }
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  padding: 10px;
+}
+
+.product-grid img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
   </style>
 </head>
 
@@ -230,13 +242,23 @@
     <div id="productsPage">
         <div id="shirtsPage" style="display: none;">
   <h2><center>Shirts Collection</center></h2>
-  <p>Showcase your shirt products here.</p>
+  <div class="product-grid">
+  <img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/image.jpg" alt="Shirt 1">
+  <img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/image.jpg" alt="Shirt 2">
+  <img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/image.jpg" alt="Shirt 3">
+  <img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/image.jpg" alt="Shirt 4">
+</div>
   <div class="form-section"><button onclick="backToProducts()">Back</button></div><br>
 </div>
 
 <div id="pantsPage" style="display: none;">
   <h2><center>Pants Collection</center></h2>
-  <p>Showcase your pant products here.</p>
+  <div class="product-grid">
+  <img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/image.jpg" alt="Shirt 1">
+  <img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/image.jpg" alt="Shirt 2">
+  <img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/image.jpg" alt="Shirt 3">
+  <img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/image.jpg" alt="Shirt 4">
+</div>
   <div class="form-section"><button onclick="backToProducts()">Back</button></div><br>
 </div>
           <div id="sliderSection" class="slider-wrapper">
