@@ -228,6 +228,23 @@
       height: 100%;
       border-radius: 8px;
     }
+    .product-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background: #fff;
+  margin: 5px;
+}
+
+.product-card .price {
+  margin-top: 8px;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #333;
+}
   </style>
 </head>
 <body>
@@ -264,24 +281,48 @@
 
     <div id="productsPage">
         <div id="shirtsPage" style="display: none;">
-  <h2><center>Shirts Collection</center></h2>
+  <h2><center>Shirts Collection</center></h2><br>
   <div class="product-grid">
-  <img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/Red%20and%20Black%20Ripped%20Paper%20Black%20Friday%20Flyer%20Portrait.png" alt="Shirt 1">
-  <img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/image.jpg" alt="Shirt 2">
-  <img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/image.jpg" alt="Shirt 3">
-  <img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/image.jpg" alt="Shirt 4">
-</div>
+  <div class="product-card">
+    <img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/Red%20and%20Black%20Ripped%20Paper%20Black%20Friday%20Flyer%20Portrait.png" alt="Shirt 1">
+    <p class="price">₹499</p>
+  </div>
+  <div class="product-card">
+    <img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/Red%20and%20Black%20Ripped%20Paper%20Black%20Friday%20Flyer%20Portrait.png" alt="Shirt 2">
+    <p class="price">₹499</p>
+  </div>
+  <div class="product-card">
+    <img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/Red%20and%20Black%20Ripped%20Paper%20Black%20Friday%20Flyer%20Portrait.png" alt="Shirt 3">
+    <p class="price">₹499</p>
+  </div>
+  <div class="product-card">
+    <img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/Red%20and%20Black%20Ripped%20Paper%20Black%20Friday%20Flyer%20Portrait.png" alt="Shirt 4">
+    <p class="price">₹499</p>
+  </div>
+</div><br>
   <div class="form-section"><button onclick="backToProducts()">Back</button></div><br>
 </div>
 
 <div id="pantsPage" style="display: none;">
-  <h2><center>Pants Collection</center></h2>
+  <h2><center>Pants Collection</center></h2><br>
   <div class="product-grid">
-  <img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/image.jpg" alt="Shirt 1">
-  <img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/image.jpg" alt="Shirt 2">
-  <img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/image.jpg" alt="Shirt 3">
-  <img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/image.jpg" alt="Shirt 4">
-</div>
+  <div class="product-card">
+    <img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/Red%20and%20Black%20Ripped%20Paper%20Black%20Friday%20Flyer%20Portrait.png" alt="Shirt 1">
+    <p class="price">₹499</p>
+  </div>
+  <div class="product-card">
+    <img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/Red%20and%20Black%20Ripped%20Paper%20Black%20Friday%20Flyer%20Portrait.png" alt="Shirt 2">
+    <p class="price">₹499</p>
+  </div>
+  <div class="product-card">
+    <img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/Red%20and%20Black%20Ripped%20Paper%20Black%20Friday%20Flyer%20Portrait.png" alt="Shirt 3">
+    <p class="price">₹499</p>
+  </div>
+  <div class="product-card">
+    <img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/Red%20and%20Black%20Ripped%20Paper%20Black%20Friday%20Flyer%20Portrait.png" alt="Shirt 4">
+    <p class="price">₹499</p>
+  </div>
+</div><br>
   <div class="form-section"><button onclick="backToProducts()">Back</button></div><br>
 </div>
           <div id="sliderSection" class="slider-wrapper">
