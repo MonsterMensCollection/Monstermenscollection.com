@@ -313,8 +313,6 @@
   <div style="text-align: center;">
     <img id="descImage" src="" style="max-width: 80%; border-radius: 12px;" />
     <p class="price" id="descPrice">₹0</p>
-    <input type="text" id="buyerName" placeholder="Your Name" style="margin: 10px 0; padding: 10px; width: 80%;" />
-<input type="text" id="buyerAddress" placeholder="Your Address" style="margin: 10px 0; padding: 10px; width: 80%;" />
    <div style="margin-top: 16px;">
   <button onclick="buyNow()">Buy Now</button>
   <button onclick="addToCart()">Add to Cart</button>
@@ -394,28 +392,20 @@ let cart = [];
     document.getElementById("sliderSection").style.display = "none";
   }
 
-  
 function addToCart() {
   const image = document.getElementById('descImage').src;
   const price = parseInt(document.getElementById('descPrice').innerText.replace('₹', ''));
-  const name = document.getElementById('buyerName').value;
-  const address = document.getElementById('buyerAddress').value;
 
-  if (!name || !address) {
-    alert('Please enter your name and address before adding to cart.');
-    return;
-  }
-
-  cart.push({ image, price, name, address });
+  cart.push({ image, price });
   alert('Item added to cart!');
 }
 
 function showCart() {
   document.getElementById("descriptionPage").style.display = "none";
-    document.getElementById("productList").style.display = "none";
-    document.getElementById("shirtsPage").style.display = "none";
-    document.getElementById("pantsPage").style.display = "none";
-    document.getElementById("sliderSection").style.display = "none";
+  document.getElementById("productList").style.display = "none";
+  document.getElementById("shirtsPage").style.display = "none";
+  document.getElementById("pantsPage").style.display = "none";
+  document.getElementById("sliderSection").style.display = "none";
   document.getElementById("cartPage").style.display = "block";
 
   const cartItemsDiv = document.getElementById("cartItems");
@@ -429,14 +419,16 @@ function showCart() {
       <div style="margin-bottom: 15px;">
         <img src="${item.image}" style="max-width: 100px; border-radius: 6px;" />
         <p><strong>Price:</strong> ₹${item.price}</p>
-        <p><strong>Name:</strong> ${item.name}</p>
-        <p><strong>Address:</strong> ${item.address}</p>
       </div>
     `;
     cartItemsDiv.innerHTML += itemHTML;
   });
 
-  cartItemsDiv.innerHTML += `<h3>Total: ₹${total}</h3>`;
+  cartItemsDiv.innerHTML += `
+    <h3>Total: ₹${total}</h3>
+    <input type="text" id="checkoutName" placeholder="Your Name" style="padding:10px; width:100%; margin-top:10px;" />
+    <input type="text" id="checkoutAddress" placeholder="Your Address" style="padding:10px; width:100%; margin-top:10px;" />
+  `;
 }
 
 function hideCart() {
@@ -444,8 +436,15 @@ function hideCart() {
   document.getElementById("productList").style.display = "block";
   document.getElementById("sliderSection").style.display = "block";
 }
-
 function checkoutCart() {
+  const name = document.getElementById("checkoutName").value;
+  const address = document.getElementById("checkoutAddress").value;
+
+  if (!name || !address) {
+    alert("Please enter name and address to continue.");
+    return;
+  }
+
   const totalAmount = cart.reduce((sum, item) => sum + item.price, 0) * 100; // in paisa
 
   if (totalAmount === 0) {
@@ -454,7 +453,7 @@ function checkoutCart() {
   }
 
   const options = {
-    key: 'rzp_live_0M0qHSpzByvZAr', // Replace with your Razorpay key
+    key: 'rzp_live_0M0qHSpzByvZAr',
     amount: totalAmount,
     currency: "INR",
     name: "Monster Men's Collection",
@@ -462,13 +461,25 @@ function checkoutCart() {
     image: "https://your-logo-url.com/logo.png",
     handler: function (response) {
       alert("Payment Successful!\nPayment ID: " + response.razorpay_payment_id);
+
+      // Save to Firebase
+      const user = auth.currentUser;
+      if (user) {
+        db.collection("orders").add({
+          uid: user.uid,
+          name: name,
+          address: address,
+          cart: cart,
+          paymentId: response.razorpay_payment_id,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      }
+
       cart = [];
       hideCart();
     },
     prefill: {
-      name: cart[0].name,
-      email: "", // Optional
-      contact: "" // Optional
+      name: name
     },
     theme: {
       color: "#007bff"
