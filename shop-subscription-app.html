@@ -381,16 +381,7 @@ function backToProducts() {
   document.getElementById("pantsPage").style.display = "none";
   document.getElementById("sliderSection").style.display = "block";
 }
-function showDescriptionPage(imageUrl, price) {
-  document.getElementById("productList").style.display = "none";
-  document.getElementById("shirtsPage").style.display = "none";
-  document.getElementById("pantsPage").style.display = "none";
-  document.getElementById("sliderSection").style.display = "none";
-  document.getElementById("descriptionPage").style.display = "block";
 
-  document.getElementById("descImage").src = imageUrl;
-  document.getElementById("descPrice").textContent = price;
-}
 let cart = [];
 
   function showDescriptionPage(imageUrl, price) {
@@ -403,55 +394,90 @@ let cart = [];
     document.getElementById("sliderSection").style.display = "none";
   }
 
-  function addToCart() {
-    const image = document.getElementById("descImage").src;
-    const price = document.getElementById("descPrice").textContent;
-    const name = document.getElementById("buyerName").value || "No Name";
-    const address = document.getElementById("buyerAddress").value || "No Address";
+  
+function addToCart() {
+  const image = document.getElementById('descImage').src;
+  const price = parseInt(document.getElementById('descPrice').innerText.replace('₹', ''));
+  const name = document.getElementById('buyerName').value;
+  const address = document.getElementById('buyerAddress').value;
 
-    const item = { image, price, name, address };
-    cart.push(item);
-    alert("Item added to cart!");
+  if (!name || !address) {
+    alert('Please enter your name and address before adding to cart.');
+    return;
   }
 
-  function showCart() {
-    document.getElementById("descriptionPage").style.display = "none";
+  cart.push({ image, price, name, address });
+  alert('Item added to cart!');
+}
+
+function showCart() {
+  document.getElementById("descriptionPage").style.display = "none";
     document.getElementById("productList").style.display = "none";
     document.getElementById("shirtsPage").style.display = "none";
     document.getElementById("pantsPage").style.display = "none";
     document.getElementById("sliderSection").style.display = "none";
+  document.getElementById("cartPage").style.display = "block";
 
-    const cartItemsDiv = document.getElementById("cartItems");
-    cartItemsDiv.innerHTML = "";
+  const cartItemsDiv = document.getElementById("cartItems");
+  cartItemsDiv.innerHTML = '';
 
-    if (cart.length === 0) {
-      cartItemsDiv.innerHTML = "<p>Your cart is empty.</p>";
-    } else {
-      cart.forEach((item, index) => {
-        const div = document.createElement("div");
-        div.innerHTML = `
-          <img src="${item.image}" style="max-width: 100px; border-radius: 8px;" />
-          <p>Price: ${item.price}</p>
-          <p>Name: ${item.name}</p>
-          <p>Address: ${item.address}</p>
-          <hr/>
-        `;
-        cartItemsDiv.appendChild(div);
-      });
+  let total = 0;
+
+  cart.forEach((item, index) => {
+    total += item.price;
+    const itemHTML = `
+      <div style="margin-bottom: 15px;">
+        <img src="${item.image}" style="max-width: 100px; border-radius: 6px;" />
+        <p><strong>Price:</strong> ₹${item.price}</p>
+        <p><strong>Name:</strong> ${item.name}</p>
+        <p><strong>Address:</strong> ${item.address}</p>
+      </div>
+    `;
+    cartItemsDiv.innerHTML += itemHTML;
+  });
+
+  cartItemsDiv.innerHTML += `<h3>Total: ₹${total}</h3>`;
+}
+
+function hideCart() {
+  document.getElementById("cartPage").style.display = "none";
+  document.getElementById("productList").style.display = "block";
+  document.getElementById("sliderSection").style.display = "block";
+}
+
+function checkoutCart() {
+  const totalAmount = cart.reduce((sum, item) => sum + item.price, 0) * 100; // in paisa
+
+  if (totalAmount === 0) {
+    alert('Cart is empty!');
+    return;
+  }
+
+  const options = {
+    key: 'rzp_live_0M0qHSpzByvZAr', // Replace with your Razorpay key
+    amount: totalAmount,
+    currency: "INR",
+    name: "Monster Men's Collection",
+    description: "Cart Checkout",
+    image: "https://your-logo-url.com/logo.png",
+    handler: function (response) {
+      alert("Payment Successful!\nPayment ID: " + response.razorpay_payment_id);
+      cart = [];
+      hideCart();
+    },
+    prefill: {
+      name: cart[0].name,
+      email: "", // Optional
+      contact: "" // Optional
+    },
+    theme: {
+      color: "#007bff"
     }
+  };
 
-    document.getElementById("cartPage").style.display = "block";
-  }
-
-  function hideCart() {
-    document.getElementById("cartPage").style.display = "none";
-    backToProducts();
-  }
-
-  function checkoutCart() {
-    alert("Proceeding to checkout with " + cart.length + " item(s).");
-    // Add Razorpay integration here if needed
-  }
+  const rzp = new Razorpay(options);
+  rzp.open();
+}
      const firebaseConfig = {
       apiKey: "AIzaSyDzW8XuqrxM47W42HcIUXifa_X8tnfrLkY",
       authDomain: "monster-mens-collection.firebaseapp.com",
