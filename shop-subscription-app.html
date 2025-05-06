@@ -267,11 +267,11 @@
   <h2><center>Shirts Collection</center></h2>
  <div class="product-grid">
   <div class="product-card">
-    <img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/Red%20and%20Black%20Ripped%20Paper%20Black%20Friday%20Flyer%20Portrait.png" alt="Shirt 1"onclick="showDescriptionPage(this.src, '₹499')">
+    <img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/Red%20and%20Black%20Ripped%20Paper%20Black%20Friday%20Flyer%20Portrait.png" alt="Shirt 1"onclick="showDescriptionPage(this.src, '₹499','shirts')">
     <p class="price">₹499</p>
   </div>
   <div class="product-card">
-    <img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/Red%20and%20Black%20Ripped%20Paper%20Black%20Friday%20Flyer%20Portrait.png" alt="Shirt 2"onclick="showDescriptionPage(this.src, '₹499')">
+    <img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/Red%20and%20Black%20Ripped%20Paper%20Black%20Friday%20Flyer%20Portrait.png" alt="Shirt 2"onclick="showDescriptionPage(this.src, '₹499','shirts')">
     <p class="price">₹499</p>
   </div>
   <div class="product-card">
@@ -283,7 +283,7 @@
     <p class="price">₹499</p>
   </div>
 </div><br>
-  <div class="form-section"><button onclick="backToProducts()">Back</button></div><br>
+  <div class="form-section"><button onclick="hideCart()">Back</button></div><br>
 </div>
 
 <div id="pantsPage" style="display: none;">
@@ -306,7 +306,7 @@
     <p class="price">₹499</p>
   </div>
 </div><br>
-  <div class="form-section"><button onclick="backToProducts()">Back</button></div><br>
+  <div class="form-section"><button onclick="hideCart()">Back</button></div><br>
  </div>
  <div id="descriptionPage" style="display: none; padding: 16px;">
   <h2 id="descTitle"><center>Product Description</center></h2>
@@ -358,7 +358,11 @@
     </div>
   </div>
   <script>
-  function showShirtsPage() {
+  let currentCategory = ''; // 'shirts' or 'pants'
+
+function showShirtsPage() {
+  currentCategory = 'shirts';
+  history.pushState({ page: 'shirts' }, '', '?category=shirts');
   document.getElementById("productList").style.display = "none";
   document.getElementById("shirtsPage").style.display = "block";
   document.getElementById("pantsPage").style.display = "none";
@@ -366,31 +370,61 @@
 }
 
 function showPantsPage() {
+  currentCategory = 'pants';
+  history.pushState({ page: 'pants' }, '', '?category=pants');
   document.getElementById("productList").style.display = "none";
-  document.getElementById("pantsPage").style.display = "block";
   document.getElementById("shirtsPage").style.display = "none";
+  document.getElementById("pantsPage").style.display = "block";
   document.getElementById("sliderSection").style.display = "none";
 }
 
+window.onpopstate = function(event) {
+  const state = event.state;
+  
+  if (!state) {
+    // Default: show product list
+    document.getElementById("descriptionPage").style.display = "none";
+    document.getElementById("cartPage").style.display = "none";
+    document.getElementById("shirtsPage").style.display = "none";
+    document.getElementById("pantsPage").style.display = "none";
+    document.getElementById("productList").style.display = "block";
+    document.getElementById("sliderSection").style.display = "block";
+  } else if (state.page === 'description') {
+    currentCategory = state.category;
+    backToProducts(); // reuse your function to show previous category
+  } else if (state.page === 'cart') {
+    showCart();
+  } else if (state.page === 'shirts') {
+    showShirtsPage();
+  } else if (state.page === 'pants') {
+    showPantsPage();
+  }
+};
+
 function backToProducts() {
-  document.getElementById("descriptionPage").style.display = "none"; // Hide description page
-  document.getElementById("productList").style.display = "block";
-  document.getElementById("shirtsPage").style.display = "none";
-  document.getElementById("pantsPage").style.display = "none";
-  document.getElementById("sliderSection").style.display = "block";
+  document.getElementById("descriptionPage").style.display = "none";
+  if (currentCategory === 'shirts') {
+    document.getElementById("shirtsPage").style.display = "block";
+  } else if (currentCategory === 'pants') {
+    document.getElementById("pantsPage").style.display = "block";
+  }else{
+      document.getElementById("productList").style.display = "block";
+    document.getElementById("sliderSection").style.display = "block";
+}
 }
 
 let cart = [];
-
-  function showDescriptionPage(imageUrl, price) {
-    document.getElementById("descImage").src = imageUrl;
-    document.getElementById("descPrice").textContent = price;
-    document.getElementById("descriptionPage").style.display = "block";
-    document.getElementById("productList").style.display = "none";
-    document.getElementById("shirtsPage").style.display = "none";
-    document.getElementById("pantsPage").style.display = "none";
-    document.getElementById("sliderSection").style.display = "none";
-  }
+function showDescriptionPage(imageUrl, price, category) {
+  history.pushState({ page: 'description', category }, '', '');
+  currentCategory = category;
+  document.getElementById("descImage").src = imageUrl;
+  document.getElementById("descPrice").textContent = price;
+  document.getElementById("descriptionPage").style.display = "block";
+  document.getElementById("productList").style.display = "none";
+  document.getElementById("shirtsPage").style.display = "none";
+  document.getElementById("pantsPage").style.display = "none";
+  document.getElementById("sliderSection").style.display = "none";
+}
 
 function addToCart() {
   const image = document.getElementById('descImage').src;
@@ -399,8 +433,7 @@ function addToCart() {
   cart.push({ image, price });
   alert('Item added to cart!');
 }
-
-function showCart() {
+function showCart() {history.pushState({ page: 'cart' }, '', '');
   document.getElementById("descriptionPage").style.display = "none";
   document.getElementById("productList").style.display = "none";
   document.getElementById("shirtsPage").style.display = "none";
@@ -433,8 +466,22 @@ function showCart() {
 
 function hideCart() {
   document.getElementById("cartPage").style.display = "none";
-  document.getElementById("productList").style.display = "block";
-  document.getElementById("sliderSection").style.display = "block";
+
+  if (currentCategory === 'shirts') {
+    document.getElementById("shirtsPage").style.display = "block";
+    document.getElementById("pantsPage").style.display = "none";
+    document.getElementById("sliderSection").style.display = "none";
+  } else if (currentCategory === 'pants') {
+    document.getElementById("pantsPage").style.display = "block";
+    document.getElementById("shirtsPage").style.display = "none";
+    document.getElementById("sliderSection").style.display = "none";
+  } else {
+    // Fallback to main list
+    document.getElementById("productList").style.display = "block";
+    document.getElementById("sliderSection").style.display = "block";
+    document.getElementById("shirtsPage").style.display = "none";
+    document.getElementById("pantsPage").style.display = "none";
+  }
 }
 function checkoutCart() {
   const name = document.getElementById("checkoutName").value;
