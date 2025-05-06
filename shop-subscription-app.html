@@ -267,11 +267,11 @@
   <h2><center>Shirts Collection</center></h2>
  <div class="product-grid">
   <div class="product-card">
-    <img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/Red%20and%20Black%20Ripped%20Paper%20Black%20Friday%20Flyer%20Portrait.png" alt="Shirt 1">
+    <img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/Red%20and%20Black%20Ripped%20Paper%20Black%20Friday%20Flyer%20Portrait.png" alt="Shirt 1"onclick="showDescriptionPage(this.src, '₹499')">
     <p class="price">₹499</p>
   </div>
   <div class="product-card">
-    <img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/Red%20and%20Black%20Ripped%20Paper%20Black%20Friday%20Flyer%20Portrait.png" alt="Shirt 2">
+    <img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/Red%20and%20Black%20Ripped%20Paper%20Black%20Friday%20Flyer%20Portrait.png" alt="Shirt 2"onclick="showDescriptionPage(this.src, '₹499')">
     <p class="price">₹499</p>
   </div>
   <div class="product-card">
@@ -307,6 +307,21 @@
   </div>
 </div><br>
   <div class="form-section"><button onclick="backToProducts()">Back</button></div><br>
+ </div>
+ <div id="descriptionPage" style="display: none; padding: 16px;">
+  <h2 id="descTitle"><center>Product Description</center></h2>
+  <div style="text-align: center;">
+    <img id="descImage" src="" style="max-width: 80%; border-radius: 12px;" />
+    <p class="price" id="descPrice">₹0</p>
+    <input type="text" id="buyerName" placeholder="Your Name" style="margin: 10px 0; padding: 10px; width: 80%;" />
+<input type="text" id="buyerAddress" placeholder="Your Address" style="margin: 10px 0; padding: 10px; width: 80%;" />
+   <div style="margin-top: 16px;">
+  <button onclick="buyNow()">Buy Now</button>
+  <button onclick="addToCart()">Add to Cart</button>
+  <button onclick="backToProducts()">Back</button>
+  <button onclick="showCart()">View Cart</button>
+  </div>
+ </div>
 </div>
           <div id="sliderSection" class="slider-wrapper">
           <div class="slider">
@@ -323,6 +338,7 @@
   <div class="form-section">
   <button onclick="showShirtsPage()">View Shirts</button>
   <button onclick="showPantsPage()">View Pants</button>
+  <button onclick="showCart()">View Cart</button>
 </div>
   <h2><center><br>Contact:</h2><center>6380900310<br>Monstermenscollection@gmail.com<br>
   <h2><center><br>Location:</h2><br>
@@ -331,13 +347,18 @@
   </div>
   <p class="form-section" id="logoutProductsBtn"><button id="backToSubscription">Logout</button></p>
 </div>
-
+<div id="cartPage" style="display: none; padding: 20px;">
+  <h2><center>Your Cart</center></h2>
+  <div id="cartItems"></div>
+  <br>
+  <button onclick="hideCart()">Back to Products</button>
+  <button onclick="checkoutCart()">Checkout</button>
+</div>
     <div id="adminControls" class="admin-controls" style="display:none;">
       <h3>Admin Panel</h3>
       <button onclick="location.href='admin-dashboard.html'">Go to Dashboard</button>
     </div>
   </div>
-
   <script>
   function showShirtsPage() {
   document.getElementById("productList").style.display = "none";
@@ -354,12 +375,84 @@ function showPantsPage() {
 }
 
 function backToProducts() {
+  document.getElementById("descriptionPage").style.display = "none"; // Hide description page
   document.getElementById("productList").style.display = "block";
   document.getElementById("shirtsPage").style.display = "none";
   document.getElementById("pantsPage").style.display = "none";
   document.getElementById("sliderSection").style.display = "block";
 }
-    const firebaseConfig = {
+function showDescriptionPage(imageUrl, price) {
+  document.getElementById("productList").style.display = "none";
+  document.getElementById("shirtsPage").style.display = "none";
+  document.getElementById("pantsPage").style.display = "none";
+  document.getElementById("sliderSection").style.display = "none";
+  document.getElementById("descriptionPage").style.display = "block";
+
+  document.getElementById("descImage").src = imageUrl;
+  document.getElementById("descPrice").textContent = price;
+}
+let cart = [];
+
+  function showDescriptionPage(imageUrl, price) {
+    document.getElementById("descImage").src = imageUrl;
+    document.getElementById("descPrice").textContent = price;
+    document.getElementById("descriptionPage").style.display = "block";
+    document.getElementById("productList").style.display = "none";
+    document.getElementById("shirtsPage").style.display = "none";
+    document.getElementById("pantsPage").style.display = "none";
+    document.getElementById("sliderSection").style.display = "none";
+  }
+
+  function addToCart() {
+    const image = document.getElementById("descImage").src;
+    const price = document.getElementById("descPrice").textContent;
+    const name = document.getElementById("buyerName").value || "No Name";
+    const address = document.getElementById("buyerAddress").value || "No Address";
+
+    const item = { image, price, name, address };
+    cart.push(item);
+    alert("Item added to cart!");
+  }
+
+  function showCart() {
+    document.getElementById("descriptionPage").style.display = "none";
+    document.getElementById("productList").style.display = "none";
+    document.getElementById("shirtsPage").style.display = "none";
+    document.getElementById("pantsPage").style.display = "none";
+    document.getElementById("sliderSection").style.display = "none";
+
+    const cartItemsDiv = document.getElementById("cartItems");
+    cartItemsDiv.innerHTML = "";
+
+    if (cart.length === 0) {
+      cartItemsDiv.innerHTML = "<p>Your cart is empty.</p>";
+    } else {
+      cart.forEach((item, index) => {
+        const div = document.createElement("div");
+        div.innerHTML = `
+          <img src="${item.image}" style="max-width: 100px; border-radius: 8px;" />
+          <p>Price: ${item.price}</p>
+          <p>Name: ${item.name}</p>
+          <p>Address: ${item.address}</p>
+          <hr/>
+        `;
+        cartItemsDiv.appendChild(div);
+      });
+    }
+
+    document.getElementById("cartPage").style.display = "block";
+  }
+
+  function hideCart() {
+    document.getElementById("cartPage").style.display = "none";
+    backToProducts();
+  }
+
+  function checkoutCart() {
+    alert("Proceeding to checkout with " + cart.length + " item(s).");
+    // Add Razorpay integration here if needed
+  }
+     const firebaseConfig = {
       apiKey: "AIzaSyDzW8XuqrxM47W42HcIUXifa_X8tnfrLkY",
       authDomain: "monster-mens-collection.firebaseapp.com",
       projectId: "monster-mens-collection",
@@ -534,7 +627,6 @@ if (subscribed) {
           statusMessage.textContent = error.message;
         });
     });
-
     function toggleForm() {
       const isLoginVisible = loginSection.style.display !== "none";
       loginSection.style.display = isLoginVisible ? "none" : "flex";
