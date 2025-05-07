@@ -329,7 +329,7 @@
   </div>
 </div>
  </div>
- <div id="descriptionPage" style="display: none; padding: 16px;">
+ <div id="descriptionPage" style="display: none; padding: 16px;"class="form-section">
   <h2 id="descTitle"><center>Product Description</center></h2>
   <div style="text-align: center;">
     <img id="descImage" src="" style="max-width: 80%; border-radius: 12px;" />
@@ -360,13 +360,13 @@
     <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1951.9412388138983!2d79.75375512746827!3d11.913266345081821!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a536197b55718a3%3A0xb1d567dddfc2f85c!2sMonster%20Men&#39;s%20Collection!5e0!3m2!1sen!2sin!4v1746009236221!5m2!1sen!2sin" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
   </div>
 </div>
-<div id="cartPage" style="display: none; padding: 20px;">
+<div id="cartPage" style="display: none; padding: 20px;" class="form-section" >
   <h2><center>Your Cart</center></h2>
   <div id="cartItems"></div>
   <br>
   <button onclick="checkoutCart()">Checkout</button>
 </div>
-<div id="profilePage" style="display: none; padding: 20px;">
+<div id="profilePage" style="display: none; padding: 20px;" class="form-section">
   <h2><center>Your Profile</center></h2>
   <p><strong>Name:</strong> <span id="profileName">Loading...</span></p>
   <p><strong>Email:</strong> <span id="profileEmail">Loading...</span></p>
@@ -386,6 +386,7 @@ function showShirtsPage() {
   document.getElementById("sliderSection").style.display = "none";
    document.getElementById("cartPage").style.display = "none";
    document.getElementById("profilePage").style.display = "none";
+   document.getElementById("descriptionPage").style.display = "none";
 }
 
 function showPantsPage() {
@@ -395,6 +396,7 @@ function showPantsPage() {
   document.getElementById("sliderSection").style.display = "none";
    document.getElementById("cartPage").style.display = "none";
    document.getElementById("profilePage").style.display = "none";
+   document.getElementById("descriptionPage").style.display = "none";
 }
 
 function backToProducts() {
