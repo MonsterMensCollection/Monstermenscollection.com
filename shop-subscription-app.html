@@ -535,6 +535,8 @@ function showProfilePage() {
     document.getElementById("sliderSection").style.display = "none";
     document.getElementById("cartPage").style.display = "none";
     document.getElementById("profilePage").style.display = "block";
+    document.getElementById("shirtsPage").style.display = "none";
+    document.getElementById("pantsPage").style.display = "none";
   }
 }
 function logout() {
@@ -643,7 +645,6 @@ if (subscribed) {
       const rzp = new Razorpay(options);
       rzp.open();
     });
-
     logoutBtn.addEventListener("click", () => {
       auth.signOut();
     });
