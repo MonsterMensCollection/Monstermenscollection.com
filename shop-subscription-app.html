@@ -265,6 +265,7 @@
     </div>
 
     <div id="signupSection" class="form-section" style="display: none;">
+      <input type="text" id="signupName" placeholder="Enter your name" required>
       <input type="email" id="signupEmail" placeholder="Email" />
       <input type="password" id="signupPassword" placeholder="Password" />
       <button id="emailSignupBtn">Sign Up</button>
@@ -676,12 +677,23 @@ if (subscribed) {
     });
 
     document.getElementById("emailSignupBtn").addEventListener("click", () => {
+  const name = document.getElementById("signupName").value;
   const email = document.getElementById("signupEmail").value;
   const password = document.getElementById("signupPassword").value;
 
   auth.createUserWithEmailAndPassword(email, password)
     .then((userCredential) => {
       const user = userCredential.user;
+
+      // Save name and email to Firestore
+      db.collection("users").doc(user.uid).set({
+        name: name,
+        email: email
+      }).then(() => {
+        console.log("User data saved to Firestore.");
+      }).catch((error) => {
+        console.error("Error saving user data to Firestore: ", error);
+      });
 
       user.sendEmailVerification()
         .then(() => {
@@ -705,8 +717,6 @@ if (subscribed) {
       }
     });
 });
-
-
     document.getElementById("forgotPasswordLink").addEventListener("click", () => {
       const email = document.getElementById("email").value;
       if (!email) {
