@@ -392,13 +392,39 @@
   <br>
   <button onclick="logout()">Logout</button>
 </div>
-<div class="bottom-nav" id="bottomNav" style="margin-left:-5%;margin-right:-5%;" >
-  <a href="#" onclick="backToProducts()">Home</a>    
-  <a href="#" onclick="showShirtsPage()">Shirts</a>
-  <a href="#" onclick="showPantsPage()">Pants</a>
-  <a href="#" onclick="showCart()">Cart</a>
-  <a href="#" onclick="showProfilePage()"><img src="https://raw.githubusercontent.com/MonsterMensCollection/Monstermenscollection.com/refs/heads/main/profile%20(4).jpg"></a>
-  </div>
+<div class="bottom-nav" id="bottomNav" style="margin-left:-5%;margin-right:-5%;">
+  <a href="#" onclick="backToProducts()">
+    <div style="display: flex; flex-direction: column; align-items: center;">
+      <img src="https://img.icons8.com/ios-filled/50/007bff/home.png" width="24" alt="Home"/>
+      <span>Home</span>
+    </div>
+  </a>
+  <a href="#" onclick="showShirtsPage()">
+    <div style="display: flex; flex-direction: column; align-items: center;">
+      <img src="https://img.icons8.com/ios-filled/50/007bff/t-shirt.png" width="24" alt="Shirts"/>
+      <span>Shirts</span>
+    </div>
+  </a>
+  <a href="#" onclick="showPantsPage()">
+    <div style="display: flex; flex-direction: column; align-items: center;">
+      <img src="https://img.icons8.com/ios-filled/50/007bff/trousers.png" width="24" alt="Pants"/>
+      <span>Pants</span>
+    </div>
+  </a>
+  <a href="#" onclick="showCart()">
+    <div style="display: flex; flex-direction: column; align-items: center;">
+      <img src="https://img.icons8.com/ios-filled/50/007bff/shopping-cart.png" width="24" alt="Cart"/>
+      <span>Cart</span>
+    </div>
+  </a>
+  <a href="#" onclick="showProfilePage()">
+    <div style="display: flex; flex-direction: column; align-items: center;">
+      <img src="https://img.icons8.com/ios-filled/50/007bff/user.png" width="24" alt="Profile"/>
+      <span>Profile</span>
+    </div>
+  </a>
+</div>
+
 </div>
     <div id="adminControls" class="admin-controls" style="display:none;">
       <h3>Admin Panel</h3>
