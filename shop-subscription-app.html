@@ -19,8 +19,17 @@
       margin: 0;
       padding:0;
       padding-bottom: 130px ; /* Adjust if your .bottom-nav is taller */
-    
+      height: 100%;
+      overflow-x: hidden;
      }
+     #cartPage,
+#profilePage,
+#shirtsPage,
+#pantsPage,
+#descriptionPage,
+#productList {
+  min-height: calc(100vh - 130px); /* Account for bottom nav */
+ } 
     .container {
       max-width: 75%;
       background: #fff;
@@ -250,6 +259,15 @@
 .bottom-nav a:hover {
  color: #0056b3;
 }
+.centered-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 130px);
+  text-align: center;
+}
+
   </style>
 </head>
 <body>
@@ -285,8 +303,6 @@
         <button id="logoutBtn">Logout</button>
       </p>
     </div>
-</div>
-</div>
 </div>
     <div id="productsPage" style="margin-left:5%;margin-right:5%;" >
         <div id="shirtsPage" style="display: none;">
@@ -362,24 +378,33 @@
     <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1951.9412388138983!2d79.75375512746827!3d11.913266345081821!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a536197b55718a3%3A0xb1d567dddfc2f85c!2sMonster%20Men&#39;s%20Collection!5e0!3m2!1sen!2sin!4v1746009236221!5m2!1sen!2sin" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
   </div>
 </div>
-<div id="cartPage" style=" display: none;" class="form-section" >
+<div id="cartPage" style=" display: none;" class="form-section centered-section">
   <h2><center>Your Cart</center></h2>
   <center><div id="cartItems"></div>
   <br></center>
    <center><button onclick="checkoutCart()">Checkout</button></center>
 </div>
-<div id="profilePage" style="display: none; " class="form-section">
+<div id="profilePage" style="display: none;" class="form-section centered-section">
   <h2><center>Your Profile</center></h2>
   <center><p><strong>Name:</strong> <span id="profileName">Loading...</span></p></center>
   <center><p><strong>Email:</strong> <span id="profileEmail">Loading...</span></p></center>
   <br>
   <center><button onclick="logout()">Logout</button></center>
 </div>
+<div class="bottom-nav" id="bottomNav" style="margin-left:-5%;margin-right:-5%;" >
+  <a href="#" onclick="backToProducts()">Home</a>    
+  <a href="#" onclick="showShirtsPage()">Shirts</a>
+  <a href="#" onclick="showPantsPage()">Pants</a>
+  <a href="#" onclick="showCart()">Cart</a>
+  <a href="#" onclick="showProfilePage()">Profile</a>
+  </div>
+</div>
     <div id="adminControls" class="admin-controls" style="display:none;">
       <h3>Admin Panel</h3>
       <button onclick="location.href='admin-dashboard.html'">Go to Dashboard</button>
     </div>
   </div>
+  
   <script>
 function showShirtsPage() {
   document.getElementById("productList").style.display = "none";
@@ -735,6 +760,20 @@ if (subscribed) {
           statusMessage.textContent = error.message;
         });
     });
+    function updateBottomNavVisibility() {
+  const loginVisible = document.getElementById("loginSection").style.display !== "none";
+  const signupVisible = document.getElementById("signupSection").style.display !== "none";
+  const subscriptionVisible = document.getElementById("subscriptionSection").style.display !== "none";
+
+  const bottomNav = document.getElementById("bottomNav");
+
+  if (loginVisible || signupVisible || subscriptionVisible) {
+    bottomNav.style.display = "none";
+  } else {
+    bottomNav.style.display = "flex"; // or "block" if you're not using flex layout
+  }
+}
+
     function toggleForm() {
       const isLoginVisible = loginSection.style.display !== "none";
       loginSection.style.display = isLoginVisible ? "none" : "flex";
@@ -749,15 +788,6 @@ document.getElementById("backToSubscription").addEventListener("click", () => {
   document.getElementById("mainContainer").classList.add("with-top-margin");
 });
   </script>
-  <div class="bottom-nav">
-  <a href="#" onclick="backToProducts()">Home</a>    
-  <a href="#" onclick="showShirtsPage()">Shirts</a>
-  <a href="#" onclick="showPantsPage()">Pants</a>
-  <a href="#" onclick="showCart()">Cart</a>
-  <a href="#" onclick="showProfilePage()">Profile</a>
-
-</div>
-
 </body>
 
 </html>
