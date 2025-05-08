@@ -294,7 +294,7 @@
     </div>
 
     <div id="subscriptionSection" style="display:none;">
-      <p class="info">Get any 1 Shirt + any 1 Pant at ₹999 <br><h3><center>UNLIMITED</h3></p>
+      <p class="info">Get any 1 Shirt + any 1 Pant at ₹999 <br><h3><center>WHOLOSALE PRICE</h3></p>
       <form class="form-section" id="subscriptionForm">
         <input type="text" id="name" placeholder="Your Name" required />
         <button type="submit">Subscribe at ₹2/month </button>
@@ -307,16 +307,25 @@
 </div>
     <div id="productsPage" style="margin-left:5%;margin-right:5%;" >
         <div id="shirtsPage" style="display: none;">
-  <h2><center>Shirts Collection</center></h2>
  <div class="product-grid">
   <div class="product-card">
-    <img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/Red%20and%20Black%20Ripped%20Paper%20Black%20Friday%20Flyer%20Portrait.png" alt="Shirt 1"onclick="showDescriptionPage(this.src, '₹499')">
+  <img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/Red%20and%20Black%20Ripped%20Paper%20Black%20Friday%20Flyer%20Portrait.png" alt="Shirt 1" onclick="showDescription(this.src, '₹499')">
+ <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 10px;">
     <p class="price">₹499</p>
+    <button onclick="addToCart()" style="background: none; border: none; cursor: pointer;">
+      <img src="https://img.icons8.com/?size=20&id=VqxLf3Y9RVLk&format=png&color=000000" alt="Add to Cart">
+    </button>
   </div>
+</div>
   <div class="product-card">
-    <img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/Red%20and%20Black%20Ripped%20Paper%20Black%20Friday%20Flyer%20Portrait.png" alt="Shirt 2"onclick="showDescriptionPage(this.src, '₹499')">
+  <img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/Red%20and%20Black%20Ripped%20Paper%20Black%20Friday%20Flyer%20Portrait.png" alt="Shirt 2" onclick="showDescription(this.src, '₹499')">
+ <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 10px;">
     <p class="price">₹499</p>
+    <button onclick="addToCart()" style="background: none; border: none; cursor: pointer;">
+      <img src="https://img.icons8.com/?size=20&id=VqxLf3Y9RVLk&format=png&color=000000" alt="Add to Cart">
+    </button>
   </div>
+</div>
   <div class="product-card">
     <img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/Red%20and%20Black%20Ripped%20Paper%20Black%20Friday%20Flyer%20Portrait.png" alt="Shirt 3">
     <p class="price">₹499</p>
@@ -328,7 +337,6 @@
 </div>
 </div>
 <div id="pantsPage" style="display: none;">
-  <h2><center>Pants Collection</center></h2>
   <div class="product-grid">
   <div class="product-card">
     <img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/Red%20and%20Black%20Ripped%20Paper%20Black%20Friday%20Flyer%20Portrait.png" alt="Shirt 1">
@@ -349,15 +357,11 @@
 </div>
  </div>
  <div id="descriptionPage" style="display: none;margin-left:5%; margin-right:5%;"class="form-section">
-  <h2 id="descTitle"><center>Product Description</center></h2>
   <div style="text-align: center;">
     <img id="descImage" src="" style="max-width: 80%; border-radius: 12px;" />
     <p class="price" id="descPrice">₹0</p>
    <div style="margin-top: 16px;">
-  <button onclick="buyNow()">Buy Now</button>
   <button onclick="addToCart()">Add to Cart</button>
-  <button onclick="backToProducts()">Back</button>
-  <button onclick="showCart()">View Cart</button>
   </div>
  </div>
 </div>
@@ -461,7 +465,7 @@ function backToProducts() {
 
 let cart = [];
 
-  function showDescriptionPage(imageUrl, price) {
+  function showDescription(imageUrl, price) {
     document.getElementById("descImage").src = imageUrl;
     document.getElementById("descPrice").textContent = price;
     document.getElementById("descriptionPage").style.display = "block";
@@ -470,6 +474,8 @@ let cart = [];
     document.getElementById("pantsPage").style.display = "none";
     document.getElementById("sliderSection").style.display = "none";
     document.getElementById("profilePage").style.display = "none";
+    document.getElementById("descImage").src = imageSrc;
+    document.getElementById("descPrice").innerText = price;
   }
 
 function addToCart() {
@@ -599,7 +605,6 @@ function logout() {
     location.reload(); // Reload to return to login screen
   });
 }
-
      const firebaseConfig = {
       apiKey: "AIzaSyDzW8XuqrxM47W42HcIUXifa_X8tnfrLkY",
       authDomain: "monster-mens-collection.firebaseapp.com",
@@ -810,7 +815,8 @@ document.getElementById("backToSubscription").addEventListener("click", () => {
      firebase.auth().signOut();
   document.getElementById("mainContainer").classList.add("with-top-margin");
 });
-  </script>
+</script>
+
 </body>
 
 </html>
