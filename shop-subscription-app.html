@@ -305,11 +305,11 @@
       </p>
     </div>
 </div>
-    <div id="productsPage" style="margin-left:5%;margin-right:5%;" >
+   <div id="productsPage" style="margin-left:5%;margin-right:5%;" >
         <div id="shirtsPage" style="display: none;">
  <div class="product-grid">
   <div class="product-card">
-  <img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/Red%20and%20Black%20Ripped%20Paper%20Black%20Friday%20Flyer%20Portrait.png" alt="Shirt 1" onclick="showDescription(this.src, '₹499')">
+  <img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/Red%20and%20Black%20Ripped%20Paper%20Black%20Friday%20Flyer%20Portrait.png" alt="Shirt 1" onclick="showDescription(this.src, '₹499', 'Premium cotton shirt ideal for every occasion.')">
  <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 10px;">
     <p class="price">₹499</p>
     <button onclick="addToCart('https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/Red%20and%20Black%20Ripped%20Paper%20Black%20Friday%20Flyer%20Portrait.png', '₹499')" style="background: none; border: none; cursor: pointer;">
@@ -318,7 +318,7 @@
   </div>
 </div>
   <div class="product-card">
-<img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/Red%20and%20Black%20Ripped%20Paper%20Black%20Friday%20Flyer%20Portrait.png" alt="Shirt 1" onclick="showDescription(this.src, '₹499')">
+<img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/Red%20and%20Black%20Ripped%20Paper%20Black%20Friday%20Flyer%20Portrait.png" alt="Shirt 1" onclick="showDescription(this.src, '₹499', 'Stylish cotton shirt with a modern fit. Perfect for casual and formal wear.')">
  <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 10px;">
     <p class="price">₹499</p>
     <button onclick="addToCart('https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/Red%20and%20Black%20Ripped%20Paper%20Black%20Friday%20Flyer%20Portrait.png', '₹499')" style="background: none; border: none; cursor: pointer;">
@@ -386,14 +386,15 @@
   </div>
 </div>
  </div>
- <div id="descriptionPage" style="display: none;margin-left:5%; margin-right:5%;"class="form-section">
+<div id="descriptionPage" style="display: none; margin-left:5%; margin-right:5%;" class="form-section">
   <div style="text-align: center;">
     <img id="descImage" src="" style="max-width: 80%; border-radius: 12px;" />
     <p class="price" id="descPrice">₹0</p>
-   <div style="margin-top: 16px;">
-  <button onclick="addToCart()">Add to Cart</button>
+    <p id="descText" style="margin-top: 10px; font-size: 16px; color: #333;"></p> <!-- Product Description -->
+    <div style="margin-top: 16px;">
+      <button onclick="addToCart()">Add to Cart</button>
+    </div>
   </div>
- </div>
 </div>
           <div id="sliderSection" class="slider-wrapper">
           <div class="slider1">
@@ -494,20 +495,17 @@ function backToProducts() {
 }
 
 let cart = [];
-
-  function showDescription(imageUrl, price) {
-    document.getElementById("descImage").src = imageUrl;
+  function showDescription(imageSrc, price, description ="No description available") {
+    document.getElementById("descImage").src = imageSrc;
     document.getElementById("descPrice").textContent = price;
+      document.getElementById('descText').textContent = description;
     document.getElementById("descriptionPage").style.display = "block";
     document.getElementById("productList").style.display = "none";
     document.getElementById("shirtsPage").style.display = "none";
     document.getElementById("pantsPage").style.display = "none";
     document.getElementById("sliderSection").style.display = "none";
     document.getElementById("profilePage").style.display = "none";
-    document.getElementById("descImage").src = imageSrc;
-    document.getElementById("descPrice").innerText = price;
   }
-
 function addToCart(image = null, price = null) {
   if (!image || !price) {
     image = document.getElementById('descImage').src;
@@ -519,7 +517,6 @@ function addToCart(image = null, price = null) {
   cart.push({ image, price: parsedPrice });
   alert('Item added to cart!');
 }
-
 
 function showCart() {
   document.getElementById("descriptionPage").style.display = "none";
