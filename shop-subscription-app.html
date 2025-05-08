@@ -545,15 +545,15 @@ let cart = [];
     document.getElementById("sliderSection").style.display = "none";
     document.getElementById("profilePage").style.display = "none";
   }
-function addToCart(image = null, price = null) {
-  if (!image || !price) {
+function addToCart(image = null, price = null, title = null) {
+  if (!image || !price || !title) {
     image = document.getElementById('descImage').src;
     price = document.getElementById('descPrice').innerText;
+    title = document.getElementById('descName').innerText;
   }
 
   const parsedPrice = parseInt(price.replace('₹', ''));
-
-  cart.push({ image, price: parsedPrice });
+  cart.push({ image, price: parsedPrice, title });
   alert('Item added to cart!');
 }
 
@@ -577,13 +577,17 @@ cart.forEach((item, index) => {
     <div style="margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ccc; padding-bottom: 10px;">
       <div style="display: flex; align-items: center;">
         <img src="${item.image}" style="max-width: 80px; border-radius: 6px; margin-right: 10px;" />
-        <p><strong>Price:</strong> ₹${item.price}</p>
+        <div>
+          <p><strong>${item.title}</strong></p>
+          <p><strong>Price:</strong> ₹${item.price}</p>
+        </div>
       </div>
       <button onclick="removeFromCart(${index})" style="padding: 5px 10px; background-color: red; color: white; border: none; border-radius: 5px;">Remove</button>
     </div>
   `;
   cartItemsDiv.innerHTML += itemHTML;
 });
+
 
   cartItemsDiv.innerHTML += `
     <h3>Total: ₹${total}</h3>
