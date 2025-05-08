@@ -531,23 +531,31 @@ function showCart() {
   cartItemsDiv.innerHTML = '';
 
   let total = 0;
-
-  cart.forEach((item, index) => {
-    total += item.price;
-    const itemHTML = `
-      <div style="margin-bottom: 15px;">
-        <img src="${item.image}" style="max-width: 100px; border-radius: 6px;" />
+  
+cart.forEach((item, index) => {
+  total += item.price;
+  const itemHTML = `
+    <div style="margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ccc; padding-bottom: 10px;">
+      <div style="display: flex; align-items: center;">
+        <img src="${item.image}" style="max-width: 80px; border-radius: 6px; margin-right: 10px;" />
         <p><strong>Price:</strong> ₹${item.price}</p>
       </div>
-    `;
-    cartItemsDiv.innerHTML += itemHTML;
-  });
+      <button onclick="removeFromCart(${index})" style="padding: 5px 10px; background-color: red; color: white; border: none; border-radius: 5px;">Remove</button>
+    </div>
+  `;
+  cartItemsDiv.innerHTML += itemHTML;
+});
 
   cartItemsDiv.innerHTML += `
     <h3>Total: ₹${total}</h3>
     <input type="text" id="checkoutName" placeholder="Your Name" style="padding:10px; width:100%; margin-top:10px;" />
     <input type="text" id="checkoutAddress" placeholder="Your Address" style="padding:10px; width:100%; margin-top:10px;" />
   `;
+}
+
+function removeFromCart(index) {
+  cart.splice(index, 1); // Remove item at the given index
+  showCart(); // Re-render the cart
 }
 
 function hideCart() {
