@@ -310,7 +310,7 @@
  <div class="product-grid">
      
  <div class="product-card">
-<img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/Red%20and%20Black%20Ripped%20Paper%20Black%20Friday%20Flyer%20Portrait.png" alt="Shirt 1" onclick="showDescription(this.src, '₹499',' Red & Bull','Non-Spread Collar Casual Shirt', 'Stylish cotton shirt with a modern fit. Perfect for casual and formal wear.')">
+<img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/Red%20and%20Black%20Ripped%20Paper%20Black%20Friday%20Flyer%20Portrait.png" alt="Shirt 1" onclick="showDescription(this.src, '₹499',' Red & Bull', 'Stylish cotton shirt with a modern fit. Perfect for casual and formal wear.')">
 <h3>Red & Bull </h3> <!-- Product Title -->
 <p>Non-Spread Collar Casual Shirt</p>
  <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 10px;">
@@ -412,27 +412,28 @@
   
 </div>
  </div>
-<div id="descriptionPage" style="display: none; margin-left: 0%; margin-right: 2%;" class="form-section">
-  <div style="text-align: left;"> <!-- Changed from center to left -->
-    <img id="descImage" src="" style="max-width: 80%; border-radius: 12px; display: block; margin: 0 auto;" /><br><br>
+<div id="descriptionPage" style="display: none; margin-left:0%; margin-right:2%;" class="form-section">
+  <div style="text-align: center;">
+    <img id="descImage" src="" style="max-width: 80%; border-radius: 12px;" /><br>
 
-    <!-- Title and description on the left, price on the right -->
-    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-top: 10px; width: 100%; padding: 0 15px;">
-      <div>
-        <h2 id="descName" style="font-size: 24px; color: #333; margin: 0;">Product Title</h2>
-        <p id="descSName" style="font-size: 16px; color: #777; margin: 5px 0 0 0;">Small description goes here</p>
-      </div>
-      <p class="price" id="descPrice" style="font-size: 20px; color: #555; margin: 0 5% 0 0;">₹0</p>
+    <!-- Title on the left, Price on the right -->
+    <br>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; width: 100%; padding: 0 15px;">
+      <h2 id="descName" style="font-size: 24px; color: #333; margin: 0;">Product Title</h2>
+      <p class="price" id="descPrice" style="font-size: 20px; color: #555; margin-right:5%;">₹0</p>
     </div>
-
-    <div style="margin-top: 10px; text-align: right; margin-right:3%;">
-      <button onclick="addToCart()">Add to Cart</button>
-    </div>
-
-    <h2>Description</h2>
-    <p id="descText" style="margin-top: 10px; font-size: 16px; color: #333;"></p>
+ <div style="margin-top: 0px; text-align: right; margin-right:3%">
+    <button onclick="addToCart()">Add to Cart</button>
   </div>
+    <h2>Discription</h2>
+    <p id="descText" style="margin-top: 10px; font-size: 16px; color: #333;"></p> <!-- Product Description -->
+  </div>
+
+  <!-- Add to Cart button aligned to left -->
 </div>
+
+
+
           <div id="sliderSection" class="slider-wrapper">
           <div class="slider1">
             <br><img id="slide-1" src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/Red-and-Black-Ripped-Paper-Black-Friday-Flyer-Portrait.jpeg" alt="3D rendering of an words"/>
@@ -532,32 +533,31 @@ function backToProducts() {
 }
 
 let cart = [];
- function showDescription(imageSrc, price, title = "No title", smalldis = "No short desc", description = "No description") {
-  document.getElementById("descImage").src = imageSrc;
-  document.getElementById("descPrice").textContent = price;
-  document.getElementById('descName').textContent = title;
-  document.getElementById('descSName').textContent = smalldis;
-  document.getElementById('descText').textContent = description;
-
-  document.getElementById("descriptionPage").style.display = "block";
-  document.getElementById("productList").style.display = "none";
-  document.getElementById("shirtsPage").style.display = "none";
-  document.getElementById("pantsPage").style.display = "none";
-  document.getElementById("sliderSection").style.display = "none";
-  document.getElementById("profilePage").style.display = "none";
-}
-
+  function showDescription(imageSrc, price,title="No description available", description ="No description available") {
+    document.getElementById("descImage").src = imageSrc;
+    document.getElementById("descPrice").textContent = price;
+    document.getElementById('descName').textContent = title;
+     document.getElementById('descText').textContent = description;
+    document.getElementById("descriptionPage").style.display = "block";
+    document.getElementById("productList").style.display = "none";
+    document.getElementById("shirtsPage").style.display = "none";
+    document.getElementById("pantsPage").style.display = "none";
+    document.getElementById("sliderSection").style.display = "none";
+    document.getElementById("profilePage").style.display = "none";
+  }
 function addToCart(image = null, price = null, title = null) {
-  if (!image || !price || !title) {
+  if (!image || !price) {
     image = document.getElementById('descImage').src;
     price = document.getElementById('descPrice').innerText;
-    title = document.getElementById('descName').innerText;
+    title = document.getElementById('descName').innerText; // Get title
   }
 
   const parsedPrice = parseInt(price.replace('₹', ''));
-  cart.push({ image, price: parsedPrice, title });
+
+  cart.push({ image, price: parsedPrice, title }); // Include title
   alert('Item added to cart!');
 }
+
 
 function showCart() {
   document.getElementById("descriptionPage").style.display = "none";
@@ -580,16 +580,15 @@ cart.forEach((item, index) => {
       <div style="display: flex; align-items: center;">
         <img src="${item.image}" style="max-width: 80px; border-radius: 6px; margin-right: 10px;" />
         <div>
-          <p><strong>${item.title}</strong></p>
-          <p><strong>Price:</strong> ₹${item.price}</p>
-        </div>
+        <p><strong>${item.title}</strong></p>
+        <p><strong>Price:</strong> ₹${item.price}</p>
+      </div>
       </div>
       <button onclick="removeFromCart(${index})" style="padding: 5px 10px; background-color: red; color: white; border: none; border-radius: 5px;">Remove</button>
     </div>
   `;
   cartItemsDiv.innerHTML += itemHTML;
 });
-
 
   cartItemsDiv.innerHTML += `
     <h3>Total: ₹${total}</h3>
