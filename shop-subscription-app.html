@@ -319,14 +319,14 @@
  <div class="product-grid">
      
   <div class="product-card">
-<img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/Red%20and%20Black%20Ripped%20Paper%20Black%20Friday%20Flyer%20Portrait.png" alt="Shirt 1" onclick="showDescription(this.src, '₹499',' Red & Bull', 'bro', 'Stylish cotton shirt with a modern fit. Perfect for casual and formal wear.')">
+<img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/Red%20and%20Black%20Ripped%20Paper%20Black%20Friday%20Flyer%20Portrait.png" alt="Shirt 1" onclick="showDescription(this.src, '₹1',' Red & Bull', 'bro', 'Stylish cotton shirt with a modern fit. Perfect for casual and formal wear.')">
 <div class=cardName>
 <h3>Red & Bull </h3> <!-- Product Title -->
 <p>Non-Spread Collar Casual Shirt</p>
 </div>
  <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 10px;">
     <p class="price">₹499</p>
-    <button onclick="addToCart('https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/Red%20and%20Black%20Ripped%20Paper%20Black%20Friday%20Flyer%20Portrait.png', '₹499',' Red & Bull')" style="background: none; border: none; cursor: pointer;">
+    <button onclick="addToCart('https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/Red%20and%20Black%20Ripped%20Paper%20Black%20Friday%20Flyer%20Portrait.png', '₹1',' Red & Bull')" style="background: none; border: none; cursor: pointer;">
       <img src="https://img.icons8.com/?size=20&id=VqxLf3Y9RVLk&format=png&color=000000" alt="Add to Cart">
     </button>
   </div>
@@ -592,6 +592,7 @@ function addToCart(image = null, price = null, title = null) {
     image = document.getElementById('descImage').src;
     price = document.getElementById('descPrice').innerText;
     title = document.getElementById('descName').innerText; // Get title
+    updateCartUI();
   }
 
   const parsedPrice = parseInt(price.replace('₹', ''));
