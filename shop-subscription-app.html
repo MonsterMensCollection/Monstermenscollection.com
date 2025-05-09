@@ -469,10 +469,15 @@
   </div>
 </div>
 <div class="container" id="mainContainer" style="margin:auto;">
- <div id="cartPage" class="form-section" style="display: none;">
+
+    <div id="cartPage" class="form-section" style="display: none;">
   <h2><center>Cart</center></h2>
   <div id="cartItems"></div>
   <br>
+  <h2>Enter Shipping Details</h2>
+    <input type="text" id="customerName" placeholder="Full Name" onfocus="scrollIntoViewMobile(this)">
+    <input type="text" id="customerAddress" placeholder="Shipping Address" onfocus="scrollIntoViewMobile(this)">
+    <br>
    <button onclick="checkoutCart()">Checkout</button>
 </div>
 
@@ -628,24 +633,14 @@ cart.forEach((item, index) => {
 });
   cartItemsDiv.innerHTML += `
   <h3>Total: ₹${total}</h3>
-  <div id="checkoutSection" style="display: flex; flex-direction: column; align-items: center; margin-top: 20px;">
-    <input type="text" id="checkoutName" placeholder="Your Name" 
-      style="padding:10px; width:100%; max-width: 500px; margin-top:10px;" 
-      onfocus="scrollIntoViewIfNeeded(this)" />
-      
-    <input type="text" id="checkoutAddress" placeholder="Your Address" 
-      style="padding:10px; width:100%; max-width: 500px; margin-top:10px;" 
-      onfocus="scrollIntoViewIfNeeded(this)" />
-  </div>
 `;
 }
- function scrollIntoViewIfNeeded(element) {
-    // Use modern scrollIntoView with options
-    element.scrollIntoView({
-      behavior: "smooth",
-      block: "center"
-    });
-  }
+
+function scrollIntoViewMobile(el) {
+  setTimeout(() => {
+    el.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, 300); // delay to let keyboard open on mobile
+}
 
 function removeFromCart(index) {
   cart.splice(index, 1); // Remove item at the given index
