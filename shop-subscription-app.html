@@ -475,15 +475,10 @@
   </div>
 </div>
 <div class="container" id="mainContainer" style="margin:auto;">
-
-    <div id="cartPage" class="form-section" style="display: none;">
-  <h2><center>Cart</center></h2>
+  <div id="cartPage" class="form-section" style="display: none;">
+  <h2><center>Your Cart</center></h2>
   <div id="cartItems"></div>
   <br>
-  <h2>Enter Shipping Details</h2>
-    <input type="text" id="customerName" placeholder="Full Name" onfocus="scrollIntoViewMobile(this)">
-    <input type="text" id="customerAddress" placeholder="Shipping Address" onfocus="scrollIntoViewMobile(this)">
-    <br>
    <button onclick="checkoutCart()">Checkout</button>
 </div>
 
@@ -637,9 +632,11 @@ cart.forEach((item, index) => {
   `;
   cartItemsDiv.innerHTML += itemHTML;
 });
-  cartItemsDiv.innerHTML += `
-  <h3>Total: ₹${total}</h3>
-`;
+ cartItemsDiv.innerHTML += `
+    <h3>Total: ₹${total}</h3>
+    <input type="text" id="checkoutName" placeholder="Your Name" style="padding:10px; width:100%; margin-top:10px;" />
+    <input type="text" id="checkoutAddress" placeholder="Your Address" style="padding:10px; width:100%; margin-top:10px;" />
+  `;
 }
 
 function scrollIntoViewMobile(el) {
