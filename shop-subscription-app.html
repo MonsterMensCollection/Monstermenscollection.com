@@ -673,37 +673,7 @@ function checkoutCart() {
     alert('Cart is empty!');
     return;
   }
-   document.getElementById("subscriptionForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const name = document.getElementById("name").value;
-      const email = auth.currentUser?.email || '';
-
-      const options = {
-        key: 'rzp_live_0M0qHSpzByvZAr',
-        amount: 2 * 100,
-        currency: 'INR',
-        name: 'Monster Mens Collection',
-        description: 'Monthly Subscription',
-        handler: async function (response) {
-          alert('Payment successful! Payment ID: ' + response.razorpay_payment_id);
-          await saveSubscription(auth.currentUser.uid);
-          await updatePageForUser(auth.currentUser);
-          document.getElementById("confirmationMessage").textContent = `Thank you, ${name || 'Subscriber'}! You are subscribed.`;
-        },
-        prefill: {
-          email: email,
-          name: name || 'Guest'
-        },
-        theme: {
-          color: "#007bff"
-        },
-        webview_intent: true
-      };
-
-      const rzp = new Razorpay(options);
-      rzp.open();
-    });
-    
+  
   const options = {
     key: 'rzp_live_0M0qHSpzByvZAr',
     amount: totalAmount,
@@ -936,7 +906,32 @@ if (subscribed) {
     bottomNav.style.display = "flex"; // or "block" if you're not using flex layout
   }
 }
+  const subscriptionForm = document.getElementById("subscriptionForm");
 
+  subscriptionForm.addEventListener("submit", async function (e) {
+    e.preventDefault(); // Prevent page reload
+
+    const razorpayOptions = {
+      key: "rzp_live_0M0qHSpzByvZAr", // Replace with your Razorpay test key
+      amount: 200, // ₹2 in paise
+      currency: "INR",
+      name: "Shop Subscription",
+      description: "Monthly Subscription",
+      handler: function (response) {
+        // You can store payment success in Firestore or show a message
+        document.getElementById("confirmationMessage").innerText = "Payment successful! Thank you for subscribing.";
+      },
+      prefill: {
+        email: firebase.auth().currentUser?.email || "",
+      },
+      theme: {
+        color: "#007bff",
+      },
+    };
+
+    const rzp = new Razorpay(razorpayOptions);
+    rzp.open();
+  });
     function toggleForm() {
       const isLoginVisible = loginSection.style.display !== "none";
       loginSection.style.display = isLoginVisible ? "none" : "flex";
@@ -950,6 +945,7 @@ document.getElementById("backToSubscription").addEventListener("click", () => {
      firebase.auth().signOut();
   document.getElementById("mainContainer").classList.add("with-top-margin");
 });
+
 </script>
 
 </body>
