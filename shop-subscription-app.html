@@ -476,16 +476,36 @@
   <br>
    <button onclick="checkoutCart()">Checkout</button>
 </div>
-<div id="profilePage" class="form-section" style="display: none;">
-  <div class="slider">
-            <img id="slide-1" src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/subscriber1.png" alt="3D rendering of an words"/> 
-         </div>
-  <h2><center>Your Profile</center></h2>
-  <p><strong>Name:</strong> <span id="profileName">Loading...</span></p>
-  <p><strong>Email:</strong> <span id="profileEmail">Loading...</span></p>
-  <br>
-  <button onclick="logout()">Logout</button>
+
+<div id="profilePage" class="form-section" style="display: none; padding: 20px;">
+  <div style="position: relative; text-align: center; background: #ffffff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-width: 400px; margin: 0 auto;">
+    
+    <!-- Premium Badge -->
+    <img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/subscriber1.png" 
+         alt="Premium Badge" 
+         style="position: absolute; top: 20px; right: 20px; width: 50px; height: 50px;"/>
+
+    <h2 style="margin-top: 0; font-size: 24px; font-weight: 600;">Profile</h2>
+    
+   <div style="margin-top: 25px; text-align: left; background-color: #f9f9f9; padding: 15px 20px; border-radius: 10px;">
+  <div style="margin-bottom: 12px;">
+    <label style="font-size: 14px; color: #555;">Name</label>
+    <div id="profileName" style="font-size: 18px; font-weight: 500; color: #333;">Loading...</div>
+  </div>
+  <div style="margin-bottom: 12px;">
+    <label style="font-size: 14px; color: #555;">Email</label>
+    <div id="profileEmail" style="font-size: 18px; font-weight: 500; color: #333;">Loading...</div>
+  </div>
 </div>
+
+    <button onclick="logout()" style="margin-top: 30px; padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer;">
+      Logout
+    </button>
+  </div>
+</div>
+
+
+
 </div>
 <div class="bottom-nav" id="bottomNav" style="margin-left:0%;margin-right:0;">
   <a href="#" onclick="backToProducts()">
@@ -578,7 +598,6 @@ function addToCart(image = null, price = null, title = null) {
   cart.push({ image, price: parsedPrice, title }); // Include title
   alert('Item added to cart!');
 }
-
 
 function showCart() {
   document.getElementById("descriptionPage").style.display = "none";
