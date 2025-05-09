@@ -634,8 +634,8 @@ cart.forEach((item, index) => {
 });
  cartItemsDiv.innerHTML += `
     <h3>Total: ₹${total}</h3>
-    <input type="text" id="checkoutName" placeholder="Your Name" style="padding:10px; width:100%; margin-top:10px;" />
-    <input type="text" id="checkoutAddress" placeholder="Your Address" style="padding:10px; width:100%; margin-top:10px;" />
+    <input type="text" id="checkoutName" placeholder="Your Name" onfocus="scrollIntoViewMobile(this)" style="padding:10px; width:100%; margin-top:10px;" />
+    <input type="text" id="checkoutAddress" placeholder="Your Address" onfocus="scrollIntoViewMobile(this)" style="padding:10px; width:100%; margin-top:10px;" />
   `;
 }
 
