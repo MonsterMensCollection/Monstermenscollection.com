@@ -533,10 +533,13 @@
 </div>
 </div>
 
-<div id="paymentSuccessMessage" style="display: none; padding: 15px; margin-top: 15px; border: 1px solid green; background-color: #e6ffe6; color: green; border-radius: 5px;">
-  <!-- Message will be set dynamically -->
+<div id="paymentSuccessPage" style="display:none; padding: 30px; text-align: center;">
+  <div style="padding: 20px; border: 2px solid green; background-color: #d4fcd4; color: green; border-radius: 10px;">
+    ✅ Payment successful!<br>
+    Payment ID: <strong id="successPaymentId">Loading...</strong><br>
+    Your order has been placed. Thank you!
+  </div>
 </div>
-
 
     <div id="adminControls" class="admin-controls" style="display:none;">
       <h3>Admin Panel</h3>
@@ -686,7 +689,8 @@ function checkoutCart() {
     image: "https://your-logo-url.com/logo.png",
     
     handler: function (response) {
-  const paymentSuccessDiv = document.getElementById("paymentSuccessMessage");
+        
+const paymentSuccessDiv = document.getElementById("paymentSuccessMessage");
 
   const user = auth.currentUser;
   if (user) {
@@ -700,12 +704,26 @@ function checkoutCart() {
       timestamp: firebase.firestore.FieldValue.serverTimestamp()
     }).then(() => {
       // Show success message
-      paymentSuccessDiv.style.display = "block";
-      paymentSuccessDiv.innerHTML = `
-        ✅ Payment successful!<br>
-        Payment ID: <strong>${response.razorpay_payment_id}</strong><br>
-        Your order has been placed. Thank you!
-      `;
+      // Hide all sections
+document.getElementById("descriptionPage").style.display = "none";
+document.getElementById("productList").style.display = "none";
+document.getElementById("shirtsPage").style.display = "none";
+document.getElementById("pantsPage").style.display = "none";
+document.getElementById("sliderSection").style.display = "none";
+document.getElementById("cartPage").style.display = "none";
+document.getElementById("profilePage").style.display = "none";
+
+// Show success page
+document.getElementById("paymentSuccessPage").style.display = "block";
+document.getElementById("successPaymentId").textContent = response.razorpay_payment_id;
+
+// Hide after 5 seconds and go back to products
+setTimeout(() => {
+  document.getElementById("paymentSuccessPage").style.display = "none";
+  document.getElementById("productList").style.display = "block";
+  document.getElementById("sliderSection").style.display = "block";
+}, 5000);
+
     }).catch(error => {
       console.error("Error saving order:", error);
       paymentSuccessDiv.style.display = "block";
