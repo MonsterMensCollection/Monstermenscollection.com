@@ -273,7 +273,6 @@
   text-align: center;
 }
 
-
   </style>
 </head>
 <body>
@@ -629,27 +628,22 @@ cart.forEach((item, index) => {
 });
   cartItemsDiv.innerHTML += `
   <h3>Total: ₹${total}</h3>
-  <div style="display: flex; flex-direction: column; align-items: center; margin-top: 20px;">
-    <input type="text" id="checkoutName" placeholder="Your Name" style="padding:10px; width:100%; max-width: 500px; margin-top:10px;" />
-    <input type="text" id="checkoutAddress" placeholder="Your Address" style="padding:10px; width:100%; max-width: 500px; margin-top:10px;" />
+  <div id="checkoutSection" style="display: flex; flex-direction: column; align-items: center; margin-top: 20px;">
+    <input type="text" id="checkoutName" placeholder="Your Name" 
+      style="padding:10px; width:100%; max-width: 500px; margin-top:10px;" 
+      onfocus="scrollIntoViewIfNeeded(this)" />
+      
+    <input type="text" id="checkoutAddress" placeholder="Your Address" 
+      style="padding:10px; width:100%; max-width: 500px; margin-top:10px;" 
+      onfocus="scrollIntoViewIfNeeded(this)" />
   </div>
 `;
 }
-// Auto-scroll on mobile when input is focused
-document.addEventListener('focusin', function(e) {
-  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-  const target = e.target;
-
-  if (isMobile && (target.id === 'checkoutName' || target.id === 'checkoutAddress')) {
-    setTimeout(() => {
-      if ('scrollIntoViewIfNeeded' in target) {
-        target.scrollIntoViewIfNeeded({ behavior: 'smooth', block: 'center' });
-      } else {
-        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    }, 400); // Adjusted delay for better keyboard sync
-  }
-});
+function scrollIntoViewIfNeeded(el) {
+  setTimeout(() => {
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 300); // Delay helps with mobile keyboard animations
+}
 
 function removeFromCart(index) {
   cart.splice(index, 1); // Remove item at the given index
