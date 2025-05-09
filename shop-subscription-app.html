@@ -532,6 +532,12 @@
   </a>
 </div>
 </div>
+
+<div id="paymentSuccessMessage" style="display: none; padding: 15px; margin-top: 15px; border: 1px solid green; background-color: #e6ffe6; color: green; border-radius: 5px;">
+  <!-- Message will be set dynamically -->
+</div>
+
+
     <div id="adminControls" class="admin-controls" style="display:none;">
       <h3>Admin Panel</h3>
       <button onclick="location.href='admin-dashboard.html'">Go to Dashboard</button>
@@ -678,33 +684,42 @@ function checkoutCart() {
     name: "Monster Men's Collection",
     description: "Cart Checkout",
     image: "https://your-logo-url.com/logo.png",
+    
     handler: function (response) {
-      alert("✅ Payment Successful!\nPayment ID: " + response.razorpay_payment_id);
+  const paymentSuccessDiv = document.getElementById("paymentSuccessMessage");
 
-      const user = auth.currentUser;
-      if (user) {
-        db.collection("orders").add({
-          uid: user.uid,
-          name: name,
-          address: address,
-          cart: cart,
-          total: totalAmount / 100,
-          paymentId: response.razorpay_payment_id,
-          timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        }).then(() => {
-          alert("🧾 Order placed successfully!");
-        }).catch(error => {
-          console.error("Error saving order:", error);
-          alert("Something went wrong while saving your order.");
-        });
-      }
+  const user = auth.currentUser;
+  if (user) {
+    db.collection("orders").add({
+      uid: user.uid,
+      name: name,
+      address: address,
+      cart: cart,
+      total: totalAmount / 100,
+      paymentId: response.razorpay_payment_id,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(() => {
+      // Show success message
+      paymentSuccessDiv.style.display = "block";
+      paymentSuccessDiv.innerHTML = `
+        ✅ Payment successful!<br>
+        Payment ID: <strong>${response.razorpay_payment_id}</strong><br>
+        Your order has been placed. Thank you!
+      `;
+    }).catch(error => {
+      console.error("Error saving order:", error);
+      paymentSuccessDiv.style.display = "block";
+      paymentSuccessDiv.style.color = "red";
+      paymentSuccessDiv.innerHTML = "⚠️ Payment was successful but there was an error placing the order. Please contact support.";
+    });
+  }
 
-      // Clear cart and form
-      cart = [];
-      hideCart();
-      document.getElementById("checkoutName").value = '';
-      document.getElementById("checkoutAddress").value = '';
-    },
+  // Clear cart and form
+  cart = [];
+  hideCart();
+  document.getElementById("checkoutName").value = '';
+  document.getElementById("checkoutAddress").value = '';
+},
     prefill: {
       name: name
     },
@@ -717,6 +732,7 @@ function checkoutCart() {
   const rzp = new Razorpay(options);
   rzp.open();
 }
+
 
 function showProfilePage() {
   const user = auth.currentUser;
