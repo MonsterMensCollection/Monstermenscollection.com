@@ -671,41 +671,44 @@ function checkoutCart() {
     return;
   }
   
-const options = {
-      key: "rzp_live_0M0qHSpzByvZAr", // replace with your Razorpay key
-      amount: 200 * 100, // ₹2 in paise
-      currency: "INR",
-      name: "Monster mens collection",
-      description: "Monthly Subscription",
-      handler: async function (response) {
-        // Payment was successful
-        console.log("Payment success", response);
+  const options = {
+    key: 'rzp_live_0M0qHSpzByvZAr',
+    amount: totalAmount,
+    currency: "INR",
+    name: "Monster Men's Collection",
+    description: "Cart Checkout",
+    image: "https://your-logo-url.com/logo.png",
+    handler: function (response) {
+      alert("Payment Successful!\nPayment ID: " + response.razorpay_payment_id);
 
-        // 🔹 Store subscription in Firestore
-        await firebase.firestore().collection("subscriptions").add({
+      // Save to Firebase
+      const user = auth.currentUser;
+      if (user) {
+        db.collection("orders").add({
           uid: user.uid,
-          email: user.email,
+          name: name,
+          address: address,
+          cart: cart,
           paymentId: response.razorpay_payment_id,
-          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-          status: "active"
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
         });
-
-        // ✅ Show confirmation
-        document.getElementById("confirmationMessage").innerText = "Subscription successful!";
-      },
-      prefill: {
-        email: user.email
-      },
-      theme: {
-        color: "#007bff"
       }
-       webview_intent: true
-    };
 
-    const rzp = new Razorpay(options);
-    rzp.open();
-  });
-  
+      cart = [];
+      hideCart();
+    },
+    prefill: {
+      name: name
+    },
+    theme: {
+      color: "#007bff"
+    },
+     webview_intent: true
+  };
+
+  const rzp = new Razorpay(options);
+  rzp.open();
+}
 function showProfilePage() {
   const user = auth.currentUser;
   if (user) {
