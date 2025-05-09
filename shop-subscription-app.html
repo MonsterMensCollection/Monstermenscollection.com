@@ -656,32 +656,31 @@ function hideCart() {
   document.getElementById("sliderSection").style.display = "block";
 }
 function checkoutCart() {
-  const name = document.getElementById("checkoutName").value;
-  const address = document.getElementById("checkoutAddress").value;
+  const name = document.getElementById("checkoutName").value.trim();
+  const address = document.getElementById("checkoutAddress").value.trim();
 
   if (!name || !address) {
     alert("Please enter name and address to continue.");
     return;
   }
 
-  const totalAmount = cart.reduce((sum, item) => sum + item.price, 0) * 100; // in paisa
+  const totalAmount = cart.reduce((sum, item) => sum + item.price, 0) * 100; // in paise
 
   if (totalAmount === 0) {
-    alert('Cart is empty!');
+    alert("Cart is empty!");
     return;
   }
-  
+
   const options = {
-    key: 'rzp_live_0M0qHSpzByvZAr',
+    key: 'rzp_live_0M0qHSpzByvZAr', // your Razorpay key
     amount: totalAmount,
     currency: "INR",
     name: "Monster Men's Collection",
     description: "Cart Checkout",
     image: "https://your-logo-url.com/logo.png",
     handler: function (response) {
-      alert("Payment Successful!\nPayment ID: " + response.razorpay_payment_id);
+      alert("✅ Payment Successful!\nPayment ID: " + response.razorpay_payment_id);
 
-      // Save to Firebase
       const user = auth.currentUser;
       if (user) {
         db.collection("orders").add({
@@ -689,13 +688,22 @@ function checkoutCart() {
           name: name,
           address: address,
           cart: cart,
+          total: totalAmount / 100,
           paymentId: response.razorpay_payment_id,
           timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        }).then(() => {
+          alert("🧾 Order placed successfully!");
+        }).catch(error => {
+          console.error("Error saving order:", error);
+          alert("Something went wrong while saving your order.");
         });
       }
 
+      // Clear cart and form
       cart = [];
       hideCart();
+      document.getElementById("checkoutName").value = '';
+      document.getElementById("checkoutAddress").value = '';
     },
     prefill: {
       name: name
@@ -703,12 +711,13 @@ function checkoutCart() {
     theme: {
       color: "#007bff"
     },
-     webview_intent: true
+    webview_intent: true
   };
 
   const rzp = new Razorpay(options);
   rzp.open();
 }
+
 function showProfilePage() {
   const user = auth.currentUser;
   if (user) {
