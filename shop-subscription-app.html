@@ -673,7 +673,37 @@ function checkoutCart() {
     alert('Cart is empty!');
     return;
   }
+   document.getElementById("subscriptionForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const name = document.getElementById("name").value;
+      const email = auth.currentUser?.email || '';
 
+      const options = {
+        key: 'rzp_live_0M0qHSpzByvZAr',
+        amount: 2 * 100,
+        currency: 'INR',
+        name: 'Monster Mens Collection',
+        description: 'Monthly Subscription',
+        handler: async function (response) {
+          alert('Payment successful! Payment ID: ' + response.razorpay_payment_id);
+          await saveSubscription(auth.currentUser.uid);
+          await updatePageForUser(auth.currentUser);
+          document.getElementById("confirmationMessage").textContent = `Thank you, ${name || 'Subscriber'}! You are subscribed.`;
+        },
+        prefill: {
+          email: email,
+          name: name || 'Guest'
+        },
+        theme: {
+          color: "#007bff"
+        },
+        webview_intent: true
+      };
+
+      const rzp = new Razorpay(options);
+      rzp.open();
+    });
+    
   const options = {
     key: 'rzp_live_0M0qHSpzByvZAr',
     amount: totalAmount,
@@ -705,7 +735,8 @@ function checkoutCart() {
     },
     theme: {
       color: "#007bff"
-    }
+    },
+     webview_intent: true
   };
 
   const rzp = new Razorpay(options);
@@ -809,37 +840,6 @@ if (subscribed) {
         createdAt: new Date()
       });
     }
-
-    document.getElementById("subscriptionForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const name = document.getElementById("name").value;
-      const email = auth.currentUser?.email || '';
-
-      const options = {
-        key: 'rzp_live_0M0qHSpzByvZAr',
-        amount: 2 * 100,
-        currency: 'INR',
-        name: 'Monster Mens Collection',
-        description: 'Monthly Subscription',
-        handler: async function (response) {
-          alert('Payment successful! Payment ID: ' + response.razorpay_payment_id);
-          await saveSubscription(auth.currentUser.uid);
-          await updatePageForUser(auth.currentUser);
-          document.getElementById("confirmationMessage").textContent = `Thank you, ${name || 'Subscriber'}! You are subscribed.`;
-        },
-        prefill: {
-          email: email,
-          name: name || 'Guest'
-        },
-        theme: {
-          color: "#007bff"
-        },
-        webview_intent: true
-      };
-
-      const rzp = new Razorpay(options);
-      rzp.open();
-    });
     logoutBtn.addEventListener("click", () => {
       auth.signOut();
     });
