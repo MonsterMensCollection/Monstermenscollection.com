@@ -639,11 +639,13 @@ cart.forEach((item, index) => {
   </div>
 `;
 }
-function scrollIntoViewIfNeeded(el) {
-  setTimeout(() => {
-    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }, 300); // Delay helps with mobile keyboard animations
-}
+ function scrollIntoViewIfNeeded(element) {
+    // Use modern scrollIntoView with options
+    element.scrollIntoView({
+      behavior: "smooth",
+      block: "center"
+    });
+  }
 
 function removeFromCart(index) {
   cart.splice(index, 1); // Remove item at the given index
