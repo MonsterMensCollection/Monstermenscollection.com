@@ -915,7 +915,7 @@ if (subscribed) {
       key: "rzp_live_0M0qHSpzByvZAr", // Replace with your Razorpay test key
       amount: 200, // ₹2 in paise
       currency: "INR",
-      name: "Shop Subscription",
+      name: "Monster Men's Collection",
       description: "Monthly Subscription",
       handler: function (response) {
         // You can store payment success in Firestore or show a message
@@ -926,7 +926,8 @@ if (subscribed) {
       },
       theme: {
         color: "#007bff",
-      },
+      },  
+      webview_intent: true
     };
 
     const rzp = new Razorpay(razorpayOptions);
