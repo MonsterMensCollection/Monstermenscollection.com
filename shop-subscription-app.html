@@ -273,6 +273,12 @@
   text-align: center;
 }
 
+@media (max-width: 768px) {
+  #cartPage:focus-within {
+    padding-bottom: 200px; /* ensures there's space to scroll */
+  }
+}
+
   </style>
 </head>
 <body>
@@ -638,8 +644,11 @@ cart.forEach((item, index) => {
 
 function scrollIntoViewMobile(el) {
   setTimeout(() => {
-    el.scrollIntoView({ behavior: "smooth", block: "center" });
-  }, 300); // delay to let keyboard open on mobile
+    const rect = el.getBoundingClientRect();
+    const scrollTop = window.scrollY || window.pageYOffset;
+    const elementTop = rect.top + scrollTop - 100; // adjust 100px above the element
+    window.scrollTo({ top: elementTop, behavior: "smooth" });
+  }, 300);
 }
 
 function removeFromCart(index) {
