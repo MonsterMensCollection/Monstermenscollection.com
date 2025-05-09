@@ -272,6 +272,10 @@
   min-height: calc(100vh - 130px);
   text-align: center;
 }
+#cartPage {
+  padding-bottom: 200px; /* Gives room for the keyboard */
+}
+
 
   </style>
 </head>
@@ -636,13 +640,19 @@ cart.forEach((item, index) => {
 }
 // Auto-scroll on mobile when input is focused
 document.addEventListener('focusin', function(e) {
-  if (e.target.id === 'checkoutName' || e.target.id === 'checkoutAddress') {
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  const target = e.target;
+
+  if (isMobile && (target.id === 'checkoutName' || target.id === 'checkoutAddress')) {
     setTimeout(() => {
-      e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 300); // Delay to allow keyboard to appear
+      if ('scrollIntoViewIfNeeded' in target) {
+        target.scrollIntoViewIfNeeded({ behavior: 'smooth', block: 'center' });
+      } else {
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 400); // Adjusted delay for better keyboard sync
   }
 });
-
 
 function removeFromCart(index) {
   cart.splice(index, 1); // Remove item at the given index
