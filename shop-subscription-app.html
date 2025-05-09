@@ -613,10 +613,12 @@ cart.forEach((item, index) => {
   cartItemsDiv.innerHTML += itemHTML;
 });
   cartItemsDiv.innerHTML += `
-    <h3>Total: ₹${total}</h3>
-    <input type="text" id="checkoutName" placeholder="Your Name" style="padding:10px; width:100%; margin-top:10px;" />
-    <input type="text" id="checkoutAddress" placeholder="Your Address" style="padding:10px; width:100%; margin-top:10px;" />
-  `;
+  <h3>Total: ₹${total}</h3>
+  <div style="display: flex; flex-direction: column; align-items: center; margin-top: 20px;">
+    <input type="text" id="checkoutName" placeholder="Your Name" style="padding:10px; width:100%; max-width: 500px; margin-top:10px;" />
+    <input type="text" id="checkoutAddress" placeholder="Your Address" style="padding:10px; width:100%; max-width: 500px; margin-top:10px;" />
+  </div>
+`;
 }
 
 function removeFromCart(index) {
