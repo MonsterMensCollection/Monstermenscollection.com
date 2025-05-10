@@ -671,7 +671,7 @@ function hideCart() {
   document.getElementById("productList").style.display = "block";
   document.getElementById("sliderSection").style.display = "block";
 }
-function checkoutCart() {
+function checkoutCart() { 
   const name = document.getElementById("checkoutName").value.trim();
   const address = document.getElementById("checkoutAddress").value.trim();
 
@@ -699,43 +699,43 @@ function checkoutCart() {
       const user = auth.currentUser;
 
       if (user) {
-        db.collection("orders").add({
+        const orderData = {
           uid: user.uid,
           name: name,
           address: address,
           cart: cart,
           total: totalAmount / 100,
           paymentId: response.razorpay_payment_id,
-          timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        }).then(() => {
+          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+          orderNumber: `ORD-${Date.now()}` // ✅ Add Order Number
+        };
+
+        db.collection("orders").add(orderData).then(() => {
 
           // Save simplified order entries
-          cart.forEach(item => {
-           saveOrder(item.title || "Unknown Item", user.uid);
-          });
 
           // ✅ UI changes after successful order
           document.getElementById("descriptionPage").style.display = "none";
-document.getElementById("productList").style.display = "none";
-document.getElementById("shirtsPage").style.display = "none";
-document.getElementById("pantsPage").style.display = "none";
-document.getElementById("sliderSection").style.display = "none";
-document.getElementById("cartPage").style.display = "none";
-document.getElementById("profilePage").style.display = "none";
+          document.getElementById("productList").style.display = "none";
+          document.getElementById("shirtsPage").style.display = "none";
+          document.getElementById("pantsPage").style.display = "none";
+          document.getElementById("sliderSection").style.display = "none";
+          document.getElementById("cartPage").style.display = "none";
+          document.getElementById("profilePage").style.display = "none";
 
-// Show success page
-document.getElementById("paymentSuccessPage").style.display = "block";
-document.getElementById("successPaymentId").textContent = response.razorpay_payment_id;
+          // Show success page
+          document.getElementById("paymentSuccessPage").style.display = "block";
+          document.getElementById("successPaymentId").textContent = response.razorpay_payment_id;
 
-        
-          
-// Hide after 5 seconds and go back to products
-setTimeout(() => {
-  document.getElementById("paymentSuccessPage").style.display = "none";
-  document.getElementById("productList").style.display = "block";
-  document.getElementById("sliderSection").style.display = "block";
-}, 5000);
+          // Hide after 5 seconds and go back to products
+          setTimeout(() => {
+            document.getElementById("paymentSuccessPage").style.display = "none";
+            document.getElementById("productList").style.display = "block";
+            document.getElementById("sliderSection").style.display = "block";
+          }, 5000);
 
+          // Empty cart after order
+          cart = [];
 
         }).catch(error => {
           console.error("Error saving order:", error);
@@ -743,8 +743,6 @@ setTimeout(() => {
           paymentSuccessDiv.style.color = "red";
           paymentSuccessDiv.innerHTML = "⚠️ Payment was successful but there was an error placing the order. Please contact support.";
         });
-        
-         cart = [];
       }
     },
     prefill: {
@@ -863,11 +861,11 @@ ordersSnapshot.forEach((doc, index) => {
   });
 
   orderDiv.innerHTML = `
-    <div><strong>Order #${index + 1}</strong></div>
-    <div><strong>Total:</strong> ₹${order.total}</div>
+    <div><strong>Order No:</strong> ${order.orderNumber || `#${index + 1}`}</div>
     <div><strong>Payment ID:</strong> ${order.paymentId}</div>
+     <div style="font-size: 12px; color: gray;">Placed on: ${order.timestamp?.toDate().toLocaleString() || "Unknown"}</div>
     <div><strong>Address:</strong> ${order.address}</div>
-    <div style="font-size: 12px; color: gray;">Placed on: ${order.timestamp?.toDate().toLocaleString() || "Unknown"}</div>
+    <div><strong>Total:</strong> ₹${order.total}</div>
     <div style="margin-top: 10px;">${itemsHTML}</div>
   `;
 
