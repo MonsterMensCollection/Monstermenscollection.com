@@ -497,6 +497,12 @@
   </div>
 </div>
 
+<div style="margin-top: 25px;">
+  <h3>Your Orders</h3>
+  <ol id="orderList" style="padding-left: 20px; color: #333;"></ol>
+</div>
+
+
     <button onclick="logout()" style="margin-top: 30px; padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer;">
       Logout
     </button>
@@ -682,63 +688,64 @@ function checkoutCart() {
   }
 
   const options = {
-    key: 'rzp_live_0M0qHSpzByvZAr', // your Razorpay key
+    key: 'rzp_live_0M0qHSpzByvZAr',
     amount: totalAmount,
     currency: "INR",
     name: "Monster Men's Collection",
     description: "Cart Checkout",
     image: "https://your-logo-url.com/logo.png",
-    
     handler: function (response) {
-        
-const paymentSuccessDiv = document.getElementById("paymentSuccessMessage");
+      const paymentSuccessDiv = document.getElementById("paymentSuccessMessage");
+      const user = auth.currentUser;
 
-  const user = auth.currentUser;
-  if (user) {
-    db.collection("orders").add({
-      uid: user.uid,
-      name: name,
-      address: address,
-      cart: cart,
-      total: totalAmount / 100,
-      paymentId: response.razorpay_payment_id,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    }).then(() => {
-      // Show success message
-      // Hide all sections
-document.getElementById("descriptionPage").style.display = "none";
-document.getElementById("productList").style.display = "none";
-document.getElementById("shirtsPage").style.display = "none";
-document.getElementById("pantsPage").style.display = "none";
-document.getElementById("sliderSection").style.display = "none";
-document.getElementById("cartPage").style.display = "none";
-document.getElementById("profilePage").style.display = "none";
+      if (user) {
+        db.collection("orders").add({
+          uid: user.uid,
+          name: name,
+          address: address,
+          cart: cart,
+          total: totalAmount / 100,
+          paymentId: response.razorpay_payment_id,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        }).then(() => {
 
-// Show success page
-document.getElementById("paymentSuccessPage").style.display = "block";
-document.getElementById("successPaymentId").textContent = response.razorpay_payment_id;
+          // Save simplified order entries
+          cart.forEach(item => {
+            saveOrder(item.title || "Unknown Item", user.uid);
+          });
 
-// Hide after 5 seconds and go back to products
-setTimeout(() => {
-  document.getElementById("paymentSuccessPage").style.display = "none";
-  document.getElementById("productList").style.display = "block";
-  document.getElementById("sliderSection").style.display = "block";
-}, 5000);
+          // ✅ UI changes after successful order
+          document.getElementById("descriptionPage").style.display = "none";
+          document.getElementById("productList").style.display = "none";
+          document.getElementById("shirtsPage").style.display = "none";
+          document.getElementById("pantsPage").style.display = "none";
+          document.getElementById("sliderSection").style.display = "none";
+          document.getElementById("cartPage").style.display = "none";
+          document.getElementById("profilePage").style.display = "none";
+          document.getElementById("paymentSuccessPage").style.display = "block";
+          document.getElementById("successPaymentId").textContent = response.razorpay_payment_id;
 
-    }).catch(error => {
-      console.error("Error saving order:", error);
-      paymentSuccessDiv.style.display = "block";
-      paymentSuccessDiv.style.color = "red";
-      paymentSuccessDiv.innerHTML = "⚠️ Payment was successful but there was an error placing the order. Please contact support.";
-    });
-  }
+          // Clear cart and form inputs (after saving)
+          cart = [];
+          hideCart();
+          document.getElementById("checkoutName").value = '';
+          document.getElementById("checkoutAddress").value = '';
 
-  // Clear cart and form
-  cart = [];
-  hideCart();
-  document.getElementById("checkoutName").value = '';
-  document.getElementById("checkoutAddress").value = '';
-},
+          // Go back to home after 5 seconds
+          setTimeout(() => {
+            document.getElementById("paymentSuccessPage").style.display = "none";
+            document.getElementById("productList").style.display = "block";
+            document.getElementById("sliderSection").style.display = "block";
+          }, 5000);
+
+        }).catch(error => {
+          console.error("Error saving order:", error);
+          paymentSuccessDiv.style.display = "block";
+          paymentSuccessDiv.style.color = "red";
+          paymentSuccessDiv.innerHTML = "⚠️ Payment was successful but there was an error placing the order. Please contact support.";
+        });
+      }
+    },
     prefill: {
       name: name
     },
@@ -752,7 +759,6 @@ setTimeout(() => {
   rzp.open();
 }
 
-
 function showProfilePage() {
   const user = auth.currentUser;
   if (user) {
@@ -765,6 +771,9 @@ function showProfilePage() {
       } else {
         document.getElementById("profileName").textContent = "Not available";
       }
+      
+      loadUserProfileAndOrders();
+      
     });
 
     // Hide all pages, show profile
@@ -782,6 +791,20 @@ function logout() {
     location.reload(); // Reload to return to login screen
   });
 }
+
+function saveOrder(productName, userId) {
+  db.collection("orders").add({
+    userId,
+    productName,
+    status: "Pending",
+    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+  }).then(docRef => {
+    console.log("Simple order saved:", docRef.id);
+  }).catch(error => {
+    console.error("Error saving simple order:", error);
+  });
+}
+
      const firebaseConfig = {
       apiKey: "AIzaSyDzW8XuqrxM47W42HcIUXifa_X8tnfrLkY",
       authDomain: "monster-mens-collection.firebaseapp.com",
@@ -796,6 +819,39 @@ function logout() {
     const auth = firebase.auth();
     const db = firebase.firestore();
 
+function loadUserProfileAndOrders() {
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        // Set profile name and email
+        document.getElementById('profileName').innerText = user.displayName || "N/A";
+        document.getElementById('profileEmail').innerText = user.email;
+
+        // Load orders
+        const orderList = document.getElementById("orderList");
+        orderList.innerHTML = "<li>Loading orders...</li>";
+
+        try {
+          const ordersSnapshot = await db.collection("orders").where("userId", "==", user.uid).get();
+          orderList.innerHTML = "";
+
+          if (ordersSnapshot.empty) {
+            orderList.innerHTML = "<li>No orders found.</li>";
+          } else {
+            ordersSnapshot.forEach((doc) => {
+              const order = doc.data();
+              const listItem = document.createElement("li");
+              listItem.textContent = `Order #${doc.id} - ${order.productName} (${order.status})`;
+              orderList.appendChild(listItem);
+            });
+          }
+        } catch (error) {
+          console.error("Error loading orders:", error);
+          orderList.innerHTML = "<li>Error loading orders.</li>";
+        }
+      }
+    });
+  }
+  
     const loginSection = document.getElementById("loginSection");
     const signupSection = document.getElementById("signupSection");
     const subscriptionSection = document.getElementById("subscriptionSection");
