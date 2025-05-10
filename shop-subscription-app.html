@@ -716,27 +716,26 @@ function checkoutCart() {
 
           // ✅ UI changes after successful order
           document.getElementById("descriptionPage").style.display = "none";
-          document.getElementById("productList").style.display = "none";
-          document.getElementById("shirtsPage").style.display = "none";
-          document.getElementById("pantsPage").style.display = "none";
-          document.getElementById("sliderSection").style.display = "none";
-          document.getElementById("cartPage").style.display = "none";
-          document.getElementById("profilePage").style.display = "none";
-          document.getElementById("paymentSuccessPage").style.display = "block";
-          document.getElementById("successPaymentId").textContent = response.razorpay_payment_id;
+document.getElementById("productList").style.display = "none";
+document.getElementById("shirtsPage").style.display = "none";
+document.getElementById("pantsPage").style.display = "none";
+document.getElementById("sliderSection").style.display = "none";
+document.getElementById("cartPage").style.display = "none";
+document.getElementById("profilePage").style.display = "none";
 
-          // Clear cart and form inputs (after saving)
-          cart = [];
-          hideCart();
-          document.getElementById("checkoutName").value = '';
-          document.getElementById("checkoutAddress").value = '';
+// Show success page
+document.getElementById("paymentSuccessPage").style.display = "block";
+document.getElementById("successPaymentId").textContent = response.razorpay_payment_id;
 
-          // Go back to home after 5 seconds
-          setTimeout(() => {
-            document.getElementById("paymentSuccessPage").style.display = "none";
-            document.getElementById("productList").style.display = "block";
-            document.getElementById("sliderSection").style.display = "block";
-          }, 5000);
+        
+          
+// Hide after 5 seconds and go back to products
+setTimeout(() => {
+  document.getElementById("paymentSuccessPage").style.display = "none";
+  document.getElementById("productList").style.display = "block";
+  document.getElementById("sliderSection").style.display = "block";
+}, 5000);
+
 
         }).catch(error => {
           console.error("Error saving order:", error);
@@ -744,6 +743,8 @@ function checkoutCart() {
           paymentSuccessDiv.style.color = "red";
           paymentSuccessDiv.innerHTML = "⚠️ Payment was successful but there was an error placing the order. Please contact support.";
         });
+        
+         cart = [];
       }
     },
     prefill: {
