@@ -499,7 +499,7 @@
 
 <div style="margin-top: 25px;">
   <h3>Your Orders</h3>
-  <ol id="orderList" style="padding-left: 20px; color: #333;"></ol>
+  <div id="orderList" style="padding-left: 20px; color: #333;"></div>
 </div>
 
 
@@ -711,7 +711,7 @@ function checkoutCart() {
 
           // Save simplified order entries
           cart.forEach(item => {
-            saveOrder(item.title || "Unknown Item", user.uid);
+           saveOrder(item.title || "Unknown Item", user.uid);
           });
 
           // ✅ UI changes after successful order
@@ -793,9 +793,9 @@ function logout() {
   });
 }
 
-function saveOrder(productName, userId) {
+function saveOrder(productName, uid) {
   db.collection("orders").add({
-    userId,
+    uid, // ✅ match field used in query
     productName,
     status: "Pending",
     timestamp: firebase.firestore.FieldValue.serverTimestamp()
@@ -805,6 +805,7 @@ function saveOrder(productName, userId) {
     console.error("Error saving simple order:", error);
   });
 }
+
 
      const firebaseConfig = {
       apiKey: "AIzaSyDzW8XuqrxM47W42HcIUXifa_X8tnfrLkY",
@@ -832,22 +833,51 @@ function loadUserProfileAndOrders() {
         orderList.innerHTML = "<li>Loading orders...</li>";
 
         try {
-          const ordersSnapshot = await db.collection("orders").where("userId", "==", user.uid).get();
+         const ordersSnapshot = await db.collection("orders")
+             .where("uid", "==", user.uid)
+              .orderBy("timestamp", "desc")
+             .get();
+
           orderList.innerHTML = "";
 
           if (ordersSnapshot.empty) {
             orderList.innerHTML = "<li>No orders found.</li>";
           } else {
-            ordersSnapshot.forEach((doc) => {
-              const order = doc.data();
-              const listItem = document.createElement("li");
-              listItem.textContent = `Order #${doc.id} - ${order.productName} (${order.status})`;
-              orderList.appendChild(listItem);
-            });
+            orderList.innerHTML = "";
+
+ordersSnapshot.forEach((doc, index) => {
+  const order = doc.data();
+  const orderDiv = document.createElement("div");
+  orderDiv.style.border = "1px solid #ccc";
+  orderDiv.style.borderRadius = "8px";
+  orderDiv.style.padding = "10px";
+  orderDiv.style.marginBottom = "15px";
+
+  let itemsHTML = "";
+  (order.cart || []).forEach(item => {
+    itemsHTML += `
+      <div style="margin-left: 10px; margin-top: 5px;">
+        🔹 <strong>${item.title}</strong> - ₹${item.price}
+      </div>
+    `;
+  });
+
+  orderDiv.innerHTML = `
+    <div><strong>Order #${index + 1}</strong></div>
+    <div><strong>Total:</strong> ₹${order.total}</div>
+    <div><strong>Payment ID:</strong> ${order.paymentId}</div>
+    <div><strong>Address:</strong> ${order.address}</div>
+    <div style="font-size: 12px; color: gray;">Placed on: ${order.timestamp?.toDate().toLocaleString() || "Unknown"}</div>
+    <div style="margin-top: 10px;">${itemsHTML}</div>
+  `;
+
+  orderList.appendChild(orderDiv);
+});
+
           }
         } catch (error) {
-          console.error("Error loading orders:", error);
-          orderList.innerHTML = "<li>Error loading orders.</li>";
+         console.error("Error loading orders:", error);
+         document.getElementById("orderList").innerHTML = `<li>Error loading orders: ${error.message}</li>`;
         }
       }
     });
