@@ -759,21 +759,25 @@ function checkoutCart() {
 }
 
 function showProfilePage() {
-  const user = auth.currentUser;
+ const user = auth.currentUser;
+ console.log(auth.currentUser?.email);
+  console.log("Current user:", user?.email, user?.uid);
   if (user) {
     document.getElementById("profileEmail").textContent = user.email;
 
-    // If you saved user name in Firestore, fetch it
-    db.collection("users").doc(user.uid).get().then(doc => {
-      if (doc.exists && doc.data().name) {
-        document.getElementById("profileName").textContent = doc.data().name;
-      } else {
-        document.getElementById("profileName").textContent = "Not available";
-      }
-      
-      loadUserProfileAndOrders();
-      
-    });
+db.collection("users").doc(user.uid).get().then(doc => {
+  let name = "Not available";
+
+  if (doc.exists && doc.data().name) {
+    name = doc.data().name;
+  } else if (user.displayName) {
+    name = user.displayName;
+  }
+
+  document.getElementById("profileName").textContent = name;
+  loadUserProfileAndOrders();
+});
+
 
     // Hide all pages, show profile
     document.getElementById("productList").style.display = "none";
@@ -823,7 +827,6 @@ function loadUserProfileAndOrders() {
     auth.onAuthStateChanged(async (user) => {
       if (user) {
         // Set profile name and email
-        document.getElementById('profileName').innerText = user.displayName || "N/A";
         document.getElementById('profileEmail').innerText = user.email;
 
         // Load orders
@@ -917,11 +920,11 @@ if (subscribed) {
   container.classList.add("no-box");
   container.classList.remove("with-top-margin");
 } else {
-  subscriptionSection.style.display = "block";
-  productsPage.style.display = "none";
-  document.getElementById("title").textContent = "PREMIUM MEMBERSHIP";
-  container.classList.remove("no-box");
-  container.classList.add("with-top-margin");
+  subscriptionSection.style.display = "none";
+  productsPage.style.display = "block";
+  document.getElementById("title").textContent = "";
+  container.classList.add("no-box");
+  container.classList.remove("with-top-margin");
 }
       loginSection.style.display = "none";
       signupSection.style.display = "none";
