@@ -688,6 +688,8 @@ cart.forEach((item, index) => {
     <h3>Total: ₹${total}</h3>
     <input type="text" id="checkoutName" placeholder="Your Name" onfocus="scrollIntoViewMobile(this)" style="padding:10px; width:100%; margin-top:10px;" />
     <input type="text" id="checkoutAddress" placeholder="Your Address" onfocus="scrollIntoViewMobile(this)" style="padding:10px; width:100%; margin-top:10px;" />
+    <input type="text" id="checkoutPincode" placeholder="Pin Code" onfocus="scrollIntoViewMobile(this)" style="padding:10px; width:100%; margin-top:10px;" />
+    <input type="text" id="checkoutMobileNumber" placeholder="Mobile Number" onfocus="scrollIntoViewMobile(this)" style="padding:10px; width:100%; margin-top:10px;" />
   `;
 }
 
@@ -713,8 +715,10 @@ function hideCart() {
 function checkoutCart() { 
   const name = document.getElementById("checkoutName").value.trim();
   const address = document.getElementById("checkoutAddress").value.trim();
+  const pincode = document.getElementById("checkoutPincode").value.trim();
+  const mobilenumber  = document.getElementById("checkoutMobileNumber").value.trim();
 
-  if (!name || !address) {
+  if (!name || !address || !pincode || !mobilenumber ) {
     alert("Please enter name and address to continue.");
     return;
   }
@@ -742,6 +746,8 @@ function checkoutCart() {
           uid: user.uid,
           name: name,
           address: address,
+          pincode: pincode,
+          mobilenumber: mobilenumber,
           cart: cart,
           total: totalAmount / 100,
           paymentId: response.razorpay_payment_id,
@@ -800,6 +806,8 @@ function checkoutCart() {
 function checkoutCOD() {
   const name = document.getElementById("checkoutName").value.trim();
   const address = document.getElementById("checkoutAddress").value.trim();
+   const pincode = document.getElementById("checkoutPincode").value.trim();
+  const mobilenumber  = document.getElementById("checkoutMobileNumber").value.trim();
 
   if (!name || !address) {
     alert("Please enter name and address to continue.");
@@ -821,9 +829,11 @@ function checkoutCOD() {
 
   const orderData = {
     uid: user.uid,
-    name,
-    address,
-    cart,
+    name: name,
+    address: address,
+    pincode: pincode,
+    mobilenumber: mobilenumber,
+    cart: cart,
     total: totalAmount,
     paymentId: "COD",
     paymentMode: "Cash on Delivery",
@@ -980,13 +990,12 @@ ordersSnapshot.forEach((doc, index) => {
   });
 
   orderDiv.innerHTML = `
+   <div style="font-size: 12px; color: gray;">Placed on: ${order.timestamp?.toDate().toLocaleString() || "Unknown"}</div>
     <div><strong>Order No:</strong> ${order.orderNumber || `#${index + 1}`}</div>
     <div><strong>Payment:</strong>${paymentInfo}</div>
     <div><strong>Payment ID:</strong> ${order.paymentId}</div>
-     <div style="font-size: 12px; color: gray;">Placed on: ${order.timestamp?.toDate().toLocaleString() || "Unknown"}</div>
-    <div><strong>Address:</strong> ${order.address}</div>
-    <div><strong>Total:</strong> ₹${order.total}</div>
     <div style="margin-top: 10px;">${itemsHTML}</div>
+    <br><div><strong>Total:</strong> ₹${order.total}</div>
   `;
 
   orderList.appendChild(orderDiv);
