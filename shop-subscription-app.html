@@ -34,33 +34,31 @@
 
 .filter-controls {
   display: flex;
-  flex-wrap: nowrap;
-  justify-content: flex-start;
-  gap: 15px;
+  flex-wrap: wrap; /* Allows wrap if absolutely needed */
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
   margin: 20px auto;
   padding: 15px;
   background-color: #f8f9fa;
   border-radius: 12px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
   max-width: 100%;
-  overflow-x: auto;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE/Edge */
-}
-
-.filter-controls::-webkit-scrollbar {
-  display: none; /* Chrome/Safari */
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .filter-controls label {
   font-weight: bold;
   color: #333;
-  white-space: nowrap;
   display: flex;
   align-items: center;
+  white-space: nowrap;
 }
 
 .filter-controls select {
+  flex: 1 1 auto; /* Let selects shrink/grow */
+  min-width: 100px;
   padding: 10px 15px;
   border: 1px solid #ccc;
   border-radius: 8px;
@@ -68,20 +66,20 @@
   background-color: #fff;
   transition: border-color 0.3s, box-shadow 0.3s;
   cursor: pointer;
-  min-width: 140px;
 }
 
 /* Mobile view adjustments */
 @media (max-width: 600px) {
   .filter-controls {
-    padding: 10px;
-    gap: 10px;
+    flex-wrap: wrap;
   }
 
   .filter-controls select {
+    flex: 1 1 45%; /* Two items per row */
     font-size: 0.95rem;
   }
 }
+
 
 
 
