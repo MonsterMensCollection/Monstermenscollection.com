@@ -36,28 +36,49 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  margin: auto;
-  padding: 1%;
-  background-color: #ffffff;
-  border-radius: 0px;
+  gap: 15px;
+  margin: 20px auto;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 12px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-  max-width: 100%;
+  max-width: 500px;
 }
 
 .filter-controls label {
   font-weight: bold;
-  color: #000000;
-  margin: auto;
+  color: #333;
+  margin-right: 5px;
 }
 
 .filter-controls select {
-  padding: 5%;
+  padding: 10px 15px;
   border: 1px solid #ccc;
-  border-radius: 0px;
+  border-radius: 8px;
   font-size: 1rem;
   background-color: #fff;
   transition: border-color 0.3s, box-shadow 0.3s;
   cursor: pointer;
+  width: 100%;
+  max-width: 200px;
+}
+
+/* Mobile view adjustments */
+@media (max-width: 600px) {
+  .filter-controls {
+    flex-direction: column;
+    align-items: stretch;
+    max-width: 90%;
+  }
+
+  .filter-controls select {
+    max-width: 100%;
+  }
+
+  .filter-controls label {
+    margin-right: 0;
+    margin-bottom: 5px;
+  }
 }
 
 
