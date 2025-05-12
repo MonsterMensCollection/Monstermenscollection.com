@@ -34,18 +34,19 @@
 
 .filter-controls {
   display: flex;
-  flex-wrap: wrap; /* Allows wrap if absolutely needed */
+  flex-wrap: nowrap; /* Force single line */
   justify-content: space-between;
   align-items: center;
   gap: 10px;
   margin: 20px auto;
-  padding: 15px;
+  padding: 10px;
   background-color: #f8f9fa;
   border-radius: 12px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-  max-width: 100%;
   width: 100%;
+  max-width: 100%;
   box-sizing: border-box;
+  overflow-x: hidden; /* Prevent horizontal scroll */
 }
 
 .filter-controls label {
@@ -54,15 +55,17 @@
   display: flex;
   align-items: center;
   white-space: nowrap;
+  font-size: 0.9rem;
 }
 
 .filter-controls select {
-  flex: 1 1 auto; /* Let selects shrink/grow */
-  min-width: 100px;
-  padding: 10px 15px;
+  flex: 1 1 0;
+  min-width: 80px;
+  max-width: 150px;
+  padding: 8px 10px;
   border: 1px solid #ccc;
   border-radius: 8px;
-  font-size: 1rem;
+  font-size: 0.9rem;
   background-color: #fff;
   transition: border-color 0.3s, box-shadow 0.3s;
   cursor: pointer;
@@ -71,14 +74,21 @@
 /* Mobile view adjustments */
 @media (max-width: 600px) {
   .filter-controls {
-    flex-wrap: wrap;
+    padding: 8px;
+    gap: 8px;
+  }
+
+  .filter-controls label {
+    font-size: 0.85rem;
   }
 
   .filter-controls select {
-    flex: 1 1 45%; /* Two items per row */
-    font-size: 0.95rem;
+    font-size: 0.85rem;
+    min-width: 60px;
+    max-width: 120px;
   }
 }
+
 
 
 
