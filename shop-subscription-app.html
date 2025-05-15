@@ -752,12 +752,14 @@ function showShirtsPage() {
    document.getElementById("cartPage").style.display = "none";
    document.getElementById("profilePage").style.display = "none";
    document.getElementById("descriptionPage").style.display = "none";
+      document.getElementById("tshirtsPage").style.display = "none";
 }
 
 function showPantsPage() {
   document.getElementById("productList").style.display = "none";
   document.getElementById("pantsPage").style.display = "block";
   document.getElementById("shirtsPage").style.display = "none";
+   document.getElementById("tshirtsPage").style.display = "none";
   document.getElementById("sliderSection").style.display = "none";
    document.getElementById("cartPage").style.display = "none";
    document.getElementById("profilePage").style.display = "none";
@@ -772,6 +774,7 @@ function backToProducts() {
   document.getElementById("sliderSection").style.display = "block";
    document.getElementById("cartPage").style.display = "none";
    document.getElementById("profilePage").style.display = "none";
+      document.getElementById("tshirtsPage").style.display = "none";
 }
 
 let cart = [];
@@ -911,6 +914,7 @@ function showDescription(media = [], price, title = "No title", sdes = "No short
   document.getElementById("pantsPage").style.display = "none";
   document.getElementById("sliderSection").style.display = "none";
   document.getElementById("profilePage").style.display = "none";
+     document.getElementById("tshirtsPage").style.display = "none";
 }
 
 
@@ -1014,6 +1018,7 @@ function showCart() {
   document.getElementById("sliderSection").style.display = "none";
   document.getElementById("cartPage").style.display = "block";
   document.getElementById("profilePage").style.display = "none";
+     document.getElementById("tshirtsPage").style.display = "none";
 
   const cartItemsDiv = document.getElementById("cartItems");
   cartItemsDiv.innerHTML = '';
@@ -1122,6 +1127,7 @@ function checkoutCart() {
           document.getElementById("sliderSection").style.display = "none";
           document.getElementById("cartPage").style.display = "none";
           document.getElementById("profilePage").style.display = "none";
+             document.getElementById("tshirtsPage").style.display = "none";
 
           // Show success page
           document.getElementById("paymentSuccessPage").style.display = "block";
@@ -1206,6 +1212,7 @@ function checkoutCOD() {
           document.getElementById("sliderSection").style.display = "none";
           document.getElementById("cartPage").style.display = "none";
           document.getElementById("profilePage").style.display = "none";
+             document.getElementById("tshirtsPage").style.display = "none";
 
           // Show success page
           document.getElementById("paymentSuccessPageCOD").style.display = "block";
@@ -1266,6 +1273,7 @@ db.collection("users").doc(user.uid).get().then(doc => {
     document.getElementById("shirtsPage").style.display = "none";
     document.getElementById("pantsPage").style.display = "none";
     document.getElementById("descriptionPage").style.display = "none";
+       document.getElementById("tshirtsPage").style.display = "none";
   }
 }
 function logout() {
