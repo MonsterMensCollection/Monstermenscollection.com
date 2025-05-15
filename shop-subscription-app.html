@@ -570,6 +570,12 @@
     <h2>Discription</h2>
     <p id="descText" style="margin-top: 10px; font-size: 16px; color: #333; text-align: left;"></p> <!-- Product Description -->
   </div>
+  
+  <div id="mainMediaWrapper" style="display: flex; justify-content: center; overflow: hidden; touch-action: pan-y;">
+  <img id="descImage" src="" style="max-width: 80%; border-radius: 12px; display: none;" />
+  <video id="descVideo" controls style="max-width: 80%; border-radius: 12px; display: none;"></video>
+</div>
+
 
           <div id="sliderSection" class="slider-wrapper">
           <div class="slider1">
@@ -743,19 +749,50 @@ function showDescription(media = [], price, title = "No title", sdes = "No short
   const mainVideo = document.getElementById("descVideo");
   const previewContainer = document.getElementById("descImagePreview");
 
-  const showMedia = (item) => {
-    if (item.type === "video") {
-      mainImage.style.display = "none";
-      mainVideo.style.display = "block";
-      mainVideo.src = item.src;
-    } else {
-      mainVideo.style.display = "none";
-      mainImage.style.display = "block";
-      mainImage.src = item.src;
-    }
-  };
+ let currentIndex = 0;
 
-  showMedia(media[0]);
+const showMediaAt = (index) => {
+  currentIndex = index;
+  const item = media[index];
+  if (item.type === "video") {
+    mainImage.style.display = "none";
+    mainVideo.style.display = "block";
+    mainVideo.src = item.src;
+  } else {
+    mainVideo.style.display = "none";
+    mainImage.style.display = "block";
+    mainImage.src = item.src;
+  }
+};
+
+const setupSwipe = (container) => {
+  let startX = 0;
+  let endX = 0;
+
+  container.addEventListener("touchstart", e => {
+    startX = e.touches[0].clientX;
+  });
+
+  container.addEventListener("touchmove", e => {
+    endX = e.touches[0].clientX;
+  });
+
+  container.addEventListener("touchend", () => {
+    const diff = startX - endX;
+    if (Math.abs(diff) > 50) {
+      if (diff > 0 && currentIndex < media.length - 1) {
+        showMediaAt(currentIndex + 1);
+      } else if (diff < 0 && currentIndex > 0) {
+        showMediaAt(currentIndex - 1);
+      }
+    }
+  });
+};
+
+// Show initial media and enable swipe
+showMediaAt(0);
+setupSwipe(document.getElementById("mainMediaWrapper"));
+
   previewContainer.innerHTML = "";
 
   media.forEach(item => {
