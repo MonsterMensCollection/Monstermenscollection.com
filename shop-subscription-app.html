@@ -451,6 +451,40 @@
 </div>
 </div>
 
+<div id="tshirtsPage" style="display: none;">
+    <br><img src="https://see.fontimg.com/api/rf5/8MnG2/NDk1NWQ2OGI5Njg0NDc5NDhmMzMzOWRlYzAxZmRmODYub3Rm/dHNoaXJ0cw/gamer-spot-semi-italic.png?r=fs&h=30&w=1000&fg=000000&bg=FFFFFF&tb=1&s=30" style="display: block;margin-left: auto;margin-right: auto;">
+
+    <div class="filter-controls" data-target="tshirtsPage">
+      <label>Sort by Price:</label>
+      <select class="sortPrice">
+        <option value="default">Default</option>
+        <option value="asc">Low to High</option>
+        <option value="desc">High to Low</option>
+      </select>
+
+      <label>Filter by Size:</label>
+      <select class="filterSize">
+        <option value="all">All</option>
+        <option value="M">M</option>
+        <option value="L">L</option>
+        <option value="XL">XL</option>
+      </select>
+    </div>
+
+    <div class="product-grid">
+      <div class="product-card">
+        <img src="https://raw.githubusercontent.com/MonsterMensCollection/Products/refs/heads/tshirt/tshirt1.jpeg" alt="Tshirt 1" onclick="showDescription(this.src, '₹399', 'Monster Tee', 'Comfortable fit cotton t-shirt', 'Cotton', ['M', 'L'])">
+        <div class=cardName>
+          <h3>Monster Tee</h3>
+          <p>Comfortable fit</p>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 10px;">
+          <p class="price">₹399</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
 <div id="pantsPage" style="display: none;">
     
     <br> <img src="https://see.fontimg.com/api/rf5/8MnG2/NDk1NWQ2OGI5Njg0NDc5NDhmMzMzOWRlYzAxZmRmODYub3Rm/cGFudHM/gamer-spot-semi-italic.png?r=fs&h=30&w=1000&fg=000000&bg=FFFFFF&tb=1&s=30"style="display: block;margin-left: auto;
@@ -944,6 +978,33 @@ function filterProductsBySize(pageId) {
     card.style.display = hasSize ? "block" : "none";
   });
 }
+
+ let startX;
+  const shirtsPage = document.getElementById("shirtsPage");
+  const tshirtsPage = document.getElementById("tshirtsPage");
+
+  function handleTouchStart(e) {
+    startX = e.touches[0].clientX;
+  }
+
+  function handleTouchEnd(e) {
+    const endX = e.changedTouches[0].clientX;
+    const diff = endX - startX;
+
+    if (diff > 50) {
+      // Swipe Right - Show T-Shirts
+      shirtsPage.style.display = "none";
+      tshirtsPage.style.display = "block";
+    } else if (diff < -50) {
+      // Swipe Left - Show Shirts
+      shirtsPage.style.display = "block";
+      tshirtsPage.style.display = "none";
+    }
+  }
+
+  const swipeArea = document.getElementById("productsPage");
+  swipeArea.addEventListener("touchstart", handleTouchStart, false);
+  swipeArea.addEventListener("touchend", handleTouchEnd, false);
 
 function showCart() {
   document.getElementById("descriptionPage").style.display = "none";
