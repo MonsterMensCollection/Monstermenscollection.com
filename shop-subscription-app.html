@@ -402,7 +402,11 @@
  <div class="product-grid">
      
   <div class="product-card">
-<img src="https://raw.githubusercontent.com/MonsterMensCollection/Products/refs/heads/main/a620547a-7168-4b4b-a59b-38d65685f7e1.jpeg" alt="Shirt 1" onclick="showDescription(this.src, '₹499', 'Diesel', 'Down Shoulder With rib', 'Cotton Lycra', ['M', 'XL'])">
+<img src="https://raw.githubusercontent.com/MonsterMensCollection/Products/refs/heads/main/a620547a-7168-4b4b-a59b-38d65685f7e1.jpeg" alt="Shirt 1" onclick="showDescription([
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/Products/refs/heads/main/a620547a-7168-4b4b-a59b-38d65685f7e1.jpeg' },
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/Red%20and%20Black%20Ripped%20Paper%20Black%20Friday%20Flyer%20Portrait.png' },
+  { type: 'video', src: 'https://github.com/MonsterMensCollection/Products/raw/refs/heads/tshirt/WhatsApp%20Video%202025-05-15%20at%2011.57.32%20AM.mp4' }
+], '₹499', 'Diesel', 'Down Shoulder With rib', 'Cotton Lycra', ['M', 'XL'])">
 <div class=cardName>
 <h3>Red & Bull </h3> <!-- Product Title -->
 <p>Down Shoulder</p>
@@ -524,9 +528,25 @@
 </div>
  </div>
  
+<!-- Product Description Page with Scrollable Image Gallery -->
 <div id="descriptionPage" style="display: none; padding: 0 5%;" class="form-section">
-  <div style="text-align: center;">
-    <img id="descImage" src="" style="max-width: 80%; border-radius: 12px;" /><br>
+<div style="display: flex; justify-content: center;">
+  <img id="descImage" src="" style="max-width: 80%; border-radius: 12px; display: none;" />
+  <video id="descVideo" controls style="max-width: 80%; border-radius: 12px; display: none;"></video>
+</div>
+
+<!-- Thumbnails Preview (Image + Video Swipe Area) -->
+<div id="descImagePreview" style="
+  margin-top: 15px;
+  display: flex;
+  overflow-x: auto;
+  white-space: nowrap;
+  gap: 10px;
+  padding: 10px;
+  justify-content: flex-start;
+  -webkit-overflow-scrolling: touch;
+"></div>
+
     <br><div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; width: 100%; padding: 0 5px;">
   <div style="flex: 1; min-width: 150px;">
     <h2 id="descName" style="font-size: 20px; color: #333; margin: 0; text-align: left;">Product Title</h2>
@@ -550,9 +570,6 @@
     <h2>Discription</h2>
     <p id="descText" style="margin-top: 10px; font-size: 16px; color: #333; text-align: left;"></p> <!-- Product Description -->
   </div>
-</div>
-
-
 
           <div id="sliderSection" class="slider-wrapper">
           <div class="slider1">
@@ -721,69 +738,108 @@ function backToProducts() {
 }
 
 let cart = [];
-  function showDescription(imageSrc, price, title = "No title", sdes = "No short description", description = "No description", sizesAvailable = ["M", "L", "XL"]) {
-    document.getElementById("descImage").src = imageSrc;
-    document.getElementById("descPrice").textContent = price;
-    document.getElementById('descName').textContent = title;
-    document.getElementById('descSText').textContent = sdes;
-     document.getElementById('descText').textContent = description;
-     
-       const sizeContainer = document.getElementById("sizeButtons");
-  sizeContainer.innerHTML = ""; // Clear old buttons
- let selectedSize = null; 
+function showDescription(media = [], price, title = "No title", sdes = "No short description", description = "No description", sizesAvailable = ["M", "L", "XL"]) {
+  const mainImage = document.getElementById("descImage");
+  const mainVideo = document.getElementById("descVideo");
+  const previewContainer = document.getElementById("descImagePreview");
 
-sizesAvailable.forEach((size, index) => {
-  const btn = document.createElement("button");
-  btn.textContent = size;
-  btn.style.padding = "10px 20px";
-  btn.style.border = "1px solid #ccc";
-  btn.style.borderRadius = "5px";
-  btn.style.cursor = "pointer";
-
-  // Default: first size is selected and styled as active
-  if (index === 0) {
-    btn.style.backgroundColor = "#333";
-    btn.style.color = "#fff";
-    selectedSize = size;
-  } else {
-    btn.style.backgroundColor = "#f8f8f8";
-    btn.style.color = "#000";
-  }
-
-  btn.onclick = () => {
-    // Deselect all buttons
-    document.querySelectorAll("#sizeButtons button").forEach(b => {
-      b.style.backgroundColor = "#f8f8f8";
-      b.style.color = "#000";
-    });
-    // Select clicked button
-    btn.style.backgroundColor = "#333";
-    btn.style.color = "#fff";
-    selectedSize = size;
-    document.getElementById("selectedSize").value = size;
+  const showMedia = (item) => {
+    if (item.type === "video") {
+      mainImage.style.display = "none";
+      mainVideo.style.display = "block";
+      mainVideo.src = item.src;
+    } else {
+      mainVideo.style.display = "none";
+      mainImage.style.display = "block";
+      mainImage.src = item.src;
+    }
   };
 
-  sizeContainer.appendChild(btn);
-});
+  showMedia(media[0]);
+  previewContainer.innerHTML = "";
 
-// Hidden input to store selected size
-let hiddenInput = document.getElementById("selectedSize");
-if (!hiddenInput) {
-  hiddenInput = document.createElement("input");
-  hiddenInput.type = "hidden";
-  hiddenInput.id = "selectedSize";
-  sizeContainer.appendChild(hiddenInput);
-}
-hiddenInput.value = selectedSize;
+  media.forEach(item => {
+    let thumb;
+    if (item.type === "video") {
+      thumb = document.createElement("video");
+      thumb.src = item.src;
+      thumb.muted = true;
+      thumb.loop = true;
+      thumb.autoplay = true;
+    } else {
+      thumb = document.createElement("img");
+      thumb.src = item.src;
+    }
 
-    document.getElementById("descriptionPage").style.display = "block";
-    document.getElementById("productList").style.display = "none";
-    document.getElementById("shirtsPage").style.display = "none";
-    document.getElementById("pantsPage").style.display = "none";
-    document.getElementById("sliderSection").style.display = "none";
-    document.getElementById("profilePage").style.display = "none";
+    thumb.style.width = "70px";
+    thumb.style.height = "70px";
+    thumb.style.objectFit = "cover";
+    thumb.style.cursor = "pointer";
+    thumb.style.borderRadius = "8px";
+    thumb.style.flexShrink = "0";
+
+    thumb.onclick = () => showMedia(item);
+    previewContainer.appendChild(thumb);
+  });
+
+  // Update product details
+  document.getElementById("descPrice").textContent = price;
+  document.getElementById("descName").textContent = title;
+  document.getElementById("descSText").textContent = sdes;
+  document.getElementById("descText").textContent = description;
+
+  // Size buttons logic (unchanged)
+  const sizeContainer = document.getElementById("sizeButtons");
+  sizeContainer.innerHTML = "";
+  let selectedSize = null;
+
+  sizesAvailable.forEach((size, index) => {
+    const btn = document.createElement("button");
+    btn.textContent = size;
+    btn.style.padding = "10px 20px";
+    btn.style.border = "1px solid #ccc";
+    btn.style.borderRadius = "5px";
+    btn.style.cursor = "pointer";
+
+    if (index === 0) {
+      btn.style.backgroundColor = "#333";
+      btn.style.color = "#fff";
+      selectedSize = size;
+    }
+
+    btn.onclick = () => {
+      document.querySelectorAll("#sizeButtons button").forEach(b => {
+        b.style.backgroundColor = "#f8f8f8";
+        b.style.color = "#000";
+      });
+      btn.style.backgroundColor = "#333";
+      btn.style.color = "#fff";
+      selectedSize = size;
+      document.getElementById("selectedSize").value = size;
+    };
+
+    sizeContainer.appendChild(btn);
+  });
+
+  let hiddenInput = document.getElementById("selectedSize");
+  if (!hiddenInput) {
+    hiddenInput = document.createElement("input");
+    hiddenInput.type = "hidden";
+    hiddenInput.id = "selectedSize";
+    sizeContainer.appendChild(hiddenInput);
   }
-  
+  hiddenInput.value = selectedSize;
+
+  // Show page
+  document.getElementById("descriptionPage").style.display = "block";
+  document.getElementById("productList").style.display = "none";
+  document.getElementById("shirtsPage").style.display = "none";
+  document.getElementById("pantsPage").style.display = "none";
+  document.getElementById("sliderSection").style.display = "none";
+  document.getElementById("profilePage").style.display = "none";
+}
+
+
 function addToCart(image = null, price = null, title = null) {
   if (!image || !price) {
     image = document.getElementById('descImage').src;
