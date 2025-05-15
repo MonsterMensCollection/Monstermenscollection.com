@@ -746,53 +746,55 @@ function showDescription(media = [], price, title = "No title", sdes = "No short
   const mainVideo = document.getElementById("descVideo");
   const previewContainer = document.getElementById("descImagePreview");
 
- let currentIndex = 0;
+  let currentIndex = 0;
 
-const showMediaAt = (index) => {
-  currentIndex = index;
-  const item = media[index];
-  if (item.type === "video") {
-    mainImage.style.display = "none";
-    mainVideo.style.display = "block";
-    mainVideo.src = item.src;
-  } else {
-    mainVideo.style.display = "none";
-    mainImage.style.display = "block";
-    mainImage.src = item.src;
-  }
-};
-
-const setupSwipe = (container) => {
-  let startX = 0;
-  let endX = 0;
-
-  container.addEventListener("touchstart", e => {
-    startX = e.touches[0].clientX;
-  });
-
-  container.addEventListener("touchmove", e => {
-    endX = e.touches[0].clientX;
-  });
-
-  container.addEventListener("touchend", () => {
-    const diff = startX - endX;
-    if (Math.abs(diff) > 50) {
-      if (diff > 0 && currentIndex < media.length - 1) {
-        showMediaAt(currentIndex + 1);
-      } else if (diff < 0 && currentIndex > 0) {
-        showMediaAt(currentIndex - 1);
-      }
+  const showMediaAt = (index) => {
+    currentIndex = index;
+    const item = media[index];
+    if (item.type === "video") {
+      mainImage.style.display = "none";
+      mainVideo.style.display = "block";
+      mainVideo.src = item.src;
+      mainVideo.autoplay = true;
+      mainVideo.muted = true; // for autoplay to work on mobile
+      mainVideo.play();
+    } else {
+      mainVideo.style.display = "none";
+      mainImage.style.display = "block";
+      mainImage.src = item.src;
     }
-  });
-};
+  };
 
-// Show initial media and enable swipe
-showMediaAt(0);
-setupSwipe(document.getElementById("mainMediaWrapper"));
+  const setupSwipe = (container) => {
+    let startX = 0;
+    let endX = 0;
 
+    container.addEventListener("touchstart", e => {
+      startX = e.touches[0].clientX;
+    });
+
+    container.addEventListener("touchmove", e => {
+      endX = e.touches[0].clientX;
+    });
+
+    container.addEventListener("touchend", () => {
+      const diff = startX - endX;
+      if (Math.abs(diff) > 50) {
+        if (diff > 0 && currentIndex < media.length - 1) {
+          showMediaAt(currentIndex + 1);
+        } else if (diff < 0 && currentIndex > 0) {
+          showMediaAt(currentIndex - 1);
+        }
+      }
+    });
+  };
+
+  showMediaAt(0);
+  setupSwipe(document.getElementById("mainMediaWrapper"));
+
+  // Thumbnails preview
   previewContainer.innerHTML = "";
-
-  media.forEach(item => {
+  media.forEach((item, index) => {
     let thumb;
     if (item.type === "video") {
       thumb = document.createElement("video");
@@ -812,17 +814,21 @@ setupSwipe(document.getElementById("mainMediaWrapper"));
     thumb.style.borderRadius = "8px";
     thumb.style.flexShrink = "0";
 
-    thumb.onclick = () => showMedia(item);
+    // Tap thumbnail to show media
+    thumb.addEventListener("click", () => {
+      showMediaAt(index);
+    });
+
     previewContainer.appendChild(thumb);
   });
 
-  // Update product details
+  // Update product info
   document.getElementById("descPrice").textContent = price;
   document.getElementById("descName").textContent = title;
   document.getElementById("descSText").textContent = sdes;
   document.getElementById("descText").textContent = description;
 
-  // Size buttons logic (unchanged)
+  // Size buttons logic
   const sizeContainer = document.getElementById("sizeButtons");
   sizeContainer.innerHTML = "";
   let selectedSize = null;
@@ -864,7 +870,7 @@ setupSwipe(document.getElementById("mainMediaWrapper"));
   }
   hiddenInput.value = selectedSize;
 
-  // Show page
+  // Show description page and hide others
   document.getElementById("descriptionPage").style.display = "block";
   document.getElementById("productList").style.display = "none";
   document.getElementById("shirtsPage").style.display = "none";
@@ -872,6 +878,7 @@ setupSwipe(document.getElementById("mainMediaWrapper"));
   document.getElementById("sliderSection").style.display = "none";
   document.getElementById("profilePage").style.display = "none";
 }
+
 
 
 function addToCart(image = null, price = null, title = null) {
