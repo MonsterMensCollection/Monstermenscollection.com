@@ -451,6 +451,83 @@
 </div>
 </div>
 
+<div id="tshirtsPage" style="display: none;">
+    
+    <br> <img src="https://see.fontimg.com/api/rf5/8MnG2/NDk1NWQ2OGI5Njg0NDc5NDhmMzMzOWRlYzAxZmRmODYub3Rm/cGFudHM/gamer-spot-semi-italic.png?r=fs&h=30&w=1000&fg=000000&bg=FFFFFF&tb=1&s=30"style="display: block;margin-left: auto;
+  margin-right: auto;">
+    
+<!-- Sorting and Filtering Controls -->
+<div class="filter-controls" data-target="pantsPage">
+  <label>Sort by Price:</label>
+  <select class="sortPrice">
+    <option value="default">Default</option>
+    <option value="asc">Low to High</option>
+    <option value="desc">High to Low</option>
+  </select>
+
+  <label>Filter by Size:</label>
+  <select class="filterSize">
+    <option value="all">All</option>
+    <option value="28">28</option>
+    <option value="30">30</option>
+    <option value="32">32</option>
+    <option value="34">34</option>
+    <option value="36">36</option>
+    <option value="38">38</option>
+    <option value="40">40</option>
+  </select>
+</div>
+
+
+  <div class="product-grid">
+      
+  <div class="product-card">
+<img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/Red%20and%20Black%20Ripped%20Paper%20Black%20Friday%20Flyer%20Portrait.png" alt="Shirt 1" onclick="showDescription(this.src, '₹499', ' Black & Bull', 'bro', 'Premium cotton shirt ideal for every occasion.', ['28', '30'])">
+<div class=cardName>
+<h3>Black & Bull </h3> <!-- Product Title -->
+<p>Non-Spread Collar Casual Shirt</p>
+</div>
+ <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 10px;">
+    <p class="price">₹1</p>
+  </div>
+  </div>
+  
+  <div class="product-card">
+<img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/Red%20and%20Black%20Ripped%20Paper%20Black%20Friday%20Flyer%20Portrait.png" alt="Shirt 1" onclick="showDescription(this.src, '₹499',' Black & Bull', 'bro', 'Premium cotton shirt ideal for every occasion.', ['30', '32'])">
+<div class=cardName>
+<h3>Black & Bull </h3> <!-- Product Title -->
+<p>Non-Spread Collar Casual Shirt</p>
+</div>
+ <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 10px;">
+    <p class="price">₹2</p>
+  </div>
+  </div>
+  
+  <div class="product-card">
+<img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/Red%20and%20Black%20Ripped%20Paper%20Black%20Friday%20Flyer%20Portrait.png" alt="Shirt 1" onclick="showDescription(this.src, '₹499', ' Black & Bull', 'bro','Premium cotton shirt ideal for every occasion.', ['34', '36'])">
+<div class=cardName>
+<h3>Black & Bull </h3> <!-- Product Title -->
+<p>Non-Spread Collar Casual Shirt</p>
+</div>
+ <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 10px;">
+    <p class="price">₹3</p>
+  </div>
+  </div>
+  
+  <div class="product-card">
+<img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/Red%20and%20Black%20Ripped%20Paper%20Black%20Friday%20Flyer%20Portrait.png" alt="Shirt 1" onclick="showDescription(this.src, '₹499', ' Black & Bull', 'bro','Premium cotton shirt ideal for every occasion.', ['38', '40'])">
+<div class=cardName>
+<h3>Black & Bull </h3> <!-- Product Title -->
+<p>Non-Spread Collar Casual Shirt</p>
+</div>
+ <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 10px;">
+    <p class="price">₹4</p>
+  </div>
+  </div>
+  
+</div>
+ </div>
+
 <div id="pantsPage" style="display: none;">
     
     <br> <img src="https://see.fontimg.com/api/rf5/8MnG2/NDk1NWQ2OGI5Njg0NDc5NDhmMzMzOWRlYzAxZmRmODYub3Rm/cGFudHM/gamer-spot-semi-italic.png?r=fs&h=30&w=1000&fg=000000&bg=FFFFFF&tb=1&s=30"style="display: block;margin-left: auto;
@@ -739,6 +816,39 @@ function backToProducts() {
    document.getElementById("cartPage").style.display = "none";
    document.getElementById("profilePage").style.display = "none";
 }
+
+let startX = 0;
+
+function handleTouchStart(evt) {
+  startX = evt.touches[0].clientX;
+}
+
+function handleTouchEnd(evt, fromPage, toPage) {
+  const endX = evt.changedTouches[0].clientX;
+  const diffX = startX - endX;
+
+  if (diffX > 50 && fromPage === "shirtsPage") {
+    // Swipe left on shirtsPage -> go to tshirtsPage
+    document.getElementById("shirtsPage").style.display = "none";
+    document.getElementById("tshirtsPage").style.display = "block";
+  } else if (diffX < -50 && fromPage === "tshirtsPage") {
+    // Swipe right on tshirtsPage -> go to shirtsPage
+    document.getElementById("tshirtsPage").style.display = "none";
+    document.getElementById("shirtsPage").style.display = "block";
+  }
+}
+
+// Add listeners to both pages
+document.getElementById("shirtsPage").addEventListener("touchstart", handleTouchStart, false);
+document.getElementById("shirtsPage").addEventListener("touchend", function(evt) {
+  handleTouchEnd(evt, "shirtsPage", "tshirtsPage");
+}, false);
+
+document.getElementById("tshirtsPage").addEventListener("touchstart", handleTouchStart, false);
+document.getElementById("tshirtsPage").addEventListener("touchend", function(evt) {
+  handleTouchEnd(evt, "tshirtsPage", "shirtsPage");
+}, false);
+
 
 let cart = [];
 function showDescription(media = [], price, title = "No title", sdes = "No short description", description = "No description", sizesAvailable = ["M", "L", "XL"]) {
