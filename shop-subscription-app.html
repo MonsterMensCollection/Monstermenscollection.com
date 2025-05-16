@@ -1067,8 +1067,12 @@ document.getElementById("cargosPage").addEventListener("touchend", function(evt)
 let cart = [];
 function showDescription(media = [], price, title = "No title", sdes = "No short description", description = "No description", sizesAvailable = ["M", "L", "XL"], category = null) {
     
-    if (history.state?.page !== "descriptionPage") {
     history.pushState({ page: "descriptionPage" }, "", "#description");
+    
+    if (history.state?.page !== "shirtsPage") {
+    history.replaceState({ page: "descriptionPage" }, "", "#description");
+  }else if (history.state?.page !== "pantsPage") {
+    history.replaceState({ page: "descriptionPage" }, "", "#description");
   }
   
      justPushedCategory = false;
