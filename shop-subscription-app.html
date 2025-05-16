@@ -1258,13 +1258,15 @@ function filterProductsBySize(pageId) {
 }
 
 function showCart() {
-  document.getElementById("descriptionPage").style.display = "none";
+   history.pushState({ page: "cartPage" }, "", "#cart");
+
   document.getElementById("productList").style.display = "none";
   document.getElementById("shirtsPage").style.display = "none";
   document.getElementById("pantsPage").style.display = "none";
   document.getElementById("sliderSection").style.display = "none";
   document.getElementById("cartPage").style.display = "block";
   document.getElementById("profilePage").style.display = "none";
+  document.getElementById("descriptionPage").style.display = "none";
   document.getElementById("tshirtsPage").style.display = "none";
   document.getElementById("cargosPage").style.display = "none";
   
@@ -1494,6 +1496,7 @@ function proceedWithCOD() {
 
 
 function showProfilePage() {
+      history.pushState({ page: "profilePage" }, "", "#profile");
  const user = auth.currentUser;
  console.log(auth.currentUser?.email);
   console.log("Current user:", user?.email, user?.uid);
@@ -1514,16 +1517,15 @@ db.collection("users").doc(user.uid).get().then(doc => {
 });
 
 
-    // Hide all pages, show profile
-    document.getElementById("productList").style.display = "none";
-    document.getElementById("sliderSection").style.display = "none";
-    document.getElementById("cartPage").style.display = "none";
-    document.getElementById("profilePage").style.display = "block";
-    document.getElementById("shirtsPage").style.display = "none";
-    document.getElementById("pantsPage").style.display = "none";
-    document.getElementById("descriptionPage").style.display = "none";
-      document.getElementById("tshirtsPage").style.display = "none";
-       document.getElementById("cargosPage").style.display = "none";
+  document.getElementById("productList").style.display = "none";
+  document.getElementById("shirtsPage").style.display = "none";
+  document.getElementById("pantsPage").style.display = "none";
+  document.getElementById("sliderSection").style.display = "none";
+  document.getElementById("cartPage").style.display = "none";
+  document.getElementById("profilePage").style.display = "block";
+  document.getElementById("descriptionPage").style.display = "none";
+  document.getElementById("tshirtsPage").style.display = "none";
+  document.getElementById("cargosPage").style.display = "none";
   }
 }
 function logout() {
