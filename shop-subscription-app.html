@@ -941,7 +941,8 @@ function showShirtsPage() {
 
 function showtshirtsPage() {
 
-    history.pushState({ page: "TshirtsPage" }, "", "#shirts");
+    history.pushState({ page: "tshirtsPage" }, "", "#tshirts"); // correct page ID
+
  previousPage = "tshirtsPage";
   document.getElementById("productList").style.display = "none";
   document.getElementById("shirtsPage").style.display = "none";
@@ -957,7 +958,8 @@ function showtshirtsPage() {
 
 function showCargoPage() {
 
-    history.pushState({ page: "shirtsPage" }, "", "#shirts");
+   history.pushState({ page: "cargosPage" }, "", "#cargos");
+
  previousPage = "cargosPage";
   document.getElementById("productList").style.display = "none";
   document.getElementById("shirtsPage").style.display = "none";
@@ -1832,34 +1834,48 @@ if (subscribed) {
       statusMessage.textContent = "";
     }
     
- window.addEventListener("popstate", function(event) {
+ window.addEventListener("popstate", function (event) {
   const state = event.state;
 
-  if (!state) return;
+  if (!state || !state.page) {
+    // Fallback to home or product list
+    document.getElementById("productList").style.display = "block";
+    document.getElementById("sliderSection").style.display = "block";
+    document.getElementById("shirtsPage").style.display = "none";
+    document.getElementById("pantsPage").style.display = "none";
+    document.getElementById("tshirtsPage").style.display = "none";
+    document.getElementById("cargosPage").style.display = "none";
+    document.getElementById("descriptionPage").style.display = "none";
+    document.getElementById("cartPage").style.display = "none";
+    document.getElementById("profilePage").style.display = "none";
+    return;
+  }
 
-  if (state.page === "shirtsPage") {
-    showShirtsPage();
-  } else if (state.page === "pantsPage") {
-    showPantsPage();
-  } else if (state.page === "tshirtsPage") {
-    // create showTshirtsPage() if not already done
-    showTshirtsPage();
-  } else if (state.page === "cargosPage") {
-    // create showCargosPage() if not already done
-    showCargosPage();
-  } else if (state.page === "descriptionPage") {
-    // Go back to the previous category page
-    if (state.from === "shirtsPage") {
+  switch (state.page) {
+    case "shirtsPage":
       showShirtsPage();
-    } else if (state.from === "pantsPage") {
+      break;
+    case "tshirtsPage":
+      showtshirtsPage();
+      break;
+    case "pantsPage":
       showPantsPage();
-    } else if (state.from === "tshirtsPage") {
-      showTshirtsPage();
-    } else if (state.from === "cargosPage") {
-      showCargosPage();
-    }
+      break;
+    case "cargosPage":
+      showCargoPage();
+      break;
+    case "descriptionPage":
+      showDescription(); // You’ll want to preserve the previous media & content somehow if needed
+      break;
+    case "cartPage":
+      showCart();
+      break;
+    default:
+      // Go back to main listing
+      document.getElementById("productList").style.display = "block";
   }
 });
+
 
 
     // On initial load (login/signup page), add top margin
