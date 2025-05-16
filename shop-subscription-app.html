@@ -1810,39 +1810,53 @@ if (subscribed) {
       statusMessage.textContent = "";
     }
     
-  window.onpopstate = function (event) {
-  const state = event.state;
+  window.addEventListener("popstate", function(event) {
+  if (!event.state || !event.state.page) {
+    backToProducts();
+    return;
+  }
 
-  if (!state) return;
+  const page = event.state.page;
 
-  switch (state.page) {
+  // Hide all pages first
+  document.getElementById("productList").style.display = "none";
+  document.getElementById("shirtsPage").style.display = "none";
+  document.getElementById("pantsPage").style.display = "none";
+  document.getElementById("sliderSection").style.display = "none";
+  document.getElementById("cartPage").style.display = "none";
+  document.getElementById("profilePage").style.display = "none";
+  document.getElementById("descriptionPage").style.display = "none";
+  document.getElementById("tshirtsPage").style.display = "none";
+  document.getElementById("cargosPage").style.display = "none";
+
+  // Show the appropriate page
+  switch (page) {
     case "shirtsPage":
-      showShirtsPage();
-      break;
-    case "pantsPage":
-      showPantsPage();
-      break;
-    case "cargosPage":
-      showcargosPage();
+      document.getElementById("shirtsPage").style.display = "block";
       break;
     case "tshirtsPage":
-      showtshirtsPage();
+      document.getElementById("tshirtsPage").style.display = "block";
       break;
-    case "descriptionPage":
-      if (state.from === "shirtsPage") showShirtsPage();
-      else if (state.from === "pantsPage") showPantsPage();
-      else document.getElementById("productList").style.display = "block";
-      document.getElementById("descriptionPage").style.display = "none";
+    case "cargosPage":
+      document.getElementById("cargosPage").style.display = "block";
+      break;
+    case "pantsPage":
+      document.getElementById("pantsPage").style.display = "block";
       break;
     case "cartPage":
-      showCart();
+      document.getElementById("cartPage").style.display = "block";
       break;
-    // add other cases as needed
+    case "profilePage":
+      document.getElementById("profilePage").style.display = "block";
+      break;
+    case "descriptionPage":
+      document.getElementById("descriptionPage").style.display = "block";
+      break;
     default:
-      document.getElementById("productList").style.display = "block";
-      break;
+      backToProducts();
   }
-};
+});
+
 
     // On initial load (login/signup page), add top margin
 document.getElementById("mainContainer").classList.add("with-top-margin");
