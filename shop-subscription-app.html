@@ -1784,6 +1784,10 @@ if (subscribed) {
       document.getElementById("shirtsPage").style.display = "block";
     }
   }
+    });
+    
+    
+ window.addEventListener("popstate", function(event) {
   if (event.state && event.state.page === "descriptionPage") {
     // Do nothing if user is already on descriptionPage
   } else {
