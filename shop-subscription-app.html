@@ -1835,34 +1835,16 @@ if (subscribed) {
       document.getElementById("title").textContent = isLoginVisible ? "Sign Up" : "Login";
       statusMessage.textContent = "";
     }
-    
-window.onpopstate = function(event) {
-  const page = event.state?.page;
 
-  if (!page) {
-    backToProducts();
-    return;
-  }
+     window.onpopstate = function (event) {
+  if (event.state && event.state.page) {
+    const page = event.state.page;
+    // Hide all pages first
+    document.querySelectorAll(".page").forEach(p => p.style.display = "none");
 
-  switch (page) {
-    case "shirtsPage":
-      showShirtsPage();
-      break;
-    case "pantsPage":
-      showPantsPage();
-      break;
-    case "tshirtsPage":
-      showTshirtsPage();
-      break;
-    case "cargosPage":
-      showCargosPage();
-      break;
-    case "descriptionPage":
-      document.getElementById("descriptionPage").style.display = "block";
-      // Optionally hide others if needed
-      break;
-    default:
-      backToProducts();
+    // Then show the correct one
+    document.getElementById(page).style.display = "block";
+    document.getElementById("descriptionPage").style.display = "none";
   }
 };
 
