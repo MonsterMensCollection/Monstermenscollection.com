@@ -920,6 +920,9 @@
   </div>
   
   <script>
+      
+      let lastCategoryPage = null;
+
 function showShirtsPage() {
     
     history.pushState({ page: "shirtsPage" }, "", "#shirts");
@@ -937,8 +940,9 @@ function showShirtsPage() {
 
 function showTshirtsPage() {
     
+     lastCategoryPage = "tshirtsPage";
     history.pushState({ page: "tshirtsPage" }, "", "#tshirts");
-
+   
   document.getElementById("productList").style.display = "none";
   document.getElementById("tshirtsPage").style.display = "block";
   document.getElementById("pantsPage").style.display = "none";
@@ -963,16 +967,26 @@ function showPantsPage() {
 }
 
 function backToProducts() {
-  document.getElementById("descriptionPage").style.display = "none"; // Hide description page
-  document.getElementById("productList").style.display = "block";
+  document.getElementById("descriptionPage").style.display = "none";
+  document.getElementById("productList").style.display = "none"; // Hide this to avoid showing general list
+  document.getElementById("sliderSection").style.display = "none";
+
+  // Hide all category pages
   document.getElementById("shirtsPage").style.display = "none";
   document.getElementById("pantsPage").style.display = "none";
-  document.getElementById("sliderSection").style.display = "block";
-   document.getElementById("cartPage").style.display = "none";
-   document.getElementById("profilePage").style.display = "none";
-     document.getElementById("tshirtsPage").style.display = "none";
-     document.getElementById("cargosPage").style.display = "none";
+  document.getElementById("tshirtsPage").style.display = "none";
+  document.getElementById("cargosPage").style.display = "none";
+
+  // Show the last viewed category
+  if (lastCategoryPage) {
+    document.getElementById(lastCategoryPage).style.display = "block";
+  } else {
+    // Default fallback
+    document.getElementById("productList").style.display = "block";
+    document.getElementById("sliderSection").style.display = "block";
+  }
 }
+
 
 let startX = 0;
 
@@ -985,6 +999,7 @@ function handleTouchEnd(evt, fromPage, toPage) {
   const diffX = startX - endX;
 
   if (diffX > 50 && fromPage === "shirtsPage") {
+       lastCategoryPage = "tshirtsPage";
       history.pushState({ page: "tshirtsPage" }, "", "#shirts");
     // Swipe left on shirtsPage -> go to tshirtsPage
     document.getElementById("shirtsPage").style.display = "none";
