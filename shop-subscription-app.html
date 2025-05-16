@@ -921,6 +921,9 @@
   
   <script>
 function showShirtsPage() {
+    
+    history.pushState({ page: "shirtsPage" }, "", "#shirts");
+
   document.getElementById("productList").style.display = "none";
   document.getElementById("shirtsPage").style.display = "block";
   document.getElementById("pantsPage").style.display = "none";
@@ -1008,8 +1011,9 @@ document.getElementById("cargosPage").addEventListener("touchend", function(evt)
 }, false);
 
 let cart = [];
-let lastActivePage = null;
 function showDescription(media = [], price, title = "No title", sdes = "No short description", description = "No description", sizesAvailable = ["M", "L", "XL"]) {
+    
+    history.pushState({ page: "descriptionPage" }, "", "#description");
     
   const mainImage = document.getElementById("descImage");
   const mainVideo = document.getElementById("descVideo");
@@ -1148,22 +1152,6 @@ function showDescription(media = [], price, title = "No title", sdes = "No short
   document.getElementById("profilePage").style.display = "none";
     document.getElementById("tshirtsPage").style.display = "none";
     document.getElementById("cargosPage").style.display = "none";
-    
-    if (document.getElementById("shirtsPage").style.display === 'block') {
-  lastActivePage = "shirtsPage";
-} else if (document.getElementById("tshirtsPage").style.display === 'block') {
-  lastActivePage = "tshirtsPage";
-} else if (document.getElementById("pantsPage").style.display === 'block') {
-  lastActivePage = "pantsPage";
-} else if (document.getElementById("cargosPage").style.display === 'block') {
-  lastActivePage = "cargosPage";
-} else if (document.getElementById("productList").style.display === 'block') {
-  lastActivePage = "productList";
-}
-
-// Push to browser history so back button works
-history.pushState({ page: "description" }, null, "#description");
-
 }
 
 
@@ -1777,7 +1765,6 @@ if (subscribed) {
     const rzp = new Razorpay(razorpayOptions);
     rzp.open();
   });
-  
     function toggleForm() {
       const isLoginVisible = loginSection.style.display !== "none";
       loginSection.style.display = isLoginVisible ? "none" : "flex";
@@ -1786,18 +1773,18 @@ if (subscribed) {
       statusMessage.textContent = "";
     }
     
-    window.onpopstate = function (event) {
-  if (event.state && event.state.page === "description") {
-    document.getElementById("descriptionPage").style.display = "block";
+    window.addEventListener("popstate", function(event) {
+  if (event.state && event.state.page === "descriptionPage") {
+    // Do nothing if user is already on descriptionPage
   } else {
-    document.getElementById("descriptionPage").style.display = "none";
-    if (lastActivePage) {
-      document.getElementById(lastActivePage).style.display = "block";
+    // If going back from descriptionPage, show shirtsPage
+    if (document.getElementById("descriptionPage").style.display === "block") {
+      document.getElementById("descriptionPage").style.display = "none";
+      document.getElementById("shirtsPage").style.display = "block";
     }
   }
-};
+});
 
-    
     // On initial load (login/signup page), add top margin
 document.getElementById("mainContainer").classList.add("with-top-margin");
 document.getElementById("backToSubscription").addEventListener("click", () => {
