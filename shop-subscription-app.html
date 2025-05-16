@@ -1011,13 +1011,15 @@ document.getElementById("cargosPage").addEventListener("touchend", function(evt)
 }, false);
 
 let cart = [];
+let currentSection = 'productList';
 function showDescription(media = [], price, title = "No title", sdes = "No short description", description = "No description", sizesAvailable = ["M", "L", "XL"]) {
     
-  if (document.getElementById('tshirtsPage').style.display === 'block') currentSection = 'tshirtsPage';
-  else if (document.getElementById('pantsPage').style.display === 'block') currentSection = 'pantsPage';
-  else if (document.getElementById('cargosPage').style.display === 'block') currentSection = 'cargosPage';
-  else if (document.getElementById('shirtsPage').style.display === 'block') currentSection = 'shirtsPage';
-  
+   const sections = ['tshirtsPage', 'pantsPage', 'cargosPage', 'shirtsPage', 'productList'];
+  sections.forEach(section => {
+    if (document.getElementById(section).style.display === 'block') {
+      currentSection = section;
+    }
+  });
     
   const mainImage = document.getElementById("descImage");
   const mainVideo = document.getElementById("descVideo");
@@ -1161,6 +1163,14 @@ function showDescription(media = [], price, title = "No title", sdes = "No short
       
 }
 
+window.addEventListener('popstate', function (event) {
+  // Hide description page
+  document.getElementById('descriptionPage').style.display = 'none';
+
+  // Show the previous section or default to productList
+  const sectionToShow = (event.state && event.state.fromPage) ? event.state.fromPage : 'productList';
+  document.getElementById(sectionToShow).style.display = 'block';
+});
 
 
 function addToCart(image = null, price = null, title = null) {
@@ -1779,17 +1789,6 @@ if (subscribed) {
       document.getElementById("title").textContent = isLoginVisible ? "Sign Up" : "Login";
       statusMessage.textContent = "";
     }
-    
-   window.addEventListener('popstate', function (event) {
-  // Hide description page
-  document.getElementById('descriptionPage').style.display = 'none';
-
-  // Show previous page if available
-  if (event.state && event.state.fromPage) {
-    document.getElementById(event.state.fromPage).style.display = 'block';
-  }
-});
-
 
     // On initial load (login/signup page), add top margin
 document.getElementById("mainContainer").classList.add("with-top-margin");
