@@ -865,9 +865,8 @@
     </button>
 </div>
 
+  </div>
 
-
-</div>
 <div class="bottom-nav" id="bottomNav" style="margin-left:-1%;margin-right:0;">
   <a href="#" onclick="backToProducts()">
     <div style="display: flex; flex-direction: column; align-items: center;">
@@ -920,9 +919,9 @@
   </div>
   
   <script>
-function showShirtsPage() {
+function showShirtsPage(push = true) {
     
-history.pushState({ page: "shirtsPage" }, "", "#shirts");
+
 
   document.getElementById("productList").style.display = "none";
   document.getElementById("shirtsPage").style.display = "block";
@@ -933,11 +932,12 @@ history.pushState({ page: "shirtsPage" }, "", "#shirts");
    document.getElementById("descriptionPage").style.display = "none";
      document.getElementById("tshirtsPage").style.display = "none";
       document.getElementById("cargosPage").style.display = "none";
+      history.pushState({ page: "shirtsPage" }, "", "#shirts");
 }
 
-function showtshirtsPage() {
+function showtshirtsPage(push = true) {
     
-history.pushState({ page: "tshirtsPage" }, "", "#tshirts");
+
 
   document.getElementById("productList").style.display = "none";
   document.getElementById("shirtsPage").style.display = "none";
@@ -948,12 +948,13 @@ history.pushState({ page: "tshirtsPage" }, "", "#tshirts");
    document.getElementById("descriptionPage").style.display = "none";
      document.getElementById("tshirtsPage").style.display = "block";
       document.getElementById("cargosPage").style.display = "none";
+      history.pushState({ page: "tshirtsPage" }, "", "#tshirts");
       
       
 }
-function showcargosPage(){
+function showcargosPage(push = true){
     
-   history.pushState({ page: "cargosPage" }, "", "#cargos"); 
+
     
       document.getElementById("productList").style.display = "none";
   document.getElementById("shirtsPage").style.display = "none";
@@ -964,14 +965,14 @@ function showcargosPage(){
    document.getElementById("descriptionPage").style.display = "none";
      document.getElementById("tshirtsPage").style.display = "none";
       document.getElementById("cargosPage").style.display = "block";
-    
+       history.pushState({ page: "cargosPage" }, "", "#cargos"); 
     
     
     
 }
-function showPantsPage() {
+function showPantsPage(push = true) {
     
-      history.pushState({ page: "pantsPage" }, "", "#pants"); 
+    
     
   document.getElementById("productList").style.display = "none";
   document.getElementById("pantsPage").style.display = "block";
@@ -982,6 +983,7 @@ function showPantsPage() {
    document.getElementById("profilePage").style.display = "none";
    document.getElementById("descriptionPage").style.display = "none";
    document.getElementById("cargosPage").style.display = "none";
+     history.pushState({ page: "pantsPage" }, "", "#pants"); 
 }
 
 function backToProducts() {
@@ -1257,7 +1259,7 @@ function filterProductsBySize(pageId) {
   });
 }
 
-function showCart() {
+function showCart(push = true) {
    history.pushState({ page: "cartPage" }, "", "#cart");
 
   document.getElementById("productList").style.display = "none";
@@ -1812,48 +1814,33 @@ if (subscribed) {
       statusMessage.textContent = "";
     }
     
-  window.addEventListener("popstate", function(event) {
+    window.addEventListener("popstate", function(event) {
+  const state = event.state;
 
-  const page = event.state.page;
-
-  // Hide all pages first
-  document.getElementById("productList").style.display = "none";
-  document.getElementById("shirtsPage").style.display = "none";
-  document.getElementById("pantsPage").style.display = "none";
-  document.getElementById("sliderSection").style.display = "none";
-  document.getElementById("cartPage").style.display = "none";
-  document.getElementById("profilePage").style.display = "none";
-  document.getElementById("descriptionPage").style.display = "none";
-  document.getElementById("tshirtsPage").style.display = "none";
-  document.getElementById("cargosPage").style.display = "none";
-
-  // Show the appropriate page
-  switch (page) {
+  switch (state.page) {
     case "shirtsPage":
-      document.getElementById("shirtsPage").style.display = "block";
+      showShirtsPage(false);
       break;
     case "tshirtsPage":
-      document.getElementById("tshirtsPage").style.display = "block";
-      break;
-    case "cargosPage":
-      document.getElementById("cargosPage").style.display = "block";
+      showtshirtsPage(false);
       break;
     case "pantsPage":
-      document.getElementById("pantsPage").style.display = "block";
+      showPantsPage(false);
+      break;
+    case "cargosPage":
+      showcargosPage(false);
       break;
     case "cartPage":
-      document.getElementById("cartPage").style.display = "block";
-      break;
-    case "profilePage":
-      document.getElementById("profilePage").style.display = "block";
+      showCart(false);
       break;
     case "descriptionPage":
-      document.getElementById("descriptionPage").style.display = "block";
+      backToProducts(); // or customize if needed
       break;
     default:
       backToProducts();
   }
 });
+
 
 
     // On initial load (login/signup page), add top margin
