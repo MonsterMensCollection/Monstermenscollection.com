@@ -920,12 +920,10 @@
   </div>
   
   <script>
-      // default fallback
-let lastVisitedCategory = null;
-
+      
 function showShirtsPage() {
 
-    history.pushState({ page: "shirtsPage" }, "", "#shirts");
+    history.pushState({ page: "shirtsPage" }, "", "");
 
   document.getElementById("productList").style.display = "none";
   document.getElementById("shirtsPage").style.display = "block";
@@ -940,7 +938,7 @@ function showShirtsPage() {
 
 function showPantsPage() {
     
-    history.pushState({ page: "pantsPage" }, "", "#pants");
+    history.pushState({ page: "pantsPage" }, "", "");
     
   document.getElementById("productList").style.display = "none";
   document.getElementById("pantsPage").style.display = "block";
@@ -956,17 +954,6 @@ function showPantsPage() {
 
 function backToProducts() {
   document.getElementById("descriptionPage").style.display = "none";
-
-  if (lastVisitedCategory === "shirtsPage") {
-    showShirtsPage();
-  } else if (lastVisitedCategory === "pantsPage") {
-    showPantsPage();
-  } else if (lastVisitedCategory === "tshirtsPage") {
-    showTshirtsPage(); // if implemented
-  } else if (lastVisitedCategory === "cargosPage") {
-    showCargosPage(); // if implemented
-  } else {
-    // fallback to general product list
     document.getElementById("productList").style.display = "block";
     document.getElementById("sliderSection").style.display = "block";
     document.getElementById("shirtsPage").style.display = "none";
