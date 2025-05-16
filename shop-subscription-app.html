@@ -1785,8 +1785,14 @@ if (subscribed) {
       document.getElementById("descriptionPage").style.display = "none";
       document.getElementById("shirtsPage").style.display = "block";
     }
-     else {
-    // If going back from descriptionPage, show shirtsPage
+  }
+});
+
+window.addEventListener("popstate", function(event) {
+  if (event.state && event.state.page === "descriptionPage") {
+    // Do nothing if user is already on descriptionPage
+  } else {
+    // If going back from descriptionPage, show pantsPage
     if (document.getElementById("descriptionPage").style.display === "block") {
       document.getElementById("descriptionPage").style.display = "none";
       document.getElementById("pantsPage").style.display = "block";
