@@ -1013,7 +1013,11 @@ document.getElementById("cargosPage").addEventListener("touchend", function(evt)
 let cart = [];
 function showDescription(media = [], price, title = "No title", sdes = "No short description", description = "No description", sizesAvailable = ["M", "L", "XL"]) {
     
-    history.pushState({ page: "descriptionPage" }, "", "#description");
+  if (document.getElementById('tshirtsPage').style.display === 'block') currentSection = 'tshirtsPage';
+  else if (document.getElementById('pantsPage').style.display === 'block') currentSection = 'pantsPage';
+  else if (document.getElementById('cargosPage').style.display === 'block') currentSection = 'cargosPage';
+  else if (document.getElementById('shirtsPage').style.display === 'block') currentSection = 'shirtsPage';
+  
     
   const mainImage = document.getElementById("descImage");
   const mainVideo = document.getElementById("descVideo");
@@ -1152,6 +1156,9 @@ function showDescription(media = [], price, title = "No title", sdes = "No short
   document.getElementById("profilePage").style.display = "none";
     document.getElementById("tshirtsPage").style.display = "none";
     document.getElementById("cargosPage").style.display = "none";
+    
+      history.pushState({ fromPage: currentSection }, '', '');
+      
 }
 
 
@@ -1773,17 +1780,16 @@ if (subscribed) {
       statusMessage.textContent = "";
     }
     
-    window.addEventListener("popstate", function(event) {
-  if (event.state && event.state.page === "descriptionPage") {
-    // Do nothing if user is already on descriptionPage
-  } else {
-    // If going back from descriptionPage, show shirtsPage
-    if (document.getElementById("descriptionPage").style.display === "block") {
-      document.getElementById("descriptionPage").style.display = "none";
-      document.getElementById("shirtsPage").style.display = "block";
-    }
+   window.addEventListener('popstate', function (event) {
+  // Hide description page
+  document.getElementById('descriptionPage').style.display = 'none';
+
+  // Show previous page if available
+  if (event.state && event.state.fromPage) {
+    document.getElementById(event.state.fromPage).style.display = 'block';
   }
 });
+
 
     // On initial load (login/signup page), add top margin
 document.getElementById("mainContainer").classList.add("with-top-margin");
