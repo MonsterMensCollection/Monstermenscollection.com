@@ -935,6 +935,21 @@ function showShirtsPage() {
       document.getElementById("cargosPage").style.display = "none";
 }
 
+function showShirtsPage() {
+    
+    history.pushState({ page: "tshirtsPage" }, "", "#tshirts");
+
+  document.getElementById("productList").style.display = "none";
+  document.getElementById("tshirtsPage").style.display = "block";
+  document.getElementById("pantsPage").style.display = "none";
+  document.getElementById("sliderSection").style.display = "none";
+   document.getElementById("cartPage").style.display = "none";
+   document.getElementById("profilePage").style.display = "none";
+   document.getElementById("descriptionPage").style.display = "none";
+     document.getElementById("shirtsPage").style.display = "none";
+      document.getElementById("cargosPage").style.display = "none";
+}
+
 function showPantsPage() {
   document.getElementById("productList").style.display = "none";
   document.getElementById("pantsPage").style.display = "block";
