@@ -925,11 +925,7 @@
 let justPushedCategory = false;
 
 function showShirtsPage() {
-    
-    if (!justPushedCategory) {
-    history.pushState({ page: "shirtsPage" }, "", "#shirts");
-    justPushedCategory = true;
-  }
+  history.pushState({ page: "shirtsPage" }, "", "#shirts");
 
   lastCategoryPage = "shirtsPage";
 
@@ -937,12 +933,13 @@ function showShirtsPage() {
   document.getElementById("shirtsPage").style.display = "block";
   document.getElementById("pantsPage").style.display = "none";
   document.getElementById("sliderSection").style.display = "none";
-   document.getElementById("cartPage").style.display = "none";
-   document.getElementById("profilePage").style.display = "none";
-   document.getElementById("descriptionPage").style.display = "none";
-     document.getElementById("tshirtsPage").style.display = "none";
-      document.getElementById("cargosPage").style.display = "none";
+  document.getElementById("cartPage").style.display = "none";
+  document.getElementById("profilePage").style.display = "none";
+  document.getElementById("descriptionPage").style.display = "none";
+  document.getElementById("tshirtsPage").style.display = "none";
+  document.getElementById("cargosPage").style.display = "none";
 }
+
 
 function showTshirtsPage() {
     
@@ -962,10 +959,7 @@ function showTshirtsPage() {
 
 function showPantsPage() {
     
-   if (!justPushedCategory) {
-    history.pushState({ page: "pantsPage" }, "", "#pants");
-    justPushedCategory = true;
-  }
+  history.pushState({ page: "pantsPage" }, "", "#pants");
 
   lastCategoryPage = "pantsPage";
 
@@ -974,11 +968,12 @@ function showPantsPage() {
   document.getElementById("shirtsPage").style.display = "none";
   document.getElementById("tshirtsPage").style.display = "none";
   document.getElementById("sliderSection").style.display = "none";
-   document.getElementById("cartPage").style.display = "none";
-   document.getElementById("profilePage").style.display = "none";
-   document.getElementById("descriptionPage").style.display = "none";
-   document.getElementById("cargosPage").style.display = "none";
+  document.getElementById("cartPage").style.display = "none";
+  document.getElementById("profilePage").style.display = "none";
+  document.getElementById("descriptionPage").style.display = "none";
+  document.getElementById("cargosPage").style.display = "none";
 }
+
 
 function showCargosPage() {
     
@@ -1841,15 +1836,33 @@ if (subscribed) {
       statusMessage.textContent = "";
     }
     
-   window.onpopstate = function (event) {
-  if (event.state && event.state.page) {
-    const page = event.state.page;
-    // Hide all pages first
-    document.querySelectorAll(".page").forEach(p => p.style.display = "none");
+window.onpopstate = function(event) {
+  const page = event.state?.page;
 
-    // Then show the correct one
-    document.getElementById(page).style.display = "block";
-    document.getElementById("descriptionPage").style.display = "none";
+  if (!page) {
+    backToProducts();
+    return;
+  }
+
+  switch (page) {
+    case "shirtsPage":
+      showShirtsPage();
+      break;
+    case "pantsPage":
+      showPantsPage();
+      break;
+    case "tshirtsPage":
+      showTshirtsPage();
+      break;
+    case "cargosPage":
+      showCargosPage();
+      break;
+    case "descriptionPage":
+      document.getElementById("descriptionPage").style.display = "block";
+      // Optionally hide others if needed
+      break;
+    default:
+      backToProducts();
   }
 };
 
