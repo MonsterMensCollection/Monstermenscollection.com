@@ -925,6 +925,7 @@ function showShirtsPage() {
     history.pushState({ page: "shirtsPage" }, "", "#shirts");
 
   document.getElementById("productList").style.display = "none";
+  history.pushState({ page: "shirtsPage" }, "", "#shirts")
   document.getElementById("shirtsPage").style.display = "block";
   document.getElementById("pantsPage").style.display = "none";
   document.getElementById("sliderSection").style.display = "none";
@@ -940,7 +941,8 @@ function showPantsPage() {
     history.pushState({ page: "pantsPage" }, "", "#pants");
     
   document.getElementById("productList").style.display = "none";
-  document.getElementById("pantsPage").style.display = "block";
+  document.getElementById("pantsPage").style.display = "block"
+   history.pushState({ page: "pantsPage" }, "", "#pants");
   document.getElementById("shirtsPage").style.display = "none";
   document.getElementById("tshirtsPage").style.display = "none";
   document.getElementById("sliderSection").style.display = "none";
