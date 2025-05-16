@@ -925,10 +925,7 @@
 let justPushedCategory = false;
 
 function showShirtsPage() {
-  history.pushState({ page: "shirtsPage" }, "", "#shirts");
-
-  lastCategoryPage = "shirtsPage";
-
+  
   document.getElementById("productList").style.display = "none";
   document.getElementById("shirtsPage").style.display = "block";
   document.getElementById("pantsPage").style.display = "none";
@@ -959,10 +956,6 @@ function showTshirtsPage() {
 
 function showPantsPage() {
     
-  history.pushState({ page: "pantsPage" }, "", "#pants");
-
-  lastCategoryPage = "pantsPage";
-
   document.getElementById("productList").style.display = "none";
   document.getElementById("pantsPage").style.display = "block";
   document.getElementById("shirtsPage").style.display = "none";
@@ -1023,6 +1016,9 @@ function handleTouchEnd(evt, fromPage, toPage) {
     document.getElementById("tshirtsPage").style.display = "block";
   } else if (diffX < -50 && fromPage === "tshirtsPage") {
     // Swipe right on tshirtsPage -> go to shirtsPage
+     history.pushState({ page: "shirtsPage" }, "", "#shirts");
+
+  lastCategoryPage = "shirtsPage";
     document.getElementById("descriptionPage").style.display = "none"; 
     document.getElementById("tshirtsPage").style.display = "none";
     document.getElementById("shirtsPage").style.display = "block";
@@ -1035,7 +1031,9 @@ function handleTouchEnd(evt, fromPage, toPage) {
     document.getElementById("pantsPage").style.display = "none";
     document.getElementById("cargosPage").style.display = "block";
   } else if (diffX < -50 && fromPage === "cargosPage") {
+ history.pushState({ page: "pantsPage" }, "", "#pants");
 
+  lastCategoryPage = "pantsPage";
     // Swipe right on tshirtsPage -> go to shirtsPage
     document.getElementById("descriptionPage").style.display = "none"; 
     document.getElementById("cargosPage").style.display = "none";
