@@ -1011,7 +1011,7 @@ function handleTouchEnd(evt, fromPage, toPage) {
 
   if (diffX > 50 && fromPage === "shirtsPage") {
         lastCategoryPage = "tshirtsPage";
-    history.pushState({ page: "tshirtsPage" }, "", "#tshirts");
+    history.replaceState({ page: "tshirtsPage" }, "", "#tshirts");
     // Swipe left on shirtsPage -> go to tshirtsPage
     document.getElementById("descriptionPage").style.display = "none"; 
     document.getElementById("shirtsPage").style.display = "none";
@@ -1027,7 +1027,7 @@ function handleTouchEnd(evt, fromPage, toPage) {
   }
   if (diffX > 50 && fromPage === "pantsPage") {
       lastCategoryPage = "cargosPage"; // ✅ Add this line
-      history.pushState({ page: "cargosPage" }, "", "#cargos");
+      history.replaceState({ page: "cargosPage" }, "", "#cargos");
     // Swipe left on shirtsPage -> go to tshirtsPage
     document.getElementById("descriptionPage").style.display = "none"; 
     document.getElementById("pantsPage").style.display = "none";
