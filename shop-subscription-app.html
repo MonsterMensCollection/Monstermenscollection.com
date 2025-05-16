@@ -922,6 +922,7 @@
   <script>
 function showShirtsPage() {
     
+history.pushState({ page: "shirtsPage" }, "", "#shirts");
 
   document.getElementById("productList").style.display = "none";
   document.getElementById("shirtsPage").style.display = "block";
@@ -936,6 +937,7 @@ function showShirtsPage() {
 
 function showtshirtsPage() {
     
+history.pushState({ page: "tshirtsPage" }, "", "#shirts");
 
   document.getElementById("productList").style.display = "none";
   document.getElementById("shirtsPage").style.display = "none";
@@ -951,7 +953,7 @@ function showtshirtsPage() {
 }
 function showcargosPage(){
     
-    
+   history.pushState({ page: "cargosPage" }, "", "#shirts"); 
     
       document.getElementById("productList").style.display = "none";
   document.getElementById("shirtsPage").style.display = "none";
@@ -969,6 +971,7 @@ function showcargosPage(){
 }
 function showPantsPage() {
     
+      history.pushState({ page: "pantsPage" }, "", "#shirts"); 
     
   document.getElementById("productList").style.display = "none";
   document.getElementById("pantsPage").style.display = "block";
