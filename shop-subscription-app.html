@@ -994,6 +994,7 @@ function handleTouchEnd(evt, fromPage, toPage) {
     document.getElementById("shirtsPage").style.display = "none";
     document.getElementById("tshirtsPage").style.display = "block";
   } else if (diffX < -50 && fromPage === "tshirtsPage") {
+        history.pushState({ page: "shirtsPage" }, "", "#shirts");
     // Swipe right on tshirtsPage -> go to shirtsPage
     document.getElementById("tshirtsPage").style.display = "none";
     document.getElementById("shirtsPage").style.display = "block";
@@ -1004,7 +1005,7 @@ function handleTouchEnd(evt, fromPage, toPage) {
     document.getElementById("pantsPage").style.display = "none";
     document.getElementById("cargosPage").style.display = "block";
   } else if (diffX < -50 && fromPage === "cargosPage") {
-      
+       history.pushState({ page: "pantsPage" }, "", "#pants");
     // Swipe right on tshirtsPage -> go to shirtsPage
     document.getElementById("cargosPage").style.display = "none";
     document.getElementById("pantsPage").style.display = "block";
