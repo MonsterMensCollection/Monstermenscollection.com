@@ -1789,17 +1789,23 @@ if (subscribed) {
       statusMessage.textContent = "";
     }
     
-    window.addEventListener("popstate", function(event) {
-  if (event.state && event.state.page === "descriptionPage") {
-    // Do nothing if user is already on descriptionPage
-  } else {
-    // If going back from descriptionPage, show tshirtsPage
-    if (document.getElementById("descriptionPage").style.display === "block") {
-      document.getElementById("descriptionPage").style.display = "none";
-      document.getElementById("tshirtsPage").style.display = "block";
+   window.addEventListener("popstate", function(event) {
+  const descriptionPage = document.getElementById("descriptionPage");
+  const tshirtsPage = document.getElementById("tshirtsPage");
+  const shirtsPage = document.getElementById("shirtsPage");
+
+  if (descriptionPage.style.display === "block") {
+    descriptionPage.style.display = "none";
+    
+    // Use event.state to decide where to go back to
+    if (event.state && event.state.page === "tshirtsPage") {
+      tshirtsPage.style.display = "block";
+    } else {
+      shirtsPage.style.display = "block";
     }
   }
 });
+
 
     // On initial load (login/signup page), add top margin
 document.getElementById("mainContainer").classList.add("with-top-margin");
