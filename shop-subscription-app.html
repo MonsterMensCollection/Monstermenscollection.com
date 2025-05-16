@@ -1072,6 +1072,9 @@ document.getElementById("cargosPage").addEventListener("touchend", function(evt)
 
 
 let cart = [];
+
+lastVisitedCategory = previousPage;
+
 function showDescription(media = [], price, title = "No title", sdes = "No short description", description = "No description", sizesAvailable = ["M", "L", "XL"]) {
     
    history.pushState({ page: "descriptionPage", from: previousPage }, "", "#description");
@@ -1834,35 +1837,31 @@ if (subscribed) {
       statusMessage.textContent = "";
     }
     
- window.addEventListener("popstate", function (event) {
-  const state = event.state;
+window.addEventListener("popstate", (event) => {
+  const page = event.state?.page;
 
-  switch (state.page) {
-    case "shirtsPage":
-      showShirtsPage();
-      break;
-    case "tshirtsPage":
-      showtshirtsPage();
-      break;
-    case "pantsPage":
-      showPantsPage();
-      break;
-    case "cargosPage":
-      showCargoPage();
-      break;
-    case "descriptionPage":
-      showDescription(); // You’ll want to preserve the previous media & content somehow if needed
-      break;
-    case "cartPage":
-      showCart();
-      break;
-    default:
-      // Go back to main listing
-      document.getElementById("productList").style.display = "block";
+  if (page === "descriptionPage") {
+    // Still on descriptionPage, do nothing (browser just navigated)
+    document.getElementById("descriptionPage").style.display = "block";
+  } else if (page === "shirtsPage") {
+    showShirtsPage();
+  } else if (page === "pantsPage") {
+    showPantsPage();
+  } else if (page === "tshirtsPage") {
+    showtshirtsPage();
+  } else if (page === "cargosPage") {
+    showCargoPage();
+  } else {
+    // Fallback to main product list
+    document.getElementById("productList").style.display = "block";
+    document.getElementById("descriptionPage").style.display = "none";
+    document.getElementById("shirtsPage").style.display = "none";
+    document.getElementById("pantsPage").style.display = "none";
+    document.getElementById("tshirtsPage").style.display = "none";
+    document.getElementById("cargosPage").style.display = "none";
+    document.getElementById("sliderSection").style.display = "block";
   }
 });
-
-
 
     // On initial load (login/signup page), add top margin
 document.getElementById("mainContainer").classList.add("with-top-margin");
