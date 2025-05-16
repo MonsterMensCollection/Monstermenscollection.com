@@ -1804,30 +1804,17 @@ if (subscribed) {
       statusMessage.textContent = "";
     }
     
-    window.addEventListener("popstate", function(event) {
-  if (event.state && event.state.page === "descriptionPage") {
-    // Do nothing if user is already on descriptionPage
-  } else {
-    // If going back from descriptionPage, show shirtsPage
-    if (document.getElementById("descriptionPage").style.display === "block") {
-      document.getElementById("descriptionPage").style.display = "none";
-      document.getElementById("shirtsPage").style.display = "block";
-    }
+   window.onpopstate = function (event) {
+  if (event.state && event.state.page) {
+    const page = event.state.page;
+    // Hide all pages first
+    document.querySelectorAll(".page").forEach(p => p.style.display = "none");
+
+    // Then show the correct one
+    document.getElementById(page).style.display = "block";
   }
-    });
-    
-    
- window.addEventListener("popstate", function(event) {
-  if (event.state && event.state.page === "descriptionPage") {
-    // Do nothing if user is already on descriptionPage
-  } else {
-    // If going back from descriptionPage, show shirtsPage
-    if (document.getElementById("descriptionPage").style.display === "block") {
-      document.getElementById("descriptionPage").style.display = "none";
-      document.getElementById("tshirtsPage").style.display = "block";
-    }
-  }
-});
+};
+
 
     // On initial load (login/signup page), add top margin
 document.getElementById("mainContainer").classList.add("with-top-margin");
