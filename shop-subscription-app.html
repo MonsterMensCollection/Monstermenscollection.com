@@ -921,11 +921,11 @@
   
   <script>
       
-      let lastCategoryPage = null;
-let justPushedCategory = false;
-
 function showShirtsPage() {
   
+    history.pushState({ page: "shirtsPage" }, "", "#shirts");
+
+  lastCategoryPage = "shirtsPage";
   document.getElementById("productList").style.display = "none";
   document.getElementById("shirtsPage").style.display = "block";
   document.getElementById("pantsPage").style.display = "none";
@@ -955,7 +955,9 @@ function showTshirtsPage() {
 }
 
 function showPantsPage() {
-    
+    history.pushState({ page: "pantsPage" }, "", "#pants");
+
+  lastCategoryPage = "pantsPage";
   document.getElementById("productList").style.display = "none";
   document.getElementById("pantsPage").style.display = "block";
   document.getElementById("shirtsPage").style.display = "none";
