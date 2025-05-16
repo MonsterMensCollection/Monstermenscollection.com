@@ -1813,10 +1813,6 @@ if (subscribed) {
     }
     
   window.addEventListener("popstate", function(event) {
-  if (!event.state || !event.state.page) {
-    backToProducts();
-    return;
-  }
 
   const page = event.state.page;
 
