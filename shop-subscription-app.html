@@ -1163,14 +1163,7 @@ function showDescription(media = [], price, title = "No title", sdes = "No short
       
 }
 
-window.addEventListener('popstate', function (event) {
-  // Hide description page
-  document.getElementById('descriptionPage').style.display = 'none';
 
-  // Show the previous section or default to productList
-  const sectionToShow = (event.state && event.state.fromPage) ? event.state.fromPage : 'productList';
-  document.getElementById(sectionToShow).style.display = 'block';
-});
 
 
 function addToCart(image = null, price = null, title = null) {
@@ -1789,6 +1782,14 @@ if (subscribed) {
       document.getElementById("title").textContent = isLoginVisible ? "Sign Up" : "Login";
       statusMessage.textContent = "";
     }
+    window.addEventListener('popstate', function (event) {
+  // Hide description page
+  document.getElementById('descriptionPage').style.display = 'none';
+
+  // Show the previous section or default to productList
+  const sectionToShow = (event.state && event.state.fromPage) ? event.state.fromPage : 'productList';
+  document.getElementById(sectionToShow).style.display = 'block';
+});
 
     // On initial load (login/signup page), add top margin
 document.getElementById("mainContainer").classList.add("with-top-margin");
