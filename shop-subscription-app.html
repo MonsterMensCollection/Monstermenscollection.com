@@ -925,6 +925,7 @@
 
 function showShirtsPage() {
     
+     lastCategoryPage = "shirtsPage";
     history.pushState({ page: "shirtsPage" }, "", "#shirts");
 
   document.getElementById("productList").style.display = "none";
@@ -955,6 +956,8 @@ function showTshirtsPage() {
 }
 
 function showPantsPage() {
+    lastCategoryPage = "pantsPage";
+    
   document.getElementById("productList").style.display = "none";
   document.getElementById("pantsPage").style.display = "block";
   document.getElementById("shirtsPage").style.display = "none";
@@ -964,6 +967,20 @@ function showPantsPage() {
    document.getElementById("profilePage").style.display = "none";
    document.getElementById("descriptionPage").style.display = "none";
    document.getElementById("cargosPage").style.display = "none";
+}
+
+function showCargosPage() {
+  lastCategoryPage = "cargosPage"; // ✅ Add this line
+
+  document.getElementById("productList").style.display = "none";
+  document.getElementById("cargosPage").style.display = "block";
+  document.getElementById("shirtsPage").style.display = "none";
+  document.getElementById("pantsPage").style.display = "none";
+  document.getElementById("tshirtsPage").style.display = "none";
+  document.getElementById("sliderSection").style.display = "none";
+  document.getElementById("cartPage").style.display = "none";
+  document.getElementById("profilePage").style.display = "none";
+  document.getElementById("descriptionPage").style.display = "none";
 }
 
 function backToProducts() {
@@ -1042,10 +1059,14 @@ document.getElementById("cargosPage").addEventListener("touchend", function(evt)
 }, false);
 
 let cart = [];
-function showDescription(media = [], price, title = "No title", sdes = "No short description", description = "No description", sizesAvailable = ["M", "L", "XL"]) {
+function showDescription(media = [], price, title = "No title", sdes = "No short description", description = "No description", sizesAvailable = ["M", "L", "XL"], category = null) {
     
     history.pushState({ page: "descriptionPage" }, "", "#description");
     
+    if (category) {
+    lastCategoryPage = category; // ✅ Save the originating category
+  }
+  
   const mainImage = document.getElementById("descImage");
   const mainVideo = document.getElementById("descVideo");
   const previewContainer = document.getElementById("descImagePreview");
