@@ -970,6 +970,7 @@ function handleTouchEnd(evt, fromPage, toPage) {
   const diffX = startX - endX;
 
   if (diffX > 50 && fromPage === "shirtsPage") {
+      history.pushState({ page: "tshirtsPage" }, "", "#shirts");
     // Swipe left on shirtsPage -> go to tshirtsPage
     document.getElementById("shirtsPage").style.display = "none";
     document.getElementById("tshirtsPage").style.display = "block";
@@ -1781,6 +1782,15 @@ if (subscribed) {
     if (document.getElementById("descriptionPage").style.display === "block") {
       document.getElementById("descriptionPage").style.display = "none";
       document.getElementById("shirtsPage").style.display = "block";
+    }
+  }
+  if (event.state && event.state.page === "descriptionPage") {
+    // Do nothing if user is already on descriptionPage
+  } else {
+    // If going back from descriptionPage, show shirtsPage
+    if (document.getElementById("descriptionPage").style.display === "block") {
+      document.getElementById("descriptionPage").style.display = "none";
+      document.getElementById("tshirtsPage").style.display = "block";
     }
   }
 });
