@@ -920,12 +920,10 @@
   </div>
   
   <script>
-      
-      let lastVisitedCategory = "productList"; // default fallback
+      // default fallback
 
 function showShirtsPage() {
-    
-    lastVisitedCategory = "shirtsPage";
+
     history.pushState({ page: "shirtsPage" }, "", "#shirts");
 
   document.getElementById("productList").style.display = "none";
@@ -941,7 +939,6 @@ function showShirtsPage() {
 
 function showPantsPage() {
     
-     lastVisitedCategory = "pantsPage";
     history.pushState({ page: "pantsPage" }, "", "#pants");
     
   document.getElementById("productList").style.display = "none";
@@ -1012,6 +1009,7 @@ function handleTouchEnd(evt, fromPage, toPage) {
   }
 }
 
+
 // Add listeners to both pages
 document.getElementById("shirtsPage").addEventListener("touchstart", handleTouchStart, false);
 document.getElementById("shirtsPage").addEventListener("touchend", function(evt) {
@@ -1032,6 +1030,7 @@ document.getElementById("cargosPage").addEventListener("touchstart", handleTouch
 document.getElementById("cargosPage").addEventListener("touchend", function(evt) {
   handleTouchEnd(evt, "cargosPage", "pantsPage");
 }, false);
+
 
 let cart = [];
 function showDescription(media = [], price, title = "No title", sdes = "No short description", description = "No description", sizesAvailable = ["M", "L", "XL"]) {
