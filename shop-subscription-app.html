@@ -921,6 +921,9 @@
   
   <script>
 function showShirtsPage() {
+    
+    history.pushState({ page: "shirtsPage" }, "", "#shirts");
+
   document.getElementById("productList").style.display = "none";
   document.getElementById("shirtsPage").style.display = "block";
   document.getElementById("pantsPage").style.display = "none";
@@ -1009,6 +1012,9 @@ document.getElementById("cargosPage").addEventListener("touchend", function(evt)
 
 let cart = [];
 function showDescription(media = [], price, title = "No title", sdes = "No short description", description = "No description", sizesAvailable = ["M", "L", "XL"]) {
+    
+    history.pushState({ page: "descriptionPage" }, "", "#description");
+    
   const mainImage = document.getElementById("descImage");
   const mainVideo = document.getElementById("descVideo");
   const previewContainer = document.getElementById("descImagePreview");
@@ -1766,6 +1772,19 @@ if (subscribed) {
       document.getElementById("title").textContent = isLoginVisible ? "Sign Up" : "Login";
       statusMessage.textContent = "";
     }
+    
+    window.addEventListener("popstate", function(event) {
+  if (event.state && event.state.page === "descriptionPage") {
+    // Do nothing if user is already on descriptionPage
+  } else {
+    // If going back from descriptionPage, show shirtsPage
+    if (document.getElementById("descriptionPage").style.display === "block") {
+      document.getElementById("descriptionPage").style.display = "none";
+      document.getElementById("shirtsPage").style.display = "block";
+    }
+  }
+});
+
     // On initial load (login/signup page), add top margin
 document.getElementById("mainContainer").classList.add("with-top-margin");
 document.getElementById("backToSubscription").addEventListener("click", () => {
