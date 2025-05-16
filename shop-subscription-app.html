@@ -922,11 +922,16 @@
   <script>
       
       let lastCategoryPage = null;
+let justPushedCategory = false;
 
 function showShirtsPage() {
     
-     lastCategoryPage = "shirtsPage";
+    if (!justPushedCategory) {
     history.pushState({ page: "shirtsPage" }, "", "#shirts");
+    justPushedCategory = true;
+  }
+
+  lastCategoryPage = "shirtsPage";
 
   document.getElementById("productList").style.display = "none";
   document.getElementById("shirtsPage").style.display = "block";
@@ -957,8 +962,12 @@ function showTshirtsPage() {
 
 function showPantsPage() {
     
-    lastCategoryPage = "pantsPage";
-     history.pushState({ page: "pantsPage" }, "", "#pants");
+   if (!justPushedCategory) {
+    history.pushState({ page: "pantsPage" }, "", "#pants");
+    justPushedCategory = true;
+  }
+
+  lastCategoryPage = "pantsPage";
 
   document.getElementById("productList").style.display = "none";
   document.getElementById("pantsPage").style.display = "block";
@@ -1068,7 +1077,8 @@ let cart = [];
 function showDescription(media = [], price, title = "No title", sdes = "No short description", description = "No description", sizesAvailable = ["M", "L", "XL"], category = null) {
     
     history.pushState({ page: "descriptionPage" }, "", "#description");
-    
+     justPushedCategory = false;
+     
     if (category) {
     lastCategoryPage = category; // ✅ Save the originating category
   }
