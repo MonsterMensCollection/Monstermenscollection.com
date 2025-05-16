@@ -1020,19 +1020,28 @@ function handleTouchEnd(evt, fromPage, toPage) {
   const diffX = startX - endX;
 
   if (diffX > 50 && fromPage === "shirtsPage") {
+        lastCategoryPage = "tshirtsPage";
+    history.pushState({ page: "tshirtsPage" }, "", "#tshirts");
     // Swipe left on shirtsPage -> go to tshirtsPage
     document.getElementById("shirtsPage").style.display = "none";
     document.getElementById("tshirtsPage").style.display = "block";
   } else if (diffX < -50 && fromPage === "tshirtsPage") {
+       lastCategoryPage = "shirtsPage";
+    history.pushState({ page: "shirtsPage" }, "", "#shirts");
     // Swipe right on tshirtsPage -> go to shirtsPage
     document.getElementById("tshirtsPage").style.display = "none";
     document.getElementById("shirtsPage").style.display = "block";
   }
   if (diffX > 50 && fromPage === "pantsPage") {
+      lastCategoryPage = "cargosPage"; // ✅ Add this line
+      history.pushState({ page: "cargosPage" }, "", "#cargos");
     // Swipe left on shirtsPage -> go to tshirtsPage
     document.getElementById("pantsPage").style.display = "none";
     document.getElementById("cargosPage").style.display = "block";
   } else if (diffX < -50 && fromPage === "cargosPage") {
+       lastCategoryPage = "pantsPage";
+     history.pushState({ page: "pantsPage" }, "", "#pants");
+
     // Swipe right on tshirtsPage -> go to shirtsPage
     document.getElementById("cargosPage").style.display = "none";
     document.getElementById("pantsPage").style.display = "block";
