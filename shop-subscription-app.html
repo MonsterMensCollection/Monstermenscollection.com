@@ -924,39 +924,19 @@
       let lastCategoryPage = null;
 
 function showShirtsPage() {
-  // Only push state if we're not already on shirts page
-  if (document.getElementById("shirtsPage").style.display !== "block") {
+    
+     lastCategoryPage = "shirtsPage";
     history.pushState({ page: "shirtsPage" }, "", "#shirts");
-  }
-  
-  lastCategoryPage = "shirtsPage";
+
   document.getElementById("productList").style.display = "none";
   document.getElementById("shirtsPage").style.display = "block";
   document.getElementById("pantsPage").style.display = "none";
   document.getElementById("sliderSection").style.display = "none";
-  document.getElementById("cartPage").style.display = "none";
-  document.getElementById("profilePage").style.display = "none";
-  document.getElementById("descriptionPage").style.display = "none";
-  document.getElementById("tshirtsPage").style.display = "none";
-  document.getElementById("cargosPage").style.display = "none";
-}
-
-function showPantsPage() {
-  // Only push state if we're not already on pants page
-  if (document.getElementById("pantsPage").style.display !== "block") {
-    history.pushState({ page: "pantsPage" }, "", "#pants");
-  }
-  
-  lastCategoryPage = "pantsPage";
-  document.getElementById("productList").style.display = "none";
-  document.getElementById("pantsPage").style.display = "block";
-  document.getElementById("shirtsPage").style.display = "none";
-  document.getElementById("tshirtsPage").style.display = "none";
-  document.getElementById("sliderSection").style.display = "none";
-  document.getElementById("cartPage").style.display = "none";
-  document.getElementById("profilePage").style.display = "none";
-  document.getElementById("descriptionPage").style.display = "none";
-  document.getElementById("cargosPage").style.display = "none";
+   document.getElementById("cartPage").style.display = "none";
+   document.getElementById("profilePage").style.display = "none";
+   document.getElementById("descriptionPage").style.display = "none";
+     document.getElementById("tshirtsPage").style.display = "none";
+      document.getElementById("cargosPage").style.display = "none";
 }
 
 function showTshirtsPage() {
@@ -973,6 +953,22 @@ function showTshirtsPage() {
    document.getElementById("descriptionPage").style.display = "none";
      document.getElementById("shirtsPage").style.display = "none";
       document.getElementById("cargosPage").style.display = "none";
+}
+
+function showPantsPage() {
+    
+    lastCategoryPage = "pantsPage";
+     history.pushState({ page: "pantsPage" }, "", "#pants");
+
+  document.getElementById("productList").style.display = "none";
+  document.getElementById("pantsPage").style.display = "block";
+  document.getElementById("shirtsPage").style.display = "none";
+  document.getElementById("tshirtsPage").style.display = "none";
+  document.getElementById("sliderSection").style.display = "none";
+   document.getElementById("cartPage").style.display = "none";
+   document.getElementById("profilePage").style.display = "none";
+   document.getElementById("descriptionPage").style.display = "none";
+   document.getElementById("cargosPage").style.display = "none";
 }
 
 function showCargosPage() {
@@ -992,20 +988,15 @@ function showCargosPage() {
 }
 
 function backToProducts() {
-  // Only push state if we're not already on the product list
-  if (document.getElementById("productList").style.display !== "block") {
-    history.pushState({ page: "productList" }, "", "#products");
-  }
-  
-  document.getElementById("descriptionPage").style.display = "none";
+   document.getElementById("descriptionPage").style.display = "none"; // Hide description page
   document.getElementById("productList").style.display = "block";
   document.getElementById("shirtsPage").style.display = "none";
   document.getElementById("pantsPage").style.display = "none";
   document.getElementById("sliderSection").style.display = "block";
-  document.getElementById("cartPage").style.display = "none";
-  document.getElementById("profilePage").style.display = "none";
-  document.getElementById("tshirtsPage").style.display = "none";
-  document.getElementById("cargosPage").style.display = "none";
+   document.getElementById("cartPage").style.display = "none";
+   document.getElementById("profilePage").style.display = "none";
+     document.getElementById("tshirtsPage").style.display = "none";
+     document.getElementById("cargosPage").style.display = "none";
 }
 
 
@@ -1075,9 +1066,8 @@ document.getElementById("cargosPage").addEventListener("touchend", function(evt)
 
 let cart = [];
 function showDescription(media = [], price, title = "No title", sdes = "No short description", description = "No description", sizesAvailable = ["M", "L", "XL"], category = null) {
-    // Save the current page before showing description
-    const currentPage = document.querySelector('.product-page:not([style*="display: none"])')?.id || 'productList';
-    history.pushState({ page: "descriptionPage", fromPage: currentPage }, "", "#description");
+    
+    history.pushState({ page: "descriptionPage" }, "", "#description");
     
     if (category) {
     lastCategoryPage = category; // ✅ Save the originating category
@@ -1841,38 +1831,15 @@ if (subscribed) {
       statusMessage.textContent = "";
     }
     
-  window.onpopstate = function (event) {
-  if (event.state) {
+   window.onpopstate = function (event) {
+  if (event.state && event.state.page) {
+    const page = event.state.page;
     // Hide all pages first
-    document.getElementById("descriptionPage").style.display = "none";
-    document.getElementById("productList").style.display = "none";
-    document.getElementById("shirtsPage").style.display = "none";
-    document.getElementById("pantsPage").style.display = "none";
-    document.getElementById("tshirtsPage").style.display = "none";
-    document.getElementById("cargosPage").style.display = "none";
-    document.getElementById("sliderSection").style.display = "none";
-    document.getElementById("cartPage").style.display = "none";
-    document.getElementById("profilePage").style.display = "none";
+    document.querySelectorAll(".page").forEach(p => p.style.display = "none");
 
-    // Show the correct page based on state
-    if (event.state.page === "descriptionPage") {
-      document.getElementById("descriptionPage").style.display = "block";
-    } 
-    else if (event.state.page === "shirtsPage") {
-      document.getElementById("shirtsPage").style.display = "block";
-    }
-    else if (event.state.page === "pantsPage") {
-      document.getElementById("pantsPage").style.display = "block";
-    }
-    else if (event.state.page === "productList") {
-      document.getElementById("productList").style.display = "block";
-      document.getElementById("sliderSection").style.display = "block";
-    }
-    else {
-      // Default fallback
-      document.getElementById("productList").style.display = "block";
-      document.getElementById("sliderSection").style.display = "block";
-    }
+    // Then show the correct one
+    document.getElementById(page).style.display = "block";
+    document.getElementById("descriptionPage").style.display = "none";
   }
 };
 
@@ -1882,14 +1849,6 @@ document.getElementById("mainContainer").classList.add("with-top-margin");
 document.getElementById("backToSubscription").addEventListener("click", () => {
      firebase.auth().signOut();
   document.getElementById("mainContainer").classList.add("with-top-margin");
-});
-
-// Add this at the end of your script, before the closing tag
-document.addEventListener("DOMContentLoaded", function() {
-  // Set initial state if no hash is present
-  if (!window.location.hash) {
-    history.replaceState({ page: "productList" }, "", "#products");
-  }
 });
 
 </script>
