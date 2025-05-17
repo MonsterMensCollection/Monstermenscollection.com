@@ -1778,7 +1778,7 @@ if (subscribed) {
     
     window.addEventListener("popstate", function(event) {
         
-    if( fromPage === "shirtsPage"){   
+    if( event.state === "shirtsPage"){   
         
   if (event.state && event.state.page === "descriptionPage") {
     // Do nothing if user is already on descriptionPage
@@ -1791,7 +1791,7 @@ if (subscribed) {
   }
     }
   
-   if( fromPage === "pantsPage"){   
+   if( event.state === "pantsPage"){   
         
   if (event.state && event.state.page === "descriptionPage") {
     // Do nothing if user is already on descriptionPage
