@@ -924,9 +924,8 @@
       let lastCategoryPage = null;
 
 function showShirtsPage() {
-    
-     lastCategoryPage = "shirtsPage";
-    history.pushState({ page: "shirtsPage" }, "", "#shirts");
+  lastCategoryPage = "shirtsPage";
+  history.pushState({ page: "shirtsPage" }, "", "#shirts");
 
   document.getElementById("productList").style.display = "none";
   document.getElementById("shirtsPage").style.display = "block";
@@ -956,10 +955,8 @@ function showTshirtsPage() {
 }
 
 function showPantsPage() {
-    
-    lastCategoryPage = "pantsPage";
-     history.pushState({ page: "pantsPage" }, "", "#pants");
-
+  lastCategoryPage = "pantsPage";
+  history.pushState({ page: "pantsPage" }, "", "#pants");
   document.getElementById("productList").style.display = "none";
   document.getElementById("pantsPage").style.display = "block";
   document.getElementById("shirtsPage").style.display = "none";
@@ -988,15 +985,16 @@ function showCargosPage() {
 }
 
 function backToProducts() {
-   document.getElementById("descriptionPage").style.display = "none"; // Hide description page
+  history.pushState({ page: "productList" }, "", "#products");
+  document.getElementById("descriptionPage").style.display = "none";
   document.getElementById("productList").style.display = "block";
   document.getElementById("shirtsPage").style.display = "none";
   document.getElementById("pantsPage").style.display = "none";
   document.getElementById("sliderSection").style.display = "block";
-   document.getElementById("cartPage").style.display = "none";
-   document.getElementById("profilePage").style.display = "none";
-     document.getElementById("tshirtsPage").style.display = "none";
-     document.getElementById("cargosPage").style.display = "none";
+  document.getElementById("cartPage").style.display = "none";
+  document.getElementById("profilePage").style.display = "none";
+  document.getElementById("tshirtsPage").style.display = "none";
+  document.getElementById("cargosPage").style.display = "none";
 }
 
 
@@ -1066,8 +1064,9 @@ document.getElementById("cargosPage").addEventListener("touchend", function(evt)
 
 let cart = [];
 function showDescription(media = [], price, title = "No title", sdes = "No short description", description = "No description", sizesAvailable = ["M", "L", "XL"], category = null) {
-    
-    history.pushState({ page: "descriptionPage" }, "", "#description");
+    // Save the current page before showing description
+    const currentPage = document.querySelector('.product-page:not([style*="display: none"])')?.id || 'productList';
+    history.pushState({ page: "descriptionPage", fromPage: currentPage }, "", "#description");
     
     if (category) {
     lastCategoryPage = category; // ✅ Save the originating category
@@ -1831,15 +1830,37 @@ if (subscribed) {
       statusMessage.textContent = "";
     }
     
-   window.onpopstate = function (event) {
-  if (event.state && event.state.page) {
-    const page = event.state.page;
+  window.onpopstate = function (event) {
+  if (event.state) {
     // Hide all pages first
-    document.querySelectorAll(".page").forEach(p => p.style.display = "none");
-
-    // Then show the correct one
-    document.getElementById(page).style.display = "block";
     document.getElementById("descriptionPage").style.display = "none";
+    document.getElementById("productList").style.display = "none";
+    document.getElementById("shirtsPage").style.display = "none";
+    document.getElementById("pantsPage").style.display = "none";
+    document.getElementById("tshirtsPage").style.display = "none";
+    document.getElementById("cargosPage").style.display = "none";
+    document.getElementById("sliderSection").style.display = "none";
+    document.getElementById("cartPage").style.display = "none";
+    document.getElementById("profilePage").style.display = "none";
+
+    // Show the correct page based on state
+    if (event.state.page === "descriptionPage") {
+      // If coming back to description page (shouldn't normally happen)
+      document.getElementById("descriptionPage").style.display = "block";
+    } else if (event.state.fromPage) {
+      // If going back from description to a product page
+      document.getElementById(event.state.fromPage).style.display = "block";
+      if (event.state.fromPage === "productList") {
+        document.getElementById("sliderSection").style.display = "block";
+      }
+    } else if (event.state.page) {
+      // For other direct page navigations
+      document.getElementById(event.state.page).style.display = "block";
+    } else {
+      // Default fallback
+      document.getElementById("productList").style.display = "block";
+      document.getElementById("sliderSection").style.display = "block";
+    }
   }
 };
 
