@@ -1083,13 +1083,9 @@ function showDescription(media = [], price, title = "No title", sdes = "No short
 }
 
     
-    history.pushState({ page: "descriptionPage" }, "", "#description");
+   history.pushState({ page: "descriptionPage" }, "", "#description");
+
     
-    if (history.state?.page !== "shirtsPage") {
-    history.replaceState({ page: "descriptionPage" }, "", "#description");
-  }else if (history.state?.page !== "pantsPage") {
-    history.replaceState({ page: "descriptionPage" }, "", "#description");
-  }
   
      justPushedCategory = false;
      
