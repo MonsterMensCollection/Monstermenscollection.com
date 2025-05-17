@@ -1806,6 +1806,35 @@ if (subscribed) {
   
 });
 
+window.addEventListener("popstate", function(event) {
+  const state = event.state;
+
+  // Hide all sections first
+  document.getElementById("productList").style.display = "none";
+  document.getElementById("shirtsPage").style.display = "none";
+  document.getElementById("pantsPage").style.display = "none";
+  document.getElementById("sliderSection").style.display = "none";
+  document.getElementById("cartPage").style.display = "none";
+  document.getElementById("profilePage").style.display = "none";
+  document.getElementById("descriptionPage").style.display = "none";
+  document.getElementById("tshirtsPage").style.display = "none";
+  document.getElementById("cargosPage").style.display = "none";
+
+  // Now show the section based on the state
+  if (state && state.page === "shirtsPage") {
+    document.getElementById("shirtsPage").style.display = "block";
+  } else if (state && state.page === "pantsPage") {
+    document.getElementById("pantsPage").style.display = "block";
+  } else if (state && state.page === "descriptionPage") {
+    document.getElementById("descriptionPage").style.display = "block";
+  } else {
+    // Default: go back to main product list
+    document.getElementById("productList").style.display = "block";
+    document.getElementById("sliderSection").style.display = "block";
+  }
+});
+
+
     // On initial load (login/signup page), add top margin
 document.getElementById("mainContainer").classList.add("with-top-margin");
 document.getElementById("backToSubscription").addEventListener("click", () => {
