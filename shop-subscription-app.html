@@ -924,18 +924,39 @@
       let lastCategoryPage = null;
 
 function showShirtsPage() {
+  // Only push state if we're not already on shirts page
+  if (document.getElementById("shirtsPage").style.display !== "block") {
+    history.pushState({ page: "shirtsPage" }, "", "#shirts");
+  }
+  
   lastCategoryPage = "shirtsPage";
-  history.pushState({ page: "shirtsPage" }, "", "#shirts");
-
   document.getElementById("productList").style.display = "none";
   document.getElementById("shirtsPage").style.display = "block";
   document.getElementById("pantsPage").style.display = "none";
   document.getElementById("sliderSection").style.display = "none";
-   document.getElementById("cartPage").style.display = "none";
-   document.getElementById("profilePage").style.display = "none";
-   document.getElementById("descriptionPage").style.display = "none";
-     document.getElementById("tshirtsPage").style.display = "none";
-      document.getElementById("cargosPage").style.display = "none";
+  document.getElementById("cartPage").style.display = "none";
+  document.getElementById("profilePage").style.display = "none";
+  document.getElementById("descriptionPage").style.display = "none";
+  document.getElementById("tshirtsPage").style.display = "none";
+  document.getElementById("cargosPage").style.display = "none";
+}
+
+function showPantsPage() {
+  // Only push state if we're not already on pants page
+  if (document.getElementById("pantsPage").style.display !== "block") {
+    history.pushState({ page: "pantsPage" }, "", "#pants");
+  }
+  
+  lastCategoryPage = "pantsPage";
+  document.getElementById("productList").style.display = "none";
+  document.getElementById("pantsPage").style.display = "block";
+  document.getElementById("shirtsPage").style.display = "none";
+  document.getElementById("tshirtsPage").style.display = "none";
+  document.getElementById("sliderSection").style.display = "none";
+  document.getElementById("cartPage").style.display = "none";
+  document.getElementById("profilePage").style.display = "none";
+  document.getElementById("descriptionPage").style.display = "none";
+  document.getElementById("cargosPage").style.display = "none";
 }
 
 function showTshirtsPage() {
@@ -952,20 +973,6 @@ function showTshirtsPage() {
    document.getElementById("descriptionPage").style.display = "none";
      document.getElementById("shirtsPage").style.display = "none";
       document.getElementById("cargosPage").style.display = "none";
-}
-
-function showPantsPage() {
-  lastCategoryPage = "pantsPage";
-  history.pushState({ page: "pantsPage" }, "", "#pants");
-  document.getElementById("productList").style.display = "none";
-  document.getElementById("pantsPage").style.display = "block";
-  document.getElementById("shirtsPage").style.display = "none";
-  document.getElementById("tshirtsPage").style.display = "none";
-  document.getElementById("sliderSection").style.display = "none";
-   document.getElementById("cartPage").style.display = "none";
-   document.getElementById("profilePage").style.display = "none";
-   document.getElementById("descriptionPage").style.display = "none";
-   document.getElementById("cargosPage").style.display = "none";
 }
 
 function showCargosPage() {
@@ -985,7 +992,11 @@ function showCargosPage() {
 }
 
 function backToProducts() {
-  history.pushState({ page: "productList" }, "", "#products");
+  // Only push state if we're not already on the product list
+  if (document.getElementById("productList").style.display !== "block") {
+    history.pushState({ page: "productList" }, "", "#products");
+  }
+  
   document.getElementById("descriptionPage").style.display = "none";
   document.getElementById("productList").style.display = "block";
   document.getElementById("shirtsPage").style.display = "none";
@@ -1845,18 +1856,19 @@ if (subscribed) {
 
     // Show the correct page based on state
     if (event.state.page === "descriptionPage") {
-      // If coming back to description page (shouldn't normally happen)
       document.getElementById("descriptionPage").style.display = "block";
-    } else if (event.state.fromPage) {
-      // If going back from description to a product page
-      document.getElementById(event.state.fromPage).style.display = "block";
-      if (event.state.fromPage === "productList") {
-        document.getElementById("sliderSection").style.display = "block";
-      }
-    } else if (event.state.page) {
-      // For other direct page navigations
-      document.getElementById(event.state.page).style.display = "block";
-    } else {
+    } 
+    else if (event.state.page === "shirtsPage") {
+      document.getElementById("shirtsPage").style.display = "block";
+    }
+    else if (event.state.page === "pantsPage") {
+      document.getElementById("pantsPage").style.display = "block";
+    }
+    else if (event.state.page === "productList") {
+      document.getElementById("productList").style.display = "block";
+      document.getElementById("sliderSection").style.display = "block";
+    }
+    else {
       // Default fallback
       document.getElementById("productList").style.display = "block";
       document.getElementById("sliderSection").style.display = "block";
@@ -1870,6 +1882,14 @@ document.getElementById("mainContainer").classList.add("with-top-margin");
 document.getElementById("backToSubscription").addEventListener("click", () => {
      firebase.auth().signOut();
   document.getElementById("mainContainer").classList.add("with-top-margin");
+});
+
+// Add this at the end of your script, before the closing tag
+document.addEventListener("DOMContentLoaded", function() {
+  // Set initial state if no hash is present
+  if (!window.location.hash) {
+    history.replaceState({ page: "productList" }, "", "#products");
+  }
 });
 
 </script>
