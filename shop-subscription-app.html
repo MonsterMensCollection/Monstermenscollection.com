@@ -376,7 +376,7 @@
         <button id="logoutBtn">Logout</button>
       </p>
     </div>
-</div>
+
    <div id="productsPage" style="margin-left:1%;margin-right:1%;" >
         <div id="shirtsPage" style="display: none;">
           <br><img src="https://see.fontimg.com/api/rf5/8MnG2/NDk1NWQ2OGI5Njg0NDc5NDhmMzMzOWRlYzAxZmRmODYub3Rm/c2hpcnRz/gamer-spot-semi-italic.png?r=fs&h=30&w=1000&fg=000000&bg=FFFFFF&tb=1&s=30"style="display: block;margin-left: auto;
@@ -922,16 +922,17 @@
     </div>
   </div>
   
+  </div>
+  
   <script>
       
       let lastCategoryPage = null;
 
 function showShirtsPage() {
-    
+  if (lastCategoryPage !== 'shirtsPage') {
     lastCategoryPage = 'shirtsPage';
     history.pushState({ page: 'shirtsPage' }, '', '#shirts');
-    history.pushState({ page: 'shirtsPage' }, '', '#shirts');
-    
+  }
   document.getElementById("productList").style.display = "none";
   document.getElementById("shirtsPage").style.display = "block";
   document.getElementById("pantsPage").style.display = "none";
