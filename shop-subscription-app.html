@@ -875,7 +875,7 @@
     </div>
   </a>
   
- <a href="#" onclick="lastCategoryPage='shirtsPage'; history.pushState({ page: 'shirtsPage' }, '', '#shirts'); showShirtsPage();">
+ <a href="#" onclick=" showShirtsPage()">
   <div style="display: flex; flex-direction: column; align-items: center;">
     <img src="https://img.icons8.com/?size=100&id=zsb66Nl4NM9p&format=png&color=000000" width="24" alt="Shirts"/>
   </div>
@@ -927,7 +927,10 @@
       let lastCategoryPage = null;
 
 function showShirtsPage() {
-
+  if (lastCategoryPage !== 'shirtsPage') {
+    lastCategoryPage = 'shirtsPage';
+    history.pushState({ page: 'shirtsPage' }, '', '#shirts');
+  }
   document.getElementById("productList").style.display = "none";
   document.getElementById("shirtsPage").style.display = "block";
   document.getElementById("pantsPage").style.display = "none";
@@ -988,15 +991,16 @@ function showCargosPage() {
 }
 
 function backToProducts() {
-   document.getElementById("descriptionPage").style.display = "none"; // Hide description page
+  history.pushState({ page: "productList" }, "", "#home");
+  document.getElementById("descriptionPage").style.display = "none";
   document.getElementById("productList").style.display = "block";
   document.getElementById("shirtsPage").style.display = "none";
   document.getElementById("pantsPage").style.display = "none";
   document.getElementById("sliderSection").style.display = "block";
-   document.getElementById("cartPage").style.display = "none";
-   document.getElementById("profilePage").style.display = "none";
-     document.getElementById("tshirtsPage").style.display = "none";
-     document.getElementById("cargosPage").style.display = "none";
+  document.getElementById("cartPage").style.display = "none";
+  document.getElementById("profilePage").style.display = "none";
+  document.getElementById("tshirtsPage").style.display = "none";
+  document.getElementById("cargosPage").style.display = "none";
 }
 
 
