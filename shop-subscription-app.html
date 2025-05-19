@@ -1033,63 +1033,54 @@ function handleTouchStart(evt) {
   startX = evt.touches[0].clientX;
 }
 
-function handleTouchEnd(evt, fromPage, toPage) {
+function handleTouchEnd(evt, fromPage) {
   const endX = evt.changedTouches[0].clientX;
   const diffX = startX - endX;
 
-  if (diffX > 50 && fromPage === "shirtsPage") {
-        lastCategoryPage = "tshirtsPage";
-    history.pushState({ page: "tshirtsPage" }, "", "#tshirts");
-    // Swipe left on shirtsPage -> go to tshirtsPage
-    document.getElementById("descriptionPage").style.display = "none"; 
-    document.getElementById("shirtsPage").style.display = "none";
-    document.getElementById("tshirtsPage").style.display = "block";
-  } else if (diffX < -50 && fromPage === "tshirtsPage") {
-       lastCategoryPage = "shirtsPage";
-    history.pushState({ page: "shirtsPage" }, "", "#shirts");
-    // Swipe right on tshirtsPage -> go to shirtsPage
-    document.getElementById("descriptionPage").style.display = "none"; 
-    document.getElementById("tshirtsPage").style.display = "none";
-    document.getElementById("shirtsPage").style.display = "block";
-  }
-  if (diffX > 50 && fromPage === "pantsPage") {
-      lastCategoryPage = "cargosPage"; // ✅ Add this line
-      history.pushState({ page: "cargosPage" }, "", "#cargos");
-    // Swipe left on shirtsPage -> go to tshirtsPage
-    document.getElementById("descriptionPage").style.display = "none"; 
-    document.getElementById("pantsPage").style.display = "none";
-    document.getElementById("cargosPage").style.display = "block";
-  } else if (diffX < -50 && fromPage === "cargosPage") {
-       lastCategoryPage = "pantsPage";
-     history.pushState({ page: "pantsPage" }, "", "#pants");
+  const pagesGroup1 = ["shirtsPage", "tshirtsPage"];
+  const pagesGroup2 = ["pantsPage", "cargosPage"];
 
-    // Swipe right on tshirtsPage -> go to shirtsPage
+  const navigateTo = (from, to) => {
     document.getElementById("descriptionPage").style.display = "none"; 
-    document.getElementById("cargosPage").style.display = "none";
-    document.getElementById("pantsPage").style.display = "block";
+    document.getElementById(from).style.display = "none";
+    document.getElementById(to).style.display = "block";
+    lastCategoryPage = to;
+    history.pushState({ page: to }, "", "#" + to.replace("Page", ""));
+  };
+
+  // Loop for shirts <-> tshirts
+  if (pagesGroup1.includes(fromPage)) {
+    if (diffX > 50) { // Swipe left
+      const toPage = fromPage === "shirtsPage" ? "tshirtsPage" : "shirtsPage";
+      navigateTo(fromPage, toPage);
+    } else if (diffX < -50) { // Swipe right
+      const toPage = fromPage === "tshirtsPage" ? "shirtsPage" : "tshirtsPage";
+      navigateTo(fromPage, toPage);
+    }
+  }
+
+  // Loop for pants <-> cargos
+  if (pagesGroup2.includes(fromPage)) {
+    if (diffX > 50) { // Swipe left
+      const toPage = fromPage === "pantsPage" ? "cargosPage" : "pantsPage";
+      navigateTo(fromPage, toPage);
+    } else if (diffX < -50) { // Swipe right
+      const toPage = fromPage === "cargosPage" ? "pantsPage" : "cargosPage";
+      navigateTo(fromPage, toPage);
+    }
   }
 }
 
+
 // Add listeners to both pages
-document.getElementById("shirtsPage").addEventListener("touchstart", handleTouchStart, false);
-document.getElementById("shirtsPage").addEventListener("touchend", function(evt) {
-  handleTouchEnd(evt, "shirtsPage", "tshirtsPage");
-}, false);
+["shirtsPage", "tshirtsPage", "pantsPage", "cargosPage"].forEach(pageId => {
+  const page = document.getElementById(pageId);
+  page.addEventListener("touchstart", handleTouchStart, false);
+  page.addEventListener("touchend", function(evt) {
+    handleTouchEnd(evt, pageId);
+  }, false);
+});
 
-document.getElementById("tshirtsPage").addEventListener("touchstart", handleTouchStart, false);
-document.getElementById("tshirtsPage").addEventListener("touchend", function(evt) {
-  handleTouchEnd(evt, "tshirtsPage", "shirtsPage");
-}, false);
-
-document.getElementById("pantsPage").addEventListener("touchstart", handleTouchStart, false);
-document.getElementById("pantsPage").addEventListener("touchend", function(evt) {
-  handleTouchEnd(evt, "pantsPage", "cargosPage");
-}, false);
-
-document.getElementById("cargosPage").addEventListener("touchstart", handleTouchStart, false);
-document.getElementById("cargosPage").addEventListener("touchend", function(evt) {
-  handleTouchEnd(evt, "cargosPage", "pantsPage");
-}, false);
 
 let cart = [];
 function showDescription(media = [], price, title = "No title", sdes = "No short description", description = "No description", sizesAvailable = ["M", "L", "XL"], category = null) {
