@@ -565,7 +565,7 @@
   { type: 'image', src: 'https://github.com/MonsterMensCollection/TShirt/blob/1/WhatsApp%20Image%202025-05-23%20at%2011.12.19%20AM.jpeg?raw=true' },
   { type: 'image', src: 'https://github.com/MonsterMensCollection/TShirt/blob/1/WhatsApp%20Image%202025-05-23%20at%2011.12.21%20AM.jpeg?raw=true' },
   { type: 'image', src: 'https://github.com/MonsterMensCollection/TShirt/blob/1/WhatsApp%20Image%202025-05-23%20at%2011.12.20%20AM.jpeg?raw=true' },
-], '₹699', 'Adidas', 'Full Sleeves', 'Cotton Lycra', ['M','L', 'XL','XXL'])">
+], '₹699', 'Adidas', 'Full Sleeves', 'Cotton Lycra', ['M','L', 'XL','XXL'],['Black', 'Brown', 'Red','Dark Green,'Orange Brown','Sandle'])">
 <div class=cardName>
 <h3>Adidas </h3> <!-- Product Title -->
 <p>Full Sleeves</p>
@@ -892,6 +892,12 @@
 </div>
  </div>
  
+ 
+ 
+ 
+ 
+ 
+ 
 <!-- Product Description Page with Scrollable Image Gallery -->
 <div id="descriptionPage" style="display: none; padding: 0 5%;" class="form-section">
 <div style="display: flex; justify-content: center;">
@@ -936,6 +942,14 @@
     <h2>Discription</h2>
     <p id="descText" style="margin-top: 10px; font-size: 16px; color: #333; text-align: left;"></p> <!-- Product Description -->
   </div>
+  
+  
+  
+  
+  
+  
+  
+  
   
 
           <div id="sliderSection" class="slider-wrapper">
@@ -1238,7 +1252,7 @@ function handleTouchEnd(evt, fromPage) {
 
 
 let cart = [];
-function showDescription(media = [], price, title = "No title", sdes = "No short description", description = "No description", sizesAvailable = ["M", "L", "XL"], category = null) {
+function showDescription(media = [], price, title = "No title", sdes = "No short description", description = "No description", sizesAvailable = ["M", "L", "XL"], colorsAvailable = ["Black", "White"], category = null) {
   if (category) {
     // Push category state BEFORE description
     history.pushState({ page: category }, "", "#" + category);
@@ -1333,6 +1347,64 @@ function showDescription(media = [], price, title = "No title", sdes = "No short
   document.getElementById("descSText").textContent = sdes;
   document.getElementById("descText").textContent = description;
 
+ // Color selection
+  const colorContainer = document.getElementById("colorButtons") || document.createElement("div");
+  colorContainer.id = "colorButtons";
+  colorContainer.style.display = "flex";
+  colorContainer.style.gap = "10px";
+  colorContainer.style.margin = "10px 0";
+  colorContainer.innerHTML = "";
+
+  let selectedColor = null;
+
+  colorsAvailable.forEach((color, index) => {
+    const btn = document.createElement("button");
+    btn.textContent = color;
+    btn.style.padding = "10px 20px";
+    btn.style.border = "1px solid #ccc";
+    btn.style.borderRadius = "5px";
+    btn.style.cursor = "pointer";
+
+    if (index === 0) {
+      btn.style.backgroundColor = "#333";
+      btn.style.color = "#fff";
+      selectedColor = color;
+    }
+
+    btn.onclick = () => {
+      document.querySelectorAll("#colorButtons button").forEach(b => {
+        b.style.backgroundColor = "#f8f8f8";
+        b.style.color = "#000";
+      });
+      btn.style.backgroundColor = "#333";
+      btn.style.color = "#fff";
+      selectedColor = color;
+      document.getElementById("selectedColor").value = color;
+    };
+
+    colorContainer.appendChild(btn);
+  });
+
+  let hiddenColorInput = document.getElementById("selectedColor");
+  if (!hiddenColorInput) {
+    hiddenColorInput = document.createElement("input");
+    hiddenColorInput.type = "hidden";
+    hiddenColorInput.id = "selectedColor";
+    colorContainer.appendChild(hiddenColorInput);
+  }
+  hiddenColorInput.value = selectedColor;
+
+
+ // Append to description section if not already
+  const descPage = document.getElementById("descriptionPage");
+  if (!document.getElementById("colorSectionTitle")) {
+    const label = document.createElement("h3");
+    label.id = "colorSectionTitle";
+    label.textContent = "Select Color:";
+    descPage.insertBefore(label, document.getElementById("descText"));
+    descPage.insertBefore(colorContainer, document.getElementById("descText"));
+  }
+
   // Size buttons logic
   const sizeContainer = document.getElementById("sizeButtons");
   sizeContainer.innerHTML = "";
@@ -1375,6 +1447,8 @@ function showDescription(media = [], price, title = "No title", sdes = "No short
   }
   hiddenInput.value = selectedSize;
 
+
+
   // Show description page and hide others
   document.getElementById("descriptionPage").style.display = "block";
   document.getElementById("productList").style.display = "none";
@@ -1398,13 +1472,20 @@ function addToCart(image = null, price = null, title = null) {
   }
 
   const size = document.getElementById("selectedSize").value;
+  const color = document.getElementById("selectedColor")?.value;
+
   if (!size) {
     alert("Please select a size.");
     return;
   }
 
+  if (!color) {
+    alert("Please select a color.");
+    return;
+  }
+
   const parsedPrice = parseInt(price.replace('₹', ''));
-  cart.push({ image, price: parsedPrice, title, size });
+  cart.push({ image, price: parsedPrice, title, size, color });
 
   alert('Item added to cart!');
 }
