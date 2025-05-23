@@ -1252,7 +1252,7 @@ function handleTouchEnd(evt, fromPage) {
 
 
 let cart = [];
-function showDescription(media = [], price, title = "No title", sdes = "No short description", description = "No description", sizesAvailable = ["M", "L", "XL"], colorsAvailable = ["Black", "White"], category = null) {
+function showDescription(media = [], price, title = "No title", sdes = "No short description", description = "No description", sizesAvailable = ["M", "L", "XL"], colorsAvailable = [], category = null) {
   if (category) {
     // Push category state BEFORE description
     history.pushState({ page: category }, "", "#" + category);
