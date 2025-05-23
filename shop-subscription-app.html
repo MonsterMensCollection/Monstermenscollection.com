@@ -343,9 +343,17 @@
   
 }
 #descriptionPage {
-  max-height: 100vh;
-  overflow-y: hidden;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
+
+#descText {
+  overflow-y: auto;
+  flex: 1; /* allow it to expand and scroll if needed */
+}
+
 
   </style>
 </head>
