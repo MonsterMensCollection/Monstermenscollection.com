@@ -1398,12 +1398,12 @@ colorsAvailable.forEach(color => {
   colorOption.appendChild(colorLabel);
 
   // Handle click to select color
-  colorOption.addEventListener("click", () => {
-    document.querySelectorAll("#colorButtons div").forEach(el => el.style.border = "1px solid #ccc");
-    colorOption.style.border = "2px solid #333"; // highlight selected
-    selectedColor = color;
-    document.getElementById("selectedColor").value = selectedColor;
-  });
+ // Handle click to select color
+colorOption.addEventListener("click", () => {
+  selectedColor = color;
+  document.getElementById("selectedColor").value = selectedColor;
+});
+
 
   customDropdown.appendChild(colorOption);
 });
