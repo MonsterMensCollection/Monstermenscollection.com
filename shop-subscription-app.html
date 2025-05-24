@@ -1356,63 +1356,54 @@ function showDescription(media = [], price, title = "No title", sdes = "No short
   document.getElementById("descSText").textContent = sdes;
   document.getElementById("descText").textContent = description;
 
- // Color selection
-  const colorContainer = document.getElementById("colorButtons") || document.createElement("div");
-  colorContainer.id = "colorButtons";
-  colorContainer.style.display = "flex";
-  colorContainer.style.gap = "10px";
-  colorContainer.style.margin = "10px 0";
-  colorContainer.innerHTML = "";
+// Color selection using dropdown
+const colorContainer = document.getElementById("colorButtons") || document.createElement("div");
+colorContainer.id = "colorButtons";
+colorContainer.style.margin = "10px 0";
+colorContainer.innerHTML = "";
 
-  let selectedColor = null;
+const select = document.createElement("select");
+select.id = "colorSelect";
+select.style.padding = "10px";
+select.style.fontSize = "16px";
 
-  colorsAvailable.forEach((color, index) => {
-    const btn = document.createElement("button");
-    btn.textContent = color;
-    btn.style.padding = "10px 20px";
-    btn.style.border = "1px solid #ccc";
-    btn.style.borderRadius = "5px";
-    btn.style.cursor = "pointer";
+let selectedColor = colorsAvailable[0] || null;
 
-    if (index === 0) {
-      btn.style.backgroundColor = "#333";
-      btn.style.color = "#fff";
-      selectedColor = color;
-    }
+colorsAvailable.forEach((color, index) => {
+  const option = document.createElement("option");
+  option.value = color;
+  option.textContent = color;
+  if (index === 0) option.selected = true;
+  select.appendChild(option);
+});
 
-    btn.onclick = () => {
-      document.querySelectorAll("#colorButtons button").forEach(b => {
-        b.style.backgroundColor = "#f8f8f8";
-        b.style.color = "#000";
-      });
-      btn.style.backgroundColor = "#333";
-      btn.style.color = "#fff";
-      selectedColor = color;
-      document.getElementById("selectedColor").value = color;
-    };
+select.onchange = () => {
+  selectedColor = select.value;
+  document.getElementById("selectedColor").value = selectedColor;
+};
 
-    colorContainer.appendChild(btn);
-  });
+colorContainer.appendChild(select);
 
-  let hiddenColorInput = document.getElementById("selectedColor");
-  if (!hiddenColorInput) {
-    hiddenColorInput = document.createElement("input");
-    hiddenColorInput.type = "hidden";
-    hiddenColorInput.id = "selectedColor";
-    colorContainer.appendChild(hiddenColorInput);
-  }
-  hiddenColorInput.value = selectedColor;
+// Hidden input to store selected color
+let hiddenColorInput = document.getElementById("selectedColor");
+if (!hiddenColorInput) {
+  hiddenColorInput = document.createElement("input");
+  hiddenColorInput.type = "hidden";
+  hiddenColorInput.id = "selectedColor";
+  colorContainer.appendChild(hiddenColorInput);
+}
+hiddenColorInput.value = selectedColor;
 
+// Append dropdown to the description page
+const descPage = document.getElementById("descriptionPage");
+if (!document.getElementById("colorSectionTitle")) {
+  const label = document.createElement("h3");
+  label.id = "colorSectionTitle";
+  label.textContent = "Select Color:";
+  descPage.insertBefore(label, document.getElementById("descText"));
+  descPage.insertBefore(colorContainer, document.getElementById("descText"));
+}
 
- // Append to description section if not already
-  const descPage = document.getElementById("descriptionPage");
-  if (!document.getElementById("colorSectionTitle")) {
-    const label = document.createElement("h3");
-    label.id = "colorSectionTitle";
-    label.textContent = "Select Color:";
-    descPage.insertBefore(label, document.getElementById("descText"));
-    descPage.insertBefore(colorContainer, document.getElementById("descText"));
-  }
 
   // Size buttons logic
   const sizeContainer = document.getElementById("sizeButtons");
