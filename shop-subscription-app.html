@@ -1362,47 +1362,49 @@ colorContainer.style.margin = "20px 0";
 colorContainer.innerHTML = "";
 
 // Create dropdown wrapper for styling
-const dropdownWrapper = document.createElement("div");
-dropdownWrapper.style.position = "relative";
-dropdownWrapper.style.display = "inline-block";
-dropdownWrapper.style.width = "200px";
+const customDropdown = document.createElement("div");
+customDropdown.style.display = "flex";
+customDropdown.style.flexWrap = "wrap";
+customDropdown.style.gap = "10px";
 
-const select = document.createElement("select");
-select.id = "colorSelect";
-select.style.width = "100%";
-select.style.padding = "12px 16px";
-select.style.fontSize = "16px";
-select.style.border = "2px solid #ccc";
-select.style.borderRadius = "8px";
-select.style.backgroundColor = "#f9f9f9";
-select.style.color = "#333";
-select.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.1)";
-select.style.appearance = "none"; // remove default dropdown arrow
-select.style.WebkitAppearance = "none";
-select.style.MozAppearance = "none";
-select.style.cursor = "pointer";
-select.style.backgroundImage = `url("data:image/svg+xml;charset=UTF-8,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#333" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>')}")`;
-select.style.backgroundRepeat = "no-repeat";
-select.style.backgroundPosition = "right 12px center";
+// Create color option buttons with circle preview
+colorsAvailable.forEach(color => {
+  const colorOption = document.createElement("div");
+  colorOption.style.display = "flex";
+  colorOption.style.alignItems = "center";
+  colorOption.style.cursor = "pointer";
+  colorOption.style.border = "1px solid #ccc";
+  colorOption.style.borderRadius = "8px";
+  colorOption.style.padding = "6px 10px";
+  colorOption.style.backgroundColor = "#fff";
+  colorOption.style.boxShadow = "0 2px 6px rgba(0,0,0,0.1)";
 
-// Fill dropdown options
-let selectedColor = colorsAvailable[0] || null;
+  const colorCircle = document.createElement("div");
+  colorCircle.style.width = "16px";
+  colorCircle.style.height = "16px";
+  colorCircle.style.borderRadius = "50%";
+  colorCircle.style.marginRight = "8px";
+  colorCircle.style.border = "1px solid #888";
+  colorCircle.style.backgroundColor = color.trim().toLowerCase();
 
-colorsAvailable.forEach((color, index) => {
-  const option = document.createElement("option");
-  option.value = color;
-  option.textContent = color;
-  if (index === 0) option.selected = true;
-  select.appendChild(option);
+  const colorLabel = document.createElement("span");
+  colorLabel.textContent = color;
+
+  colorOption.appendChild(colorCircle);
+  colorOption.appendChild(colorLabel);
+
+  // Optional: Add click handler to select color
+  colorOption.addEventListener("click", () => {
+    document.querySelectorAll("#colorButtons div").forEach(el => el.style.border = "1px solid #ccc");
+    colorOption.style.border = "2px solid #333"; // highlight selected
+    // Do something with selected color if needed
+    console.log("Selected color:", color);
+  });
+
+  customDropdown.appendChild(colorOption);
 });
 
-select.onchange = () => {
-  selectedColor = select.value;
-  document.getElementById("selectedColor").value = selectedColor;
-};
-
-dropdownWrapper.appendChild(select);
-colorContainer.appendChild(dropdownWrapper);
+colorContainer.appendChild(customDropdown);
 
 // Hidden input to store selected color
 let hiddenColorInput = document.getElementById("selectedColor");
