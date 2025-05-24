@@ -1356,18 +1356,22 @@ function showDescription(media = [], price, title = "No title", sdes = "No short
   document.getElementById("descText").textContent = description;
 
 // Cool styled color dropdown
+
+
+// Circle preview color selector
 const colorContainer = document.getElementById("colorButtons") || document.createElement("div");
 colorContainer.id = "colorButtons";
 colorContainer.style.margin = "20px 0";
 colorContainer.innerHTML = "";
 
-// Create dropdown wrapper for styling
+// Create color option buttons with circle preview
+let selectedColor = colorsAvailable[0] || null;
+
 const customDropdown = document.createElement("div");
 customDropdown.style.display = "flex";
 customDropdown.style.flexWrap = "wrap";
 customDropdown.style.gap = "10px";
 
-// Create color option buttons with circle preview
 colorsAvailable.forEach(color => {
   const colorOption = document.createElement("div");
   colorOption.style.display = "flex";
@@ -1393,12 +1397,12 @@ colorsAvailable.forEach(color => {
   colorOption.appendChild(colorCircle);
   colorOption.appendChild(colorLabel);
 
-  // Optional: Add click handler to select color
+  // Handle click to select color
   colorOption.addEventListener("click", () => {
     document.querySelectorAll("#colorButtons div").forEach(el => el.style.border = "1px solid #ccc");
     colorOption.style.border = "2px solid #333"; // highlight selected
-    // Do something with selected color if needed
-    console.log("Selected color:", color);
+    selectedColor = color;
+    document.getElementById("selectedColor").value = selectedColor;
   });
 
   customDropdown.appendChild(colorOption);
@@ -1416,7 +1420,7 @@ if (!hiddenColorInput) {
 }
 hiddenColorInput.value = selectedColor;
 
-// Append label and dropdown to the description section
+// Add label and container to the description section
 const descPage = document.getElementById("descriptionPage");
 if (!document.getElementById("colorSectionTitle")) {
   const label = document.createElement("h3");
@@ -1427,6 +1431,7 @@ if (!document.getElementById("colorSectionTitle")) {
   descPage.insertBefore(label, document.getElementById("descText"));
   descPage.insertBefore(colorContainer, document.getElementById("descText"));
 }
+
 
 // 👉 Add centered "Description" heading
 if (!document.getElementById("descHeader")) {
