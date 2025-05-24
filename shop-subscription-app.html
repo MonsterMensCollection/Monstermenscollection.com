@@ -1424,7 +1424,18 @@ if (!document.getElementById("colorSectionTitle")) {
   label.style.fontSize = "18px";
   descPage.insertBefore(label, document.getElementById("descText"));
   descPage.insertBefore(colorContainer, document.getElementById("descText"));
-  label.textContent = "Discription";
+}
+
+// 👉 Add centered "Description" heading
+if (!document.getElementById("descHeader")) {
+  const descHeading = document.createElement("h2");
+  descHeading.id = "descHeader";
+  descHeading.textContent = "Description";
+  descHeading.style.textAlign = "center";
+  descHeading.style.margin = "20px 0 10px";
+  descHeading.style.fontSize = "22px";
+  descHeading.style.fontWeight = "600";
+  descPage.insertBefore(descHeading, document.getElementById("descText"));
 }
 
 
