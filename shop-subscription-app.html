@@ -948,7 +948,6 @@
   <option value="XL">XL</option>
 </div>
 <br>
-    <h2>Discription</h2>
     <p id="descText" style="margin-top: 10px; font-size: 16px; color: #333; text-align: left;"></p> <!-- Product Description -->
   </div>
   
@@ -1425,6 +1424,8 @@ if (!document.getElementById("colorSectionTitle")) {
   label.style.fontSize = "18px";
   descPage.insertBefore(label, document.getElementById("descText"));
   descPage.insertBefore(colorContainer, document.getElementById("descText"));
+  const label = document.createElement("h2");
+  label.textContent = "Discription";
 }
 
 
