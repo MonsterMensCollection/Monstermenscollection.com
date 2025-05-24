@@ -1372,12 +1372,15 @@ customDropdown.style.display = "flex";
 customDropdown.style.flexWrap = "wrap";
 customDropdown.style.gap = "10px";
 
+// Track all colorOption elements to clear selection later
+let colorOptionElements = [];
+
 colorsAvailable.forEach(color => {
   const colorOption = document.createElement("div");
   colorOption.style.display = "flex";
   colorOption.style.alignItems = "center";
   colorOption.style.cursor = "pointer";
-  colorOption.style.border = "1px solid #ccc";
+  colorOption.style.border = "2px solid transparent"; // default border
   colorOption.style.borderRadius = "8px";
   colorOption.style.padding = "6px 10px";
   colorOption.style.backgroundColor = "#fff";
@@ -1397,16 +1400,23 @@ colorsAvailable.forEach(color => {
   colorOption.appendChild(colorCircle);
   colorOption.appendChild(colorLabel);
 
-  // Handle click to select color
- // Handle click to select color
-colorOption.addEventListener("click", () => {
-  selectedColor = color;
-  document.getElementById("selectedColor").value = selectedColor;
-});
+  colorOption.addEventListener("click", () => {
+    selectedColor = color;
+    document.getElementById("selectedColor").value = selectedColor;
 
+    // Clear previous selection
+    colorOptionElements.forEach(el => {
+      el.style.border = "2px solid transparent";
+    });
+
+    // Highlight selected color
+    colorOption.style.border = "2px solid #333";
+  });
 
   customDropdown.appendChild(colorOption);
+  colorOptionElements.push(colorOption);
 });
+
 
 colorContainer.appendChild(customDropdown);
 
