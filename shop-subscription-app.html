@@ -354,7 +354,23 @@
   outline: none !important;
   box-shadow: none !important;
 }
+.bottom-nav a {
+  /* Add these 2 lines */
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+}
 
+.bottom-nav a:active,
+.bottom-nav a:focus {
+  /* Add this line to override mobile browser defaults */
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Optional: Prevent blue highlight on images */
+.bottom-nav img {
+  user-select: none;
+  -webkit-user-select: none;
+}
  </style>
 </head>
 <body>
