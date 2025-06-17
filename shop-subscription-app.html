@@ -38,7 +38,7 @@
   justify-content: space-between;
   align-items: center;
   gap: 10px;
-  margin: 20px auto;
+  margin: 10px auto 0; /* Reduced top margin */
   padding: 10px;
   background-color: #ffffff;
   border-radius: 0px;
@@ -76,6 +76,7 @@
   .filter-controls {
     padding: 8px;
     gap: 8px;
+    margin-top: 5px; /* Reduced top margin on mobile */
   }
 
   .filter-controls label {
@@ -89,11 +90,6 @@
   }
 }
 
-
-
-
-
-
     .container {
       max-width: 75%;
       background: #fff;
@@ -103,13 +99,13 @@
     h1 {
     font-size: 1.8rem;
     text-align: center;
-    margin-top: 0px;
-    margin-bottom:20px;
+    margin-top: 0;
+    margin-bottom:10px; /* Reduced bottom margin */
     }
     h2 {
    text-align: center;
-   margin-top: 0 ;
-   margin-bottom: 20px;
+   margin-top: 0;
+   margin-bottom: 10px; /* Reduced bottom margin */
    }
 
     .info,
@@ -161,7 +157,7 @@
       display: flex;
       flex-direction: column;
       gap: 15px;
-      margin-top: 20px;
+      margin-top: 0px; /* Reduced top margin */
     }
 
     .product-item {
@@ -299,6 +295,17 @@
   user-select: none;
   -webkit-user-select: none;
 }
+#shirtsPage,
+#tshirtsPage,
+#pantsPage,
+#cargosPage,
+#homePage,
+#descriptionPage,
+#cartPage,
+#profilePage {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}
  </style>
 </head>
 <body>
@@ -333,39 +340,8 @@
     </div>
 </div>
    <div id="productsPage" style="margin:0;" >
-       
-       
-       
-       
-       
-       
-       
-       
-       
-       
-       
-       
-       
-       
-       
-       
-       
-       
-       
-       
-       
-       
-       
-       
-       
-       
-       
-       
-       
-       
         <div id="shirtsPage" style="display: none; text-align: center;">
-  <br>
-  
+  <!-- Removed <br> elements -->
   <img src="https://see.fontimg.com/api/rf5/woG33/N2Y3Y2RhYTdiOGMwNGVjOGE5MWE1MTFiNGJjM2E4Y2Iub3Rm/c2hpcnQ/redtrap-expanded-puo.png?r=fs&h=28&w=1000&fg=000000&bg=FFFFFF&tb=1&s=28"
        style="height: auto;margin-right:24%;" />
 
@@ -426,7 +402,6 @@
     <p class="price">₹459</p>
   </div>
 </div>
-
 
 
    
@@ -1009,32 +984,19 @@
   
   
   
-  
-  
-  
-  
-  
-  
- <div id="HomePage" style="margin: 0; padding: 0;">
 
-  <img id="slide-1"
-    src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/Untitled%20design%20(5).png"
-    alt="3D rendering of words"
-    style="width: 100vw; height: 100vh; object-fit: cover; display: block; margin: 0; padding: 0;" />
-
-  <div class="product-list" id="productList" style="padding: 10px;">
-    <h2 style="text-align: center;">Contact:</h2>
-    <center>6380900310<br>TheEnlyWear@gmail.com</center>
-    <h2 style="text-align: center;">Location:</h2><br>
-    <div
-      style="display: flex; justify-content: center; align-items: center; height: 35vh; border-radius: 0.5rem; margin-left:5%; margin-right:5%">
-      <iframe
-        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1951.9412388138983!2d79.75375512746827!3d11.913266345081821!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a536197b55718a3%3A0xb1d567dddfc2f85c!2sMonster%20Men&#39;s%20Collection!5e0!3m2!1sen!2sin!4v1746009236221!5m2!1sen!2sin"
-        width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"
-        referrerpolicy="no-referrer-when-downgrade"></iframe>
-    </div>
-  </div>
-
+  
+  
+  
+  
+  
+<div id="homePage" style="width: 100%;margin:0;padding:0;" > 
+     
+          
+           <img id="slide-1" src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/Untitled%20design%20(5).png" alt="3D rendering of an words"style="width: 100%;margin-top:0" />
+         
+      
+      
 </div>
 
 <div class="container" id="mainContainer" style="margin:auto;">
@@ -1101,7 +1063,7 @@
     </button>
 </div>
 
-
+  
 
 </div>
 <div class="bottom-nav" id="bottomNav" style="margin:0;">
@@ -1134,7 +1096,8 @@
     </div>
   </a>
 </div>
-</div>
+
+</div> 
 
 <div id="paymentSuccessPage" style="display:none; margin-top:40%;padding: 30px; text-align: center;">
   <div style="padding: 20px; border: 2px solid green; background-color: #d4fcd4; color: green; border-radius: 10px;">
