@@ -1213,7 +1213,7 @@
       <button onclick="location.href='admin-dashboard.html'">Go to Dashboard</button>
     </div>
   
-  <div id="loadingScreen" style="
+ <div id="loadingScreen" style="
   position: fixed;
   top: 0;
   left: 0;
@@ -1223,22 +1223,27 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 9999;">
-      
-  <img src="https://raw.githubusercontent.com/MonsterMensCollection/lOGOS/refs/heads/main/envy%20(2).png" alt="Loading..." >
+  z-index: 9999;
+  opacity: 1;
+  transition: opacity 1s ease;
+">
+  <img src="https://raw.githubusercontent.com/MonsterMensCollection/lOGOS/refs/heads/main/envy%20(2).png" alt="Loading..." style="max-width: 200px;">
 </div>
 
-  <script>
-      
-     function showLoadingThen(actionFn) {
-  const loadingScreen = document.getElementById("loadingScreen");
-  loadingScreen.style.display = "flex";
-  setTimeout(() => {
-    loadingScreen.style.display = "none";
-    actionFn();
-  }, 5000); // 1 second fake load
-}
- 
+<script>
+  function showLoadingThen(actionFn) {
+    const loadingScreen = document.getElementById("loadingScreen");
+    loadingScreen.style.display = "flex";
+    loadingScreen.style.opacity = "1"; // Fade in (if hidden previously)
+
+    setTimeout(() => {
+      loadingScreen.style.opacity = "0"; // Fade out
+      setTimeout(() => {
+        loadingScreen.style.display = "none";
+        actionFn(); // Run action after fade out
+      }, 1000); // Match this with the CSS transition time (1s)
+    }, 4000); // Simulate 4s load (can adjust)
+  }
       
       let lastCategoryPage = null;
 
