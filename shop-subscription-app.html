@@ -1197,7 +1197,6 @@ function showShirtsPage() {
    document.getElementById("descriptionPage").style.display = "none";
      document.getElementById("tshirtsPage").style.display = "none";
       document.getElementById("cargosPage").style.display = "none";
-      document.getElementById("homePage").style.display = "none";
 }
 
 function showTshirtsPage() {
@@ -1214,7 +1213,6 @@ function showTshirtsPage() {
    document.getElementById("descriptionPage").style.display = "none";
      document.getElementById("shirtsPage").style.display = "none";
       document.getElementById("cargosPage").style.display = "none";
-      document.getElementById("homePage").style.display = "none";
 }
 
 function showPantsPage() {
@@ -1231,7 +1229,6 @@ function showPantsPage() {
    document.getElementById("profilePage").style.display = "none";
    document.getElementById("descriptionPage").style.display = "none";
    document.getElementById("cargosPage").style.display = "none";
-   document.getElementById("homePage").style.display = "none";
 }
 
 function showCargosPage() {
@@ -1248,7 +1245,6 @@ function showCargosPage() {
   document.getElementById("cartPage").style.display = "none";
   document.getElementById("profilePage").style.display = "none";
   document.getElementById("descriptionPage").style.display = "none";
-  document.getElementById("homePage").style.display = "none";
 }
 
 function backToProducts() {
@@ -1262,7 +1258,6 @@ function backToProducts() {
   document.getElementById("profilePage").style.display = "none";
   document.getElementById("tshirtsPage").style.display = "none";
   document.getElementById("cargosPage").style.display = "none";
-   document.getElementById("homePage").style.display = "none";
 }
 
 
@@ -1572,7 +1567,6 @@ if (!document.getElementById("descHeader")) {
   document.getElementById("profilePage").style.display = "none";
     document.getElementById("tshirtsPage").style.display = "none";
     document.getElementById("cargosPage").style.display = "none";
-    document.getElementById("homePage").style.display = "none";
     
     window.scrollTo(0, 0);
 }
@@ -1660,7 +1654,6 @@ function showCart() {
   document.getElementById("profilePage").style.display = "none";
   document.getElementById("tshirtsPage").style.display = "none";
   document.getElementById("cargosPage").style.display = "none";
-  document.getElementById("homePage").style.display = "none";
   
   const cartItemsDiv = document.getElementById("cartItems");
   cartItemsDiv.innerHTML = '';
@@ -1858,7 +1851,6 @@ function checkoutCOD() {
           document.getElementById("profilePage").style.display = "none";
             document.getElementById("tshirtsPage").style.display = "none";
              document.getElementById("cargosPage").style.display = "none";
-             document.getElementById("homePage").style.display = "none";
 
           // Show success page
           document.getElementById("paymentSuccessPageCOD").style.display = "block";
@@ -1921,7 +1913,6 @@ db.collection("users").doc(user.uid).get().then(doc => {
     document.getElementById("descriptionPage").style.display = "none";
       document.getElementById("tshirtsPage").style.display = "none";
        document.getElementById("cargosPage").style.display = "none";
-       document.getElementById("homePage").style.display = "none";
   }
 }
 function logout() {
@@ -2228,7 +2219,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Hide everything else
     const pagesToHide = [
       "productList", "shirtsPage", "pantsPage", "sliderSection", "cartPage", "profilePage",
-      "descriptionPage", "tshirtsPage", "cargosPage","homePage"
+      "descriptionPage", "tshirtsPage", "cargosPage"
     ];
     pagesToHide.forEach(id => {
       const el = document.getElementById(id);
