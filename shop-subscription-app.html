@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Shop Subscription App</title>
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-auth-compat.js"></script>
@@ -19,8 +19,10 @@
       padding-bottom: 130px ; 
       margin:0;
       margin-top: -6%; /* Adjust if your .bottom-nav is taller */
+      padding-top: env(safe-area-inset-top);
       height: 100%;
       overflow-x: hidden;
+      box-sizing: border-box;
      }
      
      html, body {
