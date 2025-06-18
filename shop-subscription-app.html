@@ -307,28 +307,31 @@
     .with-top-margin {
   margin-top: 20% !important;
    }
-    .bottom-nav { 
+.bottom-nav { 
   position: fixed;
-  bottom:0;
+  bottom: 0;
   left: 0;
   width: 100%;
+  height: 70px; /* Fixed height */
   background-color: white;
-  border-top: 0px solid #ccc;
   display: flex;
-  justify-content: space-around; /* evenly space buttons */
-  align-items: center;           /* vertically center content */
-  padding:6% 0 env(safe-area-inset-bottom);
+  justify-content: space-around;
+  align-items: center;  /* ✅ vertical centering */
+  padding-bottom: env(safe-area-inset-bottom); /* safe area support */
   z-index: 1000;
   box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
 }
 
-
 .bottom-nav a {
-  color: #007bff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; /* ✅ vertical center inside nav */
+  height: 100%; /* occupy full nav height */
   text-decoration: none;
-  font-weight: bold;
-  font-size: 1rem;
+  color: #007bff;
 }
+
 
 .bottom-nav a:hover {
  color: #0056b3;
@@ -1166,36 +1169,24 @@
 
 
 </div>
-<div class="bottom-nav" id="bottomNav" >
+<div class="bottom-nav" id="bottomNav">
   <a href="#" onclick="backToProducts()">
-    <div style="display: flex; flex-direction: column; align-items: center;">
-      <img src="https://img.icons8.com/?size=100&id=HWCgA83ZikaE&format=png&color=000000" width="24" alt="Home"/>
-    </div>
+    <img src="https://img.icons8.com/?size=100&id=HWCgA83ZikaE&format=png&color=000000" width="24" alt="Home"/>
   </a>
-  
- <a href="#" onclick=" showShirtsPage()">
-  <div style="display: flex; flex-direction: column; align-items: center;">
+  <a href="#" onclick="showShirtsPage()">
     <img src="https://img.icons8.com/?size=100&id=zsb66Nl4NM9p&format=png&color=000000" width="24" alt="Shirts"/>
-  </div>
-</a>
-
   </a>
   <a href="#" onclick="showPantsPage()">
-    <div style="display: flex; flex-direction: column; align-items: center;">
-      <img src="https://img.icons8.com/?size=100&id=0A3ziqKFWVXq&format=png&color=000000" width="24" alt="Pants"/>
-    </div>
+    <img src="https://img.icons8.com/?size=100&id=0A3ziqKFWVXq&format=png&color=000000" width="24" alt="Pants"/>
   </a>
   <a href="#" onclick="showCart()">
-    <div style="display: flex; flex-direction: column; align-items: center;">
-      <img src="https://img.icons8.com/?size=100&id=5hmLU5efq3jw&format=png&color=000000" width="24" alt="Cart"/>
-    </div>
+    <img src="https://img.icons8.com/?size=100&id=5hmLU5efq3jw&format=png&color=000000" width="24" alt="Cart"/>
   </a>
   <a href="#" onclick="showProfilePage()">
-    <div style="display: flex; flex-direction: column; align-items: center;">
-      <img src="https://img.icons8.com/?size=100&id=Or3Eb98tGbJL&format=png&color=000000" width="24" alt="Profile"/>
-    </div>
+    <img src="https://img.icons8.com/?size=100&id=Or3Eb98tGbJL&format=png&color=000000" width="24" alt="Profile"/>
   </a>
 </div>
+
 </div>
 
 <div id="paymentSuccessPage" style="display:none; margin-top:40%;padding: 30px; text-align: center;">
