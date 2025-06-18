@@ -307,16 +307,18 @@
     .with-top-margin {
   margin-top: 20% !important;
    }
-    .bottom-nav {
+    .bottom-nav { 
   position: fixed;
-  bottom: 0;
+  bottom:0;
   left: 0;
   width: 100%;
   background-color: white;
   border-top: 0px solid #ccc;
   display: flex;
-  justify-content: space-around;
-  padding: 6% 0 env(safe-area-inset-bottom);  /* ✅ safe bottom space */
+  justify-content: space-around; /* evenly space buttons */
+  align-items: center;           /* vertically center content */
+  height: 7%;
+  padding: 0 env(safe-area-inset-bottom);
   z-index: 1000;
   box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
 }
