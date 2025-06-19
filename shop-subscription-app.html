@@ -1377,10 +1377,10 @@ function handleTouchEnd(evt, fromPage) {
 
   // Loop for shirts <-> tshirts
   if (pagesGroup1.includes(fromPage)) {
-    if (diffX > 50) { // Swipe left
+    if (diffX > 100) { // Swipe left
       const toPage = fromPage === "shirtsPage" ? "tshirtsPage" : "shirtsPage";
       navigateTo(fromPage, toPage);
-    } else if (diffX < -50) { // Swipe right
+    } else if (diffX < -100) { // Swipe right
       const toPage = fromPage === "tshirtsPage" ? "shirtsPage" : "tshirtsPage";
       navigateTo(fromPage, toPage);
     }
@@ -1388,10 +1388,10 @@ function handleTouchEnd(evt, fromPage) {
 
   // Loop for pants <-> cargos
   if (pagesGroup2.includes(fromPage)) {
-    if (diffX > 50) { // Swipe left
+    if (diffX > 100) { // Swipe left
       const toPage = fromPage === "pantsPage" ? "cargosPage" : "pantsPage";
       navigateTo(fromPage, toPage);
-    } else if (diffX < -50) { // Swipe right
+    } else if (diffX < -100) { // Swipe right
       const toPage = fromPage === "cargosPage" ? "pantsPage" : "cargosPage";
       navigateTo(fromPage, toPage);
     }
