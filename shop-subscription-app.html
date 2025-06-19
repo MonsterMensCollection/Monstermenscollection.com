@@ -386,23 +386,6 @@
      gap: 20px;
     }
 
-.filter-controls,
-#bottomNav {
-  transition: transform 0.3s ease;
-  will-change: transform;
-  z-index: 1000;
-  position: fixed;
-  left: 0;
-  width: 100%;
-}
-
-.filter-controls {
-  top: 0;
-}
-
-#bottomNav {
-  bottom: 0;
-}
 
  </style>
 </head>
@@ -468,7 +451,7 @@
        
        
        
-        <div id="shirtsPage" class="page" style="display: none; text-align: center;margin-top:13%;">
+        <div id="shirtsPage" style="display: none; text-align: center;margin-top:13%;">
   
    <div id="fixed-header">
   <img src="https://see.fontimg.com/api/rf5/woG33/N2Y3Y2RhYTdiOGMwNGVjOGE5MWE1MTFiNGJjM2E4Y2Iub3Rm/c2hpcnQ/redtrap-expanded-puo.png?r=fs&h=28&w=1000&fg=000000&bg=FFFFFF&tb=1&s=28"
@@ -690,7 +673,7 @@
 
 
 
-<div id="tshirtsPage" class="page"style="display: none;text-align: center;margin-top:13%;">
+<div id="tshirtsPage" style="display: none;text-align: center;margin-top:13%;">
     
      <div id="fixed-header">
     <img src="https://see.fontimg.com/api/rf5/woG33/N2Y3Y2RhYTdiOGMwNGVjOGE5MWE1MTFiNGJjM2E4Y2Iub3Rm/VC1zaGlydA/redtrap-expanded-puo.png?r=fs&h=28&w=1000&fg=000000&bg=FFFFFF&tb=1&s=28"
@@ -832,7 +815,7 @@
 
 
 
-<div id="pantsPage" class="page" style="display: none;text-align: center;margin-top:13%;">
+<div id="pantsPage" style="display: none;text-align: center;margin-top:13%;">
     
     <div id="fixed-header">
     
@@ -973,7 +956,7 @@
  
  
  
- <div id="cargosPage" class="page" style="display: none;text-align: center;margin-top:13%;">
+ <div id="cargosPage" style="display: none;text-align: center;margin-top:13%;">
     
     <div id="fixed-header">
     
@@ -1083,7 +1066,7 @@
  
  
 <!-- Product Description Page with Scrollable Image Gallery -->
-<div id="descriptionPage" style="display: none; padding: 0 5%;margin-top:15%;" class="form-section">
+<div id="descriptionPage" style="display: none; padding: 0 5%;margin-top:13%;" class="form-section">
 <div style="display: flex; justify-content: center;">
   <div id="mainMediaWrapper" style="display: flex; justify-content: center; overflow: hidden; touch-action: pan-y;">
   <img id="descImage" src="" style="max-width: 80%; border-radius: 12px; display: none;" />
@@ -1152,7 +1135,7 @@
 </div>
 
 <div class="container" id="mainContainer" style="margin:auto;">
-  <div id="cartPage" class="form-section" style="display: none; margin-left:0%;margin-right:5%;margin-top:15%; ">
+  <div id="cartPage" class="form-section" style="display: none; margin-left:0%;margin-right:5%;margin-top:13%; ">
   <br><img src="https://see.fontimg.com/api/rf5/woG33/N2Y3Y2RhYTdiOGMwNGVjOGE5MWE1MTFiNGJjM2E4Y2Iub3Rm/Q0hFQ0tPVVQ/redtrap-expanded-puo.png?r=fs&h=30&w=1000&fg=000000&bg=FFFFFF&tb=1&s=30"style="display: block;">
    <br><div id="cartItems"></div>
   <br>
@@ -1189,7 +1172,7 @@
 </div>
 
 
-<div id="profilePage" class="form-section" style="display: none;margin-top:15%;"> <!-- Premium Badge -->
+<div id="profilePage" class="form-section" style="display: none;margin-top:13%;"> <!-- Premium Badge -->
     <br><img src="https://see.fontimg.com/api/rf5/woG33/N2Y3Y2RhYTdiOGMwNGVjOGE5MWE1MTFiNGJjM2E4Y2Iub3Rm/UFJPRklMRQ/redtrap-expanded-puo.png?r=fs&h=30&w=1000&fg=000000&bg=FFFFFF&tb=1&s=30"style="display: block;margin-left: auto;
   margin-right: auto;">
     
@@ -2358,33 +2341,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 });
-
-let lastScrollTop = 0;
-let targetPages = ["shirtsPage", "tshirtsPage", "pantsPage", "cargosPage"];
-
-window.addEventListener("scroll", function () {
-  const activePage = document.querySelector(".page:visible")?.id; // Custom way to get current page
-
-  if (!targetPages.includes(activePage)) return;
-
-  const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-
-  const filterControls = document.querySelector('.filter-controls[data-target="' + activePage + '"]');
-  const bottomNav = document.getElementById("bottomNav");
-
-  if (scrollTop > lastScrollTop) {
-    // Scroll down – hide
-    if (filterControls) filterControls.style.transform = "translateY(-100%)";
-    if (bottomNav) bottomNav.style.transform = "translateY(100%)";
-  } else {
-    // Scroll up – show
-    if (filterControls) filterControls.style.transform = "translateY(0)";
-    if (bottomNav) bottomNav.style.transform = "translateY(0)";
-  }
-
-  lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
-}, { passive: true });
-
 
     // On initial load (login/signup page), add top margin
 document.getElementById("mainContainer").classList.add("with-top-margin");
