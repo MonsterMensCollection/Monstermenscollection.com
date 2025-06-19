@@ -369,6 +369,21 @@
   user-select: none;
   -webkit-user-select: none;
 }
+
+ #fixed-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background-color: white; /* optional: background behind image */
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 10px;
+      padding-bottom: 10px;
+    }
+
  </style>
 </head>
 <body>
@@ -434,14 +449,17 @@
        
        
         <div id="shirtsPage" style="display: none; text-align: center;margin-top:13%;">
-  <br>
   
+   <div id="fixed-header">
   <img src="https://see.fontimg.com/api/rf5/woG33/N2Y3Y2RhYTdiOGMwNGVjOGE5MWE1MTFiNGJjM2E4Y2Iub3Rm/c2hpcnQ/redtrap-expanded-puo.png?r=fs&h=28&w=1000&fg=000000&bg=FFFFFF&tb=1&s=28"
        style="height: auto;margin-right:24%;" />
 
   <img src="https://see.fontimg.com/api/rf5/woG33/N2Y3Y2RhYTdiOGMwNGVjOGE5MWE1MTFiNGJjM2E4Y2Iub3Rm/VC1zaGlydA/redtrap-expanded-puo.png?r=fs&h=15&w=1000&fg=000000&bg=FFFFFF&tb=1&s=15"
        style="height: auto;" />
-       
+    </div>   
+    <br>
+    <br>
+    <br>
 <!-- Sorting and Filtering Controls -->
 <div class="filter-controls" data-target="shirtsPage">
   <label>Sort by Price:</label>
@@ -654,12 +672,17 @@
 
 <div id="tshirtsPage" style="display: none;text-align: center;margin-top:13%;">
     
-    <br> <img src="https://see.fontimg.com/api/rf5/woG33/N2Y3Y2RhYTdiOGMwNGVjOGE5MWE1MTFiNGJjM2E4Y2Iub3Rm/VC1zaGlydA/redtrap-expanded-puo.png?r=fs&h=28&w=1000&fg=000000&bg=FFFFFF&tb=1&s=28"
+     <div id="fixed-header">
+    <img src="https://see.fontimg.com/api/rf5/woG33/N2Y3Y2RhYTdiOGMwNGVjOGE5MWE1MTFiNGJjM2E4Y2Iub3Rm/VC1zaGlydA/redtrap-expanded-puo.png?r=fs&h=28&w=1000&fg=000000&bg=FFFFFF&tb=1&s=28"
        style="height: auto;margin-right:15%;" />
 
   <img src="https://see.fontimg.com/api/rf5/woG33/N2Y3Y2RhYTdiOGMwNGVjOGE5MWE1MTFiNGJjM2E4Y2Iub3Rm/c2hpcnQ/redtrap-expanded-puo.png?r=fs&h=15&w=1000&fg=000000&bg=FFFFFF&tb=1&s=15"
        style="height: auto;" />
+    </div>
     
+    <br>
+    <br>
+    <br>
 <!-- Sorting and Filtering Controls -->
 <div class="filter-controls" data-target="tshirtsPage">
   <label>Sort by Price:</label>
@@ -791,7 +814,7 @@
 
 <div id="pantsPage" style="display: none;text-align: center;margin-top:13%;">
     
-    <br> 
+    <div id="fixed-header">
     
     <img src="https://see.fontimg.com/api/rf5/woG33/N2Y3Y2RhYTdiOGMwNGVjOGE5MWE1MTFiNGJjM2E4Y2Iub3Rm/UEFOVFM/redtrap-expanded-puo.png?r=fs&h=28&w=1000&fg=000000&bg=FFFFFF&tb=1&s=28"
        style="height: auto;margin-right:15%;" />
@@ -799,7 +822,10 @@
   <img src="https://see.fontimg.com/api/rf5/woG33/N2Y3Y2RhYTdiOGMwNGVjOGE5MWE1MTFiNGJjM2E4Y2Iub3Rm/Q0FSR09T/redtrap-expanded-puo.png?r=fs&h=15&w=1000&fg=000000&bg=FFFFFF&tb=1&s=15"
        style="height: auto;" />
     
-    
+    </div>
+    <br>
+    <br>
+    <br>
 <!-- Sorting and Filtering Controls -->
 <div class="filter-controls" data-target="pantsPage">
   <label>Sort by Price:</label>
@@ -929,7 +955,7 @@
  
  <div id="cargosPage" style="display: none;text-align: center;margin-top:13%;">
     
-    <br> 
+    <div id="fixed-header">
     
     <img src="https://see.fontimg.com/api/rf5/woG33/N2Y3Y2RhYTdiOGMwNGVjOGE5MWE1MTFiNGJjM2E4Y2Iub3Rm/Q0FSR09T/redtrap-expanded-puo.png?r=fs&h=28&w=1000&fg=000000&bg=FFFFFF&tb=1&s=28"
        style="height: auto;margin-right:10%;" />
@@ -937,7 +963,10 @@
   <img src="https://see.fontimg.com/api/rf5/woG33/N2Y3Y2RhYTdiOGMwNGVjOGE5MWE1MTFiNGJjM2E4Y2Iub3Rm/UEFOVFM/redtrap-expanded-puo.png?r=fs&h=15&w=1000&fg=000000&bg=FFFFFF&tb=1&s=15"
        style="height: auto;" />
     
-    
+    </div>
+    <br>
+    <br>
+    <br>
     
 <!-- Sorting and Filtering Controls -->
 <div class="filter-controls" data-target="cargosPage">
