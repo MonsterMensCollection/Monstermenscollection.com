@@ -1355,14 +1355,25 @@ function backToProducts() {
 
 
 let startX = 0;
+let startTime = 0;
 
 function handleTouchStart(evt) {
   startX = evt.touches[0].clientX;
+  startTime = new Date().getTime(); // Start time for swipe speed calculation
 }
 
 function handleTouchEnd(evt, fromPage) {
   const endX = evt.changedTouches[0].clientX;
+  const endTime = new Date().getTime();
   const diffX = startX - endX;
+  const timeDiff = endTime - startTime;
+
+  const swipeSpeed = Math.abs(diffX / timeDiff); // px/ms
+
+  const fastSwipe = swipeSpeed > 0.3; // Tune this for sensitivity
+  const farSwipe = Math.abs(diffX) > 60; // Minimum distance
+
+  if (!(fastSwipe || farSwipe)) return; // Don't trigger on weak swipes
 
   const pagesGroup1 = ["shirtsPage", "tshirtsPage"];
   const pagesGroup2 = ["pantsPage", "cargosPage"];
@@ -1375,38 +1386,39 @@ function handleTouchEnd(evt, fromPage) {
     history.pushState({ page: to }, "", "#" + to.replace("Page", ""));
   };
 
-  // Loop for shirts <-> tshirts
+  // Logic for shirts <-> tshirts
   if (pagesGroup1.includes(fromPage)) {
-    if (diffX > 100) { // Swipe left
+    if (diffX > 0) {
       const toPage = fromPage === "shirtsPage" ? "tshirtsPage" : "shirtsPage";
       navigateTo(fromPage, toPage);
-    } else if (diffX < -100) { // Swipe right
+    } else {
       const toPage = fromPage === "tshirtsPage" ? "shirtsPage" : "tshirtsPage";
       navigateTo(fromPage, toPage);
     }
   }
 
-  // Loop for pants <-> cargos
+  // Logic for pants <-> cargos
   if (pagesGroup2.includes(fromPage)) {
-    if (diffX > 100) { // Swipe left
+    if (diffX > 0) {
       const toPage = fromPage === "pantsPage" ? "cargosPage" : "pantsPage";
       navigateTo(fromPage, toPage);
-    } else if (diffX < -100) { // Swipe right
+    } else {
       const toPage = fromPage === "cargosPage" ? "pantsPage" : "cargosPage";
       navigateTo(fromPage, toPage);
     }
   }
 }
 
-
-// Add listeners to both pages
+// Apply listeners
 ["shirtsPage", "tshirtsPage", "pantsPage", "cargosPage"].forEach(pageId => {
   const page = document.getElementById(pageId);
-  page.addEventListener("touchstart", handleTouchStart, false);
+  page.addEventListener("touchstart", handleTouchStart, { passive: true });
   page.addEventListener("touchend", function(evt) {
     handleTouchEnd(evt, pageId);
-  }, false);
+  }, { passive: true });
 });
+
+
 
 
 let cart = [];
