@@ -1357,26 +1357,35 @@ function backToProducts() {
 let startX = 0;
 let startY = 0;
 let startTime = 0;
+let isScrollingVertically = false;
 
 function handleTouchStart(evt) {
   const touch = evt.touches[0];
   startX = touch.clientX;
   startY = touch.clientY;
   startTime = new Date().getTime();
+  isScrollingVertically = false;
+}
+
+function handleTouchMove(evt) {
+  const touch = evt.touches[0];
+  const deltaX = Math.abs(touch.clientX - startX);
+  const deltaY = Math.abs(touch.clientY - startY);
+
+  if (deltaY > deltaX) {
+    isScrollingVertically = true;
+  }
 }
 
 function handleTouchEnd(evt, fromPage) {
+  if (isScrollingVertically) return; // Let native scroll happen
+
   const touch = evt.changedTouches[0];
   const endX = touch.clientX;
-  const endY = touch.clientY;
   const endTime = new Date().getTime();
 
   const diffX = startX - endX;
-  const diffY = startY - endY;
   const timeDiff = endTime - startTime;
-
-  // If the swipe is more vertical than horizontal, let it scroll normally
-  if (Math.abs(diffY) > Math.abs(diffX)) return;
 
   const swipeSpeed = Math.abs(diffX / timeDiff); // px/ms
   const fastSwipe = swipeSpeed > 0.3;
@@ -1388,44 +1397,36 @@ function handleTouchEnd(evt, fromPage) {
   const pagesGroup2 = ["pantsPage", "cargosPage"];
 
   const navigateTo = (from, to) => {
-    document.getElementById("descriptionPage").style.display = "none"; 
+    document.getElementById("descriptionPage").style.display = "none";
     document.getElementById(from).style.display = "none";
     document.getElementById(to).style.display = "block";
     lastCategoryPage = to;
     history.pushState({ page: to }, "", "#" + to.replace("Page", ""));
   };
 
-  // Logic for shirts <-> tshirts
   if (pagesGroup1.includes(fromPage)) {
-    if (diffX > 0) {
-      const toPage = fromPage === "shirtsPage" ? "tshirtsPage" : "shirtsPage";
-      navigateTo(fromPage, toPage);
-    } else {
-      const toPage = fromPage === "tshirtsPage" ? "shirtsPage" : "tshirtsPage";
-      navigateTo(fromPage, toPage);
-    }
+    const toPage = diffX > 0
+      ? (fromPage === "shirtsPage" ? "tshirtsPage" : "shirtsPage")
+      : (fromPage === "tshirtsPage" ? "shirtsPage" : "tshirtsPage");
+    navigateTo(fromPage, toPage);
   }
 
-  // Logic for pants <-> cargos
   if (pagesGroup2.includes(fromPage)) {
-    if (diffX > 0) {
-      const toPage = fromPage === "pantsPage" ? "cargosPage" : "pantsPage";
-      navigateTo(fromPage, toPage);
-    } else {
-      const toPage = fromPage === "cargosPage" ? "pantsPage" : "cargosPage";
-      navigateTo(fromPage, toPage);
-    }
+    const toPage = diffX > 0
+      ? (fromPage === "pantsPage" ? "cargosPage" : "pantsPage")
+      : (fromPage === "cargosPage" ? "pantsPage" : "cargosPage");
+    navigateTo(fromPage, toPage);
   }
 }
 
 ["shirtsPage", "tshirtsPage", "pantsPage", "cargosPage"].forEach(pageId => {
   const page = document.getElementById(pageId);
   page.addEventListener("touchstart", handleTouchStart, { passive: true });
+  page.addEventListener("touchmove", handleTouchMove, { passive: true }); // new
   page.addEventListener("touchend", function(evt) {
     handleTouchEnd(evt, pageId);
   }, { passive: true });
 });
-
 
 
 
