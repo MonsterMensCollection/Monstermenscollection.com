@@ -1355,25 +1355,34 @@ function backToProducts() {
 
 
 let startX = 0;
+let startY = 0;
 let startTime = 0;
 
 function handleTouchStart(evt) {
-  startX = evt.touches[0].clientX;
-  startTime = new Date().getTime(); // Start time for swipe speed calculation
+  const touch = evt.touches[0];
+  startX = touch.clientX;
+  startY = touch.clientY;
+  startTime = new Date().getTime();
 }
 
 function handleTouchEnd(evt, fromPage) {
-  const endX = evt.changedTouches[0].clientX;
+  const touch = evt.changedTouches[0];
+  const endX = touch.clientX;
+  const endY = touch.clientY;
   const endTime = new Date().getTime();
+
   const diffX = startX - endX;
+  const diffY = startY - endY;
   const timeDiff = endTime - startTime;
 
+  // If the swipe is more vertical than horizontal, let it scroll normally
+  if (Math.abs(diffY) > Math.abs(diffX)) return;
+
   const swipeSpeed = Math.abs(diffX / timeDiff); // px/ms
+  const fastSwipe = swipeSpeed > 0.3;
+  const farSwipe = Math.abs(diffX) > 60;
 
-  const fastSwipe = swipeSpeed > 0.3; // Tune this for sensitivity
-  const farSwipe = Math.abs(diffX) > 60; // Minimum distance
-
-  if (!(fastSwipe || farSwipe)) return; // Don't trigger on weak swipes
+  if (!(fastSwipe || farSwipe)) return;
 
   const pagesGroup1 = ["shirtsPage", "tshirtsPage"];
   const pagesGroup2 = ["pantsPage", "cargosPage"];
@@ -1409,7 +1418,6 @@ function handleTouchEnd(evt, fromPage) {
   }
 }
 
-// Apply listeners
 ["shirtsPage", "tshirtsPage", "pantsPage", "cargosPage"].forEach(pageId => {
   const page = document.getElementById(pageId);
   page.addEventListener("touchstart", handleTouchStart, { passive: true });
