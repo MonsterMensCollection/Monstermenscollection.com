@@ -79,7 +79,27 @@
   z-index: 1000;
 }
 
+.filter-box {
+  display: flex;
+  gap: 10px;
+  background-color: #ffffff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  padding: 8px 12px;
+}
 
+/* Style the select elements cleanly without separate boxes */
+.filter-box select {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 0.95rem;
+  cursor: pointer;
+  padding: 6px 10px;
+  appearance: none; /* Remove default arrow in some browsers */
+}
+    
 .filter-controls label {
   font-weight: bold;
   color: #333;
@@ -93,7 +113,7 @@
   flex: 1 1 0;
   min-width: 100%;
   max-width: 100%;
-  padding: 8px 50px;
+  padding: 8px 10px;
   border: 1px solid #ccc;
   border-radius: 0px;
   font-size: 0.9rem;
@@ -472,20 +492,23 @@
     <br>
 <!-- Sorting and Filtering Controls -->
 <div class="filter-controls" data-target="shirtsPage">
-  <select class="sortPrice">
-    <option value="default">Sort </option>
-    <option value="asc">Low to High</option>
-    <option value="desc">High to Low</option>
-  </select>
+  <div class="filter-box">
+    <select class="sortPrice">
+      <option value="default">Sort</option>
+      <option value="asc">Low to High</option>
+      <option value="desc">High to Low</option>
+    </select>
 
-  <select class="filterSize">
-    <option value="all">Filter </option>
-    <option value="M">M</option>
-    <option value="L">L</option>
-    <option value="XL">XL</option>
-    <option value="XXL">XXL</option>
-  </select>
+    <select class="filterSize">
+      <option value="all">Filter</option>
+      <option value="M">M</option>
+      <option value="L">L</option>
+      <option value="XL">XL</option>
+      <option value="XXL">XXL</option>
+    </select>
+  </div>
 </div>
+
 <div style="height: 60px;"></div>
           
  <div class="product-grid">
