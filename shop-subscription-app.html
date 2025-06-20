@@ -70,7 +70,13 @@
   max-width: 100%;
   box-sizing: border-box;
   overflow-x: hidden; /* Prevent horizontal scroll */
+
+  /* 👉 Add these lines to make it float on scroll */
+  position: sticky;
+  top: 0;
+  z-index: 999;
 }
+
 
 .filter-controls label {
   font-weight: bold;
@@ -385,15 +391,6 @@
       padding-bottom: 10px;
      gap: 20px;
     }
-
-.filter-controls {
-  position: sticky;
-  top: 0;
-  background-color: white; /* Or match your site's background */
-  z-index: 100; /* Ensure it stays above other content */
-  padding: 15%;
-  border-bottom: 1px solid #ccc;
-}
 
  </style>
 </head>
