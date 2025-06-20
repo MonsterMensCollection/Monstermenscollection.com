@@ -80,25 +80,37 @@
 
 /* Optional: Remove border & make dropdowns flat */
 .filter-controls select {
-  border: none;
-  outline: none;
-  background-color: transparent;
+  flex: 1 1 auto;
+  min-width: 120px;
+  max-width: 180px;
+  padding: 10px 14px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
   font-size: 1rem;
+  background-color: #f9f9f9;
+  color: #333;
   cursor: pointer;
-  padding: 6px 10px;
+  transition: all 0.3s ease;
+  background-image: linear-gradient(45deg, transparent 50%, #555 50%),
+                    linear-gradient(135deg, #555 50%, transparent 50%);
+  background-position: right 12px top 50%, right 7px top 50%;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
   appearance: none;
 }
 
-
-.filter-controls label {
-  font-weight: bold;
-  color: #333;
-  display: flex;
-  align-items: center;
-  white-space: nowrap;
-  font-size: 0.9rem;
+/* Hover effect */
+.filter-controls select:hover {
+  border-color: #888;
+  background-color: #fff;
 }
 
+/* Focus effect */
+.filter-controls select:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 4px rgba(0, 123, 255, 0.4);
+}
 
 /* Mobile view adjustments */
 @media (max-width: 600px) {
@@ -112,9 +124,9 @@
   }
 
   .filter-controls select {
-    font-size: 0.85rem;
-    min-width: 60px;
-    max-width: 120px;
+    font-size: 0.9rem;
+    padding: 8px 10px;
+    min-width: 100px;
   }
 }
 
