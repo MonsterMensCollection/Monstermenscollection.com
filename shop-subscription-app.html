@@ -57,26 +57,36 @@
 }
 .filter-controls {
   display: flex;
-  flex-wrap: nowrap; /* Force single line */
-  justify-content: space-between;
+  flex-wrap: nowrap;
+  justify-content: center;
   align-items: center;
   gap: 10px;
-  margin: 20px auto;
-  padding: 10px;
-  background-color: #ffffff;
-  border-radius: 0px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  margin: 10px auto;
+  padding: 0;
+  background-color: transparent;
+  border: none;
+  box-shadow: none;
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
-  overflow-x: hidden; /* Prevent horizontal scroll */
+  overflow-x: hidden;
 
-  /* 👉 Add these lines to make it float on scroll */
- position: fixed;
-  top: 8%; /* Push below the fixed header (adjust if needed) */
+  position: fixed;
+  top: 8%;
   left: 0;
   right: 0;
   z-index: 1000;
+}
+
+/* Optional: Remove border & make dropdowns flat */
+.filter-controls select {
+  border: none;
+  outline: none;
+  background-color: transparent;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 6px 10px;
+  appearance: none;
 }
 
 
@@ -89,18 +99,6 @@
   font-size: 0.9rem;
 }
 
-.filter-controls select {
-  flex: 1 1 0;
-  min-width: 100%;
-  max-width: 100%;
-  padding: 8px 10px;
-  border: 1px solid #ccc;
-  border-radius: 0px;
-  font-size: 0.9rem;
-  background-color: #fff;
-  transition: border-color 0.3s, box-shadow 0.3s;
-  cursor: pointer;
-}
 
 /* Mobile view adjustments */
 @media (max-width: 600px) {
