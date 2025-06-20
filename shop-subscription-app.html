@@ -72,9 +72,11 @@
   overflow-x: hidden; /* Prevent horizontal scroll */
 
   /* 👉 Add these lines to make it float on scroll */
-  position: sticky;
-  top: 0;
-  z-index: 999;
+ position: fixed;
+  top: 15%; /* Push below the fixed header (adjust if needed) */
+  left: 0;
+  right: 0;
+  z-index: 1000;
 }
 
 
@@ -486,7 +488,8 @@
     <option value="XXL">XXL</option>
   </select>
 </div>
-
+<div style="height: 60px;"></div>
+          
  <div class="product-grid">
 
 
@@ -650,7 +653,6 @@
    
 </div>
 </div>
-
 
 
 
