@@ -56,38 +56,29 @@
   min-height: calc(100vh - 130px);
 }
 .filter-controls {
-  position: fixed;
-  top: 8%;
+  display: flex;
+  flex-wrap: nowrap; /* Force single line */
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin: 20px auto;
+  padding: 10px;
+  background-color: #ffffff;
+  border-radius: 0px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden; /* Prevent horizontal scroll */
+
+  /* 👉 Add these lines to make it float on scroll */
+ position: fixed;
+  top: 8%; /* Push below the fixed header (adjust if needed) */
   left: 0;
   right: 0;
   z-index: 1000;
-  background-color: transparent;
-  display: flex;
-  justify-content: center;
-  padding: 0;
 }
 
-/* Box that wraps both dropdowns */
-.filter-box {
-  display: flex;
-  gap: 10px;
-  padding: 10px;
-  background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  border: 1px solid #ccc;
-}
-
-/* Dropdown styling */
-.filter-box select {
-  border: none;
-  outline: none;
-  background: transparent;
-  font-size: 1rem;
-  padding: 5px 10px;
-  cursor: pointer;
-  appearance: none;
-}
 
 .filter-controls label {
   font-weight: bold;
@@ -481,21 +472,19 @@
     <br>
 <!-- Sorting and Filtering Controls -->
 <div class="filter-controls" data-target="shirtsPage">
-  <div class="filter-box">
-    <select class="sortPrice">
-      <option value="default">Sort</option>
-      <option value="asc">Low to High</option>
-      <option value="desc">High to Low</option>
-    </select>
+  <select class="sortPrice">
+    <option value="default">Sort </option>
+    <option value="asc">Low to High</option>
+    <option value="desc">High to Low</option>
+  </select>
 
-    <select class="filterSize">
-      <option value="all">Filter</option>
-      <option value="M">M</option>
-      <option value="L">L</option>
-      <option value="XL">XL</option>
-      <option value="XXL">XXL</option>
-    </select>
-  </div>
+  <select class="filterSize">
+    <option value="all">Filter </option>
+    <option value="M">M</option>
+    <option value="L">L</option>
+    <option value="XL">XL</option>
+    <option value="XXL">XXL</option>
+  </select>
 </div>
 <div style="height: 60px;"></div>
           
