@@ -422,6 +422,17 @@
   background-color: #ccc;
   margin: 0 10px;
 }
+
+.hide-on-scroll {
+  transform: translateY(-100%);
+  transition: transform 0.3s ease-in-out;
+}
+
+.hide-bottom-nav {
+  transform: translateY(100%);
+  transition: transform 0.3s ease-in-out;
+}
+
     
  </style>
 </head>
@@ -500,7 +511,7 @@
     <br>
     <br>
 <!-- Sorting and Filtering Controls -->
-<div class="filter-controls" data-target="shirtsPage">
+<div class="filter-controls" id="filterControls" data-target="shirtsPage">
   <div class="select-wrapper">
   <select class="sortPrice">
     <option value="default">Sort </option>
@@ -2382,6 +2393,26 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 
+  let lastScrollTop = 0;
+  const filterControls = document.getElementById("filterControls");
+  const bottomNav = document.getElementById("bottomNav");
+
+  window.addEventListener("scroll", function () {
+    const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+
+    if (currentScroll > lastScrollTop) {
+      // Scrolling down
+      filterControls.classList.add("hide-on-scroll");
+      bottomNav.classList.add("hide-bottom-nav");
+    } else {
+      // Scrolling up
+      filterControls.classList.remove("hide-on-scroll");
+      bottomNav.classList.remove("hide-bottom-nav");
+    }
+
+    lastScrollTop = currentScroll <= 0 ? 0 : currentScroll; // For iOS
+  }, false);
+
     // On initial load (login/signup page), add top margin
 document.getElementById("mainContainer").classList.add("with-top-margin");
 document.getElementById("backToSubscription").addEventListener("click", () => {
@@ -2389,6 +2420,7 @@ document.getElementById("backToSubscription").addEventListener("click", () => {
   document.getElementById("mainContainer").classList.add("with-top-margin");
 });
 
+  
 </script>
 
 </body>
