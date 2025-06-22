@@ -57,65 +57,71 @@
 }
 .filter-controls {
   display: flex;
-  justify-content: center;
+  flex-wrap: nowrap; /* Force single line */
+  justify-content: space-between;
   align-items: center;
-  gap: 16px;
-  padding: 10px 12px;
-  padding-top:13%;
-  position: fixed;
-  top: 8%;
+  gap: 10px;
+  margin: 20px auto;
+  padding: 10px;
+  background-color: #ffffff;
+  border-radius: 0px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  width: 100%;
+  max-width: 100%;
+  box-sizing: full;
+  overflow-x: hidden; /* Prevent horizontal scroll */
+
+  /* 👉 Add these lines to make it float on scroll */
+ position: fixed;
+  top: 8%; /* Push below the fixed header (adjust if needed) */
   left: 0;
   right: 0;
-  background: #ffffff;
   z-index: 1000;
-  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+}
+
+
+.filter-controls label {
+  font-weight: bold;
+  color: #333;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  font-size: 0.9rem;
 }
 
 .filter-controls select {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-
-  background: transparent;
-  border: none;
-  border-bottom: 1.5px solid #ccc;
-  font-size: 1rem;
-  color: #333;
-  font-weight: 500;
-  padding: 6px 24px 6px 6px;
-  text-align: center;
-  border-radius: 0;
-  position: relative;
-  background-image: url("data:image/svg+xml;utf8,<svg fill='%23666' height='6' viewBox='0 0 10 6' width='10' xmlns='http://www.w3.org/2000/svg'><path d='M0 0l5 6 5-6z'/></svg>");
-  background-repeat: no-repeat;
-  background-position: right 4px center;
-  background-size: 10px;
+  flex: 1 1 0;
+  min-width: 100%;
+  max-width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 0px;
+  font-size: 0.9rem;
+  background-color: #fff;
+  transition: border-color 0.3s, box-shadow 0.3s;
   cursor: pointer;
 }
 
-.filter-controls select:focus {
-  outline: none;
-  border-bottom: 1.5px solid #007bff;
-}
-
-/* Smooth style for iOS tap */
-select:focus, select:active {
-  outline: none;
-  -webkit-tap-highlight-color: transparent;
-}
-
-/* Mobile Responsive */
+/* Mobile view adjustments */
 @media (max-width: 600px) {
   .filter-controls {
-    gap: 10px;
-    padding: 8px 10px;
+    padding: 8px;
+    gap: 8px;
+  }
+
+  .filter-controls label {
+    font-size: 0.85rem;
   }
 
   .filter-controls select {
-    font-size: 0.9rem;
-    padding: 5px 20px 5px 5px;
+    font-size: 0.85rem;
+    min-width: 60px;
+    max-width: 120px;
   }
 }
+
+
+
 
 
 
@@ -465,15 +471,15 @@ select:focus, select:active {
     <br>
     <br>
 <!-- Sorting and Filtering Controls -->
-<div class="filter-controls no-box" data-target="shirtsPage">
+<div class="filter-controls" data-target="shirtsPage">
   <select class="sortPrice">
-    <option value="default">Sort</option>
+    <option value="default">Sort </option>
     <option value="asc">Low to High</option>
     <option value="desc">High to Low</option>
   </select>
 
   <select class="filterSize">
-    <option value="all">Filter</option>
+    <option value="all">Filter </option>
     <option value="M">M</option>
     <option value="L">L</option>
     <option value="XL">XL</option>
