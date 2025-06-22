@@ -56,6 +56,7 @@
   min-height: calc(100vh - 130px);
 }
 .filter-controls {
+  position: relative;
   display: flex;
   flex-wrap: nowrap; /* Force single line */
   justify-content: space-between;
@@ -90,18 +91,33 @@
 }
 
 .filter-controls select {
-  flex: 1 1 0;
-  min-width: 100%;
-  max-width: 100%;
-  padding: 8px 10px;
-  border: 1px solid #ccc;
-  border-radius: 0px;
-  font-size: 0.9rem;
-  background-color: #fff;
-  transition: border-color 0.3s, box-shadow 0.3s;
+  appearance: none; /* Removes native styling */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  margin: 0;
+  font-size: 1rem;
+  color: #333;
+  text-align: center;
   cursor: pointer;
+  border-bottom: 1px solid #ccc; /* Optional: add underline */
+  width: auto; /* Shrinks to content size */
 }
 
+.filter-controls select:focus {
+  outline: none;
+  border-bottom: 1px solid #007bff; /* Highlight on focus */
+}
+    .filter-controls select::after {
+  content: "▼";
+  position: absolute;
+  right: 10px;
+  pointer-events: none;
+}
 /* Mobile view adjustments */
 @media (max-width: 600px) {
   .filter-controls {
@@ -471,15 +487,15 @@
     <br>
     <br>
 <!-- Sorting and Filtering Controls -->
-<div class="filter-controls" data-target="shirtsPage">
+<div class="filter-controls no-box" data-target="shirtsPage">
   <select class="sortPrice">
-    <option value="default">Sort </option>
+    <option value="default">Sort</option>
     <option value="asc">Low to High</option>
     <option value="desc">High to Low</option>
   </select>
 
   <select class="filterSize">
-    <option value="all">Filter </option>
+    <option value="all">Filter</option>
     <option value="M">M</option>
     <option value="L">L</option>
     <option value="XL">XL</option>
