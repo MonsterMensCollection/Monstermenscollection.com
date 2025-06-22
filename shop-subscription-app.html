@@ -57,23 +57,22 @@
 }
 .filter-controls {
   display: flex;
-  flex-wrap: nowrap; /* Force single line */
+  flex-wrap: nowrap;
   justify-content: space-between;
   align-items: center;
   gap: 10px;
   margin: 20px auto;
-  padding: 10px;
-  background-color: #ffffff;
-  border-radius: 0px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  padding: 0; /* Remove padding */
+  background-color: transparent; /* Remove white background */
+  border-radius: 0; /* No rounded corners */
+  box-shadow: none; /* Remove shadow */
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
-  overflow-x: hidden; /* Prevent horizontal scroll */
+  overflow-x: hidden;
 
-  /* 👉 Add these lines to make it float on scroll */
- position: fixed;
-  top: 8%; /* Push below the fixed header (adjust if needed) */
+  position: fixed;
+  top: 8%;
   left: 0;
   right: 0;
   z-index: 1000;
@@ -95,7 +94,7 @@
   max-width: 100%;
   padding: 8px 10px;
   
-  border-radius: 0px;
+  border-radius: 6px;
   font-size: 0.9rem;
   background-color: #fff;
   transition: border-color 0.3s, box-shadow 0.3s;
