@@ -57,33 +57,38 @@
 }
 .filter-controls {
   display: flex;
-  justify-content: center;
+  justify-content: space-around;
   align-items: center;
-  gap: 20px;
-  padding: 10px 15px;
+  gap: 12px;
+  padding: 8px 12px;
   position: fixed;
   top: 8%;
   left: 0;
   right: 0;
-  background: transparent;
+  background: #ffffff;
   z-index: 1000;
-  font-family: 'Arial', sans-serif;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
 }
 
 .filter-controls select {
-  appearance: none;
-  -webkit-appearance: none;
+  -webkit-appearance: none; /* Remove iOS native style */
   -moz-appearance: none;
+  appearance: none;
+  
   background: transparent;
   border: none;
   border-bottom: 1px solid #ccc;
-  padding: 6px 10px;
-  font-size: 1rem;
-  color: #333;
+  padding: 6px 0;
+  font-size: 0.95rem;
   font-weight: 500;
-  cursor: pointer;
-  transition: border-color 0.3s ease;
-  width: auto;
+  color: #333;
+  width: 100px;
+  text-align: center;
+
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2210%22%20height%3D%226%22%20viewBox%3D%220%200%2010%206%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M0%200l5%206%205-6H0z%22%20fill%3D%22%23666%22/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 4px center;
+  background-size: 10px;
 }
 
 .filter-controls select:focus {
@@ -91,27 +96,24 @@
   border-bottom: 1px solid #007bff;
 }
 
-/* Optional: Add a subtle dropdown arrow using pseudo-element */
-.filter-controls select::after {
-  content: "▼";
-  font-size: 0.6rem;
-  margin-left: 5px;
+/* Remove native iOS highlight */
+select:focus, select:active {
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
-/* Optional Mobile Responsiveness */
+/* Mobile responsiveness */
 @media (max-width: 600px) {
   .filter-controls {
-    flex-direction: row;
-    justify-content: space-evenly;
-    gap: 10px;
-    padding: 8px;
+    gap: 8px;
+    padding: 6px 10px;
   }
 
   .filter-controls select {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
+    width: 90px;
   }
 }
-
 
 
 
