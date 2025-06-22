@@ -57,64 +57,64 @@
 }
 .filter-controls {
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
   align-items: center;
-  gap: 12px;
-  padding: 8px 12px;
+  gap: 16px;
+  padding: 10px 12px;
   position: fixed;
   top: 8%;
   left: 0;
   right: 0;
   background: #ffffff;
   z-index: 1000;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
 }
 
 .filter-controls select {
-  -webkit-appearance: none; /* Remove iOS native style */
+  -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
-  
+
   background: transparent;
   border: none;
-  border-bottom: 1px solid #ccc;
-  padding: 6px 0;
-  font-size: 0.95rem;
-  font-weight: 500;
+  border-bottom: 1.5px solid #ccc;
+  font-size: 1rem;
   color: #333;
-  width: 100px;
+  font-weight: 500;
+  padding: 6px 24px 6px 6px;
   text-align: center;
-
-  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2210%22%20height%3D%226%22%20viewBox%3D%220%200%2010%206%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M0%200l5%206%205-6H0z%22%20fill%3D%22%23666%22/%3E%3C/svg%3E");
+  border-radius: 0;
+  position: relative;
+  background-image: url("data:image/svg+xml;utf8,<svg fill='%23666' height='6' viewBox='0 0 10 6' width='10' xmlns='http://www.w3.org/2000/svg'><path d='M0 0l5 6 5-6z'/></svg>");
   background-repeat: no-repeat;
   background-position: right 4px center;
   background-size: 10px;
+  cursor: pointer;
 }
 
 .filter-controls select:focus {
   outline: none;
-  border-bottom: 1px solid #007bff;
+  border-bottom: 1.5px solid #007bff;
 }
 
-/* Remove native iOS highlight */
+/* Smooth style for iOS tap */
 select:focus, select:active {
   outline: none;
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Mobile responsiveness */
+/* Mobile Responsive */
 @media (max-width: 600px) {
   .filter-controls {
-    gap: 8px;
-    padding: 6px 10px;
+    gap: 10px;
+    padding: 8px 10px;
   }
 
   .filter-controls select {
-    font-size: 0.85rem;
-    width: 90px;
+    font-size: 0.9rem;
+    padding: 5px 20px 5px 5px;
   }
 }
-
 
 
 
