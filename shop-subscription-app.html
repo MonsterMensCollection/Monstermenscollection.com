@@ -57,22 +57,23 @@
 }
 .filter-controls {
   display: flex;
-  flex-wrap: nowrap;
+  flex-wrap: nowrap; /* Force single line */
   justify-content: space-between;
   align-items: center;
   gap: 10px;
   margin: 20px auto;
-  padding: 0; /* Remove padding */
-  background-color: transparent; /* Remove white background */
-  border-radius: 0; /* No rounded corners */
-  box-shadow: none; /* Remove shadow */
+  padding: 10px;
+  background-color: #ffffff;
+  border-radius: 0px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
-  overflow-x: hidden;
+  overflow-x: hidden; /* Prevent horizontal scroll */
 
-  position: fixed;
-  top: 8%;
+  /* 👉 Add these lines to make it float on scroll */
+ position: fixed;
+  top: 8%; /* Push below the fixed header (adjust if needed) */
   left: 0;
   right: 0;
   z-index: 1000;
@@ -92,12 +93,18 @@
   flex: 1 1 0;
   min-width: 100%;
   max-width: 100%;
-  padding: 8px 10px;
+  padding: 6px 10px;
   
-  border-radius: 6px;
+  border: none; /* Remove border */
+  outline: none; /* Remove outline on focus */
+  background-color: transparent; /* Transparent background */
   font-size: 0.9rem;
-  background-color: #fff;
-  transition: border-color 0.3s, box-shadow 0.3s;
+  color: #333;
+
+  appearance: none; /* Removes native styling in most browsers */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
   cursor: pointer;
 }
 
@@ -393,6 +400,22 @@
      gap: 20px;
     }
 
+.select-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.select-wrapper::after {
+  content: '▾'; /* Down arrow symbol */
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: #888;
+}
+    
  </style>
 </head>
 <body>
@@ -471,6 +494,7 @@
     <br>
 <!-- Sorting and Filtering Controls -->
 <div class="filter-controls" data-target="shirtsPage">
+  <div class="select-wrapper">
   <select class="sortPrice">
     <option value="default">Sort </option>
     <option value="asc">Low to High</option>
@@ -485,6 +509,7 @@
     <option value="XXL">XXL</option>
   </select>
 </div>
+  </div>
 <div style="height: 60px;"></div>
           
  <div class="product-grid">
