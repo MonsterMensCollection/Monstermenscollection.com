@@ -127,6 +127,10 @@
 }
 
 
+
+
+
+
     .container {
       max-width: 75%;
       background: #fff;
@@ -163,16 +167,16 @@
     .form-section input {
       padding: 12px;
       border: 1px solid #ccc;
-      border-radius: 0px;
+      border-radius: 8px;
     }
 
     .form-section button,
     .form-section a {
-      background-color: #000000;
+      background-color: #007bff;
       color: white;
       padding: 12px;
       border: none;
-      border-radius: 0px;
+      border-radius: 8px;
       cursor: pointer;
       font-size: 1rem;
       text-align: center;
@@ -181,13 +185,13 @@
 
     .form-section button:hover,
     .form-section a:hover {
-      background-color: #A9A9A9;
+      background-color: #0069d9;
     }
 
     .toggle-link {
       text-align: center;
       cursor: pointer;
-      color: #000000;
+      color: #007bff;
     }
 
     .product-list {
@@ -429,54 +433,29 @@
   transition: transform 0.3s ease-in-out;
 }
 
- #loginSection,
-#signupSection {
-  margin-top: 300px; /* or adjust as needed */
-}
-
+    
  </style>
 </head>
 <body>
   <div class="container" id="mainContainer" style="margin:auto;">
-    
-    <div>
-   
-    
+    <h1 id="title">Login</h1>
     <div id="loginSection" class="form-section" >
-        <h1 id="title">Login</h1>
       <input type="email" id="email" placeholder="Email" />
       <input type="password" id="password" placeholder="Password" />
       <button id="emailLoginBtn">Login</button>
       <a href="#" id="forgotPasswordLink">Forgot Password?</a>
       <div id="statusMessage" class="status-message"></div>
       <p class="toggle-link" onclick="toggleForm()">Don't have an account? Sign Up</p>
-     
-                 <div style="margin-top: 30px; padding: 10px; text-align: center; font-size: 14px; color: #555;">
-     <a href="https://iridescent-sawine-8f375c.netlify.app/privacy-policy" 
-   target="_blank" style="color: #007bff; background: none; border: none; padding: 0; margin: 0; box-shadow: none; font-weight: normal;"> Privacy Policy</a> 
-  </div>
-
     </div>
-   
+
     <div id="signupSection" class="form-section" style="display: none;">
-        <h1 id="title">Sign Up</h1>
       <input type="text" id="signupName" placeholder="Enter your name" required>
       <input type="email" id="signupEmail" placeholder="Email" />
       <input type="password" id="signupPassword" placeholder="Password" />
       <button id="emailSignupBtn">Sign Up</button>
       <p class="toggle-link" onclick="toggleForm()">Already have an account? Login</p>
-      
-      <div style="margin-top: 30px; padding: 10px; text-align: center; font-size: 14px; color: #555;">
-    <a href="https://iridescent-sawine-8f375c.netlify.app/privacy-policy" 
-   target="_blank" style="color: #007bff; background: none; border: none; padding: 0; margin: 0; box-shadow: none; font-weight: normal;">Privacy Policy</a>
-  </div>
-
     </div>
-    
-   
-  
-  
-</div> 
+
     <div id="subscriptionSection" style="display:none;">
       <p class="info">Get any 1 Shirt + any 1 Pant at ₹999 <br><h3><center>WHOLESALE PRICE</h3></p>
       <form class="form-section" id="subscriptionForm">
@@ -488,8 +467,6 @@
       </p>
     </div>
 </div>
-
-
    <div id="productsPage" >
        
        
@@ -1271,6 +1248,9 @@
       Logout
     </button>
   
+ <div style="margin-top: 30px; padding: 10px; text-align: center; font-size: 14px; color: #555;">
+    <p>Read our <a href="https://iridescent-sawine-8f375c.netlify.app/privacy-policy" target="_blank" style="color: #007bff; text-decoration: none;">Privacy Policy</a> for details on how we handle your data.</p>
+  </div>
 
 </div>
 
