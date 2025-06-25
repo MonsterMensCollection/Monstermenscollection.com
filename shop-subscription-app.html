@@ -1276,29 +1276,35 @@
 
 </div>
 
-<div style="position: fixed; bottom: 55px; width: 100%; background: #000; color: #fff; text-align: center; font-size: 14px; z-index: 1000; overflow: hidden;">
-  <marquee behavior="scroll" direction="left" scrollamount="4">
-    🎉 Free Shipping on Orders ₹99 and Above! 🎉 Crafted Just for You!
-  </marquee>
+<!-- Bottom Bar Container (includes both scroll bar and nav bar) -->
+<div id="bottomBarContainer">
+  <!-- Scrolling Shipping Bar -->
+  <div style="position: fixed; bottom: 55px; width: 100%; background: #000; color: #fff; text-align: center; font-size: 14px; z-index: 1000; overflow: hidden;">
+    <marquee behavior="scroll" direction="left" scrollamount="4">
+      🎉 Free Shipping on Orders ₹99 and Above! 🎉 Crafted Just for You!
+    </marquee>
+  </div>
+
+  <!-- Bottom Navigation Bar -->
+  <div class="bottom-nav" id="bottomNav" style="position: fixed; bottom: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #ccc; z-index: 999;">
+    <a href="#" onclick="backToProducts()">
+      <img src="https://img.icons8.com/?size=100&id=HWCgA83ZikaE&format=png&color=000000" width="24" alt="Home"/>
+    </a>
+    <a href="#" onclick="showShirtsPage()">
+      <img src="https://img.icons8.com/?size=100&id=zsb66Nl4NM9p&format=png&color=000000" width="24" alt="Shirts"/>
+    </a>
+    <a href="#" onclick="showPantsPage()">
+      <img src="https://img.icons8.com/?size=100&id=0A3ziqKFWVXq&format=png&color=000000" width="24" alt="Pants"/>
+    </a>
+    <a href="#" onclick="showCart()">
+      <img src="https://img.icons8.com/?size=100&id=5hmLU5efq3jw&format=png&color=000000" width="24" alt="Cart"/>
+    </a>
+    <a href="#" onclick="showProfilePage()">
+      <img src="https://img.icons8.com/?size=100&id=Or3Eb98tGbJL&format=png&color=000000" width="24" alt="Profile"/>
+    </a>
+  </div>
 </div>
-<div class="bottom-nav" id="bottomNav">
-  
-  <a href="#" onclick="backToProducts()">
-    <img src="https://img.icons8.com/?size=100&id=HWCgA83ZikaE&format=png&color=000000" width="24" alt="Home"/>
-  </a>
-  <a href="#" onclick="showShirtsPage()">
-    <img src="https://img.icons8.com/?size=100&id=zsb66Nl4NM9p&format=png&color=000000" width="24" alt="Shirts"/>
-  </a>
-  <a href="#" onclick="showPantsPage()">
-    <img src="https://img.icons8.com/?size=100&id=0A3ziqKFWVXq&format=png&color=000000" width="24" alt="Pants"/>
-  </a>
-  <a href="#" onclick="showCart()">
-    <img src="https://img.icons8.com/?size=100&id=5hmLU5efq3jw&format=png&color=000000" width="24" alt="Cart"/>
-  </a>
-  <a href="#" onclick="showProfilePage()">
-    <img src="https://img.icons8.com/?size=100&id=Or3Eb98tGbJL&format=png&color=000000" width="24" alt="Profile"/>
-  </a>
-</div>
+
 
 </div>
 
@@ -2380,35 +2386,35 @@ if (subscribed) {
 
 
 
-  let lastScrollTop = 0;
-  const bottomNav = document.getElementById("bottomNav");
+ let lastScrollTop = 0;
+const bottomBarContainer = document.getElementById("bottomBarContainer");
 
-  window.addEventListener("scroll", function () {
-    const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+window.addEventListener("scroll", function () {
+  const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
 
-    // Check which product page is currently visible
-    const isShirtPage = document.getElementById("shirtsPage").style.display !== "none";
-    const isTshirtPage = document.getElementById("tshirtsPage").style.display !== "none";
-    const isPantsPage = document.getElementById("pantsPage").style.display !== "none";
-    const isCargosPage = document.getElementById("cargosPage").style.display !== "none";
+  // Check which product page is currently visible
+  const isShirtPage = document.getElementById("shirtsPage").style.display !== "none";
+  const isTshirtPage = document.getElementById("tshirtsPage")?.style.display !== "none";
+  const isPantsPage = document.getElementById("pantsPage").style.display !== "none";
+  const isCargosPage = document.getElementById("cargosPage")?.style.display !== "none";
 
-    const shouldHideNav = isShirtPage || isTshirtPage || isPantsPage || isCargosPage;
+  const shouldHideNav = isShirtPage || isTshirtPage || isPantsPage || isCargosPage;
 
-    if (shouldHideNav) {
-      if (currentScroll > lastScrollTop) {
-        // Scrolling down
-        bottomNav.classList.add("hide-bottom-nav");
-      } else {
-        // Scrolling up
-        bottomNav.classList.remove("hide-bottom-nav");
-      }
+  if (shouldHideNav) {
+    if (currentScroll > lastScrollTop) {
+      // Scrolling down
+      bottomBarContainer.classList.add("hide-bottom-nav");
     } else {
-      // On other pages, always show bottom nav
-      bottomNav.classList.remove("hide-bottom-nav");
+      // Scrolling up
+      bottomBarContainer.classList.remove("hide-bottom-nav");
     }
+  } else {
+    // On other pages, always show
+    bottomBarContainer.classList.remove("hide-bottom-nav");
+  }
 
-    lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
-  });
+  lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
+});
 
     // On initial load (login/signup page), add top margin
 document.getElementById("mainContainer").classList.add("with-top-margin");
