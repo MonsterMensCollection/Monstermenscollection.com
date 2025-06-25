@@ -2417,24 +2417,34 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
   let lastScrollTop = 0;
-  const filterControls = document.getElementById("filterControls");
   const bottomNav = document.getElementById("bottomNav");
 
   window.addEventListener("scroll", function () {
     const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
 
-    if (currentScroll > lastScrollTop) {
-      // Scrolling down
-      filterControls.classList.add("hide-on-scroll");
-      bottomNav.classList.add("hide-bottom-nav");
+    // Check which product page is currently visible
+    const isShirtPage = document.getElementById("shirtsPage").style.display !== "none";
+    const isTshirtPage = document.getElementById("tshirtsPage").style.display !== "none";
+    const isPantsPage = document.getElementById("pantsPage").style.display !== "none";
+    const isCargosPage = document.getElementById("cargosPage").style.display !== "none";
+
+    const shouldHideNav = isShirtPage || isTshirtPage || isPantsPage || isCargosPage;
+
+    if (shouldHideNav) {
+      if (currentScroll > lastScrollTop) {
+        // Scrolling down
+        bottomNav.classList.add("hide-bottom-nav");
+      } else {
+        // Scrolling up
+        bottomNav.classList.remove("hide-bottom-nav");
+      }
     } else {
-      // Scrolling up
-      filterControls.classList.remove("hide-on-scroll");
+      // On other pages, always show bottom nav
       bottomNav.classList.remove("hide-bottom-nav");
     }
 
-    lastScrollTop = currentScroll <= 0 ? 0 : currentScroll; // For iOS
-  }, false);
+    lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
+  });
 
     // On initial load (login/signup page), add top margin
 document.getElementById("mainContainer").classList.add("with-top-margin");
