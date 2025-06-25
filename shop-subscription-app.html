@@ -1317,38 +1317,9 @@
       <h3>Admin Panel</h3>
       <button onclick="location.href='admin-dashboard.html'">Go to Dashboard</button>
     </div>
-  
- <div id="loadingScreen" style="
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: black;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-  opacity: 1;
-  transition: opacity 1s ease;
-">
-  <img src="https://raw.githubusercontent.com/MonsterMensCollection/lOGOS/refs/heads/main/envy%20(2).png" alt="Loading..." style="max-width: 200px;">
-</div>
 
 <script>
-  function showLoadingThen(actionFn) {
-    const loadingScreen = document.getElementById("loadingScreen");
-    loadingScreen.style.display = "flex";
-    loadingScreen.style.opacity = "1"; // Fade in (if hidden previously)
 
-    setTimeout(() => {
-      loadingScreen.style.opacity = "0"; // Fade out
-      setTimeout(() => {
-        loadingScreen.style.display = "none";
-        actionFn(); // Run action after fade out
-      }, 1000); // Match this with the CSS transition time (1s)
-    }, 4000); // Simulate 4s load (can adjust)
-  }
       
       let lastCategoryPage = null;
 
@@ -2401,22 +2372,7 @@ if (subscribed) {
   }
 };
 
-document.addEventListener("DOMContentLoaded", function () { 
-  showLoadingThen(() => {
-    // Show login page
-    document.getElementById("loginPage").style.display = "block"; // ← FIXED THIS LINE
 
-    // Hide everything else
-    const pagesToHide = [
-      "productList", "shirtsPage", "pantsPage", "sliderSection", "cartPage", "profilePage",
-      "descriptionPage", "tshirtsPage", "cargosPage"
-    ];
-    pagesToHide.forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.style.display = "none";
-    });
-  });
-});
 
 
   let lastScrollTop = 0;
