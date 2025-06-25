@@ -428,6 +428,10 @@
   transform: translateY(100%);
   transition: transform 0.3s ease-in-out;
 }
+ .hide-shippingBar-nav {
+  transform: translateY(500%);
+  transition: transform 0.3s ease-in-out;
+}   
 
  #loginSection,
 #signupSection {
@@ -2403,16 +2407,16 @@ window.addEventListener("scroll", function () {
     if (currentScroll > lastScrollTop) {
       // Scroll down – hide both
       bottomNav.classList.add("hide-bottom-nav");
-      shippingBar.classList.add("hide-bottom-nav");
+      shippingBar.classList.add("hide-shippingBar-nav");
     } else {
       // Scroll up – show both
       bottomNav.classList.remove("hide-bottom-nav");
-      shippingBar.classList.remove("hide-bottom-nav");
+      shippingBar.classList.remove("hide-shippingBar-nav");
     }
   } else {
     // On other pages, always show
     bottomNav.classList.remove("hide-bottom-nav");
-    shippingBar.classList.remove("hide-bottom-nav");
+    shippingBar.classList.remove("hide-shippingBar-nav");
   }
 
   lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
