@@ -438,6 +438,31 @@
   margin-top: 150px; /* or adjust as needed */
 }
 
+.scrolling-banner {
+  position: fixed;
+  bottom: 109px;
+  width: 100%;
+  background: #000;
+  color: #fff;
+  font-size: 14px;
+  overflow: hidden;
+  z-index: 9999;
+  white-space: nowrap;
+  padding: 5px 0;
+}
+
+.scrolling-text {
+  display: inline-block;
+  padding-left: 100%;
+  animation: scrollText 15s linear infinite;
+}
+
+@keyframes scrollText {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
+}
+
+    
  </style>
 </head>
 <body>
@@ -1282,10 +1307,12 @@
 
 <!-- Bottom Bar Container (includes both scroll bar and nav bar) -->
 <!-- Scrolling Shipping Bar -->
-<div id="shippingBar" style="position: fixed; bottom: 109px; width: 100%; background: #000; color: #fff; text-align: center; font-size: 14px; z-index: 9999; overflow: hidden;margin-left:-13%;margin-right:20%;">
-  <marquee behavior="scroll" direction="left" scrollamount="4">
+<div id="shippingBar" class="scrolling-banner">
+  <div class="scrolling-text">
+    🎉 Free Shipping on Orders ₹99 and Above! 🎉 Crafted Just for You! &nbsp;&nbsp;&nbsp;
+    🎉 Free Shipping on Orders ₹99 and Above! 🎉 Crafted Just for You! &nbsp;&nbsp;&nbsp;
     🎉 Free Shipping on Orders ₹99 and Above! 🎉 Crafted Just for You!
-  </marquee>
+  </div>
 </div>
 
 <!-- Bottom Navigation Bar -->
