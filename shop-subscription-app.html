@@ -127,10 +127,6 @@
 }
 
 
-
-
-
-
     .container {
       max-width: 75%;
       background: #fff;
@@ -167,16 +163,16 @@
     .form-section input {
       padding: 12px;
       border: 1px solid #ccc;
-      border-radius: 8px;
+      border-radius: 0px;
     }
 
     .form-section button,
     .form-section a {
-      background-color: #007bff;
+      background-color: #000000;
       color: white;
       padding: 12px;
       border: none;
-      border-radius: 8px;
+      border-radius: 0px;
       cursor: pointer;
       font-size: 1rem;
       text-align: center;
@@ -185,13 +181,13 @@
 
     .form-section button:hover,
     .form-section a:hover {
-      background-color: #0069d9;
+      background-color: #A9A9A9;
     }
 
     .toggle-link {
       text-align: center;
       cursor: pointer;
-      color: #007bff;
+      color: #000000;
     }
 
     .product-list {
@@ -433,29 +429,54 @@
   transition: transform 0.3s ease-in-out;
 }
 
-    
+ #loginSection,
+#signupSection {
+  margin-top: 150px; /* or adjust as needed */
+}
+
  </style>
 </head>
 <body>
   <div class="container" id="mainContainer" style="margin:auto;">
-    <h1 id="title">Login</h1>
+    
+    <div>
+   
+    
     <div id="loginSection" class="form-section" >
+        <h1 id="title">Login</h1>
       <input type="email" id="email" placeholder="Email" />
       <input type="password" id="password" placeholder="Password" />
       <button id="emailLoginBtn">Login</button>
       <a href="#" id="forgotPasswordLink">Forgot Password?</a>
       <div id="statusMessage" class="status-message"></div>
       <p class="toggle-link" onclick="toggleForm()">Don't have an account? Sign Up</p>
-    </div>
+     
+                 <div style="margin-top: 30px; padding: 10px; text-align: center; font-size: 14px; color: #555;">
+     <a href="https://iridescent-sawine-8f375c.netlify.app/privacy-policy" 
+   target="_blank" style="color: #007bff; background: none; border: none; padding: 0; margin: 0; box-shadow: none; font-weight: normal;"> Privacy Policy</a> 
+  </div>
 
+    </div>
+   
     <div id="signupSection" class="form-section" style="display: none;">
+        <h1 id="title">Sign Up</h1>
       <input type="text" id="signupName" placeholder="Enter your name" required>
       <input type="email" id="signupEmail" placeholder="Email" />
       <input type="password" id="signupPassword" placeholder="Password" />
       <button id="emailSignupBtn">Sign Up</button>
       <p class="toggle-link" onclick="toggleForm()">Already have an account? Login</p>
-    </div>
+      
+      <div style="margin-top: 30px; padding: 10px; text-align: center; font-size: 14px; color: #555;">
+    <a href="https://iridescent-sawine-8f375c.netlify.app/privacy-policy" 
+   target="_blank" style="color: #007bff; background: none; border: none; padding: 0; margin: 0; box-shadow: none; font-weight: normal;">Privacy Policy</a>
+  </div>
 
+    </div>
+    
+   
+  
+  
+</div> 
     <div id="subscriptionSection" style="display:none;">
       <p class="info">Get any 1 Shirt + any 1 Pant at ₹999 <br><h3><center>WHOLESALE PRICE</h3></p>
       <form class="form-section" id="subscriptionForm">
@@ -467,6 +488,8 @@
       </p>
     </div>
 </div>
+
+
    <div id="productsPage" >
        
        
@@ -1171,20 +1194,22 @@
 
           <div id="sliderSection" class="slider-wrapper">
     <div class="slider1">
-      <img id="slide-1" src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/Coming%20soon.jpg" alt="3D rendering of an words" style="width: 100%; height: auto;" />
+      <img id="slide-1" src="https://raw.githubusercontent.com/MonsterMensCollection/nOW/refs/heads/main/Untitled%20design%20(6).png" alt="3D rendering of an words" style="width: 100%; height: auto;" />
     </div>
     <div class="slider-nav">
       <a href="#slide-1"></a>
     </div>
+      <br>
+     <img id="slide-1" src="https://raw.githubusercontent.com/MonsterMensCollection/nOW/refs/heads/main/shirt%20(1).png" alt="3D rendering of an words" style="width: 100%; height: auto;" />       
+    <br><br> 
+   <img id="slide-1" src="https://raw.githubusercontent.com/MonsterMensCollection/nOW/refs/heads/main/shirt%20(2).png" alt="3D rendering of an words" style="width: 100%; height: auto;" />      
+   <br><br> 
+  <img id="slide-1" src="https://raw.githubusercontent.com/MonsterMensCollection/nOW/refs/heads/main/pants%20(4).png" alt="3D rendering of an words" style="width: 100%; height: auto;" />      
+    <br><br> 
+  <img id="slide-1" src="https://raw.githubusercontent.com/MonsterMensCollection/nOW/refs/heads/main/cargos.png" alt="3D rendering of an words" style="width: 100%; height: auto;" />   <br><br>   
   </div>
-      <div class="product-list" id="productList">
-  <h2><center><br>Contact:</h2><center>6380900310<br>TheEnlyWear@gmail.com<br>
-  <h2><center><br>Location:</h2><br>
-  <div style="display: flex; justify-content: center; align-items: center; height: 35vh; border-radius: 0.5rem; margin-left:5%; margin-right:5%">
-    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1951.9412388138983!2d79.75375512746827!3d11.913266345081821!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a536197b55718a3%3A0xb1d567dddfc2f85c!2sMonster%20Men&#39;s%20Collection!5e0!3m2!1sen!2sin!4v1746009236221!5m2!1sen!2sin" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-  </div>
+<div class="product-list" id="productList">
 </div>
-
 <div class="container" id="mainContainer" style="margin:auto;">
   <div id="cartPage" class="form-section" style="display: none; margin-left:0%;margin-right:5%;margin-top:13%; ">
   <br><img src="https://see.fontimg.com/api/rf5/woG33/N2Y3Y2RhYTdiOGMwNGVjOGE5MWE1MTFiNGJjM2E4Y2Iub3Rm/Q0hFQ0tPVVQ/redtrap-expanded-puo.png?r=fs&h=30&w=1000&fg=000000&bg=FFFFFF&tb=1&s=30"style="display: block;">
@@ -1248,9 +1273,6 @@
       Logout
     </button>
   
- <div style="margin-top: 30px; padding: 10px; text-align: center; font-size: 14px; color: #555;">
-    <p>Read our <a href="https://iridescent-sawine-8f375c.netlify.app/privacy-policy" target="_blank" style="color: #007bff; text-decoration: none;">Privacy Policy</a> for details on how we handle your data.</p>
-  </div>
 
 </div>
 
@@ -2379,10 +2401,10 @@ if (subscribed) {
   }
 };
 
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", function () { 
   showLoadingThen(() => {
     // Show login page
-    document.getElementById("loginPage").style.display = "block";
+    document.getElementById("loginPage").style.display = "block"; // ← FIXED THIS LINE
 
     // Hide everything else
     const pagesToHide = [
@@ -2396,25 +2418,36 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 
+
   let lastScrollTop = 0;
-  const filterControls = document.getElementById("filterControls");
   const bottomNav = document.getElementById("bottomNav");
 
   window.addEventListener("scroll", function () {
     const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
 
-    if (currentScroll > lastScrollTop) {
-      // Scrolling down
-      filterControls.classList.add("hide-on-scroll");
-      bottomNav.classList.add("hide-bottom-nav");
+    // Check which product page is currently visible
+    const isShirtPage = document.getElementById("shirtsPage").style.display !== "none";
+    const isTshirtPage = document.getElementById("tshirtsPage").style.display !== "none";
+    const isPantsPage = document.getElementById("pantsPage").style.display !== "none";
+    const isCargosPage = document.getElementById("cargosPage").style.display !== "none";
+
+    const shouldHideNav = isShirtPage || isTshirtPage || isPantsPage || isCargosPage;
+
+    if (shouldHideNav) {
+      if (currentScroll > lastScrollTop) {
+        // Scrolling down
+        bottomNav.classList.add("hide-bottom-nav");
+      } else {
+        // Scrolling up
+        bottomNav.classList.remove("hide-bottom-nav");
+      }
     } else {
-      // Scrolling up
-      filterControls.classList.remove("hide-on-scroll");
+      // On other pages, always show bottom nav
       bottomNav.classList.remove("hide-bottom-nav");
     }
 
-    lastScrollTop = currentScroll <= 0 ? 0 : currentScroll; // For iOS
-  }, false);
+    lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
+  });
 
     // On initial load (login/signup page), add top margin
 document.getElementById("mainContainer").classList.add("with-top-margin");
