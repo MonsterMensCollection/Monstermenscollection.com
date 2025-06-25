@@ -429,7 +429,11 @@
   transition: transform 0.3s ease-in-out;
 }
 
-    
+ #loginSection,
+#signupSection {
+  margin-top: 300px; /* or adjust as needed */
+}
+
  </style>
 </head>
 <body>
@@ -437,8 +441,9 @@
     
     <div>
    
-    <h1 id="title">Login</h1>
+    
     <div id="loginSection" class="form-section" >
+        <h1 id="title">Login</h1>
       <input type="email" id="email" placeholder="Email" />
       <input type="password" id="password" placeholder="Password" />
       <button id="emailLoginBtn">Login</button>
@@ -454,6 +459,7 @@
     </div>
    
     <div id="signupSection" class="form-section" style="display: none;">
+        <h1 id="title">Sign Up</h1>
       <input type="text" id="signupName" placeholder="Enter your name" required>
       <input type="email" id="signupEmail" placeholder="Email" />
       <input type="password" id="signupPassword" placeholder="Password" />
