@@ -1340,7 +1340,11 @@
   <br>
 
   <div id="cartItems"></div>
-
+  
+<div id="emptyCartMessage" style="display: none; text-align: center; margin-top: 20%;">
+  <img src="https://cdn-icons-png.flaticon.com/512/1170/1170678.png" width="100" alt="Empty Cart" style="opacity: 0.6;" />
+  <p style="font-size: 1rem; color: #777; margin-top: 10px;">You have no items in your cart</p>
+</div>
   <!-- ✅ Fixed bottom bar wrapper -->
   <div class="cart-bottom-bar">
     <div class="cart-bar-inner">
@@ -2002,32 +2006,41 @@ function showCart() {
   document.getElementById("cargosPage").style.display = "none";
 
   const cartItemsDiv = document.getElementById("cartItems");
+  const emptyCartMessage = document.getElementById("emptyCartMessage");
   cartItemsDiv.innerHTML = '';
 
   let total = 0;
 
-  cart.forEach((item, index) => {
-    total += item.price;
-    const itemHTML = `
-      <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 15px; padding: 12px;">
-        <img src="${item.image}" style="width: 80px; height: auto; border-radius: 6px; object-fit: cover;" />
-        <div style="flex-grow: 1; text-align: left;">
-          <p style="margin: 4px 0;"><strong>${item.title}</strong></p>
-          <p style="margin: 4px 0;"><strong>Size:</strong> ${item.size || 'N/A'}</p>
-          <p style="margin: 4px 0;"><strong>Color:</strong> ${item.color || 'N/A'}</p>
-          <p style="margin: 4px 0;"><strong>Price:</strong> $${item.price}</p>
-        </div>
-        <button onclick="removeFromCart(${index})" style="background-color: transparent; border: none; cursor: pointer;">
-          <img src="https://img.icons8.com/?size=100&id=Qgjnp78cDeJi&format=png&color=000000" width="16">
-        </button>
-      </div>
-      <hr style="width: 80%; margin: 10px auto; border: none; border-top: 1px solid #ccc;" />
-    `;
-    cartItemsDiv.innerHTML += itemHTML;
-  });
+  if (cart.length === 0) {
+    emptyCartMessage.style.display = 'block';
+    document.getElementById("cartAmount").textContent = "$0";
+  } else {
+    emptyCartMessage.style.display = 'none';
 
-  document.getElementById("cartAmount").textContent = `$${total}`;
+    cart.forEach((item, index) => {
+      total += item.price;
+      const itemHTML = `
+        <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 15px; padding: 12px; ">
+          <img src="${item.image}" style="width: 80px; border-radius: 6px; object-fit: cover;" />
+          <div style="flex-grow: 1; text-align: left;">
+            <p style="margin: 4px 0;"><strong>${item.title}</strong></p>
+            <p style="margin: 4px 0;"><strong>Size:</strong> ${item.size || 'N/A'}</p>
+            <p style="margin: 4px 0;"><strong>Color:</strong> ${item.color || 'N/A'}</p>
+            <p style="margin: 4px 0;"><strong>Price:</strong> $${item.price}</p>
+          </div>
+          <button onclick="removeFromCart(${index})" style="background-color: transparent; border: none; cursor: pointer;">
+            <img src="https://img.icons8.com/?size=100&id=Qgjnp78cDeJi&format=png&color=000000" width="16">
+          </button>
+        </div>
+        <hr style="width: 80%; margin: 10px auto; border: none; border-top: 1px solid #ccc;" />
+      `;
+      cartItemsDiv.innerHTML += itemHTML;
+    });
+
+    document.getElementById("cartAmount").textContent = `$${total}`;
+  }
 }
+
 
 
 
