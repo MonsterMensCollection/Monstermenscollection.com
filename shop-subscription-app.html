@@ -2053,7 +2053,7 @@ function showCart() {
   const emptyCartMessage = document.getElementById("emptyCartMessage");
   cartItemsDiv.innerHTML = '';
 
-  let total = 0;
+  let subtotal = 0;
 
   if (cart.length === 0) {
     emptyCartMessage.style.display = 'block';
@@ -2062,9 +2062,9 @@ function showCart() {
     emptyCartMessage.style.display = 'none';
 
     cart.forEach((item, index) => {
-      total += item.price;
+      subtotal += item.price;
       const itemHTML = `
-        <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 15px; padding: 12px; ">
+        <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 15px; padding: 12px;">
           <img src="${item.image}" style="width: 80px; border-radius: 6px; object-fit: cover;" />
           <div style="flex-grow: 1; text-align: left;">
             <p style="margin: 4px 0;"><strong>${item.title}</strong></p>
@@ -2081,9 +2081,18 @@ function showCart() {
       cartItemsDiv.innerHTML += itemHTML;
     });
 
-    document.getElementById("cartAmount").textContent = `$${total}`;
+    // Calculate shipping
+    let shipping = subtotal >= 99 ? 0 : 19;
+    let total = subtotal + shipping;
+
+    // Update cart total display
+    const cartAmountDiv = document.getElementById("cartAmount");
+    cartAmountDiv.innerHTML = shipping === 0
+      ? `$${total} <span style="font-size: 12px; color: green;">(Free Shipping)</span>`
+      : `$${total} <span style="font-size: 12px; color: #888;">($19 shipping added)</span>`;
   }
 }
+
 
 
 
