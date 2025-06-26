@@ -1388,7 +1388,7 @@
       <button onclick="location.href='admin-dashboard.html'">Go to Dashboard</button>
     </div>
 
-<div id="detailsPage" class="form-section" style="display: none !important; position: absolute; top: 0; left: 0; width: 100%; background: white; z-index: 9999; margin-top: 0;">
+ <div id="detailsPage" class="form-section" style="display: none ; margin-top:13%; z-index: -1;">
   <h3 style="text-align:center;">Enter Your Details</h3>
   <input type="text" id="checkoutName" placeholder="Your Name" style="padding:10px; width:100%; margin-top:10px;" />
   <input type="text" id="checkoutAddress" placeholder="Your Address" style="padding:10px; width:100%; margin-top:10px;" />
@@ -1499,30 +1499,7 @@ function backToProducts() {
     document.getElementById("detailsPage").style.display = "block";
 }
 
- function showProfilePage() {
-  history.pushState({ page: "profilePage" }, "", "#profile");
 
-  // Hide all other sections
-  const sections = [
-    "descriptionPage",
-    "productList",
-    "shirtsPage",
-    "pantsPage",
-    "sliderSection",
-    "cartPage",
-    "tshirtsPage",
-    "cargosPage",
-    "detailsPage"
-  ];
-  
-  sections.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = "none";
-  });
-
-  // Then show the profile
-  document.getElementById("profilePage").style.display = "block";
-}
 
 
 
@@ -2196,6 +2173,7 @@ db.collection("users").doc(user.uid).get().then(doc => {
     document.getElementById("descriptionPage").style.display = "none";
       document.getElementById("tshirtsPage").style.display = "none";
        document.getElementById("cargosPage").style.display = "none";
+     document.getElementById("detailsPage").style.display = "none";
   }
 }
 function logout() {
