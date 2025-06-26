@@ -510,11 +510,11 @@
 }
 
 .amount {
-  text-align: left;
+  text-align: right;
 }
 
 .label {
-  text-align: right;
+  text-align: left;
 }
 
 .cart-bar-inner button {
@@ -2027,7 +2027,7 @@ function showCart() {
     cartItemsDiv.innerHTML += itemHTML;
   });
 
-  document.querySelector('.cart-total').textContent = `Total: $${total}`;
+ document.getElementById("cartAmount").textContent = `₹${total}`;
 }
 
 
