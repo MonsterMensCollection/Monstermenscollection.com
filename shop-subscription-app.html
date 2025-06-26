@@ -2009,7 +2009,7 @@ function showCart() {
   cart.forEach((item, index) => {
     total += item.price;
     const itemHTML = `
-      <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 15px; padding: 12px; border: 1px solid #ddd; border-radius: 0px;">
+      <div style="display: flex; gap: 8px; align-items: center; padding: 12px 0; border-bottom: 1px solid #ccc;">
         <img src="${item.image}" style="width: 80px; height: auto; border-radius: 6px; object-fit: cover;" />
         <div style="flex-grow: 1; text-align: left;">
           <p style="margin: 4px 0;"><strong>${item.title}</strong></p>
@@ -2027,6 +2027,7 @@ function showCart() {
 
   document.getElementById("cartAmount").textContent = `$${total}`;
 }
+
 
 
 function scrollIntoViewMobile(el) {
