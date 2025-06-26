@@ -2455,18 +2455,18 @@ window.addEventListener("scroll", function () {
       // Scroll down – hide
       bottomNav.classList.add("hide-bottom-nav");
       shippingBar.classList.add("hide-shippingBar-nav");
-      filterControls?.classList.add("hide-filter-bar");
+      filterControls.classList.add("hide-filter-bar");
     } else {
       // Scroll up – show
       bottomNav.classList.remove("hide-bottom-nav");
       shippingBar.classList.remove("hide-shippingBar-nav");
-      filterControls?.classList.remove("hide-filter-bar");
+      filterControls.classList.remove("hide-filter-bar");
     }
   } else {
     // On other pages, always show
     bottomNav.classList.remove("hide-bottom-nav");
     shippingBar.classList.remove("hide-shippingBar-nav");
-    filterControls?.classList.remove("hide-filter-bar");
+    filterControls.classList.remove("hide-filter-bar");
   }
 
   lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
