@@ -795,7 +795,7 @@
     <br>
     <br>
 <!-- Sorting and Filtering Controls -->
-<div class="filter-controls" id="filterControls" data-target="shirtsPage">
+<div class="filter-controls" id="filterControls" data-target="tshirtsPage">
   <div class="select-wrapper">
   <select class="sortPrice">
     <option value="default">Sort</option>
@@ -975,7 +975,7 @@
     <br>
     <br>
 <!-- Sorting and Filtering Controls -->
-<div class="filter-controls" id="filterControls" data-target="shirtsPage">
+<div class="filter-controls" id="filterControls" data-target="pantsPage">
   <div class="select-wrapper">
   <select class="sortPrice">
     <option value="default">Sort</option>
@@ -1121,7 +1121,7 @@
     <br>
     <br>
 <!-- Sorting and Filtering Controls -->
-<div class="filter-controls" id="filterControls" data-target="shirtsPage">
+<div class="filter-controls" id="filterControls" data-target="cargosPage">
   <div class="select-wrapper">
   <select class="sortPrice">
     <option value="default">Sort</option>
@@ -2470,7 +2470,6 @@ if (subscribed) {
 let lastScrollTop = 0;
 const bottomNav = document.getElementById("bottomNav");
 const shippingBar = document.getElementById("shippingBar");
-const filterControls = document.getElementById("filterControls");
 
 window.addEventListener("scroll", function () {
   const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
@@ -2480,22 +2479,31 @@ window.addEventListener("scroll", function () {
   const isPantsPage = document.getElementById("pantsPage").style.display !== "none";
   const isCargosPage = document.getElementById("cargosPage")?.style.display !== "none";
 
+  let filterControls = null;
+
+  if (isShirtPage) {
+    filterControls = document.getElementById("filterControlsShirts");
+  } else if (isTshirtPage) {
+    filterControls = document.getElementById("filterControlsTshirts");
+  } else if (isPantsPage) {
+    filterControls = document.getElementById("filterControlsPants");
+  } else if (isCargosPage) {
+    filterControls = document.getElementById("filterControlsCargos");
+  }
+
   const shouldHide = isShirtPage || isTshirtPage || isPantsPage || isCargosPage;
 
   if (shouldHide) {
     if (currentScroll > lastScrollTop) {
-      // Scroll down – hide
       bottomNav.classList.add("hide-bottom-nav");
       shippingBar.classList.add("hide-shippingBar-nav");
       filterControls?.classList.add("hide-filter-bar");
     } else {
-      // Scroll up – show
       bottomNav.classList.remove("hide-bottom-nav");
       shippingBar.classList.remove("hide-shippingBar-nav");
       filterControls?.classList.remove("hide-filter-bar");
     }
   } else {
-    // On other pages, always show
     bottomNav.classList.remove("hide-bottom-nav");
     shippingBar.classList.remove("hide-shippingBar-nav");
     filterControls?.classList.remove("hide-filter-bar");
