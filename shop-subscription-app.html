@@ -472,9 +472,10 @@
   0%   { transform: translateX(0); }
   100% { transform: translateX(-100%); }
 }
-#profilePage #detailsPage {
-    display: none !important;
-  }
+#profilePage ~ #detailsPage {
+  display: none !important;
+}
+
     
  </style>
 </head>
@@ -1384,7 +1385,7 @@
   </div>
 </div>
   
-<div id="detailsPage" class="form-section" style="display: none; margin-top:13%; z-index: -1;">
+<div id="detailsPage" class="form-section" style="display: none !important; margin-top:13%; z-index: -1;">
   <h3 style="text-align:center;">Enter Your Details</h3>
   <input type="text" id="checkoutName" placeholder="Your Name" style="padding:10px; width:100%; margin-top:10px;" />
   <input type="text" id="checkoutAddress" placeholder="Your Address" style="padding:10px; width:100%; margin-top:10px;" />
@@ -1500,25 +1501,31 @@ function backToProducts() {
     document.getElementById("detailsPage").style.display = "block";
 }
 
-  function showProfilePage() {
+ function showProfilePage() {
   history.pushState({ page: "profilePage" }, "", "#profile");
 
-  document.getElementById("descriptionPage").style.display = "none";
-  document.getElementById("productList").style.display = "none";
-  document.getElementById("shirtsPage").style.display = "none";
-  document.getElementById("pantsPage").style.display = "none";
-  document.getElementById("sliderSection").style.display = "none";
-  document.getElementById("cartPage").style.display = "none";
-  document.getElementById("tshirtsPage").style.display = "none";
-  document.getElementById("cargosPage").style.display = "none";
+  // Hide all other sections
+  const sections = [
+    "descriptionPage",
+    "productList",
+    "shirtsPage",
+    "pantsPage",
+    "sliderSection",
+    "cartPage",
+    "tshirtsPage",
+    "cargosPage",
+    "detailsPage"
+  ];
+  
+  sections.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = "none";
+  });
 
-  // 👇 Force hide after DOM settles
-  setTimeout(() => {
-    document.getElementById("detailsPage").style.display = "none";
-  }, 20);
-
+  // Then show the profile
   document.getElementById("profilePage").style.display = "block";
 }
+
 
 
 
