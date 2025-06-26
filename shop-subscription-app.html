@@ -130,7 +130,7 @@
       max-width:75%;
       background: #fff;
       padding: 0px;
-      border-radius: 12px;
+      border-radius: 0px;
       margin:auto;  
     }
 
@@ -138,7 +138,7 @@
       max-width: 75%;
       background: #fff;
       padding: 0px;
-      border-radius: 12px;
+      border-radius: 0px;
     }
     h1 {
     font-size: 1.8rem;
@@ -207,7 +207,7 @@
     .product-item {
       padding: 15px;
       border: 1px solid #ddd;
-      border-radius: 10px;
+      border-radius: 0px;
       background: #fafafa;
     }
 
@@ -261,7 +261,7 @@
       margin-top: 20px;
       padding: 10px;
       border: 1px solid #ccc;
-      border-radius: 10px;
+      border-radius: 0px;
       background-color: #f0f8ff;
     }
 
@@ -277,7 +277,7 @@
       margin-top: 30px;
     }
     iframe{
-      border-radius: 10px;
+      border-radius: 0px;
     } 
       #productsPage {
       display: none;
@@ -1193,11 +1193,11 @@
  
  
 <!-- Product Description Page with Scrollable Image Gallery -->
-<div id="descriptionPage" style="display: none; padding: 0 5%;margin-top:13%;" class="form-section">
+<div id="descriptionPage" style="display: none; padding: 0 5%;margin-top:18%;" class="form-section">
 <div style="display: flex; justify-content: center;">
   <div id="mainMediaWrapper" style="display: flex; justify-content: center; overflow: hidden; touch-action: pan-y;">
-  <img id="descImage" src="" style="max-width: 80%; border-radius: 12px; display: none;" />
-  <video id="descVideo" controls style="max-width: 80%; border-radius: 12px; display: none;"></video>
+  <img id="descImage" src="" style="max-width: 80%; border-radius: 0px; display: none;" />
+  <video id="descVideo" controls style="max-width: 80%; border-radius: 0px; display: none;"></video>
 </div>
 </div>
 
@@ -1205,6 +1205,7 @@
 <div id="descImagePreview" style="
   margin-top: 15px;
   display: flex;
+  border-radius: 0px;
   overflow-x: auto;
   white-space: nowrap;
   gap: 10px;
@@ -1226,7 +1227,7 @@
     <button onclick="addToCart()">Add to Cart</button>
   </div>
   <h3>Select Size:</h3>
-<div id="sizeButtons" style="display: flex; gap: 10px; margin: 10px 0;">
+<div id="sizeButtons" style="display: flex; border-radius: 0px; gap: 10px; margin: 10px 0;">
   <option value="">-- Choose Size --</option>
   <option value="M">M</option>
   <option value="L">L</option>
@@ -1234,6 +1235,12 @@
 </div>
 <br>
     <p id="descText" style="margin-top: 10px; font-size: 16px; color: #333; text-align: left;"></p> <!-- Product Description -->
+<br>
+  <br>
+  <br>
+  <br>
+  <br>
+  
   </div>
   
   
