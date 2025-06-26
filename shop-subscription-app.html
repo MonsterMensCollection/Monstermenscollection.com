@@ -1993,7 +1993,7 @@ function showCart() {
     cartItemsDiv.innerHTML += itemHTML;
   });
 
-  cartItemsDiv.innerHTML += `<h3>Total: $${total}</h3>`;
+  document.querySelector('.cart-total').textContent = `Total: $${total}`;
 }
 
 
