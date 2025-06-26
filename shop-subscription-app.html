@@ -480,22 +480,31 @@
   height: 80px;
   width: 100%;
   background-color: white;
-  padding: 10px 20px; /* Adjusted for better spacing */
   border-top: 1px solid #ddd;
   box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
   display: flex;
-  justify-content: space-between;
+  justify-content: center; /* 👈 Centering the inner content */
   align-items: center;
   z-index: 1000;
 }
 
-.cart-bottom-bar .cart-total {
+.cart-bar-inner {
+  width: 100%;
+  max-width: 800px; /* 👈 Optional: adjust as per design */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  box-sizing: border-box;
+}
+
+.cart-bar-inner .cart-total {
   font-size: 1rem;
   font-weight: bold;
   color: #000;
 }
 
-.cart-bottom-bar button {
+.cart-bar-inner button {
   background-color: #000;
   color: #fff;
   padding: 10px 20px;
@@ -505,9 +514,10 @@
   cursor: pointer;
 }
 
-.cart-bottom-bar button:hover {
+.cart-bar-inner button:hover {
   background-color: #444;
 }
+
 
 
     
@@ -1317,12 +1327,13 @@
   <div id="cartItems"></div>
 
   <!-- Bottom fixed bar -->
-  <div class="cart-bottom-bar">
-    
+ <div class="cart-bottom-bar">
+  <div class="cart-bar-inner">
     <span class="cart-total">Total: ₹0</span>
     <button onclick="goToDetailsPage()">PROCEED</button>
-  
-    </div>
+  </div>
+</div>
+
 </div>
 
 
