@@ -2000,7 +2000,7 @@ function showCart() {
   document.getElementById("profilePage").style.display = "none";
   document.getElementById("tshirtsPage").style.display = "none";
   document.getElementById("cargosPage").style.display = "none";
-  
+
   const cartItemsDiv = document.getElementById("cartItems");
   cartItemsDiv.innerHTML = '';
 
@@ -2009,7 +2009,7 @@ function showCart() {
   cart.forEach((item, index) => {
     total += item.price;
     const itemHTML = `
-       <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 15px; padding: 12px; border-bottom: 1px solid #ccc;">
+      <div style="display: flex; gap: 15px; align-items: center; padding: 10px 0;">
         <img src="${item.image}" style="width: 80px; height: auto; border-radius: 6px; object-fit: cover;" />
         <div style="flex-grow: 1; text-align: left;">
           <p style="margin: 4px 0;"><strong>${item.title}</strong></p>
@@ -2021,12 +2021,14 @@ function showCart() {
           <img src="https://img.icons8.com/?size=100&id=Qgjnp78cDeJi&format=png&color=000000" width="16">
         </button>
       </div>
+      <hr style="width: 60%; margin: 10px auto; border: none; border-top: 1px solid #ccc;" />
     `;
     cartItemsDiv.innerHTML += itemHTML;
   });
 
   document.getElementById("cartAmount").textContent = `$${total}`;
 }
+
 
 
 
