@@ -1499,18 +1499,25 @@ function backToProducts() {
 }
 
   function showProfilePage() {
-  
+  history.pushState({ page: "profilePage" }, "", "#profile");
+
   document.getElementById("descriptionPage").style.display = "none";
   document.getElementById("productList").style.display = "none";
   document.getElementById("shirtsPage").style.display = "none";
   document.getElementById("pantsPage").style.display = "none";
   document.getElementById("sliderSection").style.display = "none";
   document.getElementById("cartPage").style.display = "none";
-  document.getElementById("profilePage").style.display = "block";
   document.getElementById("tshirtsPage").style.display = "none";
   document.getElementById("cargosPage").style.display = "none";
+
+  // 👇 Force hide after DOM settles
+  setTimeout(() => {
     document.getElementById("detailsPage").style.display = "none";
+  }, 20);
+
+  document.getElementById("profilePage").style.display = "block";
 }
+
 
 
 
