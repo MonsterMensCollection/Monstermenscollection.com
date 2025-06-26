@@ -432,9 +432,9 @@
   transform: translateY(1000%);
   transition: transform 0.3s ease-in-out;
 }   
-.hide-filterControls-nav {
-  transform: translateY(100%);
-  transition: transform 0.3s ease-in-out;
+.hide-filter-bar {
+  transform: translateY(-100%);
+  transition: transform 0.3s ease;
 }
  #loginSection,
 #signupSection {
@@ -2438,6 +2438,7 @@ if (subscribed) {
 let lastScrollTop = 0;
 const bottomNav = document.getElementById("bottomNav");
 const shippingBar = document.getElementById("shippingBar");
+const filterControls = document.getElementById("filterControls");
 
 window.addEventListener("scroll", function () {
   const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
@@ -2451,21 +2452,21 @@ window.addEventListener("scroll", function () {
 
   if (shouldHide) {
     if (currentScroll > lastScrollTop) {
-      // Scroll down – hide both
+      // Scroll down – hide
       bottomNav.classList.add("hide-bottom-nav");
       shippingBar.classList.add("hide-shippingBar-nav");
-      filterControls.classList.add("hide-filterControls-nav");
+      filterControls?.classList.add("hide-filter-bar");
     } else {
-      // Scroll up – show both
+      // Scroll up – show
       bottomNav.classList.remove("hide-bottom-nav");
       shippingBar.classList.remove("hide-shippingBar-nav");
-      filterControls.classList.add("hide-filterControls-nav");
+      filterControls?.classList.remove("hide-filter-bar");
     }
   } else {
     // On other pages, always show
     bottomNav.classList.remove("hide-bottom-nav");
     shippingBar.classList.remove("hide-shippingBar-nav");
-    filterControls.classList.add("hide-filterControls-nav");
+    filterControls?.classList.remove("hide-filter-bar");
   }
 
   lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
