@@ -472,6 +472,40 @@
   0%   { transform: translateX(0); }
   100% { transform: translateX(-100%); }
 }
+.cart-bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: white;
+  padding: 10px 15px;
+  border-top: 1px solid #ddd;
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 1000;
+}
+
+.cart-bottom-bar .cart-total {
+  font-size: 1rem;
+  font-weight: bold;
+  color: #000;
+}
+
+.cart-bottom-bar button {
+  background-color: #000;
+  color: #fff;
+  padding: 10px 16px;
+  border: none;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.cart-bottom-bar button:hover {
+  background-color: #444;
+}
 
     
  </style>
@@ -1271,15 +1305,21 @@
 <div class="product-list" id="productList">
 </div>
 
-  <div id="cartPage" class="form-section" style="display: none; margin-top:13%;">
+<div id="cartPage" class="form-section" style="display: none; margin-top:13%; padding-bottom: 80px;">
   <br>
   <img src="https://see.fontimg.com/api/rf5/woG33/N2Y3Y2RhYTdiOGMwNGVjOGE5MWE1MTFiNGJjM2E4Y2Iub3Rm/Y2FydA/redtrap-expanded-puo.png?r=fs&h=30&w=1000&fg=000000&bg=FFFFFF&tb=1&s=30"
        style="display: block;margin-left: auto; margin-right: auto;">
   <br>
+
   <div id="cartItems"></div>
-  <br>
-  <button onclick="goToDetailsPage()">PROCEED</button>
+
+  <!-- Bottom fixed bar -->
+  <div class="cart-bottom-bar">
+    <span class="cart-total">Total: ₹0</span>
+    <button onclick="goToDetailsPage()">PROCEED</button>
+  </div>
 </div>
+
 
 
 <!-- COD Confirmation Modal -->
