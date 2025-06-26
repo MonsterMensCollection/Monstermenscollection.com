@@ -1332,7 +1332,8 @@
 <div class="product-list" id="productList">
 </div>
 
-<div id="cartPage" class="form-section" style="display: none; margin-top:13%; padding-bottom: 80px;">
+<!-- Cart Page -->
+<div id="cartPage" class="form-section" style="display: none; margin-top:13%; padding-bottom: 130px;">
   <br>
   <img src="https://see.fontimg.com/api/rf5/woG33/N2Y3Y2RhYTdiOGMwNGVjOGE5MWE1MTFiNGJjM2E4Y2Iub3Rm/Y2FydA/redtrap-expanded-puo.png?r=fs&h=30&w=1000&fg=000000&bg=FFFFFF&tb=1&s=30"
        style="display: block;margin-left: auto; margin-right: auto;">
@@ -1340,17 +1341,18 @@
 
   <div id="cartItems"></div>
 
-  <!-- Bottom fixed bar -->
- <div class="cart-bar-inner">
-  <div class="total-row">
-    <span class="amount">₹0</span>
-    <span class="label">Total</span>
+  <!-- ✅ Fixed bottom bar wrapper -->
+  <div class="cart-bottom-bar">
+    <div class="cart-bar-inner">
+      <div class="total-row">
+        <span class="amount" id="cartAmount">₹0</span>
+        <span class="label">Total</span>
+      </div>
+      <button onclick="goToDetailsPage()">PROCEED</button>
+    </div>
   </div>
-  <button onclick="goToDetailsPage()">PROCEED</button>
 </div>
 
-
-</div>
 
 
 
