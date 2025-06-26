@@ -2479,19 +2479,7 @@ window.addEventListener("scroll", function () {
   const isTshirtPage = document.getElementById("tshirtsPage")?.style.display !== "none";
   const isPantsPage = document.getElementById("pantsPage").style.display !== "none";
   const isCargosPage = document.getElementById("cargosPage")?.style.display !== "none";
-
-  let filterControls = null;
-
-  if (isShirtPage) {
-    filterControls = document.getElementById("filterControlsShirts");
-  } else if (isTshirtPage) {
-    filterControls = document.getElementById("filterControlsTshirts");
-  } else if (isPantsPage) {
-    filterControls = document.getElementById("filterControlsPants");
-  } else if (isCargosPage) {
-    filterControls = document.getElementById("filterControlsCargos");
-  }
-
+  
   const shouldHide = isShirtPage || isTshirtPage || isPantsPage || isCargosPage;
 
   if (shouldHide) {
