@@ -472,9 +472,6 @@
   0%   { transform: translateX(0); }
   100% { transform: translateX(-100%); }
 }
-#profilePage ~ #detailsPage {
-  display: none !important;
-}
 
     
  </style>
@@ -513,16 +510,6 @@
     <a href="https://iridescent-sawine-8f375c.netlify.app/privacy-policy" 
    target="_blank" style="color: #007bff; background: none; border: none; padding: 0; margin: 0; box-shadow: none; font-weight: normal;">Privacy Policy</a>
   </div>
-
-<div id="detailsPage" class="form-section" style="display: none !important; margin-top:13%; z-index: -1;">
-  <h3 style="text-align:center;">Enter Your Details</h3>
-  <input type="text" id="checkoutName" placeholder="Your Name" style="padding:10px; width:100%; margin-top:10px;" />
-  <input type="text" id="checkoutAddress" placeholder="Your Address" style="padding:10px; width:100%; margin-top:10px;" />
-  <input type="text" id="checkoutPincode" placeholder="Pin Code" style="padding:10px; width:100%; margin-top:10px;" />
-  <input type="text" id="checkoutMobileNumber" placeholder="Mobile Number" style="padding:10px; width:100%; margin-top:10px;" />
-  <br><br>
-  <button onclick="checkoutCart()">SUBMIT & PAY</button>
-</div>
       
     </div>
     
@@ -542,6 +529,17 @@
     </div>
 </div>
 
+
+<div id="detailsPage" class="form-section" style="display: none ; margin-top:13%; z-index: -1;">
+  <h3 style="text-align:center;">Enter Your Details</h3>
+  <input type="text" id="checkoutName" placeholder="Your Name" style="padding:10px; width:100%; margin-top:10px;" />
+  <input type="text" id="checkoutAddress" placeholder="Your Address" style="padding:10px; width:100%; margin-top:10px;" />
+  <input type="text" id="checkoutPincode" placeholder="Pin Code" style="padding:10px; width:100%; margin-top:10px;" />
+  <input type="text" id="checkoutMobileNumber" placeholder="Mobile Number" style="padding:10px; width:100%; margin-top:10px;" />
+  <br><br>
+  <button onclick="checkoutCart()">SUBMIT & PAY</button>
+</div>
+  
 
    <div id="productsPage" >
        
