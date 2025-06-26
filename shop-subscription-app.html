@@ -1388,33 +1388,35 @@
 </div>
 
 
-<div id="profilePage" class="form-section" style="display: none;border-radius: 12px;margin-top:13%;"> <!-- Premium Badge -->
-    <br><img src="https://see.fontimg.com/api/rf5/woG33/N2Y3Y2RhYTdiOGMwNGVjOGE5MWE1MTFiNGJjM2E4Y2Iub3Rm/UFJPRklMRQ/redtrap-expanded-puo.png?r=fs&h=30&w=1000&fg=000000&bg=FFFFFF&tb=1&s=30"style="display: block;margin-left: auto;
-  margin-right: auto;">
-    
-   <div style="margin-top: 25px; text-align: left; background-color: #f9f9f9; padding: 5px 5px; border-radius: 10px;">
-  <div style="margin-bottom: 12px;">
-    <label style="font-size: 14px; color: #555;">Name</label>
-    <div id="profileName" style="font-size: 18px; font-weight: 500; color: #333;">Loading...</div>
+<div id="profilePage" class="form-section" style="display: none; margin-top: 13%; padding: 20px; max-width: 90%; margin-left: auto; margin-right: auto; background-color: #fff; border-radius: 12px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);">
+  <!-- Logo -->
+  <img src="https://see.fontimg.com/api/rf5/woG33/N2Y3Y2RhYTdiOGMwNGVjOGE5MWE1MTFiNGJjM2E4Y2Iub3Rm/UFJPRklMRQ/redtrap-expanded-puo.png?r=fs&h=30&w=1000&fg=000000&bg=FFFFFF&tb=1&s=30"
+       style="display: block; margin: 0 auto 20px auto; width: 80%; max-width: 300px;" />
+
+  <!-- Profile Info -->
+  <div style="background-color: #f9f9f9; padding: 15px 20px; border-radius: 10px;">
+    <div style="margin-bottom: 15px;">
+      <label style="font-size: 14px; color: #777;">Name</label>
+      <div id="profileName" style="font-size: 18px; font-weight: bold; color: #333;">Loading...</div>
+    </div>
+    <div>
+      <label style="font-size: 14px; color: #777;">Email</label>
+      <div id="profileEmail" style="font-size: 18px; font-weight: bold; color: #333;">Loading...</div>
+    </div>
   </div>
-  <div style="margin-bottom: 12px;">
-    <label style="font-size: 14px; color: #555;">Email</label>
-    <div id="profileEmail" style="font-size: 18px; font-weight: 500; color: #333;">Loading...</div>
+
+  <!-- Orders Section -->
+  <div style="margin-top: 30px;">
+    <h3 style="font-size: 20px; color: #000;">Your Orders</h3>
+    <div id="orderList" style="margin-top: 10px; background: #f1f1f1; padding: 10px; border-radius: 8px; color: #333;"></div>
   </div>
+
+  <!-- Logout Button -->
+  <button onclick="logout()" style="margin-top: 30px; padding: 12px 20px; background-color: #000; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%;">
+    Logout
+  </button>
 </div>
 
-<div style="margin-top: 25px;">
-  <h3>Your Orders</h3>
-  <div id="orderList" style="padding-left: 5px; color: #333;  margin-left:0%;margin-right:2%;"></div>
-</div>
-
-
-    <button onclick="logout()" style="margin-top: 30px; padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer;">
-      Logout
-    </button>
-  
-
-</div>
      
 
 <!-- Bottom Bar Container (includes both scroll bar and nav bar) -->
