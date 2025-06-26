@@ -432,7 +432,10 @@
   transform: translateY(1000%);
   transition: transform 0.3s ease-in-out;
 }   
-
+.hide-filterControls-nav {
+  transform: translateY(100%);
+  transition: transform 0.3s ease-in-out;
+}
  #loginSection,
 #signupSection {
   margin-top: 150px; /* or adjust as needed */
@@ -2451,15 +2454,18 @@ window.addEventListener("scroll", function () {
       // Scroll down – hide both
       bottomNav.classList.add("hide-bottom-nav");
       shippingBar.classList.add("hide-shippingBar-nav");
+      filterControls.classList.add("hide-filterControls-nav");
     } else {
       // Scroll up – show both
       bottomNav.classList.remove("hide-bottom-nav");
       shippingBar.classList.remove("hide-shippingBar-nav");
+      filterControls.classList.add("hide-filterControls-nav");
     }
   } else {
     // On other pages, always show
     bottomNav.classList.remove("hide-bottom-nav");
     shippingBar.classList.remove("hide-shippingBar-nav");
+    filterControls.classList.add("hide-filterControls-nav");
   }
 
   lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
