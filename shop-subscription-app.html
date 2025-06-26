@@ -490,18 +490,21 @@
 
 .cart-bar-inner {
   width: 100%;
-  max-width: 800px; /* 👈 Optional: adjust as per design */
+  max-width: 800px;
   display: flex;
-  justify-content: space-between;
+  flex-direction: column; /* 👈 Make it vertical */
+  justify-content: center;
   align-items: center;
-  padding: 0 20px;
+  padding: 10px 20px;
   box-sizing: border-box;
+  gap: 10px; /* 👈 Space between Total and Button */
 }
 
 .cart-bar-inner .cart-total {
   font-size: 1rem;
   font-weight: bold;
   color: #000;
+  text-align: center;
 }
 
 .cart-bar-inner button {
