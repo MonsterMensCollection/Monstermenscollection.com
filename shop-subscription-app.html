@@ -1275,16 +1275,6 @@
   <button onclick="goToDetailsPage()">PROCEED</button>
 </div>
 
-<div id="detailsPage" class="form-section" style="display: none; margin-top:13%;">
-  <h3 style="text-align:center;">Enter Your Details</h3>
-  <input type="text" id="checkoutName" placeholder="Your Name" style="padding:10px; width:100%; margin-top:10px;" />
-  <input type="text" id="checkoutAddress" placeholder="Your Address" style="padding:10px; width:100%; margin-top:10px;" />
-  <input type="text" id="checkoutPincode" placeholder="Pin Code" style="padding:10px; width:100%; margin-top:10px;" />
-  <input type="text" id="checkoutMobileNumber" placeholder="Mobile Number" style="padding:10px; width:100%; margin-top:10px;" />
-  <br><br>
-  <button onclick="checkoutCart()">SUBMIT & PAY</button>
-</div>
-
 
 <!-- COD Confirmation Modal -->
 <div id="codConfirmationModal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5);">
@@ -1341,7 +1331,16 @@
   
 
 </div>
-
+     
+<div id="detailsPage" class="form-section" style="display: none; margin-top:13%;">
+  <h3 style="text-align:center;">Enter Your Details</h3>
+  <input type="text" id="checkoutName" placeholder="Your Name" style="padding:10px; width:100%; margin-top:10px;" />
+  <input type="text" id="checkoutAddress" placeholder="Your Address" style="padding:10px; width:100%; margin-top:10px;" />
+  <input type="text" id="checkoutPincode" placeholder="Pin Code" style="padding:10px; width:100%; margin-top:10px;" />
+  <input type="text" id="checkoutMobileNumber" placeholder="Mobile Number" style="padding:10px; width:100%; margin-top:10px;" />
+  <br><br>
+  <button onclick="checkoutCart()">SUBMIT & PAY</button>
+</div>
 <!-- Bottom Bar Container (includes both scroll bar and nav bar) -->
 <!-- Scrolling Shipping Bar -->
 <div id="shippingBar" class="scrolling-banner">
