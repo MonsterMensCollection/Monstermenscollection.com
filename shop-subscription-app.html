@@ -472,7 +472,9 @@
   0%   { transform: translateX(0); }
   100% { transform: translateX(-100%); }
 }
-
+#profilePage #detailsPage {
+    display: none !important;
+  }
     
  </style>
 </head>
@@ -1382,7 +1384,7 @@
   </div>
 </div>
   
-<div id="detailsPage" class="form-section" style="display: none; margin-top:13%;">
+<div id="detailsPage" class="form-section" style="display: none; margin-top:13%; z-index: -1;">
   <h3 style="text-align:center;">Enter Your Details</h3>
   <input type="text" id="checkoutName" placeholder="Your Name" style="padding:10px; width:100%; margin-top:10px;" />
   <input type="text" id="checkoutAddress" placeholder="Your Address" style="padding:10px; width:100%; margin-top:10px;" />
