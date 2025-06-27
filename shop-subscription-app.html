@@ -808,13 +808,13 @@
 <img src="https://raw.githubusercontent.com/MonsterMensCollection/shirt/refs/heads/s4/ChatGPT%20Image%20May%2029%2C%202025%2C%2007_56_53%20PM.png" alt="Shirt 1" onclick="showDescription([
   { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/shirt/refs/heads/s4/ChatGPT%20Image%20May%2029%2C%202025%2C%2007_56_53%20PM.png' },
   { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/shirt/refs/heads/s4/IMG_20250529_193633.jpg' },
-],'$499', 'Nordich', 'Cotton Lycra', 'This mens short-sleeve shirt features a soft steel blue color with subtle vertical pinstripes, offering a refined and modern look. Made from lightweight, breathable fabric, it is perfect for warm weather and casual outings. The shirt includes a classic notched collar, front button closure with contrasting purple buttons, and a relaxed fit for all-day comfort. Its versatile design pairs effortlessly with both light and dark trousers, making it a must-have staple for any wardrobe.', ['L','XL'],['Same'],'shirtsPage')">
+],'₹1', 'Nordich', 'Cotton Lycra', 'This mens short-sleeve shirt features a soft steel blue color with subtle vertical pinstripes, offering a refined and modern look. Made from lightweight, breathable fabric, it is perfect for warm weather and casual outings. The shirt includes a classic notched collar, front button closure with contrasting purple buttons, and a relaxed fit for all-day comfort. Its versatile design pairs effortlessly with both light and dark trousers, making it a must-have staple for any wardrobe.', ['L','XL'],['Same'],'shirtsPage')">
 <div class=cardName>
 <h3>Nordich</h3> <!-- Product Title -->
 <p>Cotton Lycra</p>
 </div>
  <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 10px;">
-    <p class="price">$499</p>
+    <p class="price">₹1</p>
   </div>
 </div>
    
@@ -897,13 +897,13 @@
   { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/2.png' },
   { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/3r.jpeg' },
   { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/3.png' },
-], '$26', 'NORDICH #201', 'FIVE SLEEVES BACK PRINT', 'Chaos meets craftsmanship in this JOKER Edition of the iconic NORDICH Five Sleeves Tee. With an unpredictable twist — five functional sleeves and a wild back print — this piece breaks all rules of design, just like the Joker breaks society’s norms.', ['M','L', 'XL','XXL'],['1', '2', '3','4','5','6'])">
+], '₹1', 'NORDICH #201', 'FIVE SLEEVES BACK PRINT', 'Chaos meets craftsmanship in this JOKER Edition of the iconic NORDICH Five Sleeves Tee. With an unpredictable twist — five functional sleeves and a wild back print — this piece breaks all rules of design, just like the Joker breaks society’s norms.', ['M','L', 'XL','XXL'],['1', '2', '3','4','5','6'])">
 <div class=cardName>
 <h3>NORDICH</h3> <!-- Product Title -->
 <p>FIVE SLEEVES BACK PRINT</p>
 </div>
  <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 10px;">
-    <p class="price">$26</p>
+    <p class="price">₹1</p>
   </div>
   </div>
   
@@ -2009,7 +2009,7 @@ function addToCart(image = null, price = null, title = null) {
     return;
   }
 
-  const parsedPrice = parseInt(price.replace('$', ''));
+  const parsedPrice = parseInt(price.replace('₹', ''));
   cart.push({ image, price: parsedPrice, title, size, color });
 
   alert('Item added to cart!');
@@ -2084,7 +2084,7 @@ function showCart() {
 
   if (cart.length === 0) {
     emptyCartMessage.style.display = 'block';
-    document.getElementById("cartAmount").textContent = "$0";
+    document.getElementById("cartAmount").textContent = "₹0";
   } else {
     emptyCartMessage.style.display = 'none';
 
@@ -2097,7 +2097,7 @@ function showCart() {
             <p style="margin: 4px 0;"><strong>${item.title}</strong></p>
             <p style="margin: 4px 0;"><strong>Size:</strong> ${item.size || 'N/A'}</p>
             <p style="margin: 4px 0;"><strong>Color:</strong> ${item.color || 'N/A'}</p>
-            <p style="margin: 4px 0;"><strong>Price:</strong> $${item.price}</p>
+            <p style="margin: 4px 0;"><strong>Price:</strong> ₹${item.price}</p>
           </div>
           <button onclick="removeFromCart(${index})" style="background-color: transparent; border: none; cursor: pointer;">
             <img src="https://img.icons8.com/?size=100&id=Qgjnp78cDeJi&format=png&color=000000" width="16">
@@ -2109,14 +2109,14 @@ function showCart() {
     });
 
     // Calculate shipping
-    let shipping = subtotal >= 99 ? 0 : 19;
+    let shipping = subtotal >= 0 ? 0 : 0;
     let total = subtotal + shipping;
 
     // Update cart total display
     const cartAmountDiv = document.getElementById("cartAmount");
     cartAmountDiv.innerHTML = shipping === 0
-      ? `<span style="font-size: 12px; color: green;">Free Shipping + </span>$${total}`
-      : `<span style="font-size: 12px; color: #888;">$19 shipping added + </span>$${total} `;
+      ? `<span style="font-size: 12px; color: green;">Free Shipping + </span>₹${total}`
+      : `<span style="font-size: 12px; color: #888;">$19 shipping added + </span>₹${total} `;
   }
 }
 
