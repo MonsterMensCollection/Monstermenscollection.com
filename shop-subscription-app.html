@@ -1548,9 +1548,33 @@
 <!-- Product Description Page with Scrollable Image Gallery -->
 <div id="descriptionPage" style="display: none; padding: 0 3%;margin-top:23%;" class="form-section">
 <div style="display: flex; justify-content: center;">
-  <div id="mainMediaWrapper" style="display: flex; justify-content: center; overflow: hidden; touch-action: pan-y;">
- <img id="descImage" src="" style="width: 100%; max-width: 100%; height: auto; border-radius: 0px; display: none;" />
-  <video id="descVideo" controls style="width: 100%; max-width: 100%; height: auto; border-radius: 0px; display: none;"></video>
+  <div id="mainMediaWrapper" style="
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  touch-action: none;
+  -ms-touch-action: none;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  width: 100%;
+  height: auto;
+">
+  <img id="descImage" src="" style="
+    max-width: 100%;
+    height: auto;
+    border-radius: 0px;
+    display: none;
+    transform-origin: center center;
+    touch-action: none;
+    transition: transform 0.1s ease;
+  " />
+  <video id="descVideo" controls style="
+    max-width: 100%;
+    height: auto;
+    border-radius: 0px;
+    display: none;
+  "></video>
 </div>
 </div>
 
@@ -2022,7 +2046,41 @@ function handleTouchEnd(evt, fromPage) {
   }, { passive: true });
 });
 
+let img = document.getElementById('descImage');
+let scale = 1;
+let lastDistance = null;
 
+function getDistance(touches) {
+  const dx = touches[0].clientX - touches[1].clientX;
+  const dy = touches[0].clientY - touches[1].clientY;
+  return Math.sqrt(dx * dx + dy * dy);
+}
+
+img.addEventListener('touchstart', (e) => {
+  if (e.touches.length === 2) {
+    lastDistance = getDistance(e.touches);
+  }
+}, { passive: false });
+
+img.addEventListener('touchmove', (e) => {
+  if (e.touches.length === 2 && lastDistance) {
+    e.preventDefault();
+    const newDistance = getDistance(e.touches);
+    const delta = newDistance - lastDistance;
+    scale += delta * 0.005;
+    scale = Math.max(1, Math.min(scale, 3));
+    img.style.transform = `scale(${scale})`;
+    lastDistance = newDistance;
+  }
+}, { passive: false });
+
+img.addEventListener('touchend', () => {
+  if (scale <= 1.05) {
+    img.style.transform = 'scale(1)';
+    scale = 1;
+    lastDistance = null;
+  }
+});
 
 let cart = [];
 function showDescription(media = [], price, title = "No title", sdes = "No short description", description = "No description", sizesAvailable = ["M", "L", "XL"], colorsAvailable = [], category = null) {
