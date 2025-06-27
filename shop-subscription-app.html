@@ -1561,14 +1561,14 @@
   height: auto;
 ">
   <img id="descImage" src="" style="
-  max-width: 100%;
-  height: auto;
-  border-radius: 0px;
-  display: none;
-  transform-origin: center center;
-  touch-action: none;
-  transition: transform 0.1s ease;
-" />
+    max-width: 100%;
+    height: auto;
+    border-radius: 0px;
+    display: none;
+    transform-origin: center center;
+    touch-action: none;
+    transition: transform 0.1s ease;
+  " />
   <video id="descVideo" controls style="
     max-width: 100%;
     height: auto;
@@ -2046,13 +2046,9 @@ function handleTouchEnd(evt, fromPage) {
   }, { passive: true });
 });
 
-const img = document.getElementById('descImage');
+let img = document.getElementById('descImage');
 let scale = 1;
 let lastDistance = null;
-let startX = 0, startY = 0;
-let translateX = 0, translateY = 0;
-let lastTouchX = 0, lastTouchY = 0;
-let isDragging = false;
 
 function getDistance(touches) {
   const dx = touches[0].clientX - touches[1].clientX;
@@ -2060,54 +2056,30 @@ function getDistance(touches) {
   return Math.sqrt(dx * dx + dy * dy);
 }
 
-function updateTransform() {
-  img.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
-}
-
 img.addEventListener('touchstart', (e) => {
   if (e.touches.length === 2) {
     lastDistance = getDistance(e.touches);
-    isDragging = false;
-  } else if (e.touches.length === 1 && scale > 1) {
-    isDragging = true;
-    lastTouchX = e.touches[0].clientX;
-    lastTouchY = e.touches[0].clientY;
   }
 }, { passive: false });
 
 img.addEventListener('touchmove', (e) => {
-  if (e.touches.length === 2) {
+  if (e.touches.length === 2 && lastDistance) {
     e.preventDefault();
     const newDistance = getDistance(e.touches);
     const delta = newDistance - lastDistance;
     scale += delta * 0.005;
     scale = Math.max(1, Math.min(scale, 3));
-    updateTransform();
+    img.style.transform = `scale(${scale})`;
     lastDistance = newDistance;
-  } else if (e.touches.length === 1 && isDragging) {
-    e.preventDefault();
-    const touch = e.touches[0];
-    const dx = touch.clientX - lastTouchX;
-    const dy = touch.clientY - lastTouchY;
-    translateX += dx;
-    translateY += dy;
-    lastTouchX = touch.clientX;
-    lastTouchY = touch.clientY;
-    updateTransform();
   }
 }, { passive: false });
 
-img.addEventListener('touchend', (e) => {
+img.addEventListener('touchend', () => {
   if (scale <= 1.05) {
-    scale = 1;
-    translateX = 0;
-    translateY = 0;
     img.style.transform = 'scale(1)';
-  } else {
-    updateTransform();
+    scale = 1;
+    lastDistance = null;
   }
-  lastDistance = null;
-  isDragging = false;
 });
 
 let cart = [];
