@@ -1548,26 +1548,10 @@
 <!-- Product Description Page with Scrollable Image Gallery -->
 <div id="descriptionPage" style="display: none; padding: 0 3%;margin-top:23%;" class="form-section">
 <div style="display: flex; justify-content: center;">
- <div id="mainMediaWrapper" style="
-  display: flex;
-  justify-content: center;
-  overflow: auto;
-  touch-action: none; /* Disable browser handling to allow pinch */
-  -ms-touch-action: none;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
-">
-  <div style="touch-action: none;">
-    <img id="descImage" src="" style="
-      width: 100%;
-      max-width: 100%;
-      height: auto;
-      border-radius: 0px;
-      display: none;
-      transform-origin: center center;
-      touch-action: none;
-    " />
-  </div>
+  <div id="mainMediaWrapper" style="display: flex; justify-content: center; overflow: hidden; touch-action: pan-y;">
+ <img id="descImage" src="" style="width: 100%; max-width: 100%; height: auto; border-radius: 0px; display: none;" />
+  <video id="descVideo" controls style="width: 100%; max-width: 100%; height: auto; border-radius: 0px; display: none;"></video>
+</div>
 </div>
 
 <!-- Thumbnails Preview (Image + Video Swipe Area) -->
@@ -2037,6 +2021,7 @@ function handleTouchEnd(evt, fromPage) {
     handleTouchEnd(evt, pageId);
   }, { passive: true });
 });
+
 
 
 let cart = [];
