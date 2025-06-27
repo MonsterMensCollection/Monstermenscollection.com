@@ -2089,7 +2089,7 @@ function showCart() {
 
   if (cart.length === 0) {
     emptyCartMessage.style.display = 'block';
-    document.getElementById("cartAmount").textContent = "$0";
+    document.getElementById("cartAmount").textContent = "₹0";
   } else {
     emptyCartMessage.style.display = 'none';
 
@@ -2120,8 +2120,8 @@ function showCart() {
     // Update cart total display
     const cartAmountDiv = document.getElementById("cartAmount");
     cartAmountDiv.innerHTML = shipping === 0
-      ? `<span style="font-size: 12px; color: green;">Free Shipping + </span>$${total}`
-      : `<span style="font-size: 12px; color: #888;">$19 shipping added + </span>$${total} `;
+      ? `<span style="font-size: 12px; color: green;">Free Shipping + </span₹${total}`
+      : `<span style="font-size: 12px; color: #888;">$19 shipping added + </span>₹${total} `;
   }
 }
 
