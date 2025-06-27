@@ -2366,6 +2366,7 @@ function addToCart(image = null, price = null, title = null) {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
+  // 🔹 Existing Filter Controls
   const filterControls = document.querySelectorAll(".filter-controls");
 
   filterControls.forEach(control => {
@@ -2376,6 +2377,72 @@ document.addEventListener("DOMContentLoaded", function () {
 
     sortSelect.addEventListener("change", () => sortProductsByPrice(targetPageId));
     sizeSelect.addEventListener("change", () => filterProductsBySize(targetPageId));
+  });
+
+  // 🔹 New Zoom + Pan Image Code
+  const img = document.getElementById('descImage');
+  if (!img) return;
+
+  let scale = 1;
+  let lastDistance = null;
+  let translateX = 0, translateY = 0;
+  let lastTouchX = 0, lastTouchY = 0;
+  let isDragging = false;
+
+  function getDistance(touches) {
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+  }
+
+  function updateTransform() {
+    img.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+  }
+
+  img.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 2) {
+      lastDistance = getDistance(e.touches);
+      isDragging = false;
+    } else if (e.touches.length === 1 && scale > 1) {
+      isDragging = true;
+      lastTouchX = e.touches[0].clientX;
+      lastTouchY = e.touches[0].clientY;
+    }
+  }, { passive: false });
+
+  img.addEventListener('touchmove', (e) => {
+    if (e.touches.length === 2) {
+      e.preventDefault();
+      const newDistance = getDistance(e.touches);
+      const delta = newDistance - lastDistance;
+      scale += delta * 0.005;
+      scale = Math.max(1, Math.min(scale, 3));
+      updateTransform();
+      lastDistance = newDistance;
+    } else if (e.touches.length === 1 && isDragging) {
+      e.preventDefault();
+      const touch = e.touches[0];
+      const dx = touch.clientX - lastTouchX;
+      const dy = touch.clientY - lastTouchY;
+      translateX += dx;
+      translateY += dy;
+      lastTouchX = touch.clientX;
+      lastTouchY = touch.clientY;
+      updateTransform();
+    }
+  }, { passive: false });
+
+  img.addEventListener('touchend', () => {
+    if (scale <= 1.05) {
+      scale = 1;
+      translateX = 0;
+      translateY = 0;
+      img.style.transform = 'scale(1)';
+    } else {
+      updateTransform();
+    }
+    lastDistance = null;
+    isDragging = false;
   });
 });
 
