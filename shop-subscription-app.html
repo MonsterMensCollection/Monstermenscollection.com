@@ -2039,41 +2039,6 @@ function handleTouchEnd(evt, fromPage) {
   }, { passive: true });
 });
 
-let img = document.getElementById('descImage');
-let scale = 1;
-let lastTouchDist = 0;
-
-function getDistance(touches) {
-  const [a, b] = touches;
-  const dx = a.clientX - b.clientX;
-  const dy = a.clientY - b.clientY;
-  return Math.sqrt(dx * dx + dy * dy);
-}
-
-img.addEventListener('touchstart', function (e) {
-  if (e.touches.length === 2) {
-    lastTouchDist = getDistance(e.touches);
-  }
-}, { passive: false });
-
-img.addEventListener('touchmove', function (e) {
-  if (e.touches.length === 2) {
-    e.preventDefault();
-    const newDist = getDistance(e.touches);
-    const delta = newDist - lastTouchDist;
-    scale += delta * 0.005;
-    scale = Math.min(Math.max(scale, 1), 3);
-    img.style.transform = `scale(${scale})`;
-    lastTouchDist = newDist;
-  }
-}, { passive: false });
-
-img.addEventListener('touchend', function () {
-  if (scale <= 1.05) {
-    img.style.transform = 'scale(1)';
-    scale = 1;
-  }
-});
 
 let cart = [];
 function showDescription(media = [], price, title = "No title", sdes = "No short description", description = "No description", sizesAvailable = ["M", "L", "XL"], colorsAvailable = [], category = null) {
