@@ -2636,33 +2636,18 @@ if (subscribed) {
       statusMessage.textContent = "";
     }
     
- window.onpopstate = function (event) {
-  const page = event.state?.page || "sliderSection"; // Default to home
+  window.onpopstate = function (event) {
+  if (event.state && event.state.page) {
+    const page = event.state.page;
+    // Hide all pages first
+    document.querySelectorAll(".page").forEach(p => p.style.display = "none");
 
-  // Hide all pages first
-  const allPages = [
-    "cartPage",
-    "detailsPage",
-    "profilePage",
-    "shirtsPage",
-    "pantsPage",
-    "tshirtsPage",
-    "cargosPage",
-    "descriptionPage",
-    "productList",
-    "sliderSection"
-  ];
-
-  allPages.forEach(pageId => {
-    const el = document.getElementById(pageId);
-    if (el) el.style.display = "none";
-  });
-
-  // Show the correct page based on history state
-  const showPage = document.getElementById(page);
-  if (showPage) showPage.style.display = "block";
+    // Then show the correct one
+    document.getElementById(page).style.display = "block";
+    document.getElementById("descriptionPage").style.display = "none";
+    document.getElementById("detailsPage").style.display = "none";
+  }
 };
-
 
 
 
