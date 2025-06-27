@@ -2058,6 +2058,10 @@ function filterProductsBySize(pageId) {
 }
 
 function showCart() {
+
+ lastCategoryPage = "cartPage"; // ✅ Add this line
+ history.pushState({ page: "cartPage" }, "", "#cart");
+  
   document.getElementById("descriptionPage").style.display = "none";
   document.getElementById("productList").style.display = "none";
   document.getElementById("shirtsPage").style.display = "none";
