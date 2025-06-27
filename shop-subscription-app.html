@@ -532,7 +532,22 @@
   background-color: #444;
 }
 
+.image-wrapper {
+  position: relative;
+  width: 100%;
+  padding-bottom: 125%; /* 4:5 ratio (height = 125% of width) */
+  overflow: hidden;
+  background-color: #f8f8f8;
+}
 
+.image-wrapper img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ensures uniform cropping without stretching */
+}
 
     
  </style>
@@ -662,11 +677,12 @@
 
  <!-- 101 -->
   <div class="product-card">
+     <div class="image-wrapper">
 <img src="https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/s1.jpeg" alt="Shirt 1" onclick="showDescription([
   { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/s1.jpeg' },
   { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/s1r.jpeg' },
 ],'$37', 'BODAK #101', 'CHECK SHIRT', 'The BODAK⚡️ Check Shirt brings bold attitude with a relaxed edge. Crafted from a comfortable cotton blend, it features a lapel collar, buttoned cuffs, and a clean button-up front. The standout? A striking back print that turns heads every time you walk away.', ['s','M','L','XL'],['Same'],'shirtsPage')">
-<div class=cardName>
+</div><div class=cardName>
 <h3>BODAK</h3> <!-- Product Title -->
 <p>CHECK SHIRT</p>
 </div>
@@ -680,11 +696,12 @@
 
 <!-- 102 -->
   <div class="product-card">
+     <div class="image-wrapper">
 <img src="https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/s2.jpeg" alt="Shirt 1" onclick="showDescription([
   { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/s2.jpeg' },
   { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/s2r.jpeg' },
 ],'$37', 'BODAK #102', 'CHECK SHIRT', 'The BODAK⚡️ Check Shirt brings bold attitude with a relaxed edge. Crafted from a comfortable cotton blend, it features a lapel collar, buttoned cuffs, and a clean button-up front. The standout? A striking back print that turns heads every time you walk away.', ['s','M','L','XL'],['Same'],'shirtsPage')">
-<div class=cardName>
+</div><div class=cardName>
 <h3>BODAK</h3> <!-- Product Title -->
 <p>CHECK SHIRT</p>
 </div>
@@ -698,11 +715,12 @@
    
   <!-- 103 -->
   <div class="product-card">
+     <div class="image-wrapper">
 <img src="https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/s3r.jpeg" alt="Shirt 1" onclick="showDescription([
   { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/s3r.jpeg' },
   { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/s3.jpeg' },
 ],'$37', 'BODAK #103', 'CHECK SHIRT', 'The BODAK⚡️ Check Shirt brings bold attitude with a relaxed edge. Crafted from a comfortable cotton blend, it features a lapel collar, buttoned cuffs, and a clean button-up front. The standout? A striking back print that turns heads every time you walk away.', ['s','M','L','XL'],['Same'],'shirtsPage')">
-<div class=cardName>
+</div><div class=cardName>
 <h3>BODAK</h3> <!-- Product Title -->
 <p>CHECK SHIRT</p>
 </div>
@@ -715,11 +733,13 @@
    
  <!-- 104 -->
   <div class="product-card">
+     <div class="image-wrapper">
 <img src="https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/s4.jpeg" alt="Shirt 1" onclick="showDescription([
   { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/s4.jpeg' },
   { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/s4r.jpeg' },
 ],'$37', 'BODAK #104', 'CHECK SHIRT', 'The BODAK⚡️ Check Shirt brings bold attitude with a relaxed edge. Crafted from a comfortable cotton blend, it features a lapel collar, buttoned cuffs, and a clean button-up front. The standout? A striking back print that turns heads every time you walk away.', ['s','M','L','XL'],['Same'],'shirtsPage')">
-<div class=cardName>
+</div>
+    <div class=cardName>
 <h3>BODAK</h3> <!-- Product Title -->
 <p>CHECK SHIRT</p>
 </div>
@@ -732,12 +752,14 @@
    
   <!-- 105 -->
   <div class="product-card">
+     <div class="image-wrapper">
 <img src="https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/s5.jpeg" alt="Shirt 1" onclick="showDescription([
   { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/s5.jpeg' },
   { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/s5r1.jpeg' },
    { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/s5r2.png' },
 ],'$44', '1947 #105', 'LINEN SHIRT', 'Crafted from lightweight and breathable linen fabric, this shirt is your go-to for warm days and relaxed vibes. Designed for a clean, laid-back silhouette, it pairs easily with anything — from casual trousers to tailored shorts.', ['s','M','L','XL'],['1', '2', '3','4','5'],'shirtsPage')">
-<div class=cardName>
+</div>
+    <div class=cardName>
 <h3>1947</h3> <!-- Product Title -->
 <p>LINEN SHIRT</p>
 </div>
