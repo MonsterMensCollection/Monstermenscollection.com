@@ -2443,6 +2443,33 @@ document.addEventListener("DOMContentLoaded", function () {
     lastDistance = null;
     isDragging = false;
   });
+    // 🔹 Double Tap to Zoom In/Out
+  let lastTapTime = 0;
+  img.addEventListener("touchend", function (e) {
+    const currentTime = new Date().getTime();
+    const tapLength = currentTime - lastTapTime;
+    lastTapTime = currentTime;
+
+    // Detect double tap (within 300ms)
+    if (tapLength < 300 && e.touches.length === 0) {
+      if (scale > 1) {
+        // Zoom out
+        scale = 1;
+        translateX = 0;
+        translateY = 0;
+        updateTransform();
+      } else {
+        // Zoom in centered at tap
+        scale = 2;
+        const rect = img.getBoundingClientRect();
+        const tapX = e.changedTouches[0].clientX - rect.left;
+        const tapY = e.changedTouches[0].clientY - rect.top;
+        translateX = (img.clientWidth / 2 - tapX) * (scale - 1);
+        translateY = (img.clientHeight / 2 - tapY) * (scale - 1);
+        updateTransform();
+      }
+    }
+  });
 });
 
 function sortProductsByPrice(pageId) {
