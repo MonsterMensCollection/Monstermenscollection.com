@@ -590,47 +590,6 @@
  </style>
 </head>
 <body>
-  <div class="container" id="mainContainer" style="margin:auto;">
-    
-    <div>
-   
-    
-    <div id="loginSection" class="form-section" >
-        <h1 id="title">Login</h1>
-      <input type="email" id="email" placeholder="Email" />
-      <input type="password" id="password" placeholder="Password" />
-      <button id="emailLoginBtn">Login</button>
-      <a href="#" id="forgotPasswordLink">Forgot Password?</a>
-      <div id="statusMessage" class="status-message"></div>
-      <p class="toggle-link" onclick="toggleForm()">Don't have an account? Sign Up</p>
-     
-                 <div style="margin-top: 30px; padding: 10px; text-align: center; font-size: 14px; color: #555;">
-     <a href="https://iridescent-sawine-8f375c.netlify.app/privacy-policy" 
-   target="_blank" style="color: #007bff; background: none; border: none; padding: 0; margin: 0; box-shadow: none; font-weight: normal;"> Privacy Policy</a> 
-  </div>
-
-    </div>
-   
-    <div id="signupSection" class="form-section" style="display: none;">
-        <h1 id="title">Sign Up</h1>
-      <input type="text" id="signupName" placeholder="Enter your name" required>
-      <input type="email" id="signupEmail" placeholder="Email" />
-      <input type="password" id="signupPassword" placeholder="Password" />
-      <button id="emailSignupBtn">Sign Up</button>
-      <p class="toggle-link" onclick="toggleForm()">Already have an account? Login</p>
-      
-      <div style="margin-top: 30px; padding: 10px; text-align: center; font-size: 14px; color: #555;">
-    <a href="https://iridescent-sawine-8f375c.netlify.app/privacy-policy" 
-   target="_blank" style="color: #007bff; background: none; border: none; padding: 0; margin: 0; box-shadow: none; font-weight: normal;">Privacy Policy</a>
-  </div>
-      
-    </div>
-    
-   
-  
-  
-</div> 
-</div>
 
    <div id="productsPage" >
        
@@ -2737,6 +2696,85 @@ function checkoutCart() {
   rzp.open();
 }
 
+function checkoutCOD() {
+  const name = document.getElementById("checkoutName").value.trim();
+  const address = document.getElementById("checkoutAddress").value.trim();
+   const pincode = document.getElementById("checkoutPincode").value.trim();
+  const mobilenumber  = document.getElementById("checkoutMobileNumber").value.trim();
+
+  if (!name || !address) {
+    alert("Please enter name and address to continue.");
+    return;
+  }
+
+  const totalAmount = cart.reduce((sum, item) => sum + item.price, 0);
+
+  if (totalAmount === 0) {
+    alert("Cart is empty!");
+    return;
+  }
+
+  const user = auth.currentUser;
+  if (!user) {
+    alert("You must be logged in to place an order.");
+    return;
+  }
+
+  const orderData = {
+    uid: user.uid,
+    name: name,
+    address: address,
+    pincode: pincode,
+    mobilenumber: mobilenumber,
+    cart: cart,
+    total: totalAmount,
+    paymentId: "COD",
+    paymentMode: "Cash on Delivery",
+    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+    orderNumber: `ORD-${Date.now()}`
+  };
+
+  db.collection("orders").add(orderData).then(() => {
+
+      // ✅ UI changes after successful order
+          document.getElementById("descriptionPage").style.display = "none";
+          document.getElementById("productList").style.display = "none";
+          document.getElementById("shirtsPage").style.display = "none";
+          document.getElementById("pantsPage").style.display = "none";
+          document.getElementById("sliderSection").style.display = "none";
+          document.getElementById("cartPage").style.display = "none";
+          document.getElementById("profilePage").style.display = "none";
+            document.getElementById("tshirtsPage").style.display = "none";
+             document.getElementById("cargosPage").style.display = "none";
+
+          // Show success page
+          document.getElementById("paymentSuccessPageCOD").style.display = "block";
+
+          // Hide after 5 seconds and go back to products
+          setTimeout(() => {
+            document.getElementById("paymentSuccessPageCOD").style.display = "none";
+            document.getElementById("productList").style.display = "block";
+            document.getElementById("sliderSection").style.display = "block";
+          }, 5000);
+    cart = []; // Return to main page
+  }).catch(error => {
+    console.error("Error placing COD order:", error);
+    alert("Error placing order. Please try again.");
+  });
+}
+
+function confirmCOD() {
+  document.getElementById("codConfirmationModal").style.display = "block";
+}
+
+function closeCODModal() {
+  document.getElementById("codConfirmationModal").style.display = "none";
+}
+
+function proceedWithCOD() {
+  closeCODModal();
+  checkoutCOD(); // existing function
+}
 
 
 function showProfilePage() {
@@ -2873,6 +2911,7 @@ ordersSnapshot.forEach((doc, index) => {
   
     const loginSection = document.getElementById("loginSection");
     const signupSection = document.getElementById("signupSection");
+    const subscriptionSection = document.getElementById("subscriptionSection");
     const productsPage = document.getElementById("productsPage");
     const logoutBtn = document.getElementById("logoutBtn");
     const statusMessage = document.getElementById("statusMessage");
@@ -2880,6 +2919,14 @@ ordersSnapshot.forEach((doc, index) => {
 
     const adminEmails = ["youremail@example.com"];
 
+    async function checkSubscription(uid) {
+      const doc = await db.collection("subscriptions").doc(uid).get();
+      if (!doc.exists) return false;
+      const data = doc.data();
+      const now = new Date();
+      const expiryDate = data.expiryDate?.toDate?.() || new Date(data.expiryDate);
+      return expiryDate > now;
+    }
 
     async function updatePageForUser(user) {
       await user.reload();
@@ -2891,17 +2938,32 @@ ordersSnapshot.forEach((doc, index) => {
       const subscribed = await checkSubscription(user.uid);
       const container = document.getElementById("mainContainer");
 
+if (subscribed) {
+  subscriptionSection.style.display = "none";
   productsPage.style.display = "block";
   document.getElementById("title").textContent = "";
   container.classList.add("no-box");
   container.classList.remove("with-top-margin");
-
+} else {
+  subscriptionSection.style.display = "none";
+  productsPage.style.display = "block";
+  document.getElementById("title").textContent = "";
+  container.classList.add("no-box");
+  container.classList.remove("with-top-margin");
+}
       loginSection.style.display = "none";
       signupSection.style.display = "none";
       adminControls.style.display = adminEmails.includes(user.email) ? "block" : "none";
     }
 
-  
+    async function saveSubscription(uid) {
+      const expiry = new Date();
+      expiry.setMonth(expiry.getMonth() + 1);
+      await db.collection("subscriptions").doc(uid).set({
+        expiryDate: expiry,
+        createdAt: new Date()
+      });
+    }
     logoutBtn.addEventListener("click", () => {
       auth.signOut();
     });
@@ -2910,6 +2972,7 @@ ordersSnapshot.forEach((doc, index) => {
       if (user) {
         await updatePageForUser(user);
       } else {
+        subscriptionSection.style.display = "none";
         productsPage.style.display = "none";
         loginSection.style.display = "flex";
         signupSection.style.display = "none";
@@ -2987,16 +3050,43 @@ ordersSnapshot.forEach((doc, index) => {
     function updateBottomNavVisibility() {
   const loginVisible = document.getElementById("loginSection").style.display !== "none";
   const signupVisible = document.getElementById("signupSection").style.display !== "none";
-  
+  const subscriptionVisible = document.getElementById("subscriptionSection").style.display !== "none";
+
   const bottomNav = document.getElementById("bottomNav");
 
-  if (loginVisible || signupVisible) {
+  if (loginVisible || signupVisible || subscriptionVisible) {
     bottomNav.style.display = "none";
   } else {
     bottomNav.style.display = "flex"; // or "block" if you're not using flex layout
   }
 }
+  const subscriptionForm = document.getElementById("subscriptionForm");
 
+  subscriptionForm.addEventListener("submit", async function (e) {
+    e.preventDefault(); // Prevent page reload
+
+    const razorpayOptions = {
+      key: "rzp_live_0M0qHSpzByvZAr", // Replace with your Razorpay test key
+      amount: 200, // ₹2 in paise
+      currency: "INR",
+      name: "Monster Men's Collection",
+      description: "Monthly Subscription",
+      handler: function (response) {
+        // You can store payment success in Firestore or show a message
+        document.getElementById("confirmationMessage").innerText = "Payment successful! Thank you for subscribing.";
+      },
+      prefill: {
+        email: firebase.auth().currentUser?.email || "",
+      },
+      theme: {
+        color: "#007bff",
+      },  
+      webview_intent: true
+    };
+
+    const rzp = new Razorpay(razorpayOptions);
+    rzp.open();
+  });
     function toggleForm() {
       const isLoginVisible = loginSection.style.display !== "none";
       loginSection.style.display = isLoginVisible ? "none" : "flex";
@@ -3070,7 +3160,12 @@ window.addEventListener("scroll", function () {
 
     // On initial load (login/signup page), add top margin
 document.getElementById("mainContainer").classList.add("with-top-margin");
- 
+document.getElementById("backToSubscription").addEventListener("click", () => {
+     firebase.auth().signOut();
+  document.getElementById("mainContainer").classList.add("with-top-margin");
+});
+
+  
 </script>
 
 </body>
