@@ -595,7 +595,7 @@
     <div>
    
     
-    <div id="loginSection" class="form-section" >
+    <div id="loginSection" class="form-section" style="display: none;" >
         <h1 id="title">Login</h1>
       <input type="email" id="email" placeholder="Email" />
       <input type="password" id="password" placeholder="Password" />
@@ -1791,7 +1791,11 @@
       <div id="profileEmail" style="font-size: 18px; font-weight: bold; color: #333;">Loading...</div>
     </div>
   </div>
-
+  
+ <div id="loginPrompt" style="margin-top: 20px; display: none;">
+  <button onclick="showLoginPage()" style="padding: 10px 20px; background-color: #000; color: white; border: none; width: 100%; font-weight: bold;">Login</button>
+</div>
+  
   <!-- Why It Takes Time Button -->
   <button onclick="toggleWhyTime()" style="margin-top: 30px; padding: 12px 20px; background-color: #eee; color: #000; border: none; border-radius: 0px; cursor: pointer; font-weight: bold; width: 100%;">
     Why It Takes Time
@@ -2017,7 +2021,16 @@ function backToProducts() {
     document.getElementById("detailsPage").style.display = "block";
 }
 
-
+function showLoginPage() {
+  profilePage.style.display = "none";
+  loginSection.style.display = "flex";
+  signupSection.style.display = "none";
+  document.getElementById("title").textContent = "Login";
+  document.getElementById("email").value = "";
+  document.getElementById("password").value = "";
+  statusMessage.textContent = "";
+}
+  
 let isMessageVisible = false;
 
   function toggleWhyTime() {
@@ -3019,20 +3032,33 @@ if (subscribed) {
       auth.signOut();
     });
 
-    auth.onAuthStateChanged(async (user) => {
-      if (user) {
-        await updatePageForUser(user);
-      } else {
-        subscriptionSection.style.display = "none";
-        productsPage.style.display = "none";
-        loginSection.style.display = "flex";
-        signupSection.style.display = "none";
-        document.getElementById("title").textContent = "Login";
-        document.getElementById("confirmationMessage").textContent = "";
-        statusMessage.textContent = "";
-        adminControls.style.display = "none";
-      }
-    });
+  auth.onAuthStateChanged(async (user) => {
+  if (user) {
+    await updatePageForUser(user);
+    profilePage.style.display = "block";
+    document.getElementById("profileEmail").innerText = user.email;
+
+    // Fetch and show name if stored in Firestore
+    const userDoc = await db.collection("users").doc(user.uid).get();
+    document.getElementById("profileName").innerText = userDoc.exists ? userDoc.data().name : "No name";
+
+    loginSection.style.display = "none";
+    signupSection.style.display = "none";
+    document.getElementById("loginPrompt").style.display = "none";
+  } else {
+    profilePage.style.display = "block";
+    document.getElementById("profileName").innerText = "Guest";
+    document.getElementById("profileEmail").innerText = "Not logged in";
+    document.getElementById("loginPrompt").style.display = "block";
+
+    loginSection.style.display = "none";
+    signupSection.style.display = "none";
+    subscriptionSection.style.display = "none";
+    productsPage.style.display = "none";
+    adminControls.style.display = "none";
+  }
+});
+
 
     document.getElementById("emailLoginBtn").addEventListener("click", () => {
       const email = document.getElementById("email").value;
@@ -3213,7 +3239,10 @@ window.addEventListener("scroll", function () {
 document.getElementById("mainContainer").classList.add("with-top-margin");
 document.getElementById("backToSubscription").addEventListener("click", () => {
      firebase.auth().signOut();
-  document.getElementById("mainContainer").classList.add("with-top-margin");
+ document.getElementById("mainContainer").classList.add("with-top-margin");
+loginSection.style.display = "none";
+signupSection.style.display = "none";
+  
 });
 
   
