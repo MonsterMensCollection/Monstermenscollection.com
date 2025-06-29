@@ -2432,6 +2432,16 @@ function addToCart(image = null, price = null, title = null) {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
+
+  auth.onAuthStateChanged(user => {
+    if (user) {
+      // User is logged in - show main content immediately
+      document.getElementById("productList").style.display = "block";
+      document.getElementById("sliderSection").style.display = "block";
+      document.querySelector(".login-container").style.display = "none";
+    }
+
+
   // 🔹 Existing Filter Controls
   const filterControls = document.querySelectorAll(".filter-controls");
 
@@ -2980,32 +2990,34 @@ ordersSnapshot.forEach((doc, index) => {
     }
 
     async function updatePageForUser(user) {
-      await user.reload();
-      if (!user.emailVerified) {
-        alert("Please verify your email address before continuing.");
-        auth.signOut();
-        return;
-      }
-      const subscribed = await checkSubscription(user.uid);
-      const container = document.getElementById("mainContainer");
+  await user.reload();
+  
+  // Remove email verification requirement if needed
+  if (!user.emailVerified) {
+    alert("Please verify your email address before continuing.");
+    auth.signOut();
+    return;
+  }
+  
+  const subscribed = await checkSubscription(user.uid);
+  const container = document.getElementById("mainContainer");
 
-if (subscribed) {
-  subscriptionSection.style.display = "none";
-  productsPage.style.display = "block";
-  document.getElementById("title").textContent = "";
-  container.classList.add("no-box");
-  container.classList.remove("with-top-margin");
-} else {
-  subscriptionSection.style.display = "none";
-  productsPage.style.display = "block";
-  document.getElementById("title").textContent = "";
-  container.classList.add("no-box");
-  container.classList.remove("with-top-margin");
+  if (subscribed) {
+    // Handle subscribed users
+    subscriptionSection.style.display = "none";
+    productsPage.style.display = "block";
+    container.classList.add("no-box");
+  } else {
+    // Handle non-subscribed but logged-in users
+    subscriptionSection.style.display = "none";
+    productsPage.style.display = "block";
+    container.classList.add("no-box");
+  }
+  
+  loginSection.style.display = "none";
+  signupSection.style.display = "none";
+  adminControls.style.display = adminEmails.includes(user.email) ? "block" : "none";
 }
-      loginSection.style.display = "none";
-      signupSection.style.display = "none";
-      adminControls.style.display = adminEmails.includes(user.email) ? "block" : "none";
-    }
 
     async function saveSubscription(uid) {
       const expiry = new Date();
@@ -3019,20 +3031,28 @@ if (subscribed) {
       auth.signOut();
     });
 
-    auth.onAuthStateChanged(async (user) => {
-      if (user) {
-        await updatePageForUser(user);
-      } else {
-        subscriptionSection.style.display = "none";
-        productsPage.style.display = "none";
-        loginSection.style.display = "flex";
-        signupSection.style.display = "none";
-        document.getElementById("title").textContent = "Login";
-        document.getElementById("confirmationMessage").textContent = "";
-        statusMessage.textContent = "";
-        adminControls.style.display = "none";
-      }
-    });
+ auth.onAuthStateChanged(async (user) => {
+  if (user) {
+    console.log("User is logged in:", user.email);
+    await updatePageForUser(user);
+    
+    // Automatically show products page for logged-in users
+    document.getElementById("productList").style.display = "block";
+    document.getElementById("sliderSection").style.display = "block";
+    loginSection.style.display = "none";
+  } else {
+    console.log("No user logged in");
+    // Show login UI for unauthenticated users
+    subscriptionSection.style.display = "none";
+    productsPage.style.display = "none";
+    loginSection.style.display = "flex";
+    signupSection.style.display = "none";
+    document.getElementById("title").textContent = "Login";
+  }
+  
+  // Always update bottom nav visibility
+  updateBottomNavVisibility();
+});
 
     document.getElementById("emailLoginBtn").addEventListener("click", () => {
       const email = document.getElementById("email").value;
