@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Shop Subscription App</title>
+  <title>ENLY</title>
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-firestore-compat.js"></script>
@@ -291,15 +291,23 @@
     border-radius: 0 !important; 
     }
 
+.product-card .cardName h3,
+.product-card .cardName p,
 .product-card .price {
-  margin-top: 0px;
-  font-size: 1rem;
-  font-weight: bold;
-  color: #333;
-   }
-   .product-card .cardName {
-  font-size:0.8rem;
-   }
+  margin: 0;
+  padding: 0;
+  line-height: 1.2; /* Optional: tighter spacing */
+}
+
+.product-card .cardName {
+  margin-bottom: 0;
+   font-size:0.8rem;/* ensure no space below cardName */
+}
+
+.product-card .price {
+  margin-top: 0; /* already set, but reaffirm */
+}
+
 .product-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -1193,8 +1201,8 @@
   { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/p17.png' },
 ],'$39', 'Man & Moda #317', 'POLO FIT', 'Step into refined comfort with the Man & Moda Polo Fit Pant – where smart style meets everyday ease. Designed for a tailored yet relaxed fit, this pant is perfect for both casual and semi-formal looks.', ['28','30',' 32 ','34 ','36','38'],['Same'],'pantsPage')">
 </div><div class=cardName>
-Man & Moda <!-- Product Title -->
-POLO FIT
+<h3>Man & Moda</h3> <!-- Product Title -->
+<p>POLO FIT </p>
 </div>
  <div style="display: flex; justify-content: center; align-items: center; padding: 0px;">
     <p class="price">$39</p>
@@ -1208,8 +1216,8 @@ POLO FIT
   { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/p16.png' },
 ],'$39', 'Man & Moda #316', 'POLO FIT', 'Step into refined comfort with the Man & Moda Polo Fit Pant – where smart style meets everyday ease. Designed for a tailored yet relaxed fit, this pant is perfect for both casual and semi-formal looks.', ['28','30',' 32 ','34 ','36','38'],['Same'],'pantsPage')">
 </div><div class=cardName>
-Man & Moda<!-- Product Title -->
-POLO FIT 
+<h3>Man & Moda</h3> <!-- Product Title -->
+<p>POLO FIT </p>
 </div>
  <div style="display: flex; justify-content: center; align-items: center; padding: 0 10px;">
     <p class="price">$39</p>
