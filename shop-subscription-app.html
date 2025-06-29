@@ -534,7 +534,7 @@
 .image-wrapper {
   position: relative;
   width: 100%;
-  padding-bottom: 125%; /* 4:5 ratio (height = 125% of width) */
+  padding-bottom: 100%; /* ✅ 1:1 square ratio */
   overflow: hidden;
   background-color: #f8f8f8;
 }
@@ -545,7 +545,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover; /* Ensures uniform cropping without stretching */
+  object-fit: cover; /* Crops image to fill square */
 }
 
     
