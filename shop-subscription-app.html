@@ -617,7 +617,7 @@
     
  </style>
 </head>
-<body>
+<body class="preload">
   <div class="container" id="mainContainer" style="margin:auto;">
     
     <div>
@@ -1929,13 +1929,13 @@
   </div>
 </div>
 
-  <body class="preload">
+  
   <div id="loadingScreen">
     <!-- replace with your own logo / GIF / static image -->
     <img src="https://see.fontimg.com/api/rf5/woG33/N2Y3Y2RhYTdiOGMwNGVjOGE5MWE1MTFiNGJjM2E4Y2Iub3Rm/RU5MWQ/redtrap-expanded-puo.png?r=fs&h=30&w=1000&fg=FFFFFF&bg=FFFFFF&tb=1&s=30"
          alt="Loading…" />
   </div>
-    </div>
+  
  
   
     <div id="adminControls" class="admin-controls" style="display:none;">
@@ -2506,6 +2506,18 @@ function addToCart(image = null, priceUSD = null, title = null) {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
+
+  const loader = document.getElementById('loadingScreen');
+
+  // small delay so the GIF / logo is actually visible
+  setTimeout(() => {
+    document.body.classList.remove('preload');  // unlock scrolling
+    loader.classList.add('fade-out');           // start CSS transition
+  }, 50);
+
+  // remove the node after the fade finishes
+  loader.addEventListener('transitionend', () => loader.remove());
+  
    updateAllPrices(); // initial
   // 🔹 Existing Filter Controls
   const filterControls = document.querySelectorAll(".filter-controls");
