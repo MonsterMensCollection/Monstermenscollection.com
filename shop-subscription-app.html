@@ -2168,7 +2168,7 @@ img.addEventListener('touchend', () => {
 });
 
 let cart = [];
-function showDescription(media = [], price, title = "No title", sdes = "No short description", description = "No description", sizesAvailable = ["M", "L", "XL"], colorsAvailable = [], category = null) {
+function showDescription(media = [], priceUSD, title = "No title", sdes = "No short description", description = "No description", sizesAvailable = ["M", "L", "XL"], colorsAvailable = [], category = null) {
   if (category) {
     // Push category state BEFORE description
     history.pushState({ page: category }, "", "#" + category);
@@ -2257,7 +2257,10 @@ function showDescription(media = [], price, title = "No title", sdes = "No short
   });
 
   // Update product info
-  document.getElementById("descPrice").textContent = price;
+  const descPriceEl = document.getElementById("descPrice");
+descPriceEl.dataset.basePrice = priceUSD;          // cache the raw USD
+ descPriceEl.textContent   = format(convert(priceUSD));
+
   document.getElementById("descName").textContent = title;
   document.getElementById("descSText").textContent = sdes;
   document.getElementById("descText").textContent = description;
@@ -2419,6 +2422,8 @@ if (!document.getElementById("descHeader")) {
     document.getElementById("cargosPage").style.display = "none";
     
     window.scrollTo(0, 0);
+
+  updateAllPrices();
 }
 
 
