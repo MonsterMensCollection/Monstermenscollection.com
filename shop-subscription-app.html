@@ -2,391 +2,2887 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>ENLY – Monster Men's Collection</title>
-
-  <!-- Firebase & Razorpay -->
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>ENLY</title>
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-firestore-compat.js"></script>
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+   <style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400&display=swap');
+    * {
+      font-family: 'Montserrat', sans-serif;
+     font-weight: 400;
 
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.gstatic.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet" />
-
-  <!-- ===== Inline CSS  =================================================== -->
-  <style>
-    :root {
-      --brand: #000;
-      --brand-light: #a9a9a9;
-      --bg: #fff;
-      --gray-100: #fafafa;
-      --gray-400: #ccc;
-      --gray-600: #777;
     }
 
-    *,
-    *::before,
-    *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: "Montserrat", sans-serif;
-    }
-
-    html,
     body {
-      height: 100%;
-      width: 100%;
-      overflow-x: hidden;
-      background-color: var(--bg);
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 400;
+      background-color: #ffffff;
+      padding-bottom: 130px ; 
+      margin:0;
+      margin-top:-14%;/* Adjust if your .bottom-nav is taller */
       padding-top: env(safe-area-inset-top);
       padding-bottom: env(safe-area-inset-bottom);
+      height: 100%;
+      overflow-x: hidden;
+      box-sizing: border-box;
+     }
+     
+     html, body {
+       overflow-x: hidden;
+     }
+     
+     /* Fixed slider section */
+     #sliderSection {
+       margin-left: -1%;
+       margin-right: -1%;
+     }
+     
+     .slider-wrapper {
+       margin-top: 0; /* Removed negative margin */
+     }
+     
+     .slider1 img {
+       width: 100%;
+       height: auto;
+       display: block;
+     }
+
+#cartPage,
+#profilePage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start; /* Avoid pushing down content */
+  text-align: center;
+  min-height: calc(100vh - 130px);
+}
+.filter-controls {
+  display: flex;
+  flex-wrap: nowrap; /* Force single line */
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin: 20px auto;
+  padding: 10px;
+  background-color: #ffffff;
+  border-radius: 0px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden; /* Prevent horizontal scroll */
+
+  /* 👉 Add these lines to make it float on scroll */
+ position: fixed;
+  top: 8%; /* Push below the fixed header (adjust if needed) */
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
+
+
+.filter-controls label {
+  font-weight: bold;
+  color: #333;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  font-size: 0.9rem;
+}
+
+.filter-controls select {
+  flex: 1 1 0;
+  min-width: 100%;
+  max-width: 100%;
+  padding: 6px 10px;
+  
+  border: none; /* Remove border */
+  outline: none; /* Remove outline on focus */
+  background-color: transparent; /* Transparent background */
+  font-size: 0.9rem;
+  color: #333;
+
+  appearance: none; /* Removes native styling in most browsers */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  cursor: pointer;
+}
+
+/* Mobile view adjustments */
+@media (max-width: 600px) {
+  .filter-controls {
+    padding: 8px;
+    gap: 8px;
+  }
+
+  .filter-controls label {
+    font-size: 0.85rem;
+  }
+
+  .filter-controls select {
+    font-size: 0.85rem;
+    min-width: 60px;
+    max-width: 120px;
+  }
+}
+
+      .containerA {
+      max-width:75%;
+      background: #fff;
+      padding: 0px;
+      border-radius: 0px;
+      margin:auto;  
     }
 
-    /* ----------------  Generic Elements ----------------  */
-    h1,
-    h2,
-    h3 {
-      font-weight: 600;
+    .container {
+      max-width: 75%;
+      background: #fff;
+      padding: 0px;
+      border-radius: 0px;
     }
-
     h1 {
-      font-size: 1.8rem;
-      margin-bottom: 1.25rem;
-      text-align: center;
+    font-size: 1.8rem;
+    text-align: center;
+    margin-top: 0px;
+    margin-bottom:20px;
     }
-
     h2 {
-      font-size: 1.4rem;
+   text-align: center;
+   margin-top: 0 ;
+   margin-bottom: 20px;
+   }
+
+    .info,
+    .confirmation,
+    .status-message {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 1rem;
+      color: #555;
     }
 
-    h3 {
-      font-size: 1.1rem;
+    .form-section {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
     }
 
-    a {
-      color: #007bff;
+    .form-section input {
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 0px;
+    }
+
+    .form-section button,
+    .form-section a {
+      background-color: #000000;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 0px;
+      cursor: pointer;
+      font-size: 1rem;
+      text-align: center;
       text-decoration: none;
     }
 
-    a:hover {
-      color: #0056b3;
+    .form-section button:hover,
+    .form-section a:hover {
+      background-color: #A9A9A9;
     }
 
-    button,
-    .btn {
+    .toggle-link {
+      text-align: center;
       cursor: pointer;
-      border: none;
-      background: var(--brand);
-      color: #fff;
-      padding: 0.75rem 1rem;
-      font-size: 1rem;
-      transition: background 0.2s;
+      color: #000000;
     }
 
-    button:hover,
-    .btn:hover {
-      background: var(--brand-light);
-    }
-
-    /* ----------------  Layout Helpers ----------------  */
-    .container {
-      max-width: 75%;
-      margin: auto;
-      padding: 0;
-    }
-
-    .flex-center {
+    .product-list {
       display: flex;
-      align-items: center;
-      justify-content: center;
+      flex-direction: column;
+      gap: 0px;
+      margin-top: 0px;
     }
 
-    .hidden {
-      display: none !important;
+    .product-item {
+      padding: 0px;
+      border: 0px solid #ddd;
+      border-radius: 0px;
+      background: #fafafa;
     }
 
-    /* =====================================================
-       COMPONENTS / SECTIONS
-       =====================================================*/
-
-    /*  ---- Slider  ---- */
-    #sliderSection {
-      margin-left: -1%;
-      margin-right: -1%;
+    .product-item h3 {
+      margin-bottom: 0px;
+      font-size: 1.2rem;
     }
 
-    .slider1 img {
-      width: 100%;
-      height: auto;
-      display: block;
+    
+    
+    .slider img{
+        flex:1 0 100%;
+        scroll-snap-align: start;
+        object-fit: cover;
+    }
+    .slider-nav {
+        display: flex;
+        column-gap: 1rem;
+        position: absolute;
+        bottom: 1.25rem;
+        left: 50%;
+        transform: transulateX(-50%);
+        z-index: 1;
+        animation: slider 30s ease-in-out infinite alternate;
+    }
+    .slide-nav a {
+        width: 0.5rem;
+        height: 0.5rem;
+        border-radius: 50%;
+        background-color: #fff;
+        opacity: 0.75;
+        transition: opacity ease 250ms;
+    }
+    .slide-nav a:hover {
+        opacity: 1;
+    }
+    @keyframes slider{
+        0%{transform: transulateX(0%);}
+        10%{transform: transulateX(-100%);}
+        20%{transform: transulateX(-100%);}
+        30%{transform: transulateX(-200%);}
+        40%{transform: transulateX(-200%);}
+        50%{transform: transulateX(-200%);}
+        60%{transform: transulateX(-300%);}
+        70%{transform: transulateX(-300%);}
+        80%{transform: transulateX(-300%);}
+        90%{transform: transulateX(0%);}
+        100%{transform: transulateX(0%);}
+    }
+    .admin-controls {
+      margin-top: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 0px;
+      background-color: #f0f8ff;
     }
 
-    @keyframes slider {
-      0% {
-        transform: translateX(0%);
-      }
-      10%,
-      20% {
-        transform: translateX(-100%);
-      }
-      30%,
-      50% {
-        transform: translateX(-200%);
-      }
-      60%,
-      90% {
-        transform: translateX(-300%);
-      }
-      100% {
-        transform: translateX(0%);
-      }
+    .admin-controls h3 {
+      margin-bottom: 0px;
     }
 
-    /*  ---- Product Grid  ---- */
-    .product-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 0.75rem 0;
-      padding: 0 0.5rem;
+    .product-item.hidden {
+      display: none;
     }
+
+    #logoutProductsBtn {
+      margin-top: 30px;
+    }
+    iframe{
+      border-radius: 0px;
+    } 
+      #productsPage {
+      display: none;
+      margin-top:0px;
+    }
+    .no-box 
+    
+    { 
+    box-shadow: none !important;
+    background: transparent !important;
+    border-radius: 0 !important; 
+    }
+
+.product-card .cardName h3,
+.product-card .cardName p,
+.product-card .price {
+  margin: 0;
+  padding: 0;
+  line-height: 1.2; /* Optional: tighter spacing */
+}
+
+.product-card .cardName {
+  margin-bottom: 0;
+   font-size:0.8rem;/* ensure no space below cardName */
+}
+
+.product-card .price {
+  margin-top: 0; /* already set, but reaffirm */
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  width: 100%;
+  row-gap: 12px;     /* Space between rows */
+  column-gap: 0;     /* No space between columns */
+  margin-left: 7px;
+  margin-right: 7px;
+}
 
     .product-card {
-      background: var(--bg);
+      background-color: #fff;
+      border-radius: 0px;
+      padding: 0px;
       text-align: center;
     }
 
-    .image-wrapper {
-      position: relative;
+    .product-card img {
       width: 100%;
-      padding-bottom: 125%;
-      background: var(--gray-100);
-      overflow: hidden;
+      height: auto;
+      border-radius: 0px;
     }
+    .with-top-margin {
+  margin-top: 20% !important;
+   }
+.bottom-nav { 
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 6.5%; /* Fixed height */
+  background-color: white;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;  /* ✅ vertical centering */
+  padding-bottom: env(safe-area-inset-bottom); /* safe area support */
+  z-index: 1000;
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+}
 
-    .image-wrapper img {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
+.bottom-nav a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; /* ✅ vertical center inside nav */
+  height: 100%; /* occupy full nav height */
+  text-decoration: none;
+  color: #007bff;
+}
 
-    .product-card .cardName {
-      text-align: left;
-      padding: 0.5rem;
-    }
 
-    .product-card .price {
-      text-align: left;
-      font-size: 0.9rem;
-      margin-left: 0.5rem;
-    }
+.bottom-nav a:hover {
+ color: #0056b3;
+}
+.centered-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 130px);
+  text-align: center;
+}
 
-    /*  ---- Fixed Header & Filter Controls  ---- */
-    #fixed-header {
+@media (max-width: 768px) {
+  #cartPage:focus-within {
+    padding-bottom: 200px; /* ensures there's space to scroll */
+  }
+  
+}
+
+.bottom-nav a {
+  /* Add these 2 lines */
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+}
+
+.bottom-nav a:active,
+.bottom-nav a:focus {
+  /* Add this line to override mobile browser defaults */
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Optional: Prevent blue highlight on images */
+.bottom-nav img {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+ #fixed-header {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
-      background: var(--bg);
+      background-color: white; /* optional: background behind image */
       z-index: 9999;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 1.25rem;
-      padding: 13% 0 0.625rem;
+    
+       flex-direction: row;
+    align-items: center;
+     justify-content: center; 
+      padding-top: 13%;
+      padding-bottom: 10px;
+     gap: 20px;
     }
 
-    .filter-controls {
-      position: fixed;
-      top: 8%;
-      left: 0;
-      right: 0;
-      z-index: 1000;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.625rem;
-      background: var(--bg);
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-    }
+.select-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
 
-    .filter-controls select {
-      flex: 1 1 0;
-      padding: 0.375rem 0.625rem;
-      background: transparent;
-      border: none;
-      font-size: 0.9rem;
-      cursor: pointer;
-    }
+.select-wrapper::after {
+  content: '▾'; /* Down arrow symbol */
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: #888;
+}
 
     .vertical-divider {
-      width: 1px;
-      height: 30px;
-      background: var(--gray-400);
-    }
+  width: 1px;
+  height: 30px;
+  background-color: #ccc;
+  margin: 0 10px;
+}
 
-    /*  ---- Bottom Navigation  ---- */
-    .bottom-nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 6.5%;
-      background: var(--bg);
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      border-top: 1px solid var(--gray-400);
-      box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
-      z-index: 1000;
-    }
+.hide-on-scroll {
+  transform: translateY(-100%);
+  transition: transform 0.3s ease-in-out;
+}
 
-    .bottom-nav a {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-      -webkit-tap-highlight-color: transparent;
-      outline: none;
-    }
+.hide-bottom-nav {
+  transform: translateY(100%);
+  transition: transform 0.3s ease-in-out;
+}
+ .hide-shippingBar-nav {
+  transform: translateY(1000%);
+  transition: transform 0.3s ease-in-out;
+}   
+.hide-filter-bar {
+  transform: translateY(-100%);
+  transition: transform 0.3s ease;
+}
+ #loginSection,
+#signupSection {
+  margin-top: 150px; /* or adjust as needed */
+}
 
-    /*  ---- Scrolling Shipping Banner  ---- */
-    .scrolling-banner {
-      position: fixed;
-      bottom: 109px;
-      width: 100%;
-      background: var(--brand);
-      color: #fff;
-      font-size: 14px;
-      overflow: hidden;
-      z-index: 9999;
-      white-space: nowrap;
-      padding: 5px 0;
-    }
+.scrolling-banner {
+  position: fixed;
+  bottom: 109px;
+  width: 100%;
+  background: #000;
+  color: #fff;
+  font-size: 14px;
+  overflow: hidden;
+  z-index: 9999;
+  white-space: nowrap;
+  padding: 5px 0;
 
-    .scrolling-text {
-      display: inline-block;
-      padding-left: 100%;
-      animation: scrollText 25s linear infinite;
-    }
+}
 
-    @keyframes scrollText {
-      0% {
-        transform: translateX(0);
-      }
-      100% {
-        transform: translateX(-100%);
-      }
-    }
+.scrolling-text {
+  display: inline-block;
+  padding-left: 100%;
+  animation: scrollText 25s linear infinite;
+}
 
-    /*  ---- Visibility Helpers (scroll hide/show) ---- */
-    .hide-bottom-nav {
-      transform: translateY(100%);
-      transition: transform 0.3s ease-in-out;
-    }
+@keyframes scrollText {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
+}
 
-    .hide-shippingBar-nav {
-      transform: translateY(1000%);
-      transition: transform 0.3s ease-in-out;
-    }
+.cart-bottom-bar {
+  position: fixed;
+  bottom: 130px;
+  left: 0;
+  height: 110px;
+  width: 100%;
+  background-color: white;
+  border-top: 1px solid #ddd;
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
 
-    .hide-filter-bar {
-      transform: translateY(-100%);
-      transition: transform 0.3s ease;
-    }
+.cart-bar-inner {
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch; /* Make children stretch to width */
+  padding: 10px 20px;
+  box-sizing: border-box;
+  gap: 10px;
+}
 
-    /*  ---- Spinner (shown while waiting for Firebase) ---- */
-    body.waiting-for-auth {
-      visibility: hidden;
-    }
-  </style>
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #000;
+}
+
+.amount {
+  text-align: right;
+}
+
+.label {
+  text-align: left;
+}
+
+.cart-bar-inner button {
+  background-color: #000;
+  color: #fff;
+  padding: 12px;
+  border: none;
+  font-weight: bold;
+  border-radius: 0px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.cart-bar-inner button:hover {
+  background-color: #444;
+}
+
+.image-wrapper {
+  position: relative;
+  width: 100%;
+  padding-bottom: 125%; /* ✅ 1:1 square ratio */
+  overflow: hidden;
+  background-color: #f8f8f8;
+}
+
+.image-wrapper img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit:  cover; /* <-- Shows full image without cropping */
+}
+.product-card .cardName {
+  text-align: left;
+  padding: 10px 8px 0 8px; /* ⬅️ Padding creates gap from image and aligns text */
+}
+
+.product-card .cardName h3 {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #000;
+}
+
+.product-card .cardName p {
+  margin-top: 4px;  /* ⬅️ Small gap between Man & Moda and POLO FIT */
+  font-size: 0.9rem;
+  color: #777; /* ⬅️ Gray text */
+}
+
+.product-card .price {
+  text-align: left;
+  margin-top: 4px; 
+  margin-left: 8px;
+  font-size: 0.9rem;
+  color: #000;
+}
+
+    
+ </style>
 </head>
-
-<body class="waiting-for-auth">
-  <!-- =====================================================
-       PAGE WRAPPER
-       =====================================================-->
-  <div id="mainContainer" class="container with-top-margin">
-    <!-- ============ AUTH SECTIONS ============ -->
-    <section id="loginSection" class="form-section">
-      <h1 id="title">Login</h1>
+<body>
+  <div class="container" id="mainContainer" style="margin:auto;">
+    
+    <div>
+   
+    
+    <div id="loginSection" class="form-section" >
+        <h1 id="title">Login</h1>
       <input type="email" id="email" placeholder="Email" />
       <input type="password" id="password" placeholder="Password" />
       <button id="emailLoginBtn">Login</button>
       <a href="#" id="forgotPasswordLink">Forgot Password?</a>
       <div id="statusMessage" class="status-message"></div>
       <p class="toggle-link" onclick="toggleForm()">Don't have an account? Sign Up</p>
-      <div style="margin-top: 30px; text-align: center; font-size: 14px; color: var(--gray-600);">
-        <a href="https://iridescent-sawine-8f375c.netlify.app/privacy-policy" target="_blank">Privacy Policy</a>
-      </div>
-    </section>
+     
+                 <div style="margin-top: 30px; padding: 10px; text-align: center; font-size: 14px; color: #555;">
+     <a href="https://iridescent-sawine-8f375c.netlify.app/privacy-policy" 
+   target="_blank" style="color: #007bff; background: none; border: none; padding: 0; margin: 0; box-shadow: none; font-weight: normal;"> Privacy Policy</a> 
+  </div>
 
-    <section id="signupSection" class="form-section hidden">
-      <h1 id="signupTitle">Sign Up</h1>
-      <input type="text" id="signupName" placeholder="Enter your name" />
+    </div>
+   
+    <div id="signupSection" class="form-section" style="display: none;">
+        <h1 id="title">Sign Up</h1>
+      <input type="text" id="signupName" placeholder="Enter your name" required>
       <input type="email" id="signupEmail" placeholder="Email" />
       <input type="password" id="signupPassword" placeholder="Password" />
       <button id="emailSignupBtn">Sign Up</button>
       <p class="toggle-link" onclick="toggleForm()">Already have an account? Login</p>
-      <div style="margin-top: 30px; text-align: center; font-size: 14px; color: var(--gray-600);">
-        <a href="https://iridescent-sawine-8f375c.netlify.app/privacy-policy" target="_blank">Privacy Policy</a>
-      </div>
-    </section>
+      
+      <div style="margin-top: 30px; padding: 10px; text-align: center; font-size: 14px; color: #555;">
+    <a href="https://iridescent-sawine-8f375c.netlify.app/privacy-policy" 
+   target="_blank" style="color: #007bff; background: none; border: none; padding: 0; margin: 0; box-shadow: none; font-weight: normal;">Privacy Policy</a>
+  </div>
+      
+    </div>
+    
+   
+  
+  
+</div> 
+    <div id="subscriptionSection" style="display:none;">
+      <p class="info">Get any 1 Shirt + any 1 Pant at ₹999 <br><h3><center>WHOLESALE PRICE</h3></p>
+      <form class="form-section" id="subscriptionForm">
+        <button type="submit">Subscribe at ₹2/month </button>
+      </form>
+      <div class="confirmation" id="confirmationMessage"></div>
+      <p class="form-section">
+        <button id="logoutBtn">Logout</button>
+      </p>
+    </div>
+</div>
 
-    <!-- ============ PRODUCTS PLACEHOLDER (loaded after auth) ============ -->
-    <section id="productsPage" class="hidden">
-      <!-- Put your slider / category sections etc. here -->
-      <div id="sliderSection">
-        <div class="slider1">
-          <img src="https://raw.githubusercontent.com/MonsterMensCollection/nOW/refs/heads/main/1.png" alt="Hero" />
-        </div>
-      </div>
-      <!-- More content ... (kept minimal here for brevity) -->
-    </section>
+   <div id="productsPage" >
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+        <div id="shirtsPage" style="display: none; text-align: center;margin-top:13%;">
+  
+   <div id="fixed-header">
+  <img src="https://see.fontimg.com/api/rf5/woG33/N2Y3Y2RhYTdiOGMwNGVjOGE5MWE1MTFiNGJjM2E4Y2Iub3Rm/c2hpcnQ/redtrap-expanded-puo.png?r=fs&h=28&w=1000&fg=000000&bg=FFFFFF&tb=1&s=28"
+       style="height: auto;margin-right:24%;" />
+
+  <img src="https://see.fontimg.com/api/rf5/woG33/N2Y3Y2RhYTdiOGMwNGVjOGE5MWE1MTFiNGJjM2E4Y2Iub3Rm/VC1zaGlydA/redtrap-expanded-puo.png?r=fs&h=15&w=1000&fg=000000&bg=FFFFFF&tb=1&s=15"
+       style="height: auto;" />
+    </div>   
+    <br>
+    <br>
+    <br>
+<!-- Sorting and Filtering Controls -->
+<div class="filter-controls" id="filterControlsShirts" data-target="shirtsPage">
+  <div class="select-wrapper">
+  <select class="sortPrice">
+    <option value="default">Sort</option>
+    <option value="asc">Low to High</option>
+    <option value="desc">High to Low</option>
+  </select>
+</div>
+  
+  <div class="vertical-divider"></div>
+
+ <div class="select-wrapper"> 
+  <select class="filterSize">
+    <option value="all">All</option>
+    <option value="M">M</option>
+    <option value="L">L</option>
+    <option value="XL">XL</option>
+    <option value="XXL">XXL</option>
+  </select>
+</div>
+  </div>
+<div style="height: 60px;"></div>
+
+          <br>
+    <br>
+ <div class="product-grid">
+
+
+ <!-- 101 -->
+  <div class="product-card">
+     <div class="image-wrapper">
+<img src="https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/s1.jpeg" alt="Shirt 1" onclick="showDescription([
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/s1.jpeg' },
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/s1r.jpeg' },
+],'$37', 'BODAK #101', 'CHECK SHIRT', 'The BODAK⚡️ Check Shirt brings bold attitude with a relaxed edge. Crafted from a comfortable cotton blend, it features a lapel collar, buttoned cuffs, and a clean button-up front. The standout? A striking back print that turns heads every time you walk away.', ['s','M','L','XL'],['Same'],'shirtsPage')">
+</div><div class=cardName>
+<h3>BODAK</h3> <!-- Product Title -->
+<p>CHECK SHIRT</p>
+</div>
+ <div style="display: flex; justify-content: center; align-items: center; padding: 0 10px;">
+    <p class="price">$37</p>
+  </div>
+</div>
+
+
+   
+
+<!-- 102 -->
+  <div class="product-card">
+     <div class="image-wrapper">
+<img src="https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/s2.jpeg" alt="Shirt 1" onclick="showDescription([
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/s2.jpeg' },
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/s2r.jpeg' },
+],'$37', 'BODAK #102', 'CHECK SHIRT', 'The BODAK⚡️ Check Shirt brings bold attitude with a relaxed edge. Crafted from a comfortable cotton blend, it features a lapel collar, buttoned cuffs, and a clean button-up front. The standout? A striking back print that turns heads every time you walk away.', ['s','M','L','XL'],['Same'],'shirtsPage')">
+</div><div class=cardName>
+<h3>BODAK</h3> <!-- Product Title -->
+<p>CHECK SHIRT</p>
+</div>
+ <div style="display: flex; justify-content: center; align-items: center; padding: 0 10px;">
+    <p class="price">$37</p>
+  </div>
+</div>
+
+
+
+   
+  <!-- 103 -->
+  <div class="product-card">
+     <div class="image-wrapper">
+<img src="https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/s3r.jpeg" alt="Shirt 1" onclick="showDescription([
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/s3r.jpeg' },
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/s3.jpeg' },
+],'$37', 'BODAK #103', 'CHECK SHIRT', 'The BODAK⚡️ Check Shirt brings bold attitude with a relaxed edge. Crafted from a comfortable cotton blend, it features a lapel collar, buttoned cuffs, and a clean button-up front. The standout? A striking back print that turns heads every time you walk away.', ['s','M','L','XL'],['Same'],'shirtsPage')">
+</div><div class=cardName>
+<h3>BODAK</h3> <!-- Product Title -->
+<p>CHECK SHIRT</p>
+</div>
+ <div style="display: flex; justify-content: center; align-items: center; padding: 0 10px;">
+    <p class="price">$37</p>
+  </div>
+</div>
+
+
+   
+ <!-- 104 -->
+  <div class="product-card">
+     <div class="image-wrapper">
+<img src="https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/s4.jpeg" alt="Shirt 1" onclick="showDescription([
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/s4.jpeg' },
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/s4r.jpeg' },
+],'$37', 'BODAK #104', 'CHECK SHIRT', 'The BODAK⚡️ Check Shirt brings bold attitude with a relaxed edge. Crafted from a comfortable cotton blend, it features a lapel collar, buttoned cuffs, and a clean button-up front. The standout? A striking back print that turns heads every time you walk away.', ['s','M','L','XL'],['Same'],'shirtsPage')">
+</div>
+    <div class=cardName>
+<h3>BODAK</h3> <!-- Product Title -->
+<p>CHECK SHIRT</p>
+</div>
+ <div style="display: flex; justify-content: center; align-items: center; padding: 0 10px;">
+    <p class="price">$37</p>
+  </div>
+</div>
+
+
+   
+  <!-- 105 -->
+  <div class="product-card">
+     <div class="image-wrapper">
+<img src="https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/s5.jpeg" alt="Shirt 1" onclick="showDescription([
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/s5.jpeg' },
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/s5r1.jpeg' },
+   { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/s5r2.png' },
+],'$44', '1947 #105', 'LINEN SHIRT', 'Crafted from lightweight and breathable linen fabric, this shirt is your go-to for warm days and relaxed vibes. Designed for a clean, laid-back silhouette, it pairs easily with anything — from casual trousers to tailored shorts.', ['s','M','L','XL'],['1', '2', '3','4','5'],'shirtsPage')">
+</div>
+    <div class=cardName>
+<h3>1947</h3> <!-- Product Title -->
+<p>LINEN SHIRT</p>
+</div>
+ <div style="display: flex; justify-content: center; align-items: center; padding: 0 10px;">
+    <p class="price">$44</p>
+  </div>
+</div>
+
+
+     <!-- 106 -->
+  <div class="product-card">
+     <div class="image-wrapper">
+<img src="https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/s6.jpeg" alt="Shirt 1" onclick="showDescription([
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/s6.jpeg' },
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/s6r.png' },
+],'$44', '1947 #106', 'LINEN SHIRT', 'Crafted from lightweight and breathable linen fabric, this shirt is your go-to for warm days and relaxed vibes. Designed for a clean, laid-back silhouette, it pairs easily with anything — from casual trousers to tailored shorts.', ['s','M','L','XL'],['1', '2', '3','4','5','6'],'shirtsPage')">
+</div><div class=cardName>
+<h3>1947</h3> <!-- Product Title -->
+<p>LINEN SHIRT</p>
+</div>
+ <div style="display: flex; justify-content: center; align-items: center; padding: 0 10px;">
+    <p class="price">$44</p>
+  </div>
+</div>
+   
+   
+     
+
+
+  
+</div>
+   <br>
+   <br>
+   <br>        
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="tshirtsPage" style="display: none;text-align: center;margin-top:13%;">
+    
+     <div id="fixed-header">
+    <img src="https://see.fontimg.com/api/rf5/woG33/N2Y3Y2RhYTdiOGMwNGVjOGE5MWE1MTFiNGJjM2E4Y2Iub3Rm/VC1zaGlydA/redtrap-expanded-puo.png?r=fs&h=28&w=1000&fg=000000&bg=FFFFFF&tb=1&s=28"
+       style="height: auto;margin-right:15%;" />
+
+  <img src="https://see.fontimg.com/api/rf5/woG33/N2Y3Y2RhYTdiOGMwNGVjOGE5MWE1MTFiNGJjM2E4Y2Iub3Rm/c2hpcnQ/redtrap-expanded-puo.png?r=fs&h=15&w=1000&fg=000000&bg=FFFFFF&tb=1&s=15"
+       style="height: auto;" />
+    </div>
+    
+    <br>
+    <br>
+    <br>
+<!-- Sorting and Filtering Controls -->
+<div class="filter-controls" id="filterControlsTshirts" data-target="tshirtsPage">
+  <div class="select-wrapper">
+  <select class="sortPrice">
+    <option value="default">Sort</option>
+    <option value="asc">Low to High</option>
+    <option value="desc">High to Low</option>
+  </select>
+</div>
+  
+  <div class="vertical-divider"></div>
+
+ <div class="select-wrapper"> 
+  <select class="filterSize">
+    <option value="all">All</option>
+    <option value="M">M</option>
+    <option value="L">L</option>
+    <option value="XL">XL</option>
+    <option value="XXL">XXL</option>
+  </select>
+</div>
+  </div>
+<div style="height: 60px;"></div>
+
+
+  <div class="product-grid">
+   
+   <!-- 201 -->
+      
+  <div class="product-card">
+     <div class="image-wrapper">
+<img src="https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/1r.jpeg" alt="TShirt 1" onclick="showDescription([
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/1r.jpeg' },
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/1.png' },
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/2r.jpeg' },
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/2.png' },
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/3r.jpeg' },
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/3.png' },
+], '$26', 'NORDICH #201', 'FIVE SLEEVES BACK PRINT', 'Chaos meets craftsmanship in this JOKER Edition of the iconic NORDICH Five Sleeves Tee. With an unpredictable twist — five functional sleeves and a wild back print — this piece breaks all rules of design, just like the Joker breaks society’s norms.', ['M','L', 'XL','XXL'],['1', '2', '3','4','5','6'])">
+</div><div class=cardName>
+<h3>NORDICH</h3> <!-- Product Title -->
+<p>FIVE SLEEVES BACK PRINT</p>
+</div>
+ <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 10px;">
+    <p class="price">$26</p>
+  </div>
+  </div>
+  
+<!-- 202 -->
+      
+  <div class="product-card">
+     <div class="image-wrapper">
+<img src="https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/4r.jpeg" alt="TShirt 1" onclick="showDescription([
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/4r.jpeg' },
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/4.png' },
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/5r.jpeg' },
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/5.png' },
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/6r.jpeg' },
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/6.png' },
+], '$26', 'NORDICH #202', 'FIVE SLEEVES BACK PRINT', 'Power. Precision. Pure attitude. The RUSTIC PORSCHE Edition of the NORDICH Five Sleeves Tee brings the raw soul of vintage speed machines to your everyday fit. Featuring five functional sleeves and a gritty Porsche-inspired back print, this drop is built for those who chase legacy, not trends.', ['M','L', 'XL','XXL'],['1', '2', '3','4','5','6'])">
+</div><div class=cardName>
+<h3>NORDICH</h3> <!-- Product Title -->
+<p>FIVE SLEEVES BACK PRINT</p>
+</div>
+ <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 10px;">
+    <p class="price">$26</p>
+  </div>
   </div>
 
-  <!-- ============ FIXED UI ELEMENTS ============ -->
-  <div id="shippingBar" class="scrolling-banner">
-    <div class="scrolling-text">
-      🎉 Free Shipping on Orders $99 and Above! 🎉 Crafted Just for You!
+    
+<!-- 203 -->
+      
+  <div class="product-card">
+     <div class="image-wrapper">
+<img src="https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/7r.jpeg" alt="TShirt 1" onclick="showDescription([
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/7r.jpeg' },
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/7.png' },
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/8r.jpeg' },
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/8.png' },
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/9r.jpeg' },
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/9.png' },
+], '$26', 'NORDICH #203', 'FIVE SLEEVES BACK PRINT', 'Step into the tapestry of time with the Anatolian Rug Edition of the NORDICH Five Sleeves Tee. Inspired by ancient Turkish rug patterns, this piece brings centuries-old art into the language of bold, modern streetwear. With five rebellious sleeves and a back print echoing Anatolian tradition, it’s where heritage meets high heat.', ['M','L', 'XL','XXL'],['1', '2', '3','4','5','6'])">
+</div><div class=cardName>
+<h3>NORDICH</h3> <!-- Product Title -->
+<p>FIVE SLEEVES BACK PRINT</p>
+</div>
+ <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 10px;">
+    <p class="price">$26</p>
+  </div>
+  </div>
+
+ <!-- 204 -->
+      
+  <div class="product-card">
+     <div class="image-wrapper">
+<img src="https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/10.jpeg" alt="TShirt 1" onclick="showDescription([
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/10.jpeg' },
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/10r.jpeg' },
+], '$26', 'Ballucci®️ #204', 'FIVE SLEEVES BACK PRINT', 'Unleash street-speed energy with the FERRARI ⚡️Oversized Tee by Ballucci®️. Designed for those who live fast and dress louder, this tee features a bold oversized silhouette, classic round neck, and short sleeves for ultimate comfort and edge.', ['S','M','L', 'XL'],['Same'])">
+</div><div class=cardName>
+<h3>Ballucci®️</h3> <!-- Product Title -->
+<p>FIVE SLEEVES BACK PRINT</p>
+</div>
+ <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 10px;">
+    <p class="price">$26</p>
+  </div>
+  </div>   
+  
+
+     <!-- 205 -->
+      
+  <div class="product-card">
+     <div class="image-wrapper">
+<img src="https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/11.jpeg" alt="TShirt 1" onclick="showDescription([
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/11.jpeg' },
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/11r.jpeg' },
+], '$26', 'Ballucci®️ #205', 'FIVE SLEEVES BACK PRINT', 'Step into the future of streetwear with the ASTON MARTIN⚡️Oversized Tee by Ballucci®️. Inspired by cosmic energy and engineered for everyday comfort, this tee blends space-age vibes with urban edge. Featuring a relaxed oversized fit, round neck, and short sleeves, it’s your go-to for bold, effortless style.', ['S','M','L', 'XL'],['Same'])">
+</div><div class=cardName>
+<h3>Ballucci®️</h3> <!-- Product Title -->
+<p>FIVE SLEEVES BACK PRINT</p>
+</div>
+ <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 10px;">
+    <p class="price">$26</p>
+  </div>
+  </div>   
+
+
+ <!-- 206 -->
+      
+  <div class="product-card">
+     <div class="image-wrapper">
+<img src="https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/12.jpeg" alt="TShirt 1" onclick="showDescription([
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/12.jpeg' },
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/12r.jpeg' },
+], '$26', 'Ballucci®️ #206', 'FIVE SLEEVES BACK PRINT', 'The PORSCHE CLASSIC ⚡️Oversized Tee by Ballucci®️ brings the legacy of speed to the streets. Featuring a relaxed oversized silhouette, round neck, and short sleeves, this tee blends luxury car culture with clean streetwear energy.', ['S','M','L', 'XL'],['Same'])">
+</div><div class=cardName>
+<h3>Ballucci®️</h3> <!-- Product Title -->
+<p>FIVE SLEEVES BACK PRINT</p>
+</div>
+ <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 10px;">
+    <p class="price">$26</p>
+  </div>
+  </div>   
+
+
+     <!-- 207 -->
+      
+  <div class="product-card">
+     <div class="image-wrapper">
+<img src="https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/13.jpeg" alt="TShirt 1" onclick="showDescription([
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/13.jpeg' },
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/13r.jpeg' },
+], '$26', 'Ballucci®️ #207', 'FIVE SLEEVES BACK PRINT', 'Fuel your streetwear game with the Ferrari ⚡️Oversized Tee by Ballucci®️. Built for those who live life in the fast lane, this tee combines a bold oversized fit, round neck, and short sleeves with the spirit of Italian speed and precision.', ['S','M','L', 'XL'],['Same'])">
+</div><div class=cardName>
+<h3>Ballucci®️</h3> <!-- Product Title -->
+<p>FIVE SLEEVES BACK PRINT</p>
+</div>
+ <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 10px;">
+    <p class="price">$26</p>
+  </div>
+  </div>   
+
+
+  <!-- 208 -->
+      
+  <div class="product-card">
+     <div class="image-wrapper">
+<img src="https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/14.jpeg" alt="TShirt 1" onclick="showDescription([
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/14.jpeg' },
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/14r.jpeg' },
+], '$26', 'Ballucci®️ #208', 'FIVE SLEEVES BACK PRINT', 'Strike with style in the MARLBORO ⚡️Oversized Tee by Ballucci®️ — where vintage racing vibes meet bold streetwear energy. Featuring a relaxed oversized fit, classic round neck, and short sleeves, this tee channels the attitude of 90s motorsport legends into everyday drip.', ['S','M','L', 'XL'],['Same'])">
+</div><div class=cardName>
+<h3>Ballucci®️</h3> <!-- Product Title -->
+<p>FIVE SLEEVES BACK PRINT</p>
+</div>
+ <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 10px;">
+    <p class="price">$26</p>
+  </div>
+  </div>   
+
+
+      <!-- 209 -->
+      
+  <div class="product-card">
+     <div class="image-wrapper">
+<img src="https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/15.jpeg" alt="TShirt 1" onclick="showDescription([
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/15.jpeg' },
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/15r.jpeg' },
+], '$26', 'Ballucci®️ #209', 'FIVE SLEEVES BACK PRINT', 'The Ferrari Oversized Tee from Ballucci®️ brings the thrill of the track to the streets. With a relaxed oversized fit, round neck, and short sleeves, this piece captures the spirit of high performance and bold fashion in one powerful look.', ['S','M','L', 'XL'],['Same'])">
+</div><div class=cardName>
+<h3>Ballucci®️</h3> <!-- Product Title -->
+<p>FIVE SLEEVES BACK PRINT</p>
+</div>
+ <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 10px;">
+    <p class="price">$26</p>
+  </div>
+  </div>   
+
+
+  <!-- 210 -->
+      
+  <div class="product-card">
+     <div class="image-wrapper">
+<img src="https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/16.jpeg" alt="TShirt 1" onclick="showDescription([
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/16.jpeg' },
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/16r.jpeg' },
+], '$26', 'Ballucci®️ #210', 'FIVE SLEEVES BACK PRINT', 'Inspired by the legacy of performance and style, the Ballucci®️ PORSCHE Oversized Tee delivers a bold silhouette with timeless energy. Featuring a comfortable oversized fit, round neck, and short sleeves, this tee fuses automotive excellence with everyday streetwear.', ['S','M','L', 'XL'],['Same'])">
+</div><div class=cardName>
+<h3>Ballucci®️</h3> <!-- Product Title -->
+<p>FIVE SLEEVES BACK PRINT</p>
+</div>
+ <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 10px;">
+    <p class="price">$26</p>
+  </div>
+  </div>   
+
+
+ <!-- 211 -->
+      
+  <div class="product-card">
+     <div class="image-wrapper">
+<img src="https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/17.jpeg" alt="TShirt 1" onclick="showDescription([
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/17.jpeg' },
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/17r.jpeg' },
+], '$26', 'Ballucci®️ #211', 'FIVE SLEEVES BACK PRINT', 'The PORSCHE ⚡️Oversized Tee from Ballucci®️ captures the essence of speed, luxury, and street-ready fashion. With a relaxed oversized fit, round neck, and short sleeves, this piece blends automotive power with bold everyday style.', ['S','M','L', 'XL'],['Same'])">
+</div><div class=cardName>
+<h3>Ballucci®️</h3> <!-- Product Title -->
+<p>FIVE SLEEVES BACK PRINT</p>
+</div>
+ <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 10px;">
+    <p class="price">$26</p>
+  </div>
+  </div>   
+
+
+<!-- 212 -->
+      
+  <div class="product-card">
+     <div class="image-wrapper">
+<img src="https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/18.jpeg" alt="TShirt 1" onclick="showDescription([
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/18.jpeg' },
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/18r.jpeg' },
+], '$26', 'Ballucci®️ #212', 'FIVE SLEEVES BACK PRINT', 'Feel the rush of motorsport heritage in the BMW M ⚡️Oversized Tee by Ballucci®️. Designed for speed lovers and streetwear heads, this tee features a relaxed oversized fit, classic round neck, and short sleeves — delivering high-performance vibes with everyday comfort.', ['S','M','L', 'XL'],['Same'])">
+</div><div class=cardName>
+<h3>Ballucci®️</h3> <!-- Product Title -->
+<p>FIVE SLEEVES BACK PRINT</p>
+</div>
+ <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 10px;">
+    <p class="price">$26</p>
+  </div>
+  </div>   
+
+
+
+    <!-- 213-->
+      
+  <div class="product-card">
+     <div class="image-wrapper">
+<img src="https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/19.jpeg" alt="TShirt 1" onclick="showDescription([
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/19.jpeg' },
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/19r.jpeg' },
+], '$26', 'Ballucci®️ #212', 'FIVE SLEEVES BACK PRINT', 'Unleash iconic racing heritage with the SCUDERIA Ferrari Oversized Tee from Ballucci®️. Inspired by the legendary F1 team, this tee brings trackside adrenaline to streetwear fashion — with a bold oversized fit, round neck, and short sleeves for all-day comfort and presence.', ['S','M','L', 'XL'],['Same'])">
+</div><div class=cardName>
+<h3>Ballucci®️</h3> <!-- Product Title -->
+<p>FIVE SLEEVES BACK PRINT</p>
+</div>
+ <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 10px;">
+    <p class="price">$26</p>
+  </div>
+  </div>   
+
+    
+    
+</div>
+   <br>
+   <br>
+   <br> 
+ </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="pantsPage" style="display: none;text-align: center;margin-top:13%;">
+    
+    <div id="fixed-header">
+    
+    <img src="https://see.fontimg.com/api/rf5/woG33/N2Y3Y2RhYTdiOGMwNGVjOGE5MWE1MTFiNGJjM2E4Y2Iub3Rm/UEFOVFM/redtrap-expanded-puo.png?r=fs&h=28&w=1000&fg=000000&bg=FFFFFF&tb=1&s=28"
+       style="height: auto;margin-right:15%;" />
+
+  <img src="https://see.fontimg.com/api/rf5/woG33/N2Y3Y2RhYTdiOGMwNGVjOGE5MWE1MTFiNGJjM2E4Y2Iub3Rm/Q0FSR09T/redtrap-expanded-puo.png?r=fs&h=15&w=1000&fg=000000&bg=FFFFFF&tb=1&s=15"
+       style="height: auto;" />
+    
+    </div>
+    <br>
+    <br>
+    <br>
+<!-- Sorting and Filtering Controls -->
+<div class="filter-controls" id="filterControlsPants" data-target="pantsPage">
+  <div class="select-wrapper">
+  <select class="sortPrice">
+    <option value="default">Sort</option>
+    <option value="asc">Low to High</option>
+    <option value="desc">High to Low</option>
+  </select>
+</div>
+  
+  <div class="vertical-divider"></div>
+
+ <div class="select-wrapper"> 
+  <select class="filterSize">
+   <option value="all">All</option>
+    <option value="28">28</option>
+    <option value="30">30</option>
+    <option value="32">32</option>
+    <option value="34">34</option>
+    <option value="36">36</option>
+    <option value="38">38</option>
+    <option value="40">40</option>
+  </select>
+</div>
+  </div>
+<div style="height: 60px;"></div>
+
+    <br>
+
+  <div class="product-grid">
+
+
+    <!-- 317 -->
+  <div class="product-card">
+     <div class="image-wrapper">
+<img src="https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/p17.png" alt="pant 1" onclick="showDescription([
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/p17.png' },
+],'$39', 'Man & Moda #317', 'POLO FIT', 'Step into refined comfort with the Man & Moda Polo Fit Pant – where smart style meets everyday ease. Designed for a tailored yet relaxed fit, this pant is perfect for both casual and semi-formal looks.', ['28','30',' 32 ','34 ','36','38'],['Same'],'pantsPage')">
+</div><div class=cardName>
+<h3>Man & Moda</h3> <!-- Product Title -->
+<p>Polo Fit</p>
+</div>
+ <div >
+    <p class="price">&nbsp;$39</p>
+  </div>
+</div>
+    
+    <!-- 316 -->
+  <div class="product-card">
+     <div class="image-wrapper">
+<img src="https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/p16.png" alt="pant 1" onclick="showDescription([
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/p16.png' },
+],'$39', 'Man & Moda #316', 'POLO FIT', 'Step into refined comfort with the Man & Moda Polo Fit Pant – where smart style meets everyday ease. Designed for a tailored yet relaxed fit, this pant is perfect for both casual and semi-formal looks.', ['28','30',' 32 ','34 ','36','38'],['Same'],'pantsPage')">
+</div><div class=cardName>
+<h3>Man & Moda</h3> <!-- Product Title -->
+<p>Polo Fit </p>
+</div>
+ <div >
+    <p class="price">&nbsp; $39</p>
+  </div>
+</div>
+     
+
+ <!-- 315 -->
+  <div class="product-card">
+     <div class="image-wrapper">
+<img src="https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/p15.png" alt="pant 1" onclick="showDescription([
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/p15.png' },
+],'$39', 'Man & Moda #315', 'POLO FIT', 'Step into refined comfort with the Man & Moda Polo Fit Pant – where smart style meets everyday ease. Designed for a tailored yet relaxed fit, this pant is perfect for both casual and semi-formal looks.', ['28','30',' 32 ','34 ','36','38'],['Same'],'pantsPage')">
+</div><div class=cardName>
+<h3>Man & Moda</h3> <!-- Product Title -->
+<p> Polo Fit </p>
+</div>
+ <div >
+    <p class="price">&nbsp;$39</p>
+  </div>
+</div>
+    
+     <!-- 314 -->
+  <div class="product-card">
+     <div class="image-wrapper">
+<img src="https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/p14.png" alt="pant 1" onclick="showDescription([
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/p14.png' },
+],'$39', 'Man & Moda #314', 'POLO FIT', 'Step into refined comfort with the Man & Moda Polo Fit Pant – where smart style meets everyday ease. Designed for a tailored yet relaxed fit, this pant is perfect for both casual and semi-formal looks.', ['28','30',' 32 ','34 ','36','38'],['Same'],'pantsPage')">
+</div><div class=cardName>
+<h3>Man & Moda</h3> <!-- Product Title -->
+<p> Polo Fit </p>
+</div>
+ <div >
+    <p class="price">&nbsp; $39</p>
+  </div>
+</div>
+    
+       
+ <!-- 313 -->
+  <div class="product-card">
+     <div class="image-wrapper">
+<img src="https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/p13.png" alt="pant 1" onclick="showDescription([
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/p13.png' },
+],'$39', 'Man & Moda #313', 'POLO FIT', 'Step into refined comfort with the Man & Moda Polo Fit Pant – where smart style meets everyday ease. Designed for a tailored yet relaxed fit, this pant is perfect for both casual and semi-formal looks.', ['28','30',' 32 ','34 ','36','38'],['Same'],'pantsPage')">
+</div><div class=cardName>
+<h3>Man & Moda</h3> <!-- Product Title -->
+<p> Polo Fit </p>
+</div>
+ <div >
+    <p class="price">&nbsp; $39</p>
+  </div>
+</div>
+  
+  <!-- 312 -->
+  <div class="product-card">
+     <div class="image-wrapper">
+<img src="https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/p12.png" alt="pant 1" onclick="showDescription([
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/p12.png' },
+],'$39', 'Man & Moda #312', 'POLO FIT', 'Step into refined comfort with the Man & Moda Polo Fit Pant – where smart style meets everyday ease. Designed for a tailored yet relaxed fit, this pant is perfect for both casual and semi-formal looks.', ['28','30',' 32 ','34 ','36','38'],['Same'],'pantsPage')">
+</div><div class=cardName>
+<h3>Man & Moda</h3> <!-- Product Title -->
+<p> Polo Fit </p>
+</div>
+ <div >
+    <p class="price">&nbsp; $39</p>
+  </div>
+</div>
+  
+ <!-- 311 -->
+  <div class="product-card">
+     <div class="image-wrapper">
+<img src="https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/p11.png" alt="pant 1" onclick="showDescription([
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/p11.png' },
+],'$39', 'Man & Moda #311', 'POLO FIT', 'Step into refined comfort with the Man & Moda Polo Fit Pant – where smart style meets everyday ease. Designed for a tailored yet relaxed fit, this pant is perfect for both casual and semi-formal looks.', ['28','30',' 32 ','34 ','36','38'],['Same'],'pantsPage')">
+</div><div class=cardName>
+<h3>Man & Moda</h3> <!-- Product Title -->
+<p> Polo Fit </p>
+</div>
+ <div >
+    <p class="price">&nbsp; $39</p>
+  </div>
+</div>
+
+ <!-- 310 -->
+  <div class="product-card">
+     <div class="image-wrapper">
+<img src="https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/p10.png" alt="pant 1" onclick="showDescription([
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/p10.png' },
+],'$39', 'Man & Moda #310', 'POLO FIT', 'Step into refined comfort with the Man & Moda Polo Fit Pant – where smart style meets everyday ease. Designed for a tailored yet relaxed fit, this pant is perfect for both casual and semi-formal looks.', ['28','30',' 32 ','34 ','36','38'],['Same'],'pantsPage')">
+</div><div class=cardName>
+<h3>Man & Moda</h3> <!-- Product Title -->
+<p> Polo Fit </p>
+</div>
+ <div >
+    <p class="price">&nbsp; $39</p>
+  </div>
+</div>
+
+
+ <!-- 309 -->
+  <div class="product-card">
+     <div class="image-wrapper">
+<img src="https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/p9.png" alt="pant 1" onclick="showDescription([
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/p9.png' },
+],'$39', 'Man & Moda #309', 'POLO FIT', 'Step into refined comfort with the Man & Moda Polo Fit Pant – where smart style meets everyday ease. Designed for a tailored yet relaxed fit, this pant is perfect for both casual and semi-formal looks.', ['28','30',' 32 ','34 ','36','38'],['Same'],'pantsPage')">
+</div><div class=cardName>
+<h3>Man & Moda</h3> <!-- Product Title -->
+<p> Polo Fit </p>
+</div>
+ <div >
+    <p class="price">&nbsp; $39</p>
+  </div>
+</div>
+
+
+ <!-- 308 -->
+  <div class="product-card">
+     <div class="image-wrapper">
+<img src="https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/p8.png" alt="pant 1" onclick="showDescription([
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/p8.png' },
+],'$39', 'Man & Moda #308', 'POLO FIT', 'Step into refined comfort with the Man & Moda Polo Fit Pant – where smart style meets everyday ease. Designed for a tailored yet relaxed fit, this pant is perfect for both casual and semi-formal looks.', ['28','30',' 32 ','34 ','36','38'],['Same'],'pantsPage')">
+</div><div class=cardName>
+<h3>Man & Moda</h3> <!-- Product Title -->
+<p> Polo Fit </p>
+</div>
+ <div >
+    <p class="price">&nbsp; $39</p>
+  </div>
+</div>
+
+ <!-- 307 -->
+  <div class="product-card">
+     <div class="image-wrapper">
+<img src="https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/p7.png" alt="pant 1" onclick="showDescription([
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/p7.png' },
+],'$39', 'Man & Moda #307', 'POLO FIT', 'Step into refined comfort with the Man & Moda Polo Fit Pant – where smart style meets everyday ease. Designed for a tailored yet relaxed fit, this pant is perfect for both casual and semi-formal looks.', ['28','30',' 32 ','34 ','36','38'],['Same'],'pantsPage')">
+</div><div class=cardName>
+<h3>Man & Moda</h3> <!-- Product Title -->
+<p> Polo Fit </p>
+</div>
+ <div >
+    <p class="price">&nbsp; $39</p>
+  </div>
+</div>
+
+
+ <!-- 306 -->
+  <div class="product-card">
+     <div class="image-wrapper">
+<img src="https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/p6.png" alt="pant 1" onclick="showDescription([
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/p6.png' },
+],'$49', 'Man & Moda #306', 'MOM FIT JEANS', 'Elevate your streetwear game with the Man & Moda Mom Fit Pant, designed for the modern trendsetter. Tailored in a relaxed mom fit silhouette, these pants blend comfort with cutting-edge style.', ['28','30',' 32 ','34 ','36'],['Same'],'pantsPage')">
+</div><div class=cardName>
+<h3>Man & Moda</h3> <!-- Product Title -->
+<p> Mom Fit Jeans </p>
+</div>
+ <div >
+    <p class="price">&nbsp; $49</p>
+  </div>
+</div>
+    
+ <!-- 305 -->
+  <div class="product-card">
+     <div class="image-wrapper">
+<img src="https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/p5.png" alt="pant 1" onclick="showDescription([
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/p5.png' },
+],'$49', 'Man & Moda #305', 'MOM FIT JEANS', 'Elevate your streetwear game with the Man & Moda Mom Fit Pant, designed for the modern trendsetter. Tailored in a relaxed mom fit silhouette, these pants blend comfort with cutting-edge style.', ['28','30',' 32 ','34 ','36'],['Same'],'pantsPage')">
+</div><div class=cardName>
+<h3>Man & Moda</h3> <!-- Product Title -->
+<p> Mom Fit Jeans </p>
+</div>
+ <div >
+    <p class="price">&nbsp; $49</p>
+  </div>
+</div>
+    
+ <!-- 304 -->
+  <div class="product-card">
+     <div class="image-wrapper">
+<img src="https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/p4.png" alt="pant 1" onclick="showDescription([
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/p4.png' },
+],'$49', 'Man & Moda #304', 'MOM FIT JEANS', 'Elevate your streetwear game with the Man & Moda Mom Fit Pant, designed for the modern trendsetter. Tailored in a relaxed mom fit silhouette, these pants blend comfort with cutting-edge style.', ['28','30',' 32 ','34 ','36'],['Same'],'pantsPage')">
+</div><div class=cardName>
+<h3>Man & Moda</h3> <!-- Product Title -->
+<p> Mom Fit Jeans </p>
+</div>
+ <div >
+    <p class="price">&nbsp; $49</p>
+  </div>
+</div>
+
+
+
+ <!-- 303 -->
+  <div class="product-card">
+     <div class="image-wrapper">
+<img src="https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/p3.png" alt="pant 1" onclick="showDescription([
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/p3.png' },
+],'$49', 'Man & Moda #303', 'MOM FIT JEANS', 'Elevate your streetwear game with the Man & Moda Mom Fit Pant, designed for the modern trendsetter. Tailored in a relaxed mom fit silhouette, these pants blend comfort with cutting-edge style.', ['28','30',' 32 ','34 ','36'],['Same'],'pantsPage')">
+</div><div class=cardName>
+<h3>Man & Moda</h3> <!-- Product Title -->
+<p> Mom Fit Jeans </p>
+</div>
+ <div >
+    <p class="price">&nbsp; $49</p>
+  </div>
+</div>
+
+ <!-- 302 -->
+  <div class="product-card">
+     <div class="image-wrapper">
+<img src="https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/p2.png" alt="pant 1" onclick="showDescription([
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/p2.png' },
+],'$49', 'Man & Moda #302', 'MOM FIT JEANS', 'Elevate your streetwear game with the Man & Moda Mom Fit Pant, designed for the modern trendsetter. Tailored in a relaxed mom fit silhouette, these pants blend comfort with cutting-edge style.', ['28','30',' 32 ','34 ','36'],['Same'],'pantsPage')">
+</div><div class=cardName>
+<h3>Man & Moda</h3> <!-- Product Title -->
+<p> Mom Fit Jeans </p>
+</div>
+ <div >
+    <p class="price">&nbsp; $49</p>
+  </div>
+</div>
+ 
+  <!-- 301 -->
+  <div class="product-card">
+     <div class="image-wrapper">
+<img src="https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/p1.png" alt="pant 1" onclick="showDescription([
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/p1.png' },
+],'$49', 'Man & Moda #301', 'MOM FIT JEANS', 'Elevate your streetwear game with the Man & Moda Mom Fit Pant, designed for the modern trendsetter. Tailored in a relaxed mom fit silhouette, these pants blend comfort with cutting-edge style.', ['28','30',' 32 ','34 ','36'],['Same'],'pantsPage')">
+</div><div class=cardName>
+<h3>Man & Moda</h3> <!-- Product Title -->
+<p> Mom Fit Jeans </p>
+</div>
+ <div >
+    <p class="price">&nbsp; $49</p>
+  </div>
+</div>
+
+
+    
+</div>
+   <br>
+   <br>
+   <br>   
+ </div>
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ <div id="cargosPage" style="display: none;text-align: center;margin-top:13%;">
+    
+    <div id="fixed-header">
+    
+    <img src="https://see.fontimg.com/api/rf5/woG33/N2Y3Y2RhYTdiOGMwNGVjOGE5MWE1MTFiNGJjM2E4Y2Iub3Rm/Q0FSR09T/redtrap-expanded-puo.png?r=fs&h=28&w=1000&fg=000000&bg=FFFFFF&tb=1&s=28"
+       style="height: auto;margin-right:10%;" />
+
+  <img src="https://see.fontimg.com/api/rf5/woG33/N2Y3Y2RhYTdiOGMwNGVjOGE5MWE1MTFiNGJjM2E4Y2Iub3Rm/UEFOVFM/redtrap-expanded-puo.png?r=fs&h=15&w=1000&fg=000000&bg=FFFFFF&tb=1&s=15"
+       style="height: auto;" />
+    
+    </div>
+      <br>
+    <br>
+    <br>
+<!-- Sorting and Filtering Controls -->
+<div class="filter-controls" id="filterControlsCargos" data-target="cargosPage">
+  <div class="select-wrapper">
+  <select class="sortPrice">
+    <option value="default">Sort</option>
+    <option value="asc">Low to High</option>
+    <option value="desc">High to Low</option>
+  </select>
+</div>
+  
+  <div class="vertical-divider"></div>
+
+ <div class="select-wrapper"> 
+  <select class="filterSize">
+   <option value="all">All</option>
+    <option value="28">28</option>
+    <option value="30">30</option>
+    <option value="32">32</option>
+    <option value="34">34</option>
+    <option value="36">36</option>
+    <option value="38">38</option>
+    <option value="40">40</option>
+  </select>
+</div>
+  </div>
+<div style="height: 60px;"></div>
+
+
+  <div class="product-grid">
+      
+  <!-- 401 -->
+  <div class="product-card">
+     <div class="image-wrapper">
+<img src="https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/c1.jpeg" alt="pant 1" onclick="showDescription([
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/c1.jpeg' },
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/c1r1.jpeg' },
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-images/refs/heads/main/c1r2.png' },
+],'$51', '1947 #401', 'Ripstop', 'Built to last, the 1947 Ripstop Pants are crafted from durable ripstop fabric — known for its resistance to tearing and wear. Designed for daily grind or off-duty style, these pants combine military-grade toughness with everyday comfort and clean structure.', ['28','30',' 32 ','34 '],['Same'],'pantsPage')">
+</div><div class=cardName>
+<h3>1947</h3> <!-- Product Title -->
+<p>Ripstop</p>
+</div>
+ <div style="display: flex; justify-content: center; align-items: center; padding: 0 10px;">
+    <p class="price">$51</p>
+  </div>
+</div>
+  
+
+    
+   
+</div>
+   <br>
+   <br>
+   <br>
+ </div>
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+<!-- Product Description Page with Scrollable Image Gallery -->
+<div id="descriptionPage" style="display: none; padding: 0 3%;margin-top:23%;" class="form-section">
+<div style="display: flex; justify-content: center;">
+ <div id="mainMediaWrapper" style="
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  touch-action: none;
+  -ms-touch-action: none;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  width: 100%;
+  height: auto;
+">
+  <img id="descImage" src="" style="
+    max-width: 100%;
+    height: auto;
+    border-radius: 0px;
+    display: none;
+    transform-origin: center center;
+    touch-action: none;
+    transition: transform 0.1s ease;
+  " />
+  <video id="descVideo" controls style="
+    max-width: 100%;
+    height: auto;
+    border-radius: 0px;
+    display: none;
+  "></video>
+</div>
+</div>
+
+<!-- Thumbnails Preview (Image + Video Swipe Area) -->
+<div id="descImagePreview" style="
+  margin-top: 15px;
+  display: flex;
+  border-radius: 0px;
+  overflow-x: auto;
+  white-space: nowrap;
+  gap: 10px;
+  padding: 10px;
+  justify-content: flex-start;
+  -webkit-overflow-scrolling: touch;
+"></div>
+
+    <br><div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; width: 100%; padding: 0 5px;">
+  <div style="flex: 1; min-width: 150px;">
+    <h2 id="descName" style="font-size: 20px; color: #333; margin: 0; text-align: left;">Product Title</h2>
+    <h4 id="descSText" style="font-size: 14px; color: #666; margin: 5px 0 0 0; text-align: left;">Short description here</h4>
+  </div>
+  <div>
+    <p class="price" id="descPrice" style="font-size: 18px; color: #555; margin-right: 10px; text-align: right;">₹0</p>
+  </div>
+</div>
+ <div style="margin-top: 0px; text-align: right; margin-right:0%">
+    <button onclick="addToCart()">Add to Cart</button>
+  </div>
+  <h3>Select Size:</h3>
+<div id="sizeButtons" style="display: flex; border-radius: 0px; gap: 10px; margin: 10px 0;">
+  <option value="">-- Choose Size --</option>
+  <option value="M">M</option>
+  <option value="L">L</option>
+  <option value="XL">XL</option>
+</div>
+<br>
+    <p id="descText" style="margin-top: 10px; font-size: 16px; color: #333; text-align: left;"></p> <!-- Product Description -->
+<br>
+  <br>
+  <br>
+  <br>
+  <br>
+  
+  </div>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+          <div id="sliderSection" class="slider-wrapper">
+    <div class="slider1">
+      <img id="slide-1" src="https://raw.githubusercontent.com/MonsterMensCollection/nOW/refs/heads/main/1.png" alt="3D rendering of an words" style="width: 100%; height: auto;" />
+    </div>
+    <div class="slider-nav">
+      <a href="#slide-1"></a>
+    </div>
+      <br>
+     <img id="slide-1" src="https://raw.githubusercontent.com/MonsterMensCollection/nOW/refs/heads/main/2.png" alt="3D rendering of an words" style="width: 100%; height: auto ; cursor: pointer; outline: none;-webkit-tap-highlight-color: transparent;" onclick="window.scrollTo({top: 0, behavior: 'instant'}); showShirtsPage();"  />       
+    <br><br> 
+   <img id="slide-1" src="https://raw.githubusercontent.com/MonsterMensCollection/nOW/refs/heads/main/3.png" alt="3D rendering of an words" style="width: 100%; height: auto; cursor: pointer; outline: none;-webkit-tap-highlight-color: transparent;" onclick="window.scrollTo({top: 0, behavior: 'instant'}); showTshirtsPage();"  />      
+   <br><br> 
+  <img id="slide-1" src="https://raw.githubusercontent.com/MonsterMensCollection/nOW/refs/heads/main/4.png" alt="3D rendering of an words" style="width: 100%; height: auto; cursor: pointer;outline: none;-webkit-tap-highlight-color: transparent;" onclick="window.scrollTo({top: 0, behavior: 'instant'}); showPantsPage();"  />      
+    <br><br> 
+  <img id="slide-1" src="https://raw.githubusercontent.com/MonsterMensCollection/nOW/refs/heads/main/5.png" alt="3D rendering of an words" style="width: 100%; height: auto; cursor: pointer;outline: none;-webkit-tap-highlight-color: transparent;" onclick="window.scrollTo({top: 0, behavior: 'instant'}); showCargosPage();" />   <br><br> <br><br>  
+  </div>
+<div class="product-list" id="productList">
+</div>
+
+<!-- Cart Page -->
+<div id="cartPage" class="form-section" style="display: none; margin-top:13%; padding-bottom: 130px;">
+  <br>
+  <img src="https://see.fontimg.com/api/rf5/woG33/N2Y3Y2RhYTdiOGMwNGVjOGE5MWE1MTFiNGJjM2E4Y2Iub3Rm/Y2FydA/redtrap-expanded-puo.png?r=fs&h=30&w=1000&fg=000000&bg=FFFFFF&tb=1&s=30"
+       style="display: block;margin-left: auto; margin-right: auto;">
+  <br>
+
+  <div id="cartItems"></div>
+  
+<div id="emptyCartMessage" style="display: none; text-align: center; margin-top: 42%;">
+  <img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/shopping-bag.png" width="100" alt="Empty Cart" style="opacity: 0.6;" />
+  <p style="font-size: 1rem; color: #777; margin-top: 10px;">You have no items in your cart</p>
+</div>
+<br>
+  <br>
+  <br>
+
+  
+  <!-- ✅ Fixed bottom bar wrapper -->
+  <div class="cart-bottom-bar">
+    <div class="cart-bar-inner">
+      <div class="total-row">
+        <span class="label">Total</span>
+        <span class="amount" id="cartAmount">$0</span>
+      </div>
+      <button onclick="goToDetailsPage()">CHECKOUT</button>
+    </div>
+  </div>
+</div>
+
+
+
+
+<!-- COD Confirmation Modal -->
+<div id="codConfirmationModal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5);">
+  <div style="background-color: #fff; margin: 15% auto; padding: 20px; border-radius: 8px; width: 80%; max-width: 400px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+    <h3 style="margin-bottom: 10px;">Confirm Cash on Delivery</h3>
+    <p style="margin-bottom: 20px;">Are you sure you want to place this order using Cash on Delivery?</p>
+    
+    <button onclick="proceedWithCOD()" style="
+      background-color: #28a745; 
+      color: white; 
+      border: none; 
+      padding: 10px 20px; 
+      border-radius: 5px; 
+      cursor: pointer; 
+      margin-right: 10px;
+    ">Yes, Confirm</button>
+
+    <button onclick="closeCODModal()" style="
+      background-color: #dc3545; 
+      color: white; 
+      border: none; 
+      padding: 10px 20px; 
+      border-radius: 5px; 
+      cursor: pointer;
+    ">Cancel</button>
+  </div>
+</div>
+
+
+<div id="profilePage" class="form-section" style="display: none; margin-top: 13%; padding: 20px; max-width: 90%; margin-left: auto; margin-right: auto; background-color: #fff; border-radius: 0px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);">
+  <!-- Logo -->
+  <img src="https://see.fontimg.com/api/rf5/woG33/N2Y3Y2RhYTdiOGMwNGVjOGE5MWE1MTFiNGJjM2E4Y2Iub3Rm/UFJPRklMRQ/redtrap-expanded-puo.png?r=fs&h=30&w=1000&fg=000000&bg=FFFFFF&tb=1&s=30" style="display: block; margin-left: auto; margin-right: auto;"><br><br>
+
+  <!-- Profile Info -->
+  <div style="width: 100%; background-color: #f9f9f9; padding: 15px 20px; border-radius: 0px; box-sizing: border-box;">
+    <div style="margin-bottom: 15px;">
+      <label style="font-size: 14px; color: #777;">Name</label>
+      <div id="profileName" style="font-size: 18px; font-weight: bold; color: #333;">Loading...</div>
+    </div>
+    <div>
+      <label style="font-size: 14px; color: #777;">Email</label>
+      <div id="profileEmail" style="font-size: 18px; font-weight: bold; color: #333;">Loading...</div>
     </div>
   </div>
 
-  <nav id="bottomNav" class="bottom-nav hidden">
-    <a href="#" onclick="backToProducts()">
-      <img src="https://img.icons8.com/?size=100&id=HWCgA83ZikaE&format=png&color=000000" width="24" alt="Home" />
-    </a>
-    <!-- more links ... -->
-  </nav>
+  <!-- Why It Takes Time Button -->
+  <button onclick="toggleWhyTime()" style="margin-top: 30px; padding: 12px 20px; background-color: #eee; color: #000; border: none; border-radius: 0px; cursor: pointer; font-weight: bold; width: 100%;">
+    Why It Takes Time
+  </button>
 
-  <!-- =====================================================
-       SCRIPTS (moved to bottom for better parsing)
-       =====================================================-->
-  <script>
-    /* ------------------------------------------------------------------
-       UTILS
-       ------------------------------------------------------------------*/
-    const qs = (sel, ctx = document) => ctx.querySelector(sel);
-    const qsa = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
+  <!-- Hidden Explanation Text -->
+<div id="whyTimeMessage" style="max-height: 0; overflow: hidden; transition: max-height 0.5s ease-out, padding 0.5s ease-out; background-color: #f0f0f0; border-left: 4px solid #000; font-size: 14px; line-height: 1.6; color: #333; padding: 0 15px;">
+  <div style="padding-top: 15px; padding-bottom: 15px;">
+    We select and bring the best and limited edition products from all over India. Each item is personally quality-checked and crafted to perfection for you.<br><br>
+    Our team visits and inspects products twice a week to ensure you get only the best. That’s why it takes a few days — approximately 3 days + shipping (total 10–15 days).<br><br>
+    Thank you for your patience and support!
+  </div>
+</div>
 
-    const toggleClass = (el, cls, force) => {
-      if (!el) return;
-      if (force === undefined) {
-        el.classList.toggle(cls);
-      } else {
-        el.classList[force ? "add" : "remove"](cls);
+  <!-- Logout Button -->
+  <button onclick="logout()" style="margin-top: 20px; padding: 12px 20px; background-color: #000; color: white; border: none; border-radius: 0px; cursor: pointer; font-weight: bold; width: 100%;">
+    Logout
+  </button>
+
+  <!-- Orders Section -->
+  <div style="margin-top: 30px;">
+    <h3 style="font-size: 20px; color: #000;">Your Orders</h3>
+    <div id="orderList" style="margin-top: 10px; background: #FFFFFF; padding: 10px; border-radius: 0px; color: #333;"></div>
+  </div>
+
+  <br><br><br><br><br>
+</div>
+
+
+     
+
+<!-- Bottom Bar Container (includes both scroll bar and nav bar) -->
+<!-- Scrolling Shipping Bar -->
+<div id="shippingBar" class="scrolling-banner">
+  <div class="scrolling-text">
+    🎉 Free Shipping on Orders $99 and Above! 🎉 Crafted Just for You! &nbsp;&nbsp;&nbsp;
+    🎉 Free Shipping on Orders $99 and Above! 🎉 Crafted Just for You! &nbsp;&nbsp;&nbsp;
+    🎉 Free Shipping on Orders $99 and Above! 🎉 Crafted Just for You!
+  </div>
+</div>
+
+<!-- Bottom Navigation Bar -->
+<div class="bottom-nav" id="bottomNav" style="position: fixed; bottom: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 10px 0 env(safe-area-inset-bottom); border-top: 1px solid #ccc; z-index: 10000;">
+  <a href="#" onclick="backToProducts()">
+    <img src="https://img.icons8.com/?size=100&id=HWCgA83ZikaE&format=png&color=000000" width="24" alt="Home"/>
+  </a>
+  <a href="#" onclick="showShirtsPage()">
+    <img src="https://img.icons8.com/?size=100&id=zsb66Nl4NM9p&format=png&color=000000" width="24" alt="Shirts"/>
+  </a>
+  <a href="#" onclick="showPantsPage()">
+    <img src="https://img.icons8.com/?size=100&id=0A3ziqKFWVXq&format=png&color=000000" width="24" alt="Pants"/>
+  </a>
+  <a href="#" onclick="showCart()">
+    <img src="https://img.icons8.com/?size=100&id=5hmLU5efq3jw&format=png&color=000000" width="24" alt="Cart"/>
+  </a>
+  <a href="#" onclick="showProfilePage()">
+    <img src="https://img.icons8.com/?size=100&id=Or3Eb98tGbJL&format=png&color=000000" width="24" alt="Profile"/>
+  </a>
+</div>
+
+
+
+</div>
+
+<div id="paymentSuccessPage" style="display:none; margin-top:40%;padding: 30px; text-align: center;">
+  <div style="padding: 20px; border: 2px solid green; background-color: #d4fcd4; color: green; border-radius: 10px;">
+    ✅ Payment successful!<br>
+    Payment ID: <strong id="successPaymentId">Loading...</strong><br>
+    Your order has been placed. Thank you!
+  </div>
+</div>
+
+<div id="paymentSuccessPageCOD" style="display:none; margin-top:40%;padding: 30px; text-align: center;">
+  <div style="padding: 20px; border: 2px solid green; background-color: #d4fcd4; color: green; border-radius: 10px;">
+     ✅ Order successful!<br>
+     Payment ID:<strong> CASH ON DELIVERY </strong><br>
+    Your order has been placed. Thank you!
+  </div>
+</div>
+  
+ 
+  
+    <div id="adminControls" class="admin-controls" style="display:none;">
+      <h3>Admin Panel</h3>
+      <button onclick="location.href='admin-dashboard.html'">Go to Dashboard</button>
+    </div>
+
+ <div id="detailsPage" class="form-section" style="
+  display: none; 
+  margin-top: 13%; 
+  padding: 20px; 
+  width: 100%; 
+  max-width: 500px; 
+  margin-left: auto; 
+  margin-right: auto;
+  box-sizing: border-box;
+">
+   <img src="https://see.fontimg.com/api/rf5/woG33/N2Y3Y2RhYTdiOGMwNGVjOGE5MWE1MTFiNGJjM2E4Y2Iub3Rm/Y2hlY2tvdXQ/redtrap-expanded-puo.png?r=fs&h=30&w=1000&fg=000000&bg=FFFFFF&tb=1&s=30"style="display: block;margin-left: auto;
+  margin-right: auto;">
+<br>
+   <br>
+  <input type="text" id="checkoutName" placeholder="Your Name"
+         style="padding: 12px; width: 100%; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 0px; box-sizing: border-box;" />
+
+  <textarea id="checkoutAddress" placeholder="Your Address"
+            style="padding: 12px; width: 100%; height: 100px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 0px; resize: vertical; box-sizing: border-box;"></textarea>
+
+  <input type="text" id="checkoutPincode" placeholder="Pin Code"
+         style="padding: 12px; width: 100%; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 0px; box-sizing: border-box;" />
+
+  <input type="text" id="checkoutMobileNumber" placeholder="Mobile Number"
+         style="padding: 12px; width: 100%; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 0px; box-sizing: border-box;" />
+
+  <button onclick="checkoutCart()" 
+          style="width: 100%; padding: 14px; background-color: #000; color: white; border: none; border-radius: 0px; font-size: 16px; font-weight: bold; cursor: pointer; box-sizing: border-box;">
+    SUBMIT & PAY
+  </button>
+</div>
+
+
+  
+<script>
+
+      
+      let lastCategoryPage = null;
+
+function showShirtsPage() {
+  if (lastCategoryPage !== 'shirtsPage') {
+    lastCategoryPage = 'shirtsPage';
+    history.pushState({ page: 'shirtsPage' }, '', '#shirts');
+  }
+  document.getElementById("productList").style.display = "none";
+  document.getElementById("shirtsPage").style.display = "block";
+  document.getElementById("pantsPage").style.display = "none";
+  document.getElementById("sliderSection").style.display = "none";
+   document.getElementById("cartPage").style.display = "none";
+   document.getElementById("profilePage").style.display = "none";
+   document.getElementById("descriptionPage").style.display = "none";
+     document.getElementById("tshirtsPage").style.display = "none";
+      document.getElementById("cargosPage").style.display = "none";
+    document.getElementById("detailsPage").style.display = "none";
+}
+
+function showTshirtsPage() {
+    
+     lastCategoryPage = "tshirtsPage";
+    history.pushState({ page: "tshirtsPage" }, "", "#tshirts");
+   
+  document.getElementById("productList").style.display = "none";
+  document.getElementById("tshirtsPage").style.display = "block";
+  document.getElementById("pantsPage").style.display = "none";
+  document.getElementById("sliderSection").style.display = "none";
+   document.getElementById("cartPage").style.display = "none";
+   document.getElementById("profilePage").style.display = "none";
+   document.getElementById("descriptionPage").style.display = "none";
+     document.getElementById("shirtsPage").style.display = "none";
+      document.getElementById("cargosPage").style.display = "none";
+    document.getElementById("detailsPage").style.display = "none";
+}
+
+function showPantsPage() {
+    
+    lastCategoryPage = "pantsPage";
+     history.pushState({ page: "pantsPage" }, "", "#pants");
+
+  document.getElementById("productList").style.display = "none";
+  document.getElementById("pantsPage").style.display = "block";
+  document.getElementById("shirtsPage").style.display = "none";
+  document.getElementById("tshirtsPage").style.display = "none";
+  document.getElementById("sliderSection").style.display = "none";
+   document.getElementById("cartPage").style.display = "none";
+   document.getElementById("profilePage").style.display = "none";
+   document.getElementById("descriptionPage").style.display = "none";
+   document.getElementById("cargosPage").style.display = "none";
+    document.getElementById("detailsPage").style.display = "none";
+}
+
+function showCargosPage() {
+    
+  lastCategoryPage = "cargosPage"; // ✅ Add this line
+ history.pushState({ page: "cargosPage" }, "", "#cargos");
+
+  document.getElementById("productList").style.display = "none";
+  document.getElementById("cargosPage").style.display = "block";
+  document.getElementById("shirtsPage").style.display = "none";
+  document.getElementById("pantsPage").style.display = "none";
+  document.getElementById("tshirtsPage").style.display = "none";
+  document.getElementById("sliderSection").style.display = "none";
+  document.getElementById("cartPage").style.display = "none";
+  document.getElementById("profilePage").style.display = "none";
+  document.getElementById("descriptionPage").style.display = "none";
+    document.getElementById("detailsPage").style.display = "none";
+}
+
+function backToProducts() {
+  history.pushState({ page: "productList" }, "", "#home");
+  document.getElementById("descriptionPage").style.display = "none";
+  document.getElementById("productList").style.display = "block";
+  document.getElementById("shirtsPage").style.display = "none";
+  document.getElementById("pantsPage").style.display = "none";
+  document.getElementById("sliderSection").style.display = "block";
+  document.getElementById("cartPage").style.display = "none";
+  document.getElementById("profilePage").style.display = "none";
+  document.getElementById("tshirtsPage").style.display = "none";
+  document.getElementById("cargosPage").style.display = "none";
+    document.getElementById("detailsPage").style.display = "none";
+}
+
+  function goToDetailsPage() {
+
+ history.pushState({ page: "detailsPage" }, "", "#details");
+
+    
+  document.getElementById("descriptionPage").style.display = "none";
+  document.getElementById("productList").style.display = "none";
+  document.getElementById("shirtsPage").style.display = "none";
+  document.getElementById("pantsPage").style.display = "none";
+  document.getElementById("sliderSection").style.display = "none";
+  document.getElementById("cartPage").style.display = "none";
+  document.getElementById("profilePage").style.display = "none";
+  document.getElementById("tshirtsPage").style.display = "none";
+  document.getElementById("cargosPage").style.display = "none";
+    document.getElementById("detailsPage").style.display = "block";
+}
+
+
+let isMessageVisible = false;
+
+  function toggleWhyTime() {
+    const message = document.getElementById("whyTimeMessage");
+
+    if (!isMessageVisible) {
+      message.style.maxHeight = "500px"; // enough height to expand fully
+      message.style.paddingTop = "15px";
+      message.style.paddingBottom = "15px";
+    } else {
+      message.style.maxHeight = "0";
+      message.style.paddingTop = "0";
+      message.style.paddingBottom = "0";
+    }
+
+    isMessageVisible = !isMessageVisible;
+  }
+
+
+
+
+let startX = 0;
+let startY = 0;
+let startTime = 0;
+let isScrollingVertically = false;
+
+function handleTouchStart(evt) {
+  const touch = evt.touches[0];
+  startX = touch.clientX;
+  startY = touch.clientY;
+  startTime = new Date().getTime();
+  isScrollingVertically = false;
+}
+
+function handleTouchMove(evt) {
+  const touch = evt.touches[0];
+  const deltaX = Math.abs(touch.clientX - startX);
+  const deltaY = Math.abs(touch.clientY - startY);
+
+  if (deltaY > deltaX) {
+    isScrollingVertically = true;
+  }
+}
+
+function handleTouchEnd(evt, fromPage) {
+  if (isScrollingVertically) return; // Let native scroll happen
+
+  const touch = evt.changedTouches[0];
+  const endX = touch.clientX;
+  const endTime = new Date().getTime();
+
+  const diffX = startX - endX;
+  const timeDiff = endTime - startTime;
+
+  const swipeSpeed = Math.abs(diffX / timeDiff); // px/ms
+  const fastSwipe = swipeSpeed > 0.3;
+  const farSwipe = Math.abs(diffX) > 60;
+
+  if (!(fastSwipe || farSwipe)) return;
+
+  const pagesGroup1 = ["shirtsPage", "tshirtsPage"];
+  const pagesGroup2 = ["pantsPage", "cargosPage"];
+
+  const navigateTo = (from, to) => {
+    document.getElementById("descriptionPage").style.display = "none";
+    document.getElementById(from).style.display = "none";
+    document.getElementById(to).style.display = "block";
+    lastCategoryPage = to;
+    history.pushState({ page: to }, "", "#" + to.replace("Page", ""));
+  };
+
+  if (pagesGroup1.includes(fromPage)) {
+    const toPage = diffX > 0
+      ? (fromPage === "shirtsPage" ? "tshirtsPage" : "shirtsPage")
+      : (fromPage === "tshirtsPage" ? "shirtsPage" : "tshirtsPage");
+    navigateTo(fromPage, toPage);
+  }
+
+  if (pagesGroup2.includes(fromPage)) {
+    const toPage = diffX > 0
+      ? (fromPage === "pantsPage" ? "cargosPage" : "pantsPage")
+      : (fromPage === "cargosPage" ? "pantsPage" : "cargosPage");
+    navigateTo(fromPage, toPage);
+  }
+}
+
+["shirtsPage", "tshirtsPage", "pantsPage", "cargosPage"].forEach(pageId => {
+  const page = document.getElementById(pageId);
+  page.addEventListener("touchstart", handleTouchStart, { passive: true });
+  page.addEventListener("touchmove", handleTouchMove, { passive: true }); // new
+  page.addEventListener("touchend", function(evt) {
+    handleTouchEnd(evt, pageId);
+  }, { passive: true });
+});
+
+let img = document.getElementById('descImage');
+let scale = 1;
+let lastDistance = null;
+
+function getDistance(touches) {
+  const dx = touches[0].clientX - touches[1].clientX;
+  const dy = touches[0].clientY - touches[1].clientY;
+  return Math.sqrt(dx * dx + dy * dy);
+}
+
+img.addEventListener('touchstart', (e) => {
+  if (e.touches.length === 2) {
+    lastDistance = getDistance(e.touches);
+  }
+}, { passive: false });
+
+img.addEventListener('touchmove', (e) => {
+  if (e.touches.length === 2 && lastDistance) {
+    e.preventDefault();
+    const newDistance = getDistance(e.touches);
+    const delta = newDistance - lastDistance;
+    scale += delta * 0.005;
+    scale = Math.max(1, Math.min(scale, 3));
+    img.style.transform = `scale(${scale})`;
+    lastDistance = newDistance;
+  }
+}, { passive: false });
+
+img.addEventListener('touchend', () => {
+  if (scale <= 1.05) {
+    img.style.transform = 'scale(1)';
+    scale = 1;
+    lastDistance = null;
+  }
+});
+
+let cart = [];
+function showDescription(media = [], price, title = "No title", sdes = "No short description", description = "No description", sizesAvailable = ["M", "L", "XL"], colorsAvailable = [], category = null) {
+  if (category) {
+    // Push category state BEFORE description
+    history.pushState({ page: category }, "", "#" + category);
+    lastCategoryPage = category;
+  }
+
+  history.pushState({ page: "descriptionPage" }, "", "#description");
+  
+  const mainImage = document.getElementById("descImage");
+  const mainVideo = document.getElementById("descVideo");
+  const previewContainer = document.getElementById("descImagePreview");
+
+  let currentIndex = 0;
+
+  const showMediaAt = (index) => {
+    currentIndex = index;
+    const item = media[index];
+    if (item.type === "video") {
+      mainImage.style.display = "none";
+      mainVideo.style.display = "block";
+      mainVideo.src = item.src;
+      mainVideo.autoplay = true;
+      mainVideo.muted = true; // for autoplay to work on mobile
+      mainVideo.play();
+    } else {
+      mainVideo.style.display = "none";
+      mainImage.style.display = "block";
+      mainImage.src = item.src;
+    }
+  };
+
+  const setupSwipe = (container) => {
+    let startX = 0;
+    let endX = 0;
+
+    container.addEventListener("touchstart", e => {
+      startX = e.touches[0].clientX;
+    });
+
+    container.addEventListener("touchmove", e => {
+      endX = e.touches[0].clientX;
+    });
+
+    container.addEventListener("touchend", () => {
+      const diff = startX - endX;
+      if (Math.abs(diff) > 50) {
+        if (diff > 0 && currentIndex < media.length - 1) {
+          showMediaAt(currentIndex + 1);
+        } else if (diff < 0 && currentIndex > 0) {
+          showMediaAt(currentIndex - 1);
+        }
       }
+    });
+  };
+
+  showMediaAt(0);
+
+  // Thumbnails preview
+  previewContainer.innerHTML = "";
+  media.forEach((item, index) => {
+    let thumb;
+    if (item.type === "video") {
+      thumb = document.createElement("video");
+      thumb.src = item.src;
+      thumb.muted = true;
+      thumb.loop = true;
+      thumb.autoplay = true;
+    } else {
+      thumb = document.createElement("img");
+      thumb.src = item.src;
+    }
+
+    thumb.style.width = "70px";
+    thumb.style.height = "70px";
+    thumb.style.objectFit = "cover";
+    thumb.style.cursor = "pointer";
+    thumb.style.borderRadius = "8px";
+    thumb.style.flexShrink = "0";
+
+    // Tap thumbnail to show media
+    thumb.addEventListener("click", () => {
+      showMediaAt(index);
+    });
+
+    previewContainer.appendChild(thumb);
+  });
+
+  // Update product info
+  document.getElementById("descPrice").textContent = price;
+  document.getElementById("descName").textContent = title;
+  document.getElementById("descSText").textContent = sdes;
+  document.getElementById("descText").textContent = description;
+
+// Cool styled color dropdown
+
+
+// Circle preview color selector
+const colorContainer = document.getElementById("colorButtons") || document.createElement("div");
+colorContainer.id = "colorButtons";
+colorContainer.style.margin = "20px 0";
+colorContainer.innerHTML = "";
+
+// Create color option buttons with circle preview
+let selectedColor = colorsAvailable[0] || null;
+
+const customDropdown = document.createElement("div");
+customDropdown.style.display = "flex";
+customDropdown.style.flexWrap = "wrap";
+customDropdown.style.gap = "10px";
+
+// Track all colorOption elements to clear selection later
+let colorOptionElements = [];
+
+colorsAvailable.forEach(color => {
+  const colorOption = document.createElement("div");
+  colorOption.style.display = "flex";
+  colorOption.style.alignItems = "center";
+  colorOption.style.cursor = "pointer";
+  colorOption.style.border = "2px solid transparent"; // default border
+  colorOption.style.borderRadius = "0px";
+  colorOption.style.padding = "6px 10px";
+  colorOption.style.backgroundColor = "#fff";
+  colorOption.style.boxShadow = "0 2px 6px rgba(0,0,0,0.1)";
+
+  const colorCircle = document.createElement("div");
+  colorCircle.style.width = "16px";
+  colorCircle.style.height = "16px";
+  colorCircle.style.borderRadius = "50%";
+  colorCircle.style.marginRight = "8px";
+  colorCircle.style.border = "1px solid #888";
+  colorCircle.style.backgroundColor = color.trim().toLowerCase();
+
+  const colorLabel = document.createElement("span");
+  colorLabel.textContent = color;
+
+  colorOption.appendChild(colorCircle);
+  colorOption.appendChild(colorLabel);
+
+  colorOption.addEventListener("click", () => {
+    selectedColor = color;
+    document.getElementById("selectedColor").value = selectedColor;
+
+    // Clear previous selection
+    colorOptionElements.forEach(el => {
+      el.style.border = "2px solid transparent";
+    });
+
+    // Highlight selected color
+    colorOption.style.border = "2px solid #333";
+  });
+
+  customDropdown.appendChild(colorOption);
+  colorOptionElements.push(colorOption);
+});
+
+
+colorContainer.appendChild(customDropdown);
+
+// Hidden input to store selected color
+let hiddenColorInput = document.getElementById("selectedColor");
+if (!hiddenColorInput) {
+  hiddenColorInput = document.createElement("input");
+  hiddenColorInput.type = "hidden";
+  hiddenColorInput.id = "selectedColor";
+  colorContainer.appendChild(hiddenColorInput);
+}
+hiddenColorInput.value = selectedColor;
+
+// Add label and container to the description section
+const descPage = document.getElementById("descriptionPage");
+if (!document.getElementById("colorSectionTitle")) {
+  const label = document.createElement("h3");
+  label.id = "colorSectionTitle";
+  label.textContent = "Select Color:";
+  label.style.marginBottom = "8px";
+  label.style.fontSize = "18px";
+  descPage.insertBefore(label, document.getElementById("descText"));
+  descPage.insertBefore(colorContainer, document.getElementById("descText"));
+}
+
+
+// 👉 Add centered "Description" heading
+if (!document.getElementById("descHeader")) {
+  const descHeading = document.createElement("h2");
+  descHeading.id = "descHeader";
+  descHeading.textContent = "Description";
+  descHeading.style.textAlign = "center";
+  descHeading.style.margin = "20px 0 10px";
+  descHeading.style.fontSize = "22px";
+  descHeading.style.fontWeight = "600";
+  descPage.insertBefore(descHeading, document.getElementById("descText"));
+}
+
+
+
+  // Size buttons logic
+  const sizeContainer = document.getElementById("sizeButtons");
+  sizeContainer.innerHTML = "";
+  let selectedSize = null;
+
+  sizesAvailable.forEach((size, index) => {
+    const btn = document.createElement("button");
+    btn.textContent = size;
+    btn.style.padding = "10px 20px";
+    btn.style.border = "1px solid #ccc";
+    btn.style.borderRadius = "0px";
+    btn.style.cursor = "pointer";
+
+    if (index === 0) {
+      btn.style.backgroundColor = "#333";
+      btn.style.color = "#fff";
+      selectedSize = size;
+    }
+
+    btn.onclick = () => {
+      document.querySelectorAll("#sizeButtons button").forEach(b => {
+        b.style.backgroundColor = "#f8f8f8";
+        b.style.color = "#000";
+      });
+      btn.style.backgroundColor = "#333";
+      btn.style.color = "#fff";
+      selectedSize = size;
+      document.getElementById("selectedSize").value = size;
     };
 
-    /* ------------------------------------------------------------------
-       AUTH  (Firebase)
-       ------------------------------------------------------------------*/
-    const firebaseConfig = {
+    sizeContainer.appendChild(btn);
+  });
+
+  let hiddenInput = document.getElementById("selectedSize");
+  if (!hiddenInput) {
+    hiddenInput = document.createElement("input");
+    hiddenInput.type = "hidden";
+    hiddenInput.id = "selectedSize";
+    sizeContainer.appendChild(hiddenInput);
+  }
+  hiddenInput.value = selectedSize;
+
+
+
+  // Show description page and hide others
+  document.getElementById("descriptionPage").style.display = "block";
+  document.getElementById("productList").style.display = "none";
+  document.getElementById("shirtsPage").style.display = "none";
+  document.getElementById("pantsPage").style.display = "none";
+  document.getElementById("sliderSection").style.display = "none";
+  document.getElementById("profilePage").style.display = "none";
+    document.getElementById("tshirtsPage").style.display = "none";
+    document.getElementById("cargosPage").style.display = "none";
+    
+    window.scrollTo(0, 0);
+}
+
+
+
+function addToCart(image = null, price = null, title = null) {
+  if (!image || !price) {
+    image = document.getElementById('descImage').src;
+    price = document.getElementById('descPrice').innerText;
+    title = document.getElementById('descName').innerText;
+  }
+
+  const size = document.getElementById("selectedSize").value;
+  const color = document.getElementById("selectedColor")?.value;
+
+  if (!size) {
+    alert("Please select a size.");
+    return;
+  }
+
+  if (!color) {
+    alert("Please select a color.");
+    return;
+  }
+
+  const parsedPrice = parseInt(price.replace('$', ''));
+  cart.push({ image, price: parsedPrice, title, size, color });
+
+  alert('Item added to cart!');
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+  // 🔹 Existing Filter Controls
+  const filterControls = document.querySelectorAll(".filter-controls");
+
+  filterControls.forEach(control => {
+    const targetPageId = control.getAttribute("data-target");
+
+    const sortSelect = control.querySelector(".sortPrice");
+    const sizeSelect = control.querySelector(".filterSize");
+
+    sortSelect.addEventListener("change", () => sortProductsByPrice(targetPageId));
+    sizeSelect.addEventListener("change", () => filterProductsBySize(targetPageId));
+  });
+
+  // 🔹 New Zoom + Pan Image Code
+  const img = document.getElementById('descImage');
+  if (!img) return;
+
+  let scale = 1;
+  let lastDistance = null;
+  let translateX = 0, translateY = 0;
+  let lastTouchX = 0, lastTouchY = 0;
+  let isDragging = false;
+
+  function getDistance(touches) {
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+  }
+
+  function updateTransform() {
+    img.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+  }
+
+  img.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 2) {
+      lastDistance = getDistance(e.touches);
+      isDragging = false;
+    } else if (e.touches.length === 1 && scale > 1) {
+      isDragging = true;
+      lastTouchX = e.touches[0].clientX;
+      lastTouchY = e.touches[0].clientY;
+    }
+  }, { passive: false });
+
+  img.addEventListener('touchmove', (e) => {
+    if (e.touches.length === 2) {
+      e.preventDefault();
+      const newDistance = getDistance(e.touches);
+      const delta = newDistance - lastDistance;
+      scale += delta * 0.005;
+      scale = Math.max(1, Math.min(scale, 3));
+      updateTransform();
+      lastDistance = newDistance;
+    } else if (e.touches.length === 1 && isDragging) {
+      e.preventDefault();
+      const touch = e.touches[0];
+      const dx = touch.clientX - lastTouchX;
+      const dy = touch.clientY - lastTouchY;
+      translateX += dx;
+      translateY += dy;
+      lastTouchX = touch.clientX;
+      lastTouchY = touch.clientY;
+      updateTransform();
+    }
+  }, { passive: false });
+
+  img.addEventListener('touchend', () => {
+    if (scale <= 1.05) {
+      scale = 1;
+      translateX = 0;
+      translateY = 0;
+      img.style.transform = 'scale(1)';
+    } else {
+      updateTransform();
+    }
+    lastDistance = null;
+    isDragging = false;
+  });
+    // 🔹 Double Tap to Zoom In/Out
+  let lastTapTime = 0;
+  img.addEventListener("touchend", function (e) {
+    const currentTime = new Date().getTime();
+    const tapLength = currentTime - lastTapTime;
+    lastTapTime = currentTime;
+
+    // Detect double tap (within 300ms)
+    if (tapLength < 300 && e.touches.length === 0) {
+      if (scale > 1) {
+        // Zoom out
+        scale = 1;
+        translateX = 0;
+        translateY = 0;
+        updateTransform();
+      } else {
+        // Zoom in centered at tap
+        scale = 2;
+        const rect = img.getBoundingClientRect();
+        const tapX = e.changedTouches[0].clientX - rect.left;
+        const tapY = e.changedTouches[0].clientY - rect.top;
+        translateX = (img.clientWidth / 2 - tapX) * (scale - 1);
+        translateY = (img.clientHeight / 2 - tapY) * (scale - 1);
+        updateTransform();
+      }
+    }
+  });
+});
+
+function sortProductsByPrice(pageId) {
+  const grid = document.querySelector(`#${pageId} .product-grid`);
+  const products = Array.from(grid.getElementsByClassName("product-card"));
+
+  const sortOrder = document.querySelector(`[data-target="${pageId}"] .sortPrice`).value;
+
+  if (sortOrder === "default") {
+    products.sort((a, b) => 0);
+  } else {
+    products.sort((a, b) => {
+      const priceA = parseInt(a.querySelector(".price").innerText.replace(/[^\d]/g, ""));
+      const priceB = parseInt(b.querySelector(".price").innerText.replace(/[^\d]/g, ""));
+      return sortOrder === "asc" ? priceA - priceB : priceB - priceA;
+    });
+  }
+
+  grid.innerHTML = "";
+  products.forEach(p => grid.appendChild(p));
+}
+
+function filterProductsBySize(pageId) {
+  const selectedSize = document.querySelector(`[data-target="${pageId}"] .filterSize`).value;
+  const cards = document.querySelectorAll(`#${pageId} .product-card`);
+
+  cards.forEach(card => {
+    const onclickAttr = card.querySelector("img").getAttribute("onclick");
+    const hasSize = selectedSize === "all" || onclickAttr.includes(`'${selectedSize}'`);
+    card.style.display = hasSize ? "block" : "none";
+  });
+}
+
+function showCart() {
+
+ lastCategoryPage = "cartPage"; // ✅ Add this line
+ history.pushState({ page: "cartPage" }, "", "#cart");
+  
+  document.getElementById("descriptionPage").style.display = "none";
+  document.getElementById("productList").style.display = "none";
+  document.getElementById("shirtsPage").style.display = "none";
+  document.getElementById("pantsPage").style.display = "none";
+  document.getElementById("sliderSection").style.display = "none";
+  document.getElementById("cartPage").style.display = "block";
+  document.getElementById("profilePage").style.display = "none";
+  document.getElementById("tshirtsPage").style.display = "none";
+  document.getElementById("cargosPage").style.display = "none";
+    document.getElementById("detailsPage").style.display = "none";
+
+  const cartItemsDiv = document.getElementById("cartItems");
+  const emptyCartMessage = document.getElementById("emptyCartMessage");
+  cartItemsDiv.innerHTML = '';
+
+  let subtotal = 0;
+
+  if (cart.length === 0) {
+    emptyCartMessage.style.display = 'block';
+    document.getElementById("cartAmount").textContent = "$0";
+  } else {
+    emptyCartMessage.style.display = 'none';
+
+    cart.forEach((item, index) => {
+      subtotal += item.price;
+      const itemHTML = `
+        <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 15px; padding: 12px;">
+          <img src="${item.image}" style="width: 80px; border-radius: 6px; object-fit: cover;" />
+          <div style="flex-grow: 1; text-align: left;">
+            <p style="margin: 4px 0;"><strong>${item.title}</strong></p>
+            <p style="margin: 4px 0;"><strong>Size:</strong> ${item.size || 'N/A'}</p>
+            <p style="margin: 4px 0;"><strong>Color:</strong> ${item.color || 'N/A'}</p>
+            <p style="margin: 4px 0;"><strong>Price:</strong> $${item.price}</p>
+          </div>
+          <button onclick="removeFromCart(${index})" style="background-color: transparent; border: none; cursor: pointer;">
+            <img src="https://img.icons8.com/?size=100&id=Qgjnp78cDeJi&format=png&color=000000" width="16">
+          </button>
+        </div>
+        <hr style="width: 80%; margin: 10px auto; border: none; border-top: 1px solid #ccc;" />
+      `;
+      cartItemsDiv.innerHTML += itemHTML;
+    });
+
+    // Calculate shipping
+    let shipping = subtotal >= 99 ? 0 : 19;
+    let total = subtotal + shipping;
+
+    // Update cart total display
+    const cartAmountDiv = document.getElementById("cartAmount");
+    cartAmountDiv.innerHTML = shipping === 0
+      ? `<span style="font-size: 12px; color: green;">Free Shipping + </span>$${total}`
+      : `<span style="font-size: 12px; color: #888;">$19 shipping added + </span>$${total} `;
+  }
+}
+
+
+
+
+
+
+function scrollIntoViewMobile(el) {
+  setTimeout(() => {
+    const rect = el.getBoundingClientRect();
+    const scrollTop = window.scrollY || window.pageYOffset;
+    const elementTop = rect.top + scrollTop - 100; // adjust 100px above the element
+    window.scrollTo({ top: elementTop, behavior: "smooth" });
+  }, 300);
+}
+
+function removeFromCart(index) {
+  cart.splice(index, 1); // Remove item at the given index
+  showCart(); // Re-render the cart
+}
+
+function hideCart() {
+  document.getElementById("cartPage").style.display = "none";
+  document.getElementById("productList").style.display = "block";
+  document.getElementById("sliderSection").style.display = "block";
+}
+function checkoutCart() { 
+  const name = document.getElementById("checkoutName").value.trim();
+  const address = document.getElementById("checkoutAddress").value.trim();
+  const pincode = document.getElementById("checkoutPincode").value.trim();
+  const mobilenumber  = document.getElementById("checkoutMobileNumber").value.trim();
+
+  if (!name || !address || !pincode || !mobilenumber ) {
+    alert("Please enter name and address to continue.");
+    return;
+  }
+
+  const totalAmount = cart.reduce((sum, item) => sum + item.price, 0) * 100; // in paise
+
+  if (totalAmount === 0) {
+    alert("Cart is empty!");
+    return;
+  }
+
+  const options = {
+    key: 'rzp_live_0M0qHSpzByvZAr',
+    amount: totalAmount,
+    currency: "USD",
+    name: "Monster Men's Collection",
+    description: "Cart Checkout",
+    image: "https://your-logo-url.com/logo.png",
+    handler: function (response) {
+      const paymentSuccessDiv = document.getElementById("paymentSuccessMessage");
+      const user = auth.currentUser;
+
+      if (user) {
+        const orderData = {
+          uid: user.uid,
+          name: name,
+          address: address,
+          pincode: pincode,
+          mobilenumber: mobilenumber,
+          cart: cart,
+          total: totalAmount / 100,
+          paymentId: response.razorpay_payment_id,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+          orderNumber: `ORD-${Date.now()}` // ✅ Add Order Number
+        };
+
+        db.collection("orders").add(orderData).then(() => {
+
+          // Save simplified order entries
+
+          // ✅ UI changes after successful order
+          document.getElementById("descriptionPage").style.display = "none";
+          document.getElementById("productList").style.display = "none";
+          document.getElementById("shirtsPage").style.display = "none";
+          document.getElementById("pantsPage").style.display = "none";
+          document.getElementById("sliderSection").style.display = "none";
+          document.getElementById("cartPage").style.display = "none";
+          document.getElementById("profilePage").style.display = "none";
+           document.getElementById("cargosPage").style.display = "none";
+            document.getElementById("detailsPage").style.display = "none";
+
+          // Show success page
+          document.getElementById("paymentSuccessPage").style.display = "block";
+          document.getElementById("successPaymentId").textContent = response.razorpay_payment_id;
+
+          // Hide after 5 seconds and go back to products
+          setTimeout(() => {
+            document.getElementById("paymentSuccessPage").style.display = "none";
+            document.getElementById("productList").style.display = "block";
+            document.getElementById("sliderSection").style.display = "block";
+          }, 5000);
+
+          // Empty cart after order
+          cart = [];
+
+        }).catch(error => {
+          console.error("Error saving order:", error);
+          paymentSuccessDiv.style.display = "block";
+          paymentSuccessDiv.style.color = "red";
+          paymentSuccessDiv.innerHTML = "⚠️ Payment was successful but there was an error placing the order. Please contact support.";
+        });
+      }
+    },
+    prefill: {
+      name: name
+    },
+    theme: {
+      color: "#007bff"
+    },
+    webview_intent: true
+  };
+
+  const rzp = new Razorpay(options);
+  rzp.open();
+}
+
+function checkoutCOD() {
+  const name = document.getElementById("checkoutName").value.trim();
+  const address = document.getElementById("checkoutAddress").value.trim();
+   const pincode = document.getElementById("checkoutPincode").value.trim();
+  const mobilenumber  = document.getElementById("checkoutMobileNumber").value.trim();
+
+  if (!name || !address) {
+    alert("Please enter name and address to continue.");
+    return;
+  }
+
+  const totalAmount = cart.reduce((sum, item) => sum + item.price, 0);
+
+  if (totalAmount === 0) {
+    alert("Cart is empty!");
+    return;
+  }
+
+  const user = auth.currentUser;
+  if (!user) {
+    alert("You must be logged in to place an order.");
+    return;
+  }
+
+  const orderData = {
+    uid: user.uid,
+    name: name,
+    address: address,
+    pincode: pincode,
+    mobilenumber: mobilenumber,
+    cart: cart,
+    total: totalAmount,
+    paymentId: "COD",
+    paymentMode: "Cash on Delivery",
+    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+    orderNumber: `ORD-${Date.now()}`
+  };
+
+  db.collection("orders").add(orderData).then(() => {
+
+      // ✅ UI changes after successful order
+          document.getElementById("descriptionPage").style.display = "none";
+          document.getElementById("productList").style.display = "none";
+          document.getElementById("shirtsPage").style.display = "none";
+          document.getElementById("pantsPage").style.display = "none";
+          document.getElementById("sliderSection").style.display = "none";
+          document.getElementById("cartPage").style.display = "none";
+          document.getElementById("profilePage").style.display = "none";
+            document.getElementById("tshirtsPage").style.display = "none";
+             document.getElementById("cargosPage").style.display = "none";
+
+          // Show success page
+          document.getElementById("paymentSuccessPageCOD").style.display = "block";
+
+          // Hide after 5 seconds and go back to products
+          setTimeout(() => {
+            document.getElementById("paymentSuccessPageCOD").style.display = "none";
+            document.getElementById("productList").style.display = "block";
+            document.getElementById("sliderSection").style.display = "block";
+          }, 5000);
+    cart = []; // Return to main page
+  }).catch(error => {
+    console.error("Error placing COD order:", error);
+    alert("Error placing order. Please try again.");
+  });
+}
+
+function confirmCOD() {
+  document.getElementById("codConfirmationModal").style.display = "block";
+}
+
+function closeCODModal() {
+  document.getElementById("codConfirmationModal").style.display = "none";
+}
+
+function proceedWithCOD() {
+  closeCODModal();
+  checkoutCOD(); // existing function
+}
+
+
+function showProfilePage() {
+ const user = auth.currentUser;
+ console.log(auth.currentUser?.email);
+  console.log("Current user:", user?.email, user?.uid);
+  if (user) {
+    document.getElementById("profileEmail").textContent = user.email;
+
+db.collection("users").doc(user.uid).get().then(doc => {
+  let name = "Not available";
+
+  if (doc.exists && doc.data().name) {
+    name = doc.data().name;
+  } else if (user.displayName) {
+    name = user.displayName;
+  }
+
+  document.getElementById("profileName").textContent = name;
+  loadUserProfileAndOrders();
+});
+
+
+    // Hide all pages, show profile
+    document.getElementById("productList").style.display = "none";
+    document.getElementById("sliderSection").style.display = "none";
+    document.getElementById("cartPage").style.display = "none";
+    document.getElementById("profilePage").style.display = "block";
+    document.getElementById("shirtsPage").style.display = "none";
+    document.getElementById("pantsPage").style.display = "none";
+    document.getElementById("descriptionPage").style.display = "none";
+      document.getElementById("tshirtsPage").style.display = "none";
+       document.getElementById("cargosPage").style.display = "none";
+     document.getElementById("detailsPage").style.display = "none";
+  }
+}
+function logout() {
+  auth.signOut().then(() => {
+    location.reload(); // Reload to return to login screen
+  });
+}
+
+function saveOrder(productName, uid) {
+  db.collection("orders").add({
+    uid, // ✅ match field used in query
+    productName,
+    status: "Pending",
+    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+  }).then(docRef => {
+    console.log("Simple order saved:", docRef.id);
+  }).catch(error => {
+    console.error("Error saving simple order:", error);
+  });
+}
+
+
+     const firebaseConfig = {
       apiKey: "AIzaSyDzW8XuqrxM47W42HcIUXifa_X8tnfrLkY",
       authDomain: "monster-mens-collection.firebaseapp.com",
       projectId: "monster-mens-collection",
@@ -400,104 +2896,329 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    /* ------------------------------------------------------------------
-       UI STATE MANAGEMENT
-       ------------------------------------------------------------------*/
-    const sections = {
-      login: qs("#loginSection"),
-      signup: qs("#signupSection"),
-      products: qs("#productsPage"),
-    };
+function loadUserProfileAndOrders() {
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        // Set profile name and email
+        document.getElementById('profileEmail').innerText = user.email;
 
-    const bottomNav = qs("#bottomNav");
+        // Load orders
+        const orderList = document.getElementById("orderList");
+        orderList.innerHTML = "<li>Loading orders...</li>";
 
-    function showSection(key) {
-      Object.values(sections).forEach((sec) => toggleClass(sec, "hidden", true));
-      toggleClass(sections[key], "hidden", false);
-      updateBottomNavVisibility();
-    }
+        try {
+         const ordersSnapshot = await db.collection("orders")
+             .where("uid", "==", user.uid)
+              .orderBy("timestamp", "desc")
+             .get();
 
-    function toggleForm() {
-      if (sections.login.classList.contains("hidden")) {
-        showSection("login");
-        qs("#title").textContent = "Login";
-      } else {
-        showSection("signup");
-        qs("#signupTitle").textContent = "Sign Up";
+          orderList.innerHTML = "";
+
+          if (ordersSnapshot.empty) {
+            orderList.innerHTML = "<li>No orders found.</li>";
+          } else {
+            orderList.innerHTML = "";
+
+ordersSnapshot.forEach((doc, index) => {
+  const order = doc.data();
+  const orderDiv = document.createElement("div");
+  orderDiv.style.border = "1px solid #ccc";
+  orderDiv.style.borderRadius = "0px";
+  orderDiv.style.padding = "10px";
+  orderDiv.style.marginBottom = "15px";
+  
+  const paymentInfo = order.paymentMode ? order.paymentMode : "Online Paid";
+
+  let itemsHTML = "";
+  (order.cart || []).forEach(item => {
+    itemsHTML += `
+      <div style="margin-left: 10px; margin-top: 5px;">
+      🔹 <strong>${item.title}</strong> - ₹${item.price}
+      <div style="font-size: 12px; color: #555;">Size: ${item.size || "N/A"}</div>
+    </div>
+    `;
+  });
+
+  orderDiv.innerHTML = `
+   <div style="font-size: 12px; color: gray;">Placed on: ${order.timestamp?.toDate().toLocaleString() || "Unknown"}</div>
+    <div><strong>Order No:</strong> ${order.orderNumber || `#${index + 1}`}</div>
+    <div><strong>Payment:</strong>${paymentInfo}</div>
+    <div><strong>Payment ID:</strong> ${order.paymentId}</div>
+    <div style="margin-top: 10px;">${itemsHTML}</div>
+    <br><div><strong>Total:</strong> ₹${order.total}</div>
+  `;
+
+  orderList.appendChild(orderDiv);
+});
+
+          }
+        } catch (error) {
+         console.error("Error loading orders:", error);
+         document.getElementById("orderList").innerHTML = `<li>Error loading orders: ${error.message}</li>`;
+        }
       }
-      qs("#statusMessage").textContent = "";
+    });
+  }
+  
+    const loginSection = document.getElementById("loginSection");
+    const signupSection = document.getElementById("signupSection");
+    const subscriptionSection = document.getElementById("subscriptionSection");
+    const productsPage = document.getElementById("productsPage");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const statusMessage = document.getElementById("statusMessage");
+    const adminControls = document.getElementById("adminControls");
+
+    const adminEmails = ["youremail@example.com"];
+
+    async function checkSubscription(uid) {
+      const doc = await db.collection("subscriptions").doc(uid).get();
+      if (!doc.exists) return false;
+      const data = doc.data();
+      const now = new Date();
+      const expiryDate = data.expiryDate?.toDate?.() || new Date(data.expiryDate);
+      return expiryDate > now;
     }
 
-    function updateBottomNavVisibility() {
-      const showNav = !sections.login.classList.contains("hidden") ||
-        !sections.signup.classList.contains("hidden")
-        ? false
-        : true;
-      toggleClass(bottomNav, "hidden", !showNav);
+    async function updatePageForUser(user) {
+      await user.reload();
+      if (!user.emailVerified) {
+        alert("Please verify your email address before continuing.");
+        auth.signOut();
+        return;
+      }
+      const subscribed = await checkSubscription(user.uid);
+      const container = document.getElementById("mainContainer");
+
+if (subscribed) {
+  subscriptionSection.style.display = "none";
+  productsPage.style.display = "block";
+  document.getElementById("title").textContent = "";
+  container.classList.add("no-box");
+  container.classList.remove("with-top-margin");
+} else {
+  subscriptionSection.style.display = "none";
+  productsPage.style.display = "block";
+  document.getElementById("title").textContent = "";
+  container.classList.add("no-box");
+  container.classList.remove("with-top-margin");
+}
+      loginSection.style.display = "none";
+      signupSection.style.display = "none";
+      adminControls.style.display = adminEmails.includes(user.email) ? "block" : "none";
     }
 
-    /* ------------------------------------------------------------------
-       AUTH HANDLERS
-       ------------------------------------------------------------------*/
-    qs("#emailLoginBtn").addEventListener("click", () => {
-      const email = qs("#email").value.trim();
-      const password = qs("#password").value.trim();
-      if (!email || !password) return;
-      auth.signInWithEmailAndPassword(email, password).catch((err) => {
-        qs("#statusMessage").textContent = err.message;
+    async function saveSubscription(uid) {
+      const expiry = new Date();
+      expiry.setMonth(expiry.getMonth() + 1);
+      await db.collection("subscriptions").doc(uid).set({
+        expiryDate: expiry,
+        createdAt: new Date()
       });
+    }
+    logoutBtn.addEventListener("click", () => {
+      auth.signOut();
     });
 
-    qs("#emailSignupBtn").addEventListener("click", () => {
-      const name = qs("#signupName").value.trim();
-      const email = qs("#signupEmail").value.trim();
-      const password = qs("#signupPassword").value.trim();
-      if (!email || !password) return;
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        await updatePageForUser(user);
+      } else {
+        subscriptionSection.style.display = "none";
+        productsPage.style.display = "none";
+        loginSection.style.display = "flex";
+        signupSection.style.display = "none";
+        document.getElementById("title").textContent = "Login";
+        document.getElementById("confirmationMessage").textContent = "";
+        statusMessage.textContent = "";
+        adminControls.style.display = "none";
+      }
+    });
 
-      auth
-        .createUserWithEmailAndPassword(email, password)
-        .then((cred) => {
-          return db.collection("users").doc(cred.user.uid).set({ name, email });
-        })
-        .then(() => {
-          qs("#statusMessage").textContent = "Account created! Please log in.";
-          toggleForm();
-        })
-        .catch((err) => {
-          qs("#statusMessage").textContent = err.message;
+    document.getElementById("emailLoginBtn").addEventListener("click", () => {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      auth.signInWithEmailAndPassword(email, password)
+        .catch((error) => {
+          statusMessage.textContent = "Incorrect email or password. Please try again.";
         });
     });
 
-    auth.onAuthStateChanged((user) => {
-      document.body.classList.remove("waiting-for-auth");
-      if (user) {
-        showSection("products");
+    document.getElementById("emailSignupBtn").addEventListener("click", () => {
+  const name = document.getElementById("signupName").value;
+  const email = document.getElementById("signupEmail").value;
+  const password = document.getElementById("signupPassword").value;
+
+  auth.createUserWithEmailAndPassword(email, password)
+    .then((userCredential) => {
+      const user = userCredential.user;
+
+      // Save name and email to Firestore
+      db.collection("users").doc(user.uid).set({
+        name: name,
+        email: email
+      }).then(() => {
+        console.log("User data saved to Firestore.");
+      }).catch((error) => {
+        console.error("Error saving user data to Firestore: ", error);
+      });
+
+      user.sendEmailVerification()
+        .then(() => {
+          statusMessage.textContent = `A verification email has been sent to ${email}. Please verify before logging in.`;
+          signupSection.style.display = "none";
+          loginSection.style.display = "flex";
+          document.getElementById("title").textContent = "Login";
+        })
+        .catch((error) => {
+          statusMessage.textContent = "Failed to send verification email: " + error.message;
+        });
+
+      auth.signOut(); // Log out after sending email
+    })
+    .catch((error) => {
+      if (error.code === 'auth/email-already-in-use') {
+        statusMessage.textContent = "This email is already in use. Please login instead.";
+        toggleForm();
       } else {
-        showSection("login");
+        statusMessage.textContent = error.message;
       }
     });
-
-    /* ------------------------------------------------------------------
-       NAVIGATION HELPERS
-       ------------------------------------------------------------------*/
-    function backToProducts() {
-      showSection("products");
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-
-    /* ------------------------------------------------------------------
-       SCROLL SHOW / HIDE NAV & BANNER
-       ------------------------------------------------------------------*/
-    let lastScroll = 0;
-    const shippingBar = qs("#shippingBar");
-
-    window.addEventListener("scroll", () => {
-      const y = window.scrollY || document.documentElement.scrollTop;
-      const down = y > lastScroll;
-      toggleClass(bottomNav, "hide-bottom-nav", down);
-      toggleClass(shippingBar, "hide-shippingBar-nav", down);
-      lastScroll = y;
+});
+    document.getElementById("forgotPasswordLink").addEventListener("click", () => {
+      const email = document.getElementById("email").value;
+      if (!email) {
+        statusMessage.textContent = "Please enter your email address first.";
+        return;
+      }
+      auth.sendPasswordResetEmail(email)
+        .then(() => {
+          statusMessage.textContent = `A password reset link has been sent to ${email}. Please check your inbox.`;
+        })
+        .catch((error) => {
+          statusMessage.textContent = error.message;
+        });
     });
-  </script>
+    function updateBottomNavVisibility() {
+  const loginVisible = document.getElementById("loginSection").style.display !== "none";
+  const signupVisible = document.getElementById("signupSection").style.display !== "none";
+  const subscriptionVisible = document.getElementById("subscriptionSection").style.display !== "none";
+
+  const bottomNav = document.getElementById("bottomNav");
+
+  if (loginVisible || signupVisible || subscriptionVisible) {
+    bottomNav.style.display = "none";
+  } else {
+    bottomNav.style.display = "flex"; // or "block" if you're not using flex layout
+  }
+}
+  const subscriptionForm = document.getElementById("subscriptionForm");
+
+  subscriptionForm.addEventListener("submit", async function (e) {
+    e.preventDefault(); // Prevent page reload
+
+    const razorpayOptions = {
+      key: "rzp_live_0M0qHSpzByvZAr", // Replace with your Razorpay test key
+      amount: 200, // ₹2 in paise
+      currency: "INR",
+      name: "Monster Men's Collection",
+      description: "Monthly Subscription",
+      handler: function (response) {
+        // You can store payment success in Firestore or show a message
+        document.getElementById("confirmationMessage").innerText = "Payment successful! Thank you for subscribing.";
+      },
+      prefill: {
+        email: firebase.auth().currentUser?.email || "",
+      },
+      theme: {
+        color: "#007bff",
+      },  
+      webview_intent: true
+    };
+
+    const rzp = new Razorpay(razorpayOptions);
+    rzp.open();
+  });
+    function toggleForm() {
+      const isLoginVisible = loginSection.style.display !== "none";
+      loginSection.style.display = isLoginVisible ? "none" : "flex";
+      signupSection.style.display = isLoginVisible ? "flex" : "none";
+      document.getElementById("title").textContent = isLoginVisible ? "Sign Up" : "Login";
+      statusMessage.textContent = "";
+    }
+    
+  window.onpopstate = function (event) {
+  if (event.state && event.state.page) {
+    const page = event.state.page;
+    // Hide all pages first
+    document.querySelectorAll(".page").forEach(p => p.style.display = "none");
+
+    // Then show the correct one
+    document.getElementById(page).style.display = "block";
+    document.getElementById("descriptionPage").style.display = "none";
+    document.getElementById("detailsPage").style.display = "none";
+  }
+};
+
+
+
+
+let lastScrollTop = 0;
+const bottomNav = document.getElementById("bottomNav");
+const shippingBar = document.getElementById("shippingBar");
+
+window.addEventListener("scroll", function () {
+  const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+
+  const isShirtPage = document.getElementById("shirtsPage").style.display !== "none";
+  const isTshirtPage = document.getElementById("tshirtsPage")?.style.display !== "none";
+  const isPantsPage = document.getElementById("pantsPage").style.display !== "none";
+  const isCargosPage = document.getElementById("cargosPage")?.style.display !== "none";
+
+  let filterControls = null;
+
+  if (isShirtPage) {
+    filterControls = document.getElementById("filterControlsShirts");
+  } else if (isTshirtPage) {
+    filterControls = document.getElementById("filterControlsTshirts");
+  } else if (isPantsPage) {
+    filterControls = document.getElementById("filterControlsPants");
+  } else if (isCargosPage) {
+    filterControls = document.getElementById("filterControlsCargos");
+  }
+
+  const shouldHide = isShirtPage || isTshirtPage || isPantsPage || isCargosPage;
+
+  if (shouldHide) {
+    if (currentScroll > lastScrollTop) {
+      bottomNav.classList.add("hide-bottom-nav");
+      shippingBar.classList.add("hide-shippingBar-nav");
+      filterControls?.classList.add("hide-filter-bar");
+    } else {
+      bottomNav.classList.remove("hide-bottom-nav");
+      shippingBar.classList.remove("hide-shippingBar-nav");
+      filterControls?.classList.remove("hide-filter-bar");
+    }
+  } else {
+    bottomNav.classList.remove("hide-bottom-nav");
+    shippingBar.classList.remove("hide-shippingBar-nav");
+    filterControls?.classList.remove("hide-filter-bar");
+  }
+
+  lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
+});
+
+
+
+    // On initial load (login/signup page), add top margin
+document.getElementById("mainContainer").classList.add("with-top-margin");
+document.getElementById("backToSubscription").addEventListener("click", () => {
+     firebase.auth().signOut();
+  document.getElementById("mainContainer").classList.add("with-top-margin");
+});
+
+  
+</script>
+
 </body>
+
 </html>
