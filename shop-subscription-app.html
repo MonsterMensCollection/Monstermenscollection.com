@@ -2168,7 +2168,7 @@ img.addEventListener('touchend', () => {
 });
 
 let cart = [];
-function showDescription(media = [], price, title = "No title", sdes = "No short description", description = "No description", sizesAvailable = ["M", "L", "XL"], colorsAvailable = [], category = null) {
+function showDescription(media = [],  priceUSD, title = "No title", sdes = "No short description", description = "No description", sizesAvailable = ["M", "L", "XL"], colorsAvailable = [], category = null) {
   if (category) {
     // Push category state BEFORE description
     history.pushState({ page: category }, "", "#" + category);
@@ -2258,8 +2258,8 @@ function showDescription(media = [], price, title = "No title", sdes = "No short
 
   // Update product info
   const descPriceEl = document.getElementById("descPrice");
-descPriceEl.dataset.basePrice = price;          // cache the raw USD
- descPriceEl.textContent   = format(convert(price));
+descPriceEl.dataset.basePrice =  priceUSD;          // cache the raw USD
+ descPriceEl.textContent   = format(convert( priceUSD));
 
   document.getElementById("descName").textContent = title;
   document.getElementById("descSText").textContent = sdes;
@@ -2428,28 +2428,18 @@ if (!document.getElementById("descHeader")) {
 
 
 
-function addToCart(image = null, price = null, title = null) {
-  if (!image || !price) {
-    image = document.getElementById('descImage').src;
-    price = document.getElementById('descPrice').innerText;
-    title = document.getElementById('descName').innerText;
-  }
+function addToCart(image = null,  priceUSD = null, title = null) {
+  if (!image)  image  = document.getElementById("descImage").src;
+ if (!title)  title  = document.getElementById("descName").innerText;
 
-  const size = document.getElementById("selectedSize").value;
-  const color = document.getElementById("selectedColor")?.value;
+ /* take the raw USD we cached earlier */
+ if (priceUSD === null) {
+   priceUSD = parseFloat(
+               document.getElementById("descPrice").dataset.basePrice || 0
+             );
+ }
 
-  if (!size) {
-    alert("Please select a size.");
-    return;
-  }
-
-  if (!color) {
-    alert("Please select a color.");
-    return;
-  }
-
-  const parsedPrice = parseInt(price.replace('$', ''));
-  cart.push({ image, price: parsedPrice, title, size, color });
+ cart.push({ image, price: priceUSD, title, size, color });
 
   alert('Item added to cart!');
 }
