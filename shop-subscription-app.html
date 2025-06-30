@@ -2599,14 +2599,33 @@ function filterProductsBySize(pageId) {
   });
 }
 
-  const RATES={USD:1, INR:83, EUR:0.92};
-  let currentCurrency='USD';
 
-  const currencySymbol=(code)=>({USD:'$',INR:'₹',EUR:'€'}[code]||'');
+const RATES = { USD: 1, INR: 83, EUR: 0.92 };
+let currentCurrency = "USD";
 
-  function convert(valUSD){return valUSD*RATES[currentCurrency];}
-  function format(val){return currencySymbol(currentCurrency)+((currentCurrency==='USD')?val.toFixed(0):val.toFixed(0));}
+const currencySymbol = c => ({ USD: "$", INR: "₹", EUR: "€" }[c] || "");
+const convert  = usd => usd * RATES[currentCurrency];
+const format   = v   => currencySymbol(currentCurrency) + v.toFixed(0);
 
+/* ────────────────  🆕  totals + free-shipping helper  ──────────────── */
+function updateCartAmounts () {
+  const amountEl = document.getElementById("cartAmount");
+  if (!amountEl) return;
+
+  const subUSD     = cart.reduce((s, it) => s + it.price, 0);   // cart prices are USD
+  const shipUSD    = subUSD >= 99 ? 0 : 19;                     // free ≥ $99
+  const grandUSD   = subUSD + shipUSD;
+
+  const shipDisplay  = format(convert(shipUSD));
+  const totalDisplay = format(convert(grandUSD));
+
+  amountEl.innerHTML =
+    shipUSD === 0
+      ? `<span style="font-size:12px;color:green;">Free Shipping + </span>${totalDisplay}`
+      : `<span style="font-size:12px;color:#888;">${shipDisplay} shipping + </span>${totalDisplay}`;
+}
+
+  
   // Update every .price text & cart totals
   function updateAllPrices(){
     document.querySelectorAll('.price').forEach(el=>{
@@ -2631,6 +2650,12 @@ function filterProductsBySize(pageId) {
   });
 
 
+
+
+
+
+
+  
   
 function showCart () {
   lastCategoryPage = "cartPage";
