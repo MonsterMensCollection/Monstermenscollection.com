@@ -49,7 +49,10 @@
        height: auto;
        display: block;
      }
-
+#loginSection,
+#signupSection {
+  display:none;          /* keep them hidden until we decide */
+}
 #cartPage,
 #profilePage {
   display: flex;
@@ -3020,19 +3023,40 @@ if (subscribed) {
     });
 
     auth.onAuthStateChanged(async (user) => {
-      if (user) {
-        await updatePageForUser(user);
-      } else {
-        subscriptionSection.style.display = "none";
-        productsPage.style.display = "none";
-        loginSection.style.display = "flex";
-        signupSection.style.display = "none";
-        document.getElementById("title").textContent = "Login";
-        document.getElementById("confirmationMessage").textContent = "";
-        statusMessage.textContent = "";
-        adminControls.style.display = "none";
-      }
-    });
+  const container        = document.getElementById("mainContainer");
+  const loginSection     = document.getElementById("loginSection");
+  const signupSection    = document.getElementById("signupSection");
+  const productsPage     = document.getElementById("productsPage");
+  const sliderSection    = document.getElementById("sliderSection");
+  const bottomNav        = document.getElementById("bottomNav");
+
+  if (user && user.emailVerified) {
+    /* ----------  LOGGED-IN  ---------- */
+    await updatePageForUser(user);          // keeps all your subscription logic
+
+    loginSection.style.display   = "none";
+    signupSection.style.display  = "none";
+
+    productsPage.style.display   = "block";
+    sliderSection.style.display  = "block";
+    bottomNav.style.display      = "flex";
+
+    container.classList.add("no-box");
+    container.classList.remove("with-top-margin");
+  } else {
+    /* ----------  NOT LOGGED-IN  ---------- */
+    productsPage.style.display   = "none";
+    sliderSection.style.display  = "none";
+    bottomNav.style.display      = "none";
+
+    loginSection.style.display   = "flex";  // show login first
+    signupSection.style.display  = "none";  // hide sign-up until toggleForm()
+
+    container.classList.remove("no-box");
+    container.classList.add("with-top-margin");
+  }
+});
+
 
     document.getElementById("emailLoginBtn").addEventListener("click", () => {
       const email = document.getElementById("email").value;
@@ -3210,10 +3234,6 @@ window.addEventListener("scroll", function () {
 
 
     // On initial load (login/signup page), add top margin
-document.getElementById("mainContainer").classList.add("with-top-margin");
-document.getElementById("backToSubscription").addEventListener("click", () => {
-     firebase.auth().signOut();
-  document.getElementById("mainContainer").classList.add("with-top-margin");
 });
 
   
