@@ -589,7 +589,7 @@
     
  </style>
 </head>
-<body>
+<body class="waiting-for-auth">
   <div class="container" id="mainContainer" style="margin:auto;">
     
     <div>
@@ -2896,70 +2896,90 @@ function saveOrder(productName, uid) {
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-function loadUserProfileAndOrders() {
-    auth.onAuthStateChanged(async (user) => {
-      if (user) {
-        // Set profile name and email
-        document.getElementById('profileEmail').innerText = user.email;
 
-        // Load orders
-        const orderList = document.getElementById("orderList");
-        orderList.innerHTML = "<li>Loading orders...</li>";
+auth.onAuthStateChanged(async (user) => {
+  // ✅ 2️⃣ un-hide once we know the auth state
+  document.body.classList.remove('waiting-for-auth');
 
-        try {
-         const ordersSnapshot = await db.collection("orders")
-             .where("uid", "==", user.uid)
-              .orderBy("timestamp", "desc")
-             .get();
-
-          orderList.innerHTML = "";
-
-          if (ordersSnapshot.empty) {
-            orderList.innerHTML = "<li>No orders found.</li>";
-          } else {
-            orderList.innerHTML = "";
-
-ordersSnapshot.forEach((doc, index) => {
-  const order = doc.data();
-  const orderDiv = document.createElement("div");
-  orderDiv.style.border = "1px solid #ccc";
-  orderDiv.style.borderRadius = "0px";
-  orderDiv.style.padding = "10px";
-  orderDiv.style.marginBottom = "15px";
-  
-  const paymentInfo = order.paymentMode ? order.paymentMode : "Online Paid";
-
-  let itemsHTML = "";
-  (order.cart || []).forEach(item => {
-    itemsHTML += `
-      <div style="margin-left: 10px; margin-top: 5px;">
-      🔹 <strong>${item.title}</strong> - ₹${item.price}
-      <div style="font-size: 12px; color: #555;">Size: ${item.size || "N/A"}</div>
-    </div>
-    `;
-  });
-
-  orderDiv.innerHTML = `
-   <div style="font-size: 12px; color: gray;">Placed on: ${order.timestamp?.toDate().toLocaleString() || "Unknown"}</div>
-    <div><strong>Order No:</strong> ${order.orderNumber || `#${index + 1}`}</div>
-    <div><strong>Payment:</strong>${paymentInfo}</div>
-    <div><strong>Payment ID:</strong> ${order.paymentId}</div>
-    <div style="margin-top: 10px;">${itemsHTML}</div>
-    <br><div><strong>Total:</strong> ₹${order.total}</div>
-  `;
-
-  orderList.appendChild(orderDiv);
+  if (user) {
+    await updatePageForUser(user);   // you already had this
+    await loadUserProfileAndOrders(user);   // ← add this line
+  } else {
+    // show login page
+    loginSection.style.display  = "flex";
+    signupSection.style.display = "none";
+    productsPage.style.display  = "none";
+  }
 });
 
-          }
-        } catch (error) {
-         console.error("Error loading orders:", error);
-         document.getElementById("orderList").innerHTML = `<li>Error loading orders: ${error.message}</li>`;
-        }
-      }
-    });
-  }
+
   
+/* ------------------------------------------------------------
+   Fetch profile + orders once for the user we already have
+------------------------------------------------------------ */
+async function loadUserProfileAndOrders(user) {
+  if (!user) return;                           // safety check
+
+  /* --- profile --- */
+  document.getElementById('profileEmail').innerText = user.email;
+
+  /* --- orders --- */
+  const orderList = document.getElementById("orderList");
+  orderList.innerHTML = "<li>Loading orders...</li>";
+
+  try {
+    const ordersSnapshot = await db.collection("orders")
+                                   .where("uid", "==", user.uid)
+                                   .orderBy("timestamp", "desc")
+                                   .get();
+
+    orderList.innerHTML = "";                  // clear “Loading…”
+
+    if (ordersSnapshot.empty) {
+      orderList.innerHTML = "<li>No orders found.</li>";
+      return;
+    }
+
+    ordersSnapshot.forEach((doc, index) => {
+      const order = doc.data();
+
+      /* build the little card exactly the way you did before  */
+      const orderDiv = document.createElement("div");
+      orderDiv.style.cssText = `
+        border:1px solid #ccc;padding:10px;margin-bottom:15px;
+      `;
+
+      const paymentInfo = order.paymentMode ? order.paymentMode : "Online Paid";
+
+      let itemsHTML = "";
+      (order.cart || []).forEach(item => {
+        itemsHTML += `
+          <div style="margin-left:10px;margin-top:5px;">
+            🔹 <strong>${item.title}</strong> - ₹${item.price}
+            <div style="font-size:12px;color:#555;">Size: ${item.size || "N/A"}</div>
+          </div>`;
+      });
+
+      orderDiv.innerHTML = `
+        <div style="font-size:12px;color:gray;">
+          Placed on: ${order.timestamp?.toDate().toLocaleString() || "Unknown"}
+        </div>
+        <div><strong>Order No:</strong> ${order.orderNumber || `#${index + 1}`}</div>
+        <div><strong>Payment:</strong> ${paymentInfo}</div>
+        <div><strong>Payment ID:</strong> ${order.paymentId}</div>
+        <div style="margin-top:10px;">${itemsHTML}</div>
+        <br><div><strong>Total:</strong> ₹${order.total}</div>
+      `;
+
+      orderList.appendChild(orderDiv);
+    });
+
+  } catch (err) {
+    console.error("Error loading orders:", err);
+    orderList.innerHTML = `<li>Error loading orders: ${err.message}</li>`;
+  }
+}
+
     const loginSection = document.getElementById("loginSection");
     const signupSection = document.getElementById("signupSection");
     const subscriptionSection = document.getElementById("subscriptionSection");
@@ -3216,7 +3236,7 @@ document.getElementById("backToSubscription").addEventListener("click", () => {
   document.getElementById("mainContainer").classList.add("with-top-margin");
 });
 
-  
+   body.waiting-for-auth { visibility: hidden; }
 </script>
 
 </body>
