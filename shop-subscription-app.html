@@ -50,6 +50,18 @@
        display: block;
      }
 
+ #currencySelector{
+      position:fixed;
+      top:6px;left:6px;
+      z-index:10000;
+      padding:4px 8px;
+      border:1px solid #ccc;
+      border-radius:4px;
+      background:#fff;
+      font-size:.8rem;
+    }
+
+     
 #cartPage,
 #profilePage {
   display: flex;
@@ -1791,6 +1803,12 @@
       <div id="profileEmail" style="font-size: 18px; font-weight: bold; color: #333;">Loading...</div>
     </div>
   </div>
+  
+ <select id="currencySelector">
+    <option value="USD">$ USD</option>
+    <option value="INR">₹ INR</option>
+    <option value="EUR">€ EUR</option>
+  </select>
 
   <!-- Why It Takes Time Button -->
   <button onclick="toggleWhyTime()" style="margin-top: 30px; padding: 12px 20px; background-color: #eee; color: #000; border: none; border-radius: 0px; cursor: pointer; font-weight: bold; width: 100%;">
@@ -2432,6 +2450,7 @@ function addToCart(image = null, price = null, title = null) {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
+   updateAllPrices(); // initial
   // 🔹 Existing Filter Controls
   const filterControls = document.querySelectorAll(".filter-controls");
 
@@ -2570,64 +2589,96 @@ function filterProductsBySize(pageId) {
   });
 }
 
-function showCart() {
+  const RATES={USD:1, INR:83, EUR:0.92};
+  let currentCurrency='USD';
 
- lastCategoryPage = "cartPage"; // ✅ Add this line
- history.pushState({ page: "cartPage" }, "", "#cart");
+  const currencySymbol=(code)=>({USD:'$',INR:'₹',EUR:'€'}[code]||'');
+
+  function convert(valUSD){return valUSD*RATES[currentCurrency];}
+  function format(val){return currencySymbol(currentCurrency)+((currentCurrency==='USD')?val.toFixed(0):val.toFixed(0));}
+
+  // Update every .price text & cart totals
+  function updateAllPrices(){
+    document.querySelectorAll('.price').forEach(el=>{
+      let usd=parseFloat(el.dataset.basePrice||(el.textContent.replace(/[^0-9.]/g,''))||0);
+      if(!usd) return;
+      el.dataset.basePrice=usd; // cache
+      el.textContent=format(convert(usd));
+    });
+    if(document.getElementById('cartPage').style.display!=='none') updateCartAmounts();
+    if(document.getElementById('descPrice')){
+      const el=document.getElementById('descPrice');
+      let usd=parseFloat(el.dataset.basePrice||(el.textContent.replace(/[^0-9.]/g,''))||0);
+      el.dataset.basePrice=usd;
+      el.textContent=format(convert(usd));
+    }
+  }
+
+  // Hook selector
+  document.getElementById('currencySelector').addEventListener('change',e=>{
+    currentCurrency=e.target.value;
+    updateAllPrices();
+  });
+
+
   
-  document.getElementById("descriptionPage").style.display = "none";
-  document.getElementById("productList").style.display = "none";
-  document.getElementById("shirtsPage").style.display = "none";
-  document.getElementById("pantsPage").style.display = "none";
-  document.getElementById("sliderSection").style.display = "none";
+function showCart () {
+  lastCategoryPage = "cartPage";
+  history.pushState({ page: "cartPage" }, "", "#cart");
+
+  /* page-visibility boilerplate (unchanged) */
+  ["descriptionPage","productList","shirtsPage","pantsPage",
+   "sliderSection","profilePage","tshirtsPage","cargosPage",
+   "detailsPage"].forEach(id => document.getElementById(id).style.display="none");
   document.getElementById("cartPage").style.display = "block";
-  document.getElementById("profilePage").style.display = "none";
-  document.getElementById("tshirtsPage").style.display = "none";
-  document.getElementById("cargosPage").style.display = "none";
-    document.getElementById("detailsPage").style.display = "none";
 
-  const cartItemsDiv = document.getElementById("cartItems");
+  /* ---------------  Build the cart UI --------------- */
+  const cartItemsDiv     = document.getElementById("cartItems");
   const emptyCartMessage = document.getElementById("emptyCartMessage");
-  cartItemsDiv.innerHTML = '';
-
-  let subtotal = 0;
+  cartItemsDiv.innerHTML = "";
 
   if (cart.length === 0) {
-    emptyCartMessage.style.display = 'block';
-    document.getElementById("cartAmount").textContent = "$0";
-  } else {
-    emptyCartMessage.style.display = 'none';
+    emptyCartMessage.style.display = "block";
+    document.getElementById("cartAmount").textContent = format(convert(0));
+    return;                         // nothing else to do
+  }
 
-    cart.forEach((item, index) => {
-      subtotal += item.price;
-      const itemHTML = `
-        <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 15px; padding: 12px;">
-          <img src="${item.image}" style="width: 80px; border-radius: 6px; object-fit: cover;" />
-          <div style="flex-grow: 1; text-align: left;">
-            <p style="margin: 4px 0;"><strong>${item.title}</strong></p>
-            <p style="margin: 4px 0;"><strong>Size:</strong> ${item.size || 'N/A'}</p>
-            <p style="margin: 4px 0;"><strong>Color:</strong> ${item.color || 'N/A'}</p>
-            <p style="margin: 4px 0;"><strong>Price:</strong> $${item.price}</p>
+  emptyCartMessage.style.display = "none";
+
+  cart.forEach((item, index) => {
+    cartItemsDiv.insertAdjacentHTML(
+      "beforeend",
+      `
+        <div style="display:flex;gap:15px;align-items:center;margin-bottom:15px;padding:12px;">
+          <img src="${item.image}"
+               style="width:80px;border-radius:6px;object-fit:cover;" />
+
+          <div style="flex-grow:1;text-align:left;">
+            <p style="margin:4px 0;"><strong>${item.title}</strong></p>
+            <p style="margin:4px 0;"><strong>Size:</strong> ${item.size || "N/A"}</p>
+            <p style="margin:4px 0;"><strong>Color:</strong> ${item.color || "N/A"}</p>
+
+            <!-- cache USD amount in data-attribute, display converted -->
+            <p  class="price"
+                data-base-price="${item.price}"
+                style="margin:4px 0;">
+              <strong>Price:</strong> ${format(convert(item.price))}
+            </p>
           </div>
-          <button onclick="removeFromCart(${index})" style="background-color: transparent; border: none; cursor: pointer;">
-            <img src="https://img.icons8.com/?size=100&id=Qgjnp78cDeJi&format=png&color=000000" width="16">
+
+          <button onclick="removeFromCart(${index})"
+                  style="background:transparent;border:none;cursor:pointer;">
+            <img src="https://img.icons8.com/?size=100&id=Qgjnp78cDeJi&format=png&color=000000"
+                 width="16">
           </button>
         </div>
-        <hr style="width: 80%; margin: 10px auto; border: none; border-top: 1px solid #ccc;" />
-      `;
-      cartItemsDiv.innerHTML += itemHTML;
-    });
+        <hr style="width:80%;margin:10px auto;border:none;border-top:1px solid #ccc;" />
+      `
+    );
+  });
 
-    // Calculate shipping
-    let shipping = subtotal >= 99 ? 0 : 19;
-    let total = subtotal + shipping;
-
-    // Update cart total display
-    const cartAmountDiv = document.getElementById("cartAmount");
-    cartAmountDiv.innerHTML = shipping === 0
-      ? `<span style="font-size: 12px; color: green;">Free Shipping + </span>$${total}`
-      : `<span style="font-size: 12px; color: #888;">$19 shipping added + </span>$${total} `;
-  }
+  /* Show the shipping/total row in the selected currency */
+  updateCartAmounts();  // <-- this uses convert() & format() inside
 }
 
 
