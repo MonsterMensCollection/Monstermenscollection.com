@@ -617,7 +617,7 @@
     
  </style>
 </head>
-<body class="preload">
+<body>
   <div class="container" id="mainContainer" style="margin:auto;">
     
     <div>
@@ -1929,13 +1929,11 @@
   </div>
 </div>
 
-  
   <div id="loadingScreen">
     <!-- replace with your own logo / GIF / static image -->
-    <img src="https://see.fontimg.com/api/rf5/woG33/N2Y3Y2RhYTdiOGMwNGVjOGE5MWE1MTFiNGJjM2E4Y2Iub3Rm/RU5MWQ/redtrap-expanded-puo.png?r=fs&h=30&w=1000&fg=FFFFFF&bg=FFFFFF&tb=1&s=30"
+    <img src="https://see.fontimg.com/api/rf5/woG33/N2Y3Y2RhYTdiOGMwNGVjOGE5MWE1MTFiNGJjM2E4Y2Iub3Rm/RU5MWQ/redtrap-expanded-puo.png?r=fs&h=34&w=1000&fg=FFFFFF&bg=FFFFFF&tb=1&s=34"
          alt="Loading…" />
   </div>
-  
  
   
     <div id="adminControls" class="admin-controls" style="display:none;">
@@ -2506,18 +2504,6 @@ function addToCart(image = null, priceUSD = null, title = null) {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-
-  const loader = document.getElementById('loadingScreen');
-
-  // small delay so the GIF / logo is actually visible
-  setTimeout(() => {
-    document.body.classList.remove('preload');  // unlock scrolling
-    loader.classList.add('fade-out');           // start CSS transition
-  }, 50);
-
-  // remove the node after the fade finishes
-  loader.addEventListener('transitionend', () => loader.remove());
-  
    updateAllPrices(); // initial
   // 🔹 Existing Filter Controls
   const filterControls = document.querySelectorAll(".filter-controls");
@@ -3288,16 +3274,11 @@ if (subscribed) {
       statusMessage.textContent = "";
     }
 
- window.addEventListener('load', () => {
+  window.addEventListener('load', () => {
   const loader = document.getElementById('loadingScreen');
-
-  /* Give the loader time to paint, then reveal the page */
-  setTimeout(() => {
-    /*** NEW ***/ document.body.classList.remove('preload');
-    loader.classList.add('fade-out');
-  }, 50);                                 // small delay = smoother transition
-
-  loader.addEventListener('transitionend', () => loader.remove());
+  /* fade first, then hard-remove to avoid catching tab-focus */
+  loader.classList.add('fade-out');
+  setTimeout(() => loader.remove(), 600);  // match CSS transition
 });
   
   window.onpopstate = function (event) {
@@ -3369,10 +3350,6 @@ document.getElementById("backToSubscription").addEventListener("click", () => {
      firebase.auth().signOut();
   document.getElementById("mainContainer").classList.add("with-top-margin");
 });
-  
-  body.preload > *:not(#loadingScreen) {
-  display: none !important;
-}
 
   
 </script>
