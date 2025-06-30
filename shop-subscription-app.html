@@ -597,7 +597,23 @@
   font-size: 0.9rem;
   color: #000;
 }
-
+#loadingScreen{
+  position:fixed;
+  inset:0;                     /* top:0 right:0 bottom:0 left:0 */
+  background:#fff;             /* fallback colour */
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:99999;
+  transition:opacity .5s ease; /* for the fade-out */
+}
+#loadingScreen.fade-out{
+  opacity:0;
+  pointer-events:none;         /* click-through once hidden */
+}
+#loadingScreen img{
+  max-width:60%;               /* tame huge images on mobile */
+  height:aut
     
  </style>
 </head>
@@ -1912,7 +1928,12 @@
     Your order has been placed. Thank you!
   </div>
 </div>
-  
+
+  <div id="loadingScreen">
+    <!-- replace with your own logo / GIF / static image -->
+    <img src="https://raw.githubusercontent.com/MonsterMensCollection/nOW/refs/heads/main/1.png"
+         alt="Loading…" />
+  </div>
  
   
     <div id="adminControls" class="admin-controls" style="display:none;">
@@ -3252,7 +3273,14 @@ if (subscribed) {
       document.getElementById("title").textContent = isLoginVisible ? "Sign Up" : "Login";
       statusMessage.textContent = "";
     }
-    
+
+  window.addEventListener('load', () => {
+  const loader = document.getElementById('loadingScreen');
+  /* fade first, then hard-remove to avoid catching tab-focus */
+  loader.classList.add('fade-out');
+  setTimeout(() => loader.remove(), 600);  // match CSS transition
+});
+  
   window.onpopstate = function (event) {
   if (event.state && event.state.page) {
     const page = event.state.page;
