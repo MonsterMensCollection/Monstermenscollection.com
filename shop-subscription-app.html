@@ -2892,38 +2892,6 @@ function saveOrder(productName, uid) {
       measurementId: "G-5WFHV50M9Z"
     };
 
- const skipAuth = true;      // <— set to false whenever you want the old behaviour back
-
-  /* -----------------------------------------------------------------
-     2.  Grab the key DOM elements once
-     -----------------------------------------------------------------*/
-  const loginSection      = document.getElementById("loginSection");
-  const signupSection     = document.getElementById("signupSection");
-  const subscriptionSection = document.getElementById("subscriptionSection");
-  const productsPage      = document.getElementById("productsPage");
-  const sliderSection     = document.getElementById("sliderSection");
-  const bottomNav         = document.getElementById("bottomNav");
-
-  /* -----------------------------------------------------------------
-     3.  Show / hide the right things on first load
-     -----------------------------------------------------------------*/
-  if (skipAuth) {
-    // Hide everything related to auth / subscription
-    [loginSection, signupSection, subscriptionSection].forEach(el => {
-      if (el) el.style.display = "none";
-    });
-
-    // Reveal the real home page
-    productsPage.style.display  = "block";
-    sliderSection.style.display = "block";
-    bottomNav.style.display     = "flex";
-
-    // OPTIONAL – if you never want Firebase auth at all, comment out the next line
-    // firebase.auth().signOut();   // makes sure no “ghost” session lingers
-  }
-
-
-  
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
