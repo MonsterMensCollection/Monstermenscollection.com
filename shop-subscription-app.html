@@ -2166,7 +2166,7 @@ img.addEventListener('touchend', () => {
     lastDistance = null;
   }
 });
-
+const toNumber = v => Number(String(v).replace(/[^0-9.]/g, '')) || 0;
 let cart = [];
 function showDescription(media = [],  priceUSD, title = "No title", sdes = "No short description", description = "No description", sizesAvailable = ["M", "L", "XL"], colorsAvailable = [], category = null) {
   if (category) {
@@ -2258,8 +2258,9 @@ function showDescription(media = [],  priceUSD, title = "No title", sdes = "No s
 
   // Update product info
   const descPriceEl = document.getElementById("descPrice");
-descPriceEl.dataset.basePrice =  priceUSD;          // cache the raw USD
- descPriceEl.textContent   = format(convert( priceUSD));
+const baseUSD = toNumber(priceUSD);                // 49
+ descPriceEl.dataset.basePrice = baseUSD;           // cache clean USD
+ descPriceEl.textContent       = format(convert(baseUSD));
 
   document.getElementById("descName").textContent = title;
   document.getElementById("descSText").textContent = sdes;
@@ -2444,9 +2445,12 @@ function addToCart(image = null, priceUSD = null, title = null) {
 
   /* ────────────────── 3 · price in raw USD ────────────────── */
   if (priceUSD === null) {
-    const raw = document.getElementById("descPrice").dataset.basePrice;
-    priceUSD  = raw ? parseFloat(raw) : 0;
-  }
+   priceUSD = toNumber(
+    document.getElementById("descPrice").dataset.basePrice
+   );
+ } else {
+   priceUSD = toNumber(priceUSD);                   // in case it was "$49"
+ }
 
   /* ────────────────── 4 · push & confirm ────────────────── */
   cart.push({ image, price: priceUSD, title, size, color });
