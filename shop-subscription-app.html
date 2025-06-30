@@ -2168,7 +2168,7 @@ img.addEventListener('touchend', () => {
 });
 
 let cart = [];
-function showDescription(media = [], priceUSD, title = "No title", sdes = "No short description", description = "No description", sizesAvailable = ["M", "L", "XL"], colorsAvailable = [], category = null) {
+function showDescription(media = [], price, title = "No title", sdes = "No short description", description = "No description", sizesAvailable = ["M", "L", "XL"], colorsAvailable = [], category = null) {
   if (category) {
     // Push category state BEFORE description
     history.pushState({ page: category }, "", "#" + category);
@@ -2258,8 +2258,8 @@ function showDescription(media = [], priceUSD, title = "No title", sdes = "No sh
 
   // Update product info
   const descPriceEl = document.getElementById("descPrice");
-descPriceEl.dataset.basePrice = priceUSD;          // cache the raw USD
- descPriceEl.textContent   = format(convert(priceUSD));
+descPriceEl.dataset.basePrice = price;          // cache the raw USD
+ descPriceEl.textContent   = format(convert(price));
 
   document.getElementById("descName").textContent = title;
   document.getElementById("descSText").textContent = sdes;
