@@ -2705,97 +2705,95 @@ function hideCart() {
   document.getElementById("productList").style.display = "block";
   document.getElementById("sliderSection").style.display = "block";
 }
-function checkoutCart() { 
-  const name = document.getElementById("checkoutName").value.trim();
-  const address = document.getElementById("checkoutAddress").value.trim();
-  const pincode = document.getElementById("checkoutPincode").value.trim();
-  const mobilenumber  = document.getElementById("checkoutMobileNumber").value.trim();
+function checkoutCart () {
 
-  if (!name || !address || !pincode || !mobilenumber ) {
-    alert("Please enter name and address to continue.");
+  /* ---------- 1. Basic form validation ---------- */
+  const name          = document.getElementById("checkoutName").value.trim();
+  const address       = document.getElementById("checkoutAddress").value.trim();
+  const pincode       = document.getElementById("checkoutPincode").value.trim();
+  const mobileNumber  = document.getElementById("checkoutMobileNumber").value.trim();
+
+  if (!name || !address || !pincode || !mobileNumber) {
+    alert("Please complete all address fields.");
     return;
   }
 
-  const totalAmount = cart.reduce((sum, item) => sum + item.price, 0) * 100; // in paise
+  /* ---------- 2.  Work out totals in *both* currencies ---------- */
+  const subtotalUSD        = cart.reduce((sum, item) => sum + item.price, 0); // prices are stored in USD
+  const subtotalSelected   = convert(subtotalUSD);                            // in currentCurrency
+  const shippingSelected   = subtotalSelected >= convert(99) ? 0 : convert(19);
+  const grandTotalSelected = subtotalSelected + shippingSelected;
 
-  if (totalAmount === 0) {
+  if (grandTotalSelected === 0) {
     alert("Cart is empty!");
     return;
   }
 
+  /* Razorpay expects “smallest currency unit” (paise / cents etc.) */
+  const amountForGateway = Math.round(grandTotalSelected * 100); //  e.g. ₹799.56 ➜ 79956
+
+  /* ---------- 3.  Open Razorpay checkout ---------- */
   const options = {
-    key: 'rzp_live_0M0qHSpzByvZAr',
-    amount: totalAmount,
-    currency: "USD",
-    name: "Monster Men's Collection",
+    key        : "rzp_live_0M0qHSpzByvZAr",
+    amount     : amountForGateway,
+    currency   : currentCurrency,                          // ←  USD / INR / EUR (comes from selector)
+    name       : "Monster Men's Collection",
     description: "Cart Checkout",
-    image: "https://your-logo-url.com/logo.png",
-    handler: function (response) {
-      const paymentSuccessDiv = document.getElementById("paymentSuccessMessage");
-      const user = auth.currentUser;
-
-      if (user) {
-        const orderData = {
-          uid: user.uid,
-          name: name,
-          address: address,
-          pincode: pincode,
-          mobilenumber: mobilenumber,
-          cart: cart,
-          total: totalAmount / 100,
-          paymentId: response.razorpay_payment_id,
-          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-          orderNumber: `ORD-${Date.now()}` // ✅ Add Order Number
-        };
-
-        db.collection("orders").add(orderData).then(() => {
-
-          // Save simplified order entries
-
-          // ✅ UI changes after successful order
-          document.getElementById("descriptionPage").style.display = "none";
-          document.getElementById("productList").style.display = "none";
-          document.getElementById("shirtsPage").style.display = "none";
-          document.getElementById("pantsPage").style.display = "none";
-          document.getElementById("sliderSection").style.display = "none";
-          document.getElementById("cartPage").style.display = "none";
-          document.getElementById("profilePage").style.display = "none";
-           document.getElementById("cargosPage").style.display = "none";
-            document.getElementById("detailsPage").style.display = "none";
-
-          // Show success page
-          document.getElementById("paymentSuccessPage").style.display = "block";
-          document.getElementById("successPaymentId").textContent = response.razorpay_payment_id;
-
-          // Hide after 5 seconds and go back to products
-          setTimeout(() => {
-            document.getElementById("paymentSuccessPage").style.display = "none";
-            document.getElementById("productList").style.display = "block";
-            document.getElementById("sliderSection").style.display = "block";
-          }, 5000);
-
-          // Empty cart after order
-          cart = [];
-
-        }).catch(error => {
-          console.error("Error saving order:", error);
-          paymentSuccessDiv.style.display = "block";
-          paymentSuccessDiv.style.color = "red";
-          paymentSuccessDiv.innerHTML = "⚠️ Payment was successful but there was an error placing the order. Please contact support.";
-        });
-      }
-    },
-    prefill: {
-      name: name
-    },
-    theme: {
-      color: "#007bff"
-    },
+    image      : "https://your-logo-url.com/logo.png",
+    handler    : handleSuccessfulPayment,                  // defined below
+    prefill    : { name },
+    theme      : { color: "#007bff" },
     webview_intent: true
   };
 
-  const rzp = new Razorpay(options);
-  rzp.open();
+  new Razorpay(options).open();
+
+  /* ---------- 4.  Success callback ---------- */
+  function handleSuccessfulPayment (response) {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const orderData = {
+      uid        : user.uid,
+      name,
+      address,
+      pincode,
+      mobilenumber : mobileNumber,
+      cart,
+      totalUSD   : subtotalUSD,            // keep both figures for reporting
+      total      : grandTotalSelected,     // in currentCurrency
+      currency   : currentCurrency,
+      paymentId  : response.razorpay_payment_id,
+      paymentMode: "Razorpay",
+      timestamp  : firebase.firestore.FieldValue.serverTimestamp(),
+      orderNumber: `ORD-${Date.now()}`
+    };
+
+    db.collection("orders").add(orderData).then(() => {
+      /* tidy up UI */
+      ["descriptionPage","productList","shirtsPage","pantsPage",
+       "sliderSection","cartPage","profilePage","tshirtsPage",
+       "cargosPage","detailsPage"].forEach(id =>
+         document.getElementById(id).style.display="none");
+
+      document.getElementById("paymentSuccessPage").style.display = "block";
+      document.getElementById("successPaymentId").textContent      = response.razorpay_payment_id;
+
+      /* clear cart */
+      cart = [];
+
+      /* auto-return to storefront */
+      setTimeout(() => {
+        document.getElementById("paymentSuccessPage").style.display = "none";
+        document.getElementById("productList").style.display        = "block";
+        document.getElementById("sliderSection").style.display      = "block";
+      }, 5000);
+
+    }).catch(err => {
+      console.error("FireStore order-save error:", err);
+      alert("Payment succeeded but order creation failed. Please contact support.");
+    });
+  }
 }
 
 function checkoutCOD() {
