@@ -2427,21 +2427,32 @@ if (!document.getElementById("descHeader")) {
 }
 
 
+function addToCart(image = null, priceUSD = null, title = null) {
+  /* ────────────────── 1 · grab the media & text ────────────────── */
+  if (!image) image = document.getElementById("descImage").src;
+  if (!title) title = document.getElementById("descName").innerText;
 
-function addToCart(image = null,  priceUSD = null, title = null) {
-  if (!image)  image  = document.getElementById("descImage").src;
- if (!title)  title  = document.getElementById("descName").innerText;
+  /* ────────────────── 2 · selected options ────────────────── */
+  const sizeInput  = document.getElementById("selectedSize");
+  const colorInput = document.getElementById("selectedColor");
 
- /* take the raw USD we cached earlier */
- if (priceUSD === null) {
-   priceUSD = parseFloat(
-               document.getElementById("descPrice").dataset.basePrice || 0
-             );
- }
+  const size  = sizeInput  ? sizeInput.value  : "";
+  const color = colorInput ? colorInput.value : "";
 
- cart.push({ image, price: priceUSD, title, size, color });
+  if (!size)  { alert("Please select a size.");  return; }
+  if (!color) { alert("Please select a color."); return; }
 
-  alert('Item added to cart!');
+  /* ────────────────── 3 · price in raw USD ────────────────── */
+  if (priceUSD === null) {
+    const raw = document.getElementById("descPrice").dataset.basePrice;
+    priceUSD  = raw ? parseFloat(raw) : 0;
+  }
+
+  /* ────────────────── 4 · push & confirm ────────────────── */
+  cart.push({ image, price: priceUSD, title, size, color });
+  alert("Item added to cart!");
+  
+  updateCartAmounts?.();      // refresh totals if cart is visible
 }
 
 document.addEventListener("DOMContentLoaded", function () {
