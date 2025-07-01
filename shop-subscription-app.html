@@ -595,12 +595,13 @@
   font-size: 0.9rem;
   color: #000;
 }
-#loadingScreen {
+
+  #loadingScreen {
   position: fixed;
-  inset: 0; /* top:0 right:0 bottom:0 left:0 */
+  inset: 0;
   background: #000000;
   display: flex;
-  flex-direction: column; /* To stack image and spinner vertically */
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   z-index: 99999;
@@ -615,9 +616,10 @@
 #loadingScreen img {
   max-width: 60%;
   height: auto;
+  display: block;
 }
 
-/* ✅ Spinner style */
+/* Mobile spinner style */
 .mobile-spinner {
   display: none;
   width: 30px;
@@ -629,13 +631,13 @@
   animation: spin 1s linear infinite;
 }
 
-/* ✅ Animation */
+/* Spinner animation */
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
 
-/* ✅ Show spinner only on mobile */
+/* Show spinner only on small screens */
 @media only screen and (max-width: 768px) {
   .mobile-spinner {
     display: block;
@@ -1869,12 +1871,14 @@
 </div>
 
   <div id="loadingScreen">
-    <!-- replace with your own logo / GIF / static image -->
-    <img src="https://see.fontimg.com/api/rf5/woG33/N2Y3Y2RhYTdiOGMwNGVjOGE5MWE1MTFiNGJjM2E4Y2Iub3Rm/RU5MWQ/redtrap-expanded-puo.png?r=fs&h=29&w=1000&fg=FFFFFF&bg=FFFFFF&tb=1&s=29"
-         alt="Loading…" />
-<br><br>
-      <div class="mobile-spinner"></div>
-  </div>
+  <!-- Centered logo -->
+  <img src="https://see.fontimg.com/api/rf5/woG33/N2Y3Y2RhYTdiOGMwNGVjOGE5MWE1MTFiNGJjM2E4Y2Iub3Rm/RU5MWQ/redtrap-expanded-puo.png?r=fs&h=29&w=1000&fg=FFFFFF&bg=FFFFFF&tb=1&s=29"
+       alt="Loading…" />
+
+  <!-- Spinner (mobile only) -->
+  <div class="mobile-spinner"></div>
+</div>
+
  
   
     <div id="adminControls" class="admin-controls" style="display:none;">
