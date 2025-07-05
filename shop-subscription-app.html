@@ -2549,61 +2549,42 @@ if (!document.getElementById("descHeader")) {
   let selectedSize = null;
 
   sizesAvailable.forEach((size, index) => {
-    const inStock = stockFor(productData, size) > 0; 
     const btn = document.createElement("button");
-  
-  // --- common styling ---
-  btn.textContent     = size;
-  btn.style.padding   = "10px 20px";
-  btn.style.border    = "1px solid #ccc";
-  btn.style.borderRadius = "0px";
-  btn.style.cursor    = "pointer";
-  btn.style.backgroundColor = "#f8f8f8"; // default
-  btn.style.color          = "#000";
+    btn.textContent = size;
+    btn.style.padding = "10px 20px";
+    btn.style.border = "1px solid #ccc";
+    btn.style.borderRadius = "0px";
+    btn.style.cursor = "pointer";
 
-  // --- OUT-OF-STOCK handling ---
-  if (!inStock) {
-      btn.disabled = true;          // un-clickable
-      btn.style.opacity = 0.4;      // greyed out
-  } else if (selectedSize === null) {
-      /* first available size becomes pre-selected */
-      selectedSize           = size;
+    if (index === 0) {
       btn.style.backgroundColor = "#333";
-      btn.style.color          = "#fff";
-  }
+      btn.style.color = "#fff";
+      selectedSize = size;
+    }
 
-  // --- click handler (only fires if inStock) ---
-  btn.onclick = () => {
-    if (btn.disabled) return;       // extra safety
+    btn.onclick = () => {
+      document.querySelectorAll("#sizeButtons button").forEach(b => {
+        b.style.backgroundColor = "#f8f8f8";
+        b.style.color = "#000";
+      });
+      btn.style.backgroundColor = "#333";
+      btn.style.color = "#fff";
+      selectedSize = size;
+      document.getElementById("selectedSize").value = size;
+    };
 
-    // clear previous selection
-    document
-       .querySelectorAll("#sizeButtons button")
-       .forEach(b => {
-          if (!b.disabled) {        // keep OOS buttons grey
-              b.style.backgroundColor = "#f8f8f8";
-              b.style.color          = "#000";
-          }
-       });
-
-    // highlight this one
-    btn.style.backgroundColor = "#333";
-    btn.style.color          = "#fff";
-    selectedSize             = size;
-    document.getElementById("selectedSize").value = size;
-  };
-
-  sizeContainer.appendChild(btn);
+    sizeContainer.appendChild(btn);
   });
 
-const hiddenInput = document.getElementById("selectedSize") || (() => {
-  const i = document.createElement("input");
-  i.type = "hidden";
-  i.id   = "selectedSize";
-  sizeContainer.appendChild(i);
-  return i;
-})();
-hiddenInput.value = selectedSize || ""; 
+  let hiddenInput = document.getElementById("selectedSize");
+  if (!hiddenInput) {
+    hiddenInput = document.createElement("input");
+    hiddenInput.type = "hidden";
+    hiddenInput.id = "selectedSize";
+    sizeContainer.appendChild(hiddenInput);
+  }
+  hiddenInput.value = selectedSize;
+
 
 
   // Show description page and hide others
@@ -2621,97 +2602,36 @@ hiddenInput.value = selectedSize || "";
   updateAllPrices();
 }
 
-  async function loadProducts () {
-  const snap = await db.collection('products').get();
-  snap.forEach(doc => renderCard(doc.id, doc.data()));
-}
 
-function renderCard (id, data) {
-  const grid = document.querySelector('#shirtsPage .product-grid');
-  
-  // clone your existing `product-card` template here …
-  // ↓ just the extra lines you need ↓
-  const btnDisabled = stockFor(data, "M") === 0 ? 'disabled' : '';
-  card.querySelector('.price').dataset.basePrice = data.priceUSD;   // keep your converter
-  card.querySelector('.price').textContent      = format(convert(data.priceUSD));
-
-  // ① mark sold-out
-  if (totalStock(data) === 0) {
-      card.classList.add('sold-out');               // style in CSS: opacity:.3 etc.
-      card.querySelector('img').style.pointerEvents = "none";
-  }
-
-  // ② pass inventory into showDescription
-  card.querySelector('img').setAttribute(
-     'onclick',
-     `showDescription(${JSON.stringify(data.images)}, 
-                      ${data.priceUSD},
-                      ${JSON.stringify(data.title)},
-                      ${JSON.stringify(data.shortDesc)},
-                      ${JSON.stringify(data.longDesc)},
-                      ${JSON.stringify(Object.keys(data.sizes))},
-                      ${JSON.stringify([])},           /* colours */
-                      'shirtsPage',
-                      '${id}'                          /* <- productId */
-                     )`
-   );
-
-  grid.appendChild(card);
-}
-
-function stockFor(data, size){ return (data.sizes||{})[size] ?? 0; }
-function totalStock(data){
-   return Object.values(data.sizes||{}).reduce((s,v)=>s+v,0);
-}
-loadProducts();
-
-
-
-async function tryReserve (productId, size){
-  const prodRef = db.collection('products').doc(productId);
-
-  return db.runTransaction(async (tx)=>{
-     const snap  = await tx.get(prodRef);
-     const sizes = snap.data().sizes || {};
-     if ((sizes[size]||0) <= 0) throw "out-of-stock";
-
-     sizes[size] = sizes[size] - 1;        // reserve 1
-     tx.update(prodRef, { sizes });
-  });
-}
-
-  
-async function addToCart(image = null, priceUSD = null, title = null) {
-
-  /* — 1. pull UI values — */
+function addToCart(image = null, priceUSD = null, title = null) {
+  /* ────────────────── 1 · grab the media & text ────────────────── */
   if (!image) image = document.getElementById("descImage").src;
   if (!title) title = document.getElementById("descName").innerText;
 
-  const size  = document.getElementById("selectedSize") ?.value || "";
-  const color = document.getElementById("selectedColor")?.value || "";
+  /* ────────────────── 2 · selected options ────────────────── */
+  const sizeInput  = document.getElementById("selectedSize");
+  const colorInput = document.getElementById("selectedColor");
+
+  const size  = sizeInput  ? sizeInput.value  : "";
+  const color = colorInput ? colorInput.value : "";
 
   if (!size)  { alert("Please select a size.");  return; }
   if (!color) { alert("Please select a color."); return; }
 
-  /* — 2. make sure there is at least 1 piece left — */
-  try {
-      await reserveStock(currentProductId, size);   // <-- blocks if 0 left
-  } catch (e) {
-      alert("Sorry, that size just sold out 😔");
-      return;
-  }
+  /* ────────────────── 3 · price in raw USD ────────────────── */
+  if (priceUSD === null) {
+   priceUSD = toNumber(
+    document.getElementById("descPrice").dataset.basePrice
+   );
+ } else {
+   priceUSD = toNumber(priceUSD);                   // in case it was "$49"
+ }
 
-  /* — 3. price (still in USD for the cart’s internal math) — */
-  const cleanUSD = priceUSD === null
-        ? toNumber(document.getElementById("descPrice").dataset.basePrice)
-        : toNumber(priceUSD);
-
-  /* — 4. push into client-side cart — */
-  cart.push({ productId: currentProductId, image, price: cleanUSD,
-              title, size, color });
-
-  updateCartAmounts();
+  /* ────────────────── 4 · push & confirm ────────────────── */
+  cart.push({ image, price: priceUSD, title, size, color });
   alert("Item added to cart!");
+  
+  updateCartAmounts?.();      // refresh totals if cart is visible
 }
 
 document.addEventListener("DOMContentLoaded", function () {
