@@ -781,7 +781,7 @@
 <img src="https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/s6.png" alt="Shirt 1" onclick="showDescription([
   { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/s6.png' },
     { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/fullimage/refs/heads/main/s6b1.png' },
-],'$56', 'BODAK #106', 'ABSTRACT PRINT SHIRT', 'Relaxed fit collared shirt. Short sleeves. Split hem. Button-up front.', ['s:1','M:4','L:3','XL:1'],['Same'],'shirtsPage')">
+],'$56', 'BODAK #106', 'ABSTRACT PRINT SHIRT', 'Relaxed fit collared shirt. Short sleeves. Split hem. Button-up front.', ['s','M','L','XL'],['Same'],'shirtsPage')">
 </div><div class=cardName>
 <h3>BODAK</h3> <!-- Product Title -->
 <p>ABSTRACT PRINT SHIRT</p>
@@ -2544,51 +2544,47 @@ if (!document.getElementById("descHeader")) {
 
 
   // Size buttons logic
-  const stockMap = {};
-sizesAvailable.forEach(pair => {
-  const [sz, q] = pair.split(":");
-  stockMap[sz.trim().toUpperCase()] = parseInt(q ?? 0, 10);
-});
+  const sizeContainer = document.getElementById("sizeButtons");
+  sizeContainer.innerHTML = "";
+  let selectedSize = null;
 
-const sizeContainer = document.getElementById("sizeButtons");
-sizeContainer.innerHTML = "";
-let selectedSize = null;
+  sizesAvailable.forEach((size, index) => {
+    const btn = document.createElement("button");
+    btn.textContent = size;
+    btn.style.padding = "10px 20px";
+    btn.style.border = "1px solid #ccc";
+    btn.style.borderRadius = "0px";
+    btn.style.cursor = "pointer";
 
-Object.entries(stockMap).forEach(([size, qty]) => {
-  const btn = document.createElement("button");
-  btn.textContent = size;
-  btn.style.padding = "10px 20px";
-  btn.style.border = "1px solid #ccc";
-  btn.style.cursor = "pointer";
+    if (index === 0) {
+      btn.style.backgroundColor = "#333";
+      btn.style.color = "#fff";
+      selectedSize = size;
+    }
 
-  if (qty <= 0) {
-    btn.disabled = true;
-    btn.style.opacity = 0.35;
-    btn.textContent += " • O/S";
-  } else if (!selectedSize) {
-    btn.style.background = "#333";
-    btn.style.color = "#fff";
-    selectedSize = size;
+    btn.onclick = () => {
+      document.querySelectorAll("#sizeButtons button").forEach(b => {
+        b.style.backgroundColor = "#f8f8f8";
+        b.style.color = "#000";
+      });
+      btn.style.backgroundColor = "#333";
+      btn.style.color = "#fff";
+      selectedSize = size;
+      document.getElementById("selectedSize").value = size;
+    };
+
+    sizeContainer.appendChild(btn);
+  });
+
+  let hiddenInput = document.getElementById("selectedSize");
+  if (!hiddenInput) {
+    hiddenInput = document.createElement("input");
+    hiddenInput.type = "hidden";
+    hiddenInput.id = "selectedSize";
+    sizeContainer.appendChild(hiddenInput);
   }
+  hiddenInput.value = selectedSize;
 
-  btn.onclick = () => {
-    if (btn.disabled) return;
-    document.querySelectorAll("#sizeButtons button")
-            .forEach(b => { b.style.background="#f8f8f8"; b.style.color="#000"; });
-    btn.style.background = "#333";
-    btn.style.color      = "#fff";
-    selectedSize         = size;
-    document.getElementById("selectedSize").value = size;
-  };
-
-  sizeContainer.appendChild(btn);
-});
-
-let hidden = document.getElementById("selectedSize") ||
-             sizeContainer.appendChild(Object.assign(document.createElement("input"), {
-               id: "selectedSize", type: "hidden"
-             }));
-hidden.value = selectedSize;
 
 
   // Show description page and hide others
@@ -2768,19 +2764,15 @@ function sortProductsByPrice(pageId) {
 }
 
 function filterProductsBySize(pageId) {
-  const wanted = document
-                 .querySelector(`[data-target="${pageId}"] .filterSize`).value
-                 .toUpperCase();
-  const cards  = document.querySelectorAll(`#${pageId} .product-card`);
+  const selectedSize = document.querySelector(`[data-target="${pageId}"] .filterSize`).value;
+  const cards = document.querySelectorAll(`#${pageId} .product-card`);
 
   cards.forEach(card => {
-    const sizesStr = card.querySelector("img").getAttribute("onclick");
-    const match    = wanted === "ALL" ||
-                     new RegExp(`'${wanted}(?::\\d+)?'`, "i").test(sizesStr);
-    card.style.display = match ? "block" : "none";
+    const onclickAttr = card.querySelector("img").getAttribute("onclick");
+    const hasSize = selectedSize === "all" || onclickAttr.includes(`'${selectedSize}'`);
+    card.style.display = hasSize ? "block" : "none";
   });
 }
-
 
 
 const RATES = { USD: 1, INR: 83, EUR: 0.92 };
@@ -2923,23 +2915,6 @@ function hideCart() {
   document.getElementById("productList").style.display = "block";
   document.getElementById("sliderSection").style.display = "block";
 }
-
-async function decrementStock(cart) {
-  const batch = db.batch();
-
-  for (const item of cart) {
-    // derive the product doc id.  Example:  "BODAK #106" → "BODAK-106"
-    const docId = item.title.replace(/[ #]/g, "-");
-    const prodRef = db.collection("products").doc(docId);
-
-    batch.update(prodRef, {
-      [`sizes.${item.size}`]: firebase.firestore.FieldValue.increment(-1)
-    });
-  }
-  await batch.commit();
-}
-
-  
 function checkoutCart () {
 
   /* ---------- 1. Basic form validation ---------- */
@@ -3014,8 +2989,6 @@ function checkoutCart () {
       document.getElementById("paymentSuccessPage").style.display = "block";
       document.getElementById("successPaymentId").textContent      = response.razorpay_payment_id;
 
-      await decrementStock(cart); 
-      
       /* clear cart */
       cart = [];
 
@@ -3093,9 +3066,6 @@ function checkoutCOD() {
             document.getElementById("productList").style.display = "block";
             document.getElementById("sliderSection").style.display = "block";
           }, 5000);
-
-    await decrementStock(cart);
-    
     cart = []; // Return to main page
   }).catch(error => {
     console.error("Error placing COD order:", error);
