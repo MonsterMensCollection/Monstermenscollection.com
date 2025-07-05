@@ -3141,6 +3141,25 @@ function saveOrder(productName, uid) {
 }
 
 
+  async function seedProducts() {
+  const batch = db.batch();               // db = firebase.firestore()
+
+  batch.set(db.collection('products').doc('BODAK-106'), {
+    title: 'BODAK #106',
+    price: 56,
+    sizes: { S: 1, M: 4, L: 3, XL: 1 }
+  });
+
+  batch.set(db.collection('products').doc('BODAK-105'), {
+    title: 'BODAK #105',
+    price: 56,
+    sizes: { S: 2, M: 5, L: 0, XL: 1 }
+  });
+
+  await batch.commit();
+  console.log('Seed complete');
+}
+
      const firebaseConfig = {
       apiKey: "AIzaSyDzW8XuqrxM47W42HcIUXifa_X8tnfrLkY",
       authDomain: "monster-mens-collection.firebaseapp.com",
