@@ -2371,7 +2371,7 @@ const getStock = (prod, size) => inventory[prod]?.[size] ?? 0;
 
  
 let cart = [];
-function showDescription(media = [],  priceUSD, title = "No title", sdes = "No short description", description = "No description", sizesAvailable = ["M", "L", "XL"], colorsAvailable = [], category = null) {
+async function showDescription(media = [],  priceUSD, title = "No title", sdes = "No short description", description = "No description", sizesAvailable = ["M", "L", "XL"], colorsAvailable = [], category = null) {
 
   await inventoryReady;
   
