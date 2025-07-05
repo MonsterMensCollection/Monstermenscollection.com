@@ -776,33 +776,20 @@
 
 
  <!-- 106 -->
-<div class="product-card"  data-sku="BODAK #106">
-  <div class="image-wrapper">
-    <img src="https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/s6.png"
-         alt="BODAK #106"
-         onclick="showDescription([
-           {type:'image',src:'https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/s6.png'},
-           {type:'image',src:'https://raw.githubusercontent.com/MonsterMensCollection/fullimage/refs/heads/main/s6b1.png'}
-         ],
-         '$0.2',
-         'BODAK #106',
-         'ABSTRACT PRINT SHIRT',
-         'Relaxed fit collared shirt. Short sleeves. Split hem. Button-up front.',
-         ['S','M','L','XL','XXL'],
-         ['Same'],
-         'shirtsPage')">
-  </div>
-
-  <div class="cardName">
-    <h3>BODAK</h3>
-    <p>ABSTRACT PRINT SHIRT</p>
-  </div>
-
-  <div style="display:flex;justify-content:space-between;padding:0 10px;">
-    <p class="price" data-base-price="0.2">$0.2</p>
+  <div class="product-card">
+     <div class="image-wrapper">
+<img src="https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/s6.png" alt="Shirt 1" onclick="showDescription([
+  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/s6.png' },
+    { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/fullimage/refs/heads/main/s6b1.png' },
+],'$56', 'BODAK #106', 'ABSTRACT PRINT SHIRT', 'Relaxed fit collared shirt. Short sleeves. Split hem. Button-up front.', ['s:1','M:4','L:3','XL:1'],['Same'],'shirtsPage')">
+</div><div class=cardName>
+<h3>BODAK</h3> <!-- Product Title -->
+<p>ABSTRACT PRINT SHIRT</p>
+</div>
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 10px;">
+    <p class="price"> $56</p>
   </div>
 </div>
-
    
  <!-- 105 -->
   <div class="product-card">
@@ -2121,6 +2108,7 @@
   
 <script>
 
+      
       let lastCategoryPage = null;
 
 function showShirtsPage() {
@@ -2354,15 +2342,8 @@ img.addEventListener('touchend', () => {
   }
 });
 const toNumber = v => Number(String(v).replace(/[^0-9.]/g, '')) || 0;
-
-/* small helper so the rest of the code stays clean */
-
- 
 let cart = [];
-async function showDescription(media = [],  priceUSD, title = "No title", sdes = "No short description", description = "No description", sizesAvailable = ["M", "L", "XL"], colorsAvailable = [], category = null) {
-
-  await inventoryReady;
-  
+function showDescription(media = [],  priceUSD, title = "No title", sdes = "No short description", description = "No description", sizesAvailable = ["M", "L", "XL"], colorsAvailable = [], category = null) {
   if (category) {
     // Push category state BEFORE description
     history.pushState({ page: category }, "", "#" + category);
@@ -2563,51 +2544,51 @@ if (!document.getElementById("descHeader")) {
 
 
   // Size buttons logic
-  const sizeContainer = document.getElementById("sizeButtons");
-  sizeContainer.innerHTML = "";
-  let selectedSize = null;
+  const stockMap = {};
+sizesAvailable.forEach(pair => {
+  const [sz, q] = pair.split(":");
+  stockMap[sz.trim().toUpperCase()] = parseInt(q ?? 0, 10);
+});
 
-  sizesAvailable.forEach((size, index) => {
-    const btn = document.createElement("button");
-    btn.textContent = size;
-    btn.style.padding = "10px 20px";
-    btn.style.border = "1px solid #ccc";
-    btn.style.borderRadius = "0px";
-    btn.style.cursor = "pointer";
+const sizeContainer = document.getElementById("sizeButtons");
+sizeContainer.innerHTML = "";
+let selectedSize = null;
 
-    if (index === 0) {
-      btn.style.backgroundColor = "#333";
-      btn.style.color = "#fff";
-      selectedSize = size;
-    }
+Object.entries(stockMap).forEach(([size, qty]) => {
+  const btn = document.createElement("button");
+  btn.textContent = size;
+  btn.style.padding = "10px 20px";
+  btn.style.border = "1px solid #ccc";
+  btn.style.cursor = "pointer";
 
-    btn.onclick = () => {
-      document.querySelectorAll("#sizeButtons button").forEach(b => {
-        b.style.backgroundColor = "#f8f8f8";
-        b.style.color = "#000";
-      });
-      btn.style.backgroundColor = "#333";
-      btn.style.color = "#fff";
-      selectedSize = size;
-      document.getElementById("selectedSize").value = size;
-       refreshDescStockUI(title, selectedSize);  
-    };
-
-    sizeContainer.appendChild(btn);
-  });
-
-  refreshDescStockUI(title, selectedSize);
-
-  
-  let hiddenInput = document.getElementById("selectedSize");
-  if (!hiddenInput) {
-    hiddenInput = document.createElement("input");
-    hiddenInput.type = "hidden";
-    hiddenInput.id = "selectedSize";
-    sizeContainer.appendChild(hiddenInput);
+  if (qty <= 0) {
+    btn.disabled = true;
+    btn.style.opacity = 0.35;
+    btn.textContent += " • O/S";
+  } else if (!selectedSize) {
+    btn.style.background = "#333";
+    btn.style.color = "#fff";
+    selectedSize = size;
   }
-  hiddenInput.value = selectedSize;
 
+  btn.onclick = () => {
+    if (btn.disabled) return;
+    document.querySelectorAll("#sizeButtons button")
+            .forEach(b => { b.style.background="#f8f8f8"; b.style.color="#000"; });
+    btn.style.background = "#333";
+    btn.style.color      = "#fff";
+    selectedSize         = size;
+    document.getElementById("selectedSize").value = size;
+  };
+
+  sizeContainer.appendChild(btn);
+});
+
+let hidden = document.getElementById("selectedSize") ||
+             sizeContainer.appendChild(Object.assign(document.createElement("input"), {
+               id: "selectedSize", type: "hidden"
+             }));
+hidden.value = selectedSize;
 
 
   // Show description page and hide others
@@ -2625,95 +2606,38 @@ if (!document.getElementById("descHeader")) {
   updateAllPrices();
 }
 
-  function getStock(productName, size) {
-  return inventory[productName]?.[size] ?? 0;
-}
 
-/* turn the “Add to Cart” button into an Out-of-Stock label */
-function refreshDescStockUI (productName, size) {
-  const btn  = document.querySelector('#descriptionPage button');
-  const qty  = getStock(productName, size);
+function addToCart(image = null, priceUSD = null, title = null) {
+  /* ────────────────── 1 · grab the media & text ────────────────── */
+  if (!image) image = document.getElementById("descImage").src;
+  if (!title) title = document.getElementById("descName").innerText;
 
-  if (qty === 0) {
-    btn.textContent      = 'OUT OF STOCK';
-    btn.disabled         = true;
-    btn.style.opacity    = 0.6;
-    btn.style.pointerEvents = 'none';
-  } else {
-    btn.textContent      = 'Add to Cart';
-    btn.disabled         = false;
-    btn.style.opacity    = 1;
-    btn.style.pointerEvents = 'auto';
-  }
-}
+  /* ────────────────── 2 · selected options ────────────────── */
+  const sizeInput  = document.getElementById("selectedSize");
+  const colorInput = document.getElementById("selectedColor");
 
-  async function reserveStock(productName, size) {
-  const ref = db.collection('inventory').doc(productName);
+  const size  = sizeInput  ? sizeInput.value  : "";
+  const color = colorInput ? colorInput.value : "";
 
-  await db.runTransaction(async (tx) => {
-    const snap = await tx.get(ref);
-    if (!snap.exists) throw `No inventory record for “${productName}”`;
+  if (!size)  { alert("Please select a size.");  return; }
+  if (!color) { alert("Please select a color."); return; }
 
-    const currentQty = snap.data().sizes?.[size] ?? 0;
-    if (currentQty <= 0) throw "Sorry, that size just sold out.";
+  /* ────────────────── 3 · price in raw USD ────────────────── */
+  if (priceUSD === null) {
+   priceUSD = toNumber(
+    document.getElementById("descPrice").dataset.basePrice
+   );
+ } else {
+   priceUSD = toNumber(priceUSD);                   // in case it was "$49"
+ }
 
-    /* build a field-path update:  sizes.S  or  sizes.M  … */
-    const update = {};
-    update[`sizes.${size}`] = firebase.firestore.FieldValue.increment(-1);
-    tx.update(ref, update);
-
-    /* keep local cache in sync so UI updates instantly */
-    if (inventory[productName]) {
-      inventory[productName][size] = currentQty - 1;
-    }
-  });
-}
-
-async function addToCart () {
-  await inventoryReady;                      // 🔑 makes getStock reliable
-
-  const imgSrc  = document.getElementById('descImage').src;
-  const title   = document.getElementById('descName').innerText;
-  const size    = document.getElementById('selectedSize')?.value;
-  const color   = document.getElementById('selectedColor')?.value;
-
-  if (!size)  { alert('Please select a size.');  return; }
-  if (!color) { alert('Please select a color.'); return; }
-
-  if (getStock(title, size) === 0) {
-    alert('Sorry, that size is sold out.');
-    refreshDescStockUI(title, size);
-    return;
-  }
-
-  try {
-    await reserveStock(title, size);         // ⬅️ unchanged – still in Firestore
-  } catch (err) {
-    alert(err);
-    refreshDescStockUI(title, size);
-    return;
-  }
-
-  /* price comes from cached data‑attr exactly as before */
-  const priceUSD = Number(
-    document.getElementById('descPrice').dataset.basePrice
-  );
-
-  cart.push({ image: imgSrc, price: priceUSD, title, size, color });
-  refreshDescStockUI(title, size);
-  updateCartAmounts();
-  alert('Item added to cart!');
-}
-
-async function seedInventory () {
-  /* example only – call once from DevTools or admin panel */
-  await db.collection('inventory').doc('BODAK #106').set({
-    sizes: { S: 1, M: 1, L: 1, XL: 0, XXL: 1 }
-  });
-  console.log('Inventory seeded');
-}
-
+  /* ────────────────── 4 · push & confirm ────────────────── */
+  cart.push({ image, price: priceUSD, title, size, color });
+  alert("Item added to cart!");
   
+  updateCartAmounts?.();      // refresh totals if cart is visible
+}
+
 document.addEventListener("DOMContentLoaded", function () {
    updateAllPrices(); // initial
   // 🔹 Existing Filter Controls
@@ -2844,15 +2768,19 @@ function sortProductsByPrice(pageId) {
 }
 
 function filterProductsBySize(pageId) {
-  const selectedSize = document.querySelector(`[data-target="${pageId}"] .filterSize`).value;
-  const cards = document.querySelectorAll(`#${pageId} .product-card`);
+  const wanted = document
+                 .querySelector(`[data-target="${pageId}"] .filterSize`).value
+                 .toUpperCase();
+  const cards  = document.querySelectorAll(`#${pageId} .product-card`);
 
   cards.forEach(card => {
-    const onclickAttr = card.querySelector("img").getAttribute("onclick");
-    const hasSize = selectedSize === "all" || onclickAttr.includes(`'${selectedSize}'`);
-    card.style.display = hasSize ? "block" : "none";
+    const sizesStr = card.querySelector("img").getAttribute("onclick");
+    const match    = wanted === "ALL" ||
+                     new RegExp(`'${wanted}(?::\\d+)?'`, "i").test(sizesStr);
+    card.style.display = match ? "block" : "none";
   });
 }
+
 
 
 const RATES = { USD: 1, INR: 83, EUR: 0.92 };
@@ -2868,7 +2796,7 @@ function updateCartAmounts () {
   if (!amountEl) return;
 
   const subUSD     = cart.reduce((s, it) => s + it.price, 0);   // cart prices are USD
-  const shipUSD    = subUSD >= 0 ? 0 : 0;                     // free ≥ $99
+  const shipUSD    = subUSD >= 99 ? 0 : 19;                     // free ≥ $99
   const grandUSD   = subUSD + shipUSD;
 
   const shipDisplay  = format(convert(shipUSD));
@@ -2986,17 +2914,32 @@ function scrollIntoViewMobile(el) {
 }
 
 function removeFromCart(index) {
-  const item = cart[index];
-  /* release the reservation */
-  inventory[item.title][item.size] += 1;
-  cart.splice(index, 1);
-  showCart();
+  cart.splice(index, 1); // Remove item at the given index
+  showCart(); // Re-render the cart
 }
+
 function hideCart() {
   document.getElementById("cartPage").style.display = "none";
   document.getElementById("productList").style.display = "block";
   document.getElementById("sliderSection").style.display = "block";
 }
+
+async function decrementStock(cart) {
+  const batch = db.batch();
+
+  for (const item of cart) {
+    // derive the product doc id.  Example:  "BODAK #106" → "BODAK-106"
+    const docId = item.title.replace(/[ #]/g, "-");
+    const prodRef = db.collection("products").doc(docId);
+
+    batch.update(prodRef, {
+      [`sizes.${item.size}`]: firebase.firestore.FieldValue.increment(-1)
+    });
+  }
+  await batch.commit();
+}
+
+  
 function checkoutCart () {
 
   /* ---------- 1. Basic form validation ---------- */
@@ -3013,7 +2956,7 @@ function checkoutCart () {
   /* ---------- 2.  Work out totals in *both* currencies ---------- */
   const subtotalUSD        = cart.reduce((sum, item) => sum + item.price, 0); // prices are stored in USD
   const subtotalSelected   = convert(subtotalUSD);                            // in currentCurrency
-  const shippingSelected   = subtotalSelected >= convert(0) ? 0 : convert(0);
+  const shippingSelected   = subtotalSelected >= convert(99) ? 0 : convert(19);
   const grandTotalSelected = subtotalSelected + shippingSelected;
 
   if (grandTotalSelected === 0) {
@@ -3071,6 +3014,8 @@ function checkoutCart () {
       document.getElementById("paymentSuccessPage").style.display = "block";
       document.getElementById("successPaymentId").textContent      = response.razorpay_payment_id;
 
+      await decrementStock(cart); 
+      
       /* clear cart */
       cart = [];
 
@@ -3148,6 +3093,9 @@ function checkoutCOD() {
             document.getElementById("productList").style.display = "block";
             document.getElementById("sliderSection").style.display = "block";
           }, 5000);
+
+    await decrementStock(cart);
+    
     cart = []; // Return to main page
   }).catch(error => {
     console.error("Error placing COD order:", error);
@@ -3236,22 +3184,7 @@ function saveOrder(productName, uid) {
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
-               // will be filled from Firestore 
-  
-const inventory       = {};                 // { "BODAK #106": { S:1, M:1 … } }
-const inventoryReady  = loadInventory();    // ⬅️ returns a promise we can await
 
-async function loadInventory () {
-  const snap = await db.collection('inventory').get();
-  snap.forEach(doc => {
-    inventory[doc.id] = doc.data().sizes || {};
-  });
-  console.log('[inventory] loaded →', inventory);
-}
-  const getStock = (prod, size) => inventory[prod]?.[size] ?? 0;
-loadInventory();
-
-  
 function loadUserProfileAndOrders() {
     auth.onAuthStateChanged(async (user) => {
       if (user) {
