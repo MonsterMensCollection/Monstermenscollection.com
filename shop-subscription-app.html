@@ -2647,7 +2647,14 @@ async function changeStock(title, size, delta) {
   });
 }
   
-
+ db.collection('products').onSnapshot(snap => {
+    snap.docChanges().forEach(change => {
+      const { title, sizes } = change.doc.data();
+      inventory[title] = sizes;     // keep local cache hot
+      updateStockUI();              // refresh “M (3)”, button states, etc.
+    });
+  });
+  
 async function addToCart(image = null, priceUSD = null, title = null) {
   /* ────────────────── 1 · grab the media & text ────────────────── */
   if (!image) image = document.getElementById("descImage").src;
@@ -2671,8 +2678,11 @@ async function addToCart(image = null, priceUSD = null, title = null) {
  } else {
    priceUSD = toNumber(priceUSD);                   // in case it was "$49"
  }
-  
-await changeStock(title, size, -1);
+
+  await cartRef.set(
+  { items: firebase.firestore.FieldValue.arrayUnion(item) },
+  { merge: true }
+);
   /* ────────────────── 4 · push & confirm ────────────────── */
   cart.push({ image, price: priceUSD, title, size, color });
   alert("Item added to cart!");
@@ -2953,7 +2963,9 @@ function scrollIntoViewMobile(el) {
 
 async function removeFromCart(index) {
 const removed = cart[index];
-await changeStock(removed.title, removed.size, +1);
+await cartRef.update({
+  items: firebase.firestore.FieldValue.arrayRemove(removed)
+});
 cart.splice(index,1);
 showCart();
 }
@@ -3008,6 +3020,10 @@ function checkoutCart () {
 
   /* ---------- 4.  Success callback ---------- */
   function handleSuccessfulPayment (response) {
+    
+     for (const itm of cart) {
+    await changeStock(itm.title, itm.size, -1);
+  }
     const user = auth.currentUser;
     if (!user) return;
 
@@ -3189,6 +3205,7 @@ function saveOrder(productName, uid) {
 }
 
 
+
      const firebaseConfig = {
       apiKey: "AIzaSyDzW8XuqrxM47W42HcIUXifa_X8tnfrLkY",
       authDomain: "monster-mens-collection.firebaseapp.com",
@@ -3327,20 +3344,49 @@ if (subscribed) {
       auth.signOut();
     });
 
-    auth.onAuthStateChanged(async (user) => {
-      if (user) {
-        await updatePageForUser(user);
-      } else {
-        subscriptionSection.style.display = "none";
-        productsPage.style.display = "none";
-        loginSection.style.display = "flex";
-        signupSection.style.display = "none";
-        document.getElementById("title").textContent = "Login";
-        document.getElementById("confirmationMessage").textContent = "";
-        statusMessage.textContent = "";
-        adminControls.style.display = "none";
+  let cartRef = null; 
+  
+   auth.onAuthStateChanged(async (user) => {
+  if (user) {
+    /*************** 1. existing UI / subscription logic ****************/
+    await updatePageForUser(user);       // ← keep whatever you already had here
+
+    /*************** 2. open (or create) the user’s cart doc ************/
+    cartRef = db.collection('carts').doc(user.uid);
+
+    // pull any existing items into the local array
+    const snap = await cartRef.get();
+    cart = snap.exists ? (snap.data().items || []) : [];
+
+    // if the cart page can be open immediately:
+    updateCartAmounts?.();              // or showCart();
+
+    // optional live-sync (uncomment if you want automatic updates)
+    /*
+    cartRef.onSnapshot(s => {
+      cart = s.exists ? (s.data().items || []) : [];
+      updateCartAmounts?.();            // keep totals fresh
+      if (document.getElementById('cartPage').style.display !== 'none') {
+        showCart();                     // rebuild list if user is watching
       }
     });
+    */
+  } else {
+    /*************** 3. user signed out – clean up ************************/
+    cartRef = null;
+    cart    = [];
+
+    // restore your “logged-out” UI
+    subscriptionSection.style.display = "none";
+    productsPage.style.display       = "none";
+    loginSection.style.display       = "flex";
+    signupSection.style.display      = "none";
+    document.getElementById("title").textContent = "Login";
+    document.getElementById("confirmationMessage").textContent = "";
+    statusMessage.textContent = "";
+    adminControls.style.display = "none";
+  }
+});
 
     document.getElementById("emailLoginBtn").addEventListener("click", () => {
       const email = document.getElementById("email").value;
