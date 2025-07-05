@@ -2341,6 +2341,12 @@ img.addEventListener('touchend', () => {
     lastDistance = null;
   }
 });
+
+
+  
+
+
+  
 const toNumber = v => Number(String(v).replace(/[^0-9.]/g, '')) || 0;
 let cart = [];
 function showDescription(media = [],  priceUSD, title = "No title", sdes = "No short description", description = "No description", sizesAvailable = ["M", "L", "XL"], colorsAvailable = [], category = null) {
@@ -2548,9 +2554,14 @@ if (!document.getElementById("descHeader")) {
   sizeContainer.innerHTML = "";
   let selectedSize = null;
 
-  sizesAvailable.forEach((size, index) => {
-    const btn = document.createElement("button");
-    btn.textContent = size;
+sizesAvailable.forEach(size => {
+  const stock = (inventory[title]?.[size] ?? 0);           // live count
+  const btn   = document.createElement("button");
+  btn.textContent = `${size} (${stock})`;
+
+  btn.disabled = stock === 0;                              // sold-out?
+  if (stock === 0) { btn.style.opacity = .5; }
+  
     btn.style.padding = "10px 20px";
     btn.style.border = "1px solid #ccc";
     btn.style.borderRadius = "0px";
@@ -2602,6 +2613,35 @@ if (!document.getElementById("descHeader")) {
   updateAllPrices();
 }
 
+function updateStockUI () {
+  document.querySelectorAll("#sizeButtons button").forEach(btn => {
+    const [size] = btn.textContent.split(" ");
+    const stock  = inventory[document.getElementById("descName").textContent]?.[size] ?? 0;
+    btn.textContent = `${size} (${stock})`;
+    btn.disabled = stock === 0;
+    btn.style.opacity = stock ? 1 : .5;
+  });
+}
+  
+  const inventory = {};       // { "BODAK #106": { S:4,M:2,L:0 } }
+
+/* fetch once on app-start */
+async function loadInventory () {
+  const snap = await db.collection("products").get();
+  snap.forEach(doc => inventory[doc.data().title] = doc.data().sizes || {});
+}
+/* update Firestore & cache atomically */
+async function changeStock (title, size, delta) {
+  const ref  = db.collection("products").doc(title.replace(/[^A-Za-z0-9\-#]/g,""));
+  await db.runTransaction(async t => {
+    const doc = await t.get(ref);
+    const sizes = doc.data().sizes || {};
+    sizes[size] = Math.max(0, (sizes[size]||0) + delta);
+    t.update(ref, { sizes });
+    inventory[title][size] = sizes[size];        // sync local cache
+  });
+}
+  
 
 function addToCart(image = null, priceUSD = null, title = null) {
   /* ────────────────── 1 · grab the media & text ────────────────── */
@@ -2626,7 +2666,8 @@ function addToCart(image = null, priceUSD = null, title = null) {
  } else {
    priceUSD = toNumber(priceUSD);                   // in case it was "$49"
  }
-
+  
+await changeStock(title, selectedSize, -1);
   /* ────────────────── 4 · push & confirm ────────────────── */
   cart.push({ image, price: priceUSD, title, size, color });
   alert("Item added to cart!");
@@ -2906,8 +2947,10 @@ function scrollIntoViewMobile(el) {
 }
 
 function removeFromCart(index) {
-  cart.splice(index, 1); // Remove item at the given index
-  showCart(); // Re-render the cart
+const removed = cart[index];
+await changeStock(removed.title, removed.size, +1);
+cart.splice(index,1);
+showCart();
 }
 
 function hideCart() {
@@ -3154,6 +3197,7 @@ function saveOrder(productName, uid) {
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
+   loadInventory(); 
 
 function loadUserProfileAndOrders() {
     auth.onAuthStateChanged(async (user) => {
