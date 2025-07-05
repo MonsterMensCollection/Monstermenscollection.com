@@ -2355,19 +2355,7 @@ img.addEventListener('touchend', () => {
 });
 const toNumber = v => Number(String(v).replace(/[^0-9.]/g, '')) || 0;
 
-const inventory       = {};                 // { "BODAK #106": { S:1, M:1 … } }
-const inventoryReady  = loadInventory();    // ⬅️ returns a promise we can await
-
-async function loadInventory () {
-  const snap = await db.collection('inventory').get();
-  snap.forEach(doc => {
-    inventory[doc.id] = doc.data().sizes || {};
-  });
-  console.log('[inventory] loaded →', inventory);
-}
-
 /* small helper so the rest of the code stays clean */
-const getStock = (prod, size) => inventory[prod]?.[size] ?? 0;
 
  
 let cart = [];
@@ -3248,16 +3236,19 @@ function saveOrder(productName, uid) {
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
-               // will be filled from Firestore
- const inventoryReady = loadInventory(); 
+               // will be filled from Firestore 
   
-async function loadInventory() {
+const inventory       = {};                 // { "BODAK #106": { S:1, M:1 … } }
+const inventoryReady  = loadInventory();    // ⬅️ returns a promise we can await
+
+async function loadInventory () {
   const snap = await db.collection('inventory').get();
   snap.forEach(doc => {
-    inventory[doc.id] = doc.data().sizes;   // {S:…, M:…}
+    inventory[doc.id] = doc.data().sizes || {};
   });
-  updateAllPrices();               // already redraws the UI
+  console.log('[inventory] loaded →', inventory);
 }
+  const getStock = (prod, size) => inventory[prod]?.[size] ?? 0;
 loadInventory();
 
   
