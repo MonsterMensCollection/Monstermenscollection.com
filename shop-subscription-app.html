@@ -3248,9 +3248,9 @@ function saveOrder(productName, uid) {
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
-
-let inventory = {};                   // will be filled from Firestore
-
+               // will be filled from Firestore
+ const inventoryReady = loadInventory(); 
+  
 async function loadInventory() {
   const snap = await db.collection('inventory').get();
   snap.forEach(doc => {
