@@ -2827,7 +2827,7 @@ function updateCartAmounts () {
   if (!amountEl) return;
 
   const subUSD     = cart.reduce((s, it) => s + it.price, 0);   // cart prices are USD
-  const shipUSD    = subUSD >= 99 ? 0 : 19;                     // free ≥ $99
+  const shipUSD    = subUSD >= 0 ? 0 : 0;                     // free ≥ $99
   const grandUSD   = subUSD + shipUSD;
 
   const shipDisplay  = format(convert(shipUSD));
@@ -2972,7 +2972,7 @@ function checkoutCart () {
   /* ---------- 2.  Work out totals in *both* currencies ---------- */
   const subtotalUSD        = cart.reduce((sum, item) => sum + item.price, 0); // prices are stored in USD
   const subtotalSelected   = convert(subtotalUSD);                            // in currentCurrency
-  const shippingSelected   = subtotalSelected >= convert(99) ? 0 : convert(19);
+  const shippingSelected   = subtotalSelected >= convert(0) ? 0 : convert(0);
   const grandTotalSelected = subtotalSelected + shippingSelected;
 
   if (grandTotalSelected === 0) {
