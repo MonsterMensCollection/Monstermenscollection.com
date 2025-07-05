@@ -643,24 +643,6 @@
     display: block;
   }
 }
-
-.product-card.sold-out {
-  position: relative;
-  opacity: .35;
-}
-
-.product-card.sold-out::after {
-  content: "SOLD OUT";
-  position: absolute;
-  top: 8px; left: 8px;
-  background: #c00;
-  color: #fff;
-  padding: 2px 6px;
-  font-size: 12px;
-  font-weight: 600;
-  border-radius: 2px;
-}     
-     
   
  </style>
 </head>
@@ -799,13 +781,13 @@
 <img src="https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/s6.png" alt="Shirt 1" onclick="showDescription([
   { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/s6.png' },
     { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/fullimage/refs/heads/main/s6b1.png' },
-],'$0.012', 'BODAK #106', 'ABSTRACT PRINT SHIRT', 'Relaxed fit collared shirt. Short sleeves. Split hem. Button-up front.', ['s','M','L','XL'],['Same'],'shirtsPage')">
+],'$56', 'BODAK #106', 'ABSTRACT PRINT SHIRT', 'Relaxed fit collared shirt. Short sleeves. Split hem. Button-up front.', ['s','M','L','XL'],['Same'],'shirtsPage')">
 </div><div class=cardName>
 <h3>BODAK</h3> <!-- Product Title -->
 <p>ABSTRACT PRINT SHIRT</p>
 </div>
     <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 10px;">
-    <p class="price"> $0.012</p>
+    <p class="price"> $56</p>
   </div>
 </div>
    
@@ -2361,9 +2343,6 @@ img.addEventListener('touchend', () => {
 });
 const toNumber = v => Number(String(v).replace(/[^0-9.]/g, '')) || 0;
 let cart = [];
-const inventory = {
-  "BODAK #106": { S: 1, M: 1, L: 1, XL: 1, XXL: 1 },
-};
 function showDescription(media = [],  priceUSD, title = "No title", sdes = "No short description", description = "No description", sizesAvailable = ["M", "L", "XL"], colorsAvailable = [], category = null) {
   if (category) {
     // Push category state BEFORE description
@@ -2565,71 +2544,46 @@ if (!document.getElementById("descHeader")) {
 
 
   // Size buttons logic
- /* ---------- Size buttons with live stock ---------- */
-const sizeContainer = document.getElementById("sizeButtons");
-sizeContainer.innerHTML = "";
+  const sizeContainer = document.getElementById("sizeButtons");
+  sizeContainer.innerHTML = "";
+  let selectedSize = null;
 
-let selectedSize = null;
-const stockForItem = inventory[title] || {};  // fallback = all in-stock
+  sizesAvailable.forEach((size, index) => {
+    const btn = document.createElement("button");
+    btn.textContent = size;
+    btn.style.padding = "10px 20px";
+    btn.style.border = "1px solid #ccc";
+    btn.style.borderRadius = "0px";
+    btn.style.cursor = "pointer";
 
-Object.entries(stockForItem).forEach(([size, qty]) => {
-  const btn = document.createElement("button");
-  btn.textContent = size;
-  btn.style.cssText = `
-    padding:10px 20px;border:1px solid #ccc;border-radius:0;cursor:pointer;
-    ${qty === 0 ? "opacity:.35;cursor:not-allowed;" : ""}
-  `;
-  btn.disabled = qty === 0;
+    if (index === 0) {
+      btn.style.backgroundColor = "#333";
+      btn.style.color = "#fff";
+      selectedSize = size;
+    }
 
-  btn.onclick = () => {
-    if (btn.disabled) return;
-    document.querySelectorAll("#sizeButtons button").forEach(b => {
-      b.style.background = "#f8f8f8";
-      b.style.color = "#000";
-    });
-    btn.style.background = "#333";
-    btn.style.color = "#fff";
-    selectedSize = size;
-    document.getElementById("selectedSize").value = size;
-    updateStockUI(); // refresh main button
-  };
+    btn.onclick = () => {
+      document.querySelectorAll("#sizeButtons button").forEach(b => {
+        b.style.backgroundColor = "#f8f8f8";
+        b.style.color = "#000";
+      });
+      btn.style.backgroundColor = "#333";
+      btn.style.color = "#fff";
+      selectedSize = size;
+      document.getElementById("selectedSize").value = size;
+    };
 
-  sizeContainer.appendChild(btn);
+    sizeContainer.appendChild(btn);
+  });
 
-  // auto-select first in-stock size
-  if (selectedSize === null && qty > 0) btn.click();
-});
-
-// Hidden input (unchanged)
-let hiddenInput = document.getElementById("selectedSize");
-if (!hiddenInput) {
-  hiddenInput = document.createElement("input");
-  hiddenInput.type = "hidden";
-  hiddenInput.id = "selectedSize";
-  sizeContainer.appendChild(hiddenInput);
-}
-hiddenInput.value = selectedSize;
-
-/* helper – runs now & whenever stock/size changes */
-function updateStockUI () {
-  const addBtn = document.querySelector(
-    "#descriptionPage button[onclick^='addToCart']"
-  );
-  const size = document.getElementById("selectedSize").value;
-  const qty  = stockForItem[size] ?? 0;
-
-  if (!size || qty === 0) {
-    addBtn.textContent = "Out of Stock";
-    addBtn.disabled = true;
-    addBtn.style.opacity = 0.6;
-    return;
+  let hiddenInput = document.getElementById("selectedSize");
+  if (!hiddenInput) {
+    hiddenInput = document.createElement("input");
+    hiddenInput.type = "hidden";
+    hiddenInput.id = "selectedSize";
+    sizeContainer.appendChild(hiddenInput);
   }
-  addBtn.textContent = "Add to Cart";
-  addBtn.disabled = false;
-  addBtn.style.opacity = 1;
-}
-updateStockUI(); // initial call
-
+  hiddenInput.value = selectedSize;
 
 
 
@@ -2664,12 +2618,6 @@ function addToCart(image = null, priceUSD = null, title = null) {
   if (!size)  { alert("Please select a size.");  return; }
   if (!color) { alert("Please select a color."); return; }
 
-const stockObj = inventory[title] || {};
-if ((stockObj[size] ?? 0) === 0) {
-  alert("Sorry, that size is sold out.");
-  return;
-}
- 
   /* ────────────────── 3 · price in raw USD ────────────────── */
   if (priceUSD === null) {
    priceUSD = toNumber(
@@ -2681,7 +2629,8 @@ if ((stockObj[size] ?? 0) === 0) {
 
   /* ────────────────── 4 · push & confirm ────────────────── */
   cart.push({ image, price: priceUSD, title, size, color });
-alert("Item added to cart!");
+  alert("Item added to cart!");
+  
   updateCartAmounts?.();      // refresh totals if cart is visible
 }
 
@@ -2793,43 +2742,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 });
-  
-async function updateInventoryAfterPurchase (cart) {
-  const batch = db.batch();          // <-- only needed if you use Firestore
 
-  cart.forEach(item => {
-    /* ---------- A. mutate the in-memory map ---------- */
-    const sizes = inventory[item.title] || {};
-    if (sizes[item.size] !== undefined) {
-      sizes[item.size] = Math.max(0, sizes[item.size] - 1);
-    }
-
-    /* ---------- B. queue a Firestore decrement ---------- */
-    // comment this block out if you don’t store inventory in Firestore
-    const docRef = db.collection("inventory").doc(item.title);
-    batch.set(
-      docRef,
-      { [`${item.size}`]: firebase.firestore.FieldValue.increment(-1) },
-      { merge: true }
-    );
-  });
-
-  /* ---------- C. commit Firestore (optional) ---------- */
-  // comment out if you skipped part B
-  try   { await batch.commit(); }
-  catch (e) { console.warn("Stock update failed:", e); }
-
-  /* ---------- D. update every card that’s now sold-out ---------- */
-  document.querySelectorAll(".product-card").forEach(card => {
-    const t = card.querySelector(".cardName h3")?.textContent?.trim();
-    const allZero = Object.values(inventory[t] || {}).every(q => q === 0);
-    if (allZero) {
-      // card.style.display = "none";              // hard-hide
-      card.classList.add("sold-out");             // nicer: badge via CSS
-    }
-  });  
-}
-  
 function sortProductsByPrice(pageId) {
   const grid = document.querySelector(`#${pageId} .product-grid`);
   const products = Array.from(grid.getElementsByClassName("product-card"));
@@ -2851,31 +2764,12 @@ function sortProductsByPrice(pageId) {
 }
 
 function filterProductsBySize(pageId) {
-  const selectedSize = document
-        .querySelector(`[data-target="${pageId}"] .filterSize`).value;
+  const selectedSize = document.querySelector(`[data-target="${pageId}"] .filterSize`).value;
   const cards = document.querySelectorAll(`#${pageId} .product-card`);
 
   cards.forEach(card => {
-
-    /* ─────────── SOLD-OUT GUARD ─────────── */
-    // 1 · get the product title that matches your inventory keys
-    const title = card.querySelector(".cardName h3")?.textContent?.trim();
-    // 2 · look up its stock and see if every size is 0
-    const allZero = Object
-          .values(inventory[title] || {})      // { S:0, M:0, … }
-          .every(qty => qty === 0);
-    if (allZero) {
-      card.style.display = "none";             // or add a badge instead
-      return;                                  // ✅ skip the rest of the checks
-    }
-    /* ─────────────────────────────────────── */
-
-    // existing size-filter logic
-    const onclickAttr = card
-          .querySelector("img")
-          .getAttribute("onclick");
-    const hasSize = selectedSize === "all" ||
-                    onclickAttr.includes(`'${selectedSize}'`);
+    const onclickAttr = card.querySelector("img").getAttribute("onclick");
+    const hasSize = selectedSize === "all" || onclickAttr.includes(`'${selectedSize}'`);
     card.style.display = hasSize ? "block" : "none";
   });
 }
@@ -2894,7 +2788,7 @@ function updateCartAmounts () {
   if (!amountEl) return;
 
   const subUSD     = cart.reduce((s, it) => s + it.price, 0);   // cart prices are USD
-  const shipUSD    = subUSD >= 0 ? 0 : 0;                     // free ≥ $99
+  const shipUSD    = subUSD >= 99 ? 0 : 19;                     // free ≥ $99
   const grandUSD   = subUSD + shipUSD;
 
   const shipDisplay  = format(convert(shipUSD));
@@ -3037,7 +2931,7 @@ function checkoutCart () {
   /* ---------- 2.  Work out totals in *both* currencies ---------- */
   const subtotalUSD        = cart.reduce((sum, item) => sum + item.price, 0); // prices are stored in USD
   const subtotalSelected   = convert(subtotalUSD);                            // in currentCurrency
-  const shippingSelected   = subtotalSelected >= convert(0) ? 0 : convert(0);
+  const shippingSelected   = subtotalSelected >= convert(99) ? 0 : convert(19);
   const grandTotalSelected = subtotalSelected + shippingSelected;
 
   if (grandTotalSelected === 0) {
@@ -3095,8 +2989,6 @@ function checkoutCart () {
       document.getElementById("paymentSuccessPage").style.display = "block";
       document.getElementById("successPaymentId").textContent      = response.razorpay_payment_id;
 
-
-      await updateInventoryAfterPurchase(cart);
       /* clear cart */
       cart = [];
 
