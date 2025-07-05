@@ -2799,31 +2799,12 @@ function sortProductsByPrice(pageId) {
 }
 
 function filterProductsBySize(pageId) {
-  const selectedSize = document
-        .querySelector(`[data-target="${pageId}"] .filterSize`).value;
-  const cards = document.querySelectorAll(`#${pageId} .product-card`);
+  const selectedSize = document.querySelector([data-target="${pageId}"] .filterSize).value;
+  const cards = document.querySelectorAll(#${pageId} .product-card);
 
   cards.forEach(card => {
-
-    /* ─────────── SOLD-OUT GUARD ─────────── */
-    // 1 · get the product title that matches your inventory keys
-    const title = card.querySelector(".cardName h3")?.textContent?.trim();
-    // 2 · look up its stock and see if every size is 0
-    const allZero = Object
-          .values(inventory[title] || {})      // { S:0, M:0, … }
-          .every(qty => qty === 0);
-    if (allZero) {
-      card.style.display = "none";             // or add a badge instead
-      return;                                  // ✅ skip the rest of the checks
-    }
-    /* ─────────────────────────────────────── */
-
-    // existing size-filter logic
-    const onclickAttr = card
-          .querySelector("img")
-          .getAttribute("onclick");
-    const hasSize = selectedSize === "all" ||
-                    onclickAttr.includes(`'${selectedSize}'`);
+    const onclickAttr = card.querySelector("img").getAttribute("onclick");
+    const hasSize = selectedSize === "all" || onclickAttr.includes('${selectedSize}');
     card.style.display = hasSize ? "block" : "none";
   });
 }
