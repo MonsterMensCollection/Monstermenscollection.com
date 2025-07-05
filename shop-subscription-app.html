@@ -2634,45 +2634,35 @@ function refreshDescStockUI(productName, size) {
 }
 
 
-function addToCart(image = null, priceUSD = null, title = null) {
-  
-  const onHand = getStock(title, size);
-if (onHand === 0) {
-  alert('Sorry, that size is sold out.');
-  return;
-}
-  /* ────────────────── 1 · grab the media & text ────────────────── */
-  if (!image) image = document.getElementById("descImage").src;
-  if (!title) title = document.getElementById("descName").innerText;
-
-  /* ────────────────── 2 · selected options ────────────────── */
-  const sizeInput  = document.getElementById("selectedSize");
-  const colorInput = document.getElementById("selectedColor");
-
-  const size  = sizeInput  ? sizeInput.value  : "";
-  const color = colorInput ? colorInput.value : "";
+function addToCart() {
+  /* 1️⃣ pull the values that live in the DOM */
+  const image = document.getElementById("descImage").src;
+  const title = document.getElementById("descName").innerText;
+  const size  = document.getElementById("selectedSize")?.value;
+  const color = document.getElementById("selectedColor")?.value;
 
   if (!size)  { alert("Please select a size.");  return; }
   if (!color) { alert("Please select a color."); return; }
 
-  /* ────────────────── 3 · price in raw USD ────────────────── */
-  if (priceUSD === null) {
-   priceUSD = toNumber(
+  /* 2️⃣ stock check AFTER you actually have a size */
+  if (getStock(title, size) === 0) {
+    alert("Sorry, that size is sold out.");
+    return;
+  }
+
+  /* 3️⃣ base USD price is cached in data-attribute */
+  const priceUSD = Number(
     document.getElementById("descPrice").dataset.basePrice
-   );
- } else {
-   priceUSD = toNumber(priceUSD);                   // in case it was "$49"
- }
+  );
 
-  /* ────────────────── 4 · push & confirm ────────────────── */
+  /* 4️⃣ push to cart & update UI */
   cart.push({ image, price: priceUSD, title, size, color });
+  inventory[title][size]--;                 // reserve that piece
+  refreshDescStockUI(title, size);          // disable button if sold out
+  updateCartAmounts();                      // keep totals in sync
   alert("Item added to cart!");
-  inventory[title][size] = onHand - 1;
-refreshDescStockUI(title, size);    
-  
-  updateCartAmounts?.();      // refresh totals if cart is visible
 }
-
+  
 document.addEventListener("DOMContentLoaded", function () {
    updateAllPrices(); // initial
   // 🔹 Existing Filter Controls
