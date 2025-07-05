@@ -2122,10 +2122,10 @@
 <script>
 
   (async () => {
-    await db.collection('inventory')
-            .doc('BODAK #106')
-            .set({ sizes:{ S:1, M:1, L:1, XL:0, XXL:1 } });
-  })();
+  await db.collection('inventory')
+          .doc('BODAK #106')
+          .set({ sizes: { S:1, M:1, L:1, XL:0, XXL:1 } });
+})();
       
       let lastCategoryPage = null;
 
