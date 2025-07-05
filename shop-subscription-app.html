@@ -2121,12 +2121,6 @@
   
 <script>
 
-  (async () => {
-  await db.collection('inventory')
-          .doc('BODAK #106')
-          .set({ sizes: { S:1, M:1, L:1, XL:0, XXL:1 } });
-})();
-      
       let lastCategoryPage = null;
 
 function showShirtsPage() {
@@ -2361,10 +2355,26 @@ img.addEventListener('touchend', () => {
 });
 const toNumber = v => Number(String(v).replace(/[^0-9.]/g, '')) || 0;
 
-  
+const inventory       = {};                 // { "BODAK #106": { S:1, M:1 … } }
+const inventoryReady  = loadInventory();    // ⬅️ returns a promise we can await
+
+async function loadInventory () {
+  const snap = await db.collection('inventory').get();
+  snap.forEach(doc => {
+    inventory[doc.id] = doc.data().sizes || {};
+  });
+  console.log('[inventory] loaded →', inventory);
+}
+
+/* small helper so the rest of the code stays clean */
+const getStock = (prod, size) => inventory[prod]?.[size] ?? 0;
+
  
 let cart = [];
 function showDescription(media = [],  priceUSD, title = "No title", sdes = "No short description", description = "No description", sizesAvailable = ["M", "L", "XL"], colorsAvailable = [], category = null) {
+
+  await inventoryReady;
+  
   if (category) {
     // Push category state BEFORE description
     history.pushState({ page: category }, "", "#" + category);
@@ -2632,19 +2642,19 @@ if (!document.getElementById("descHeader")) {
 }
 
 /* turn the “Add to Cart” button into an Out-of-Stock label */
-function refreshDescStockUI(productName, size) {
-  const btn = document.querySelector('#descriptionPage button');
-  const qty = getStock(productName, size);
+function refreshDescStockUI (productName, size) {
+  const btn  = document.querySelector('#descriptionPage button');
+  const qty  = getStock(productName, size);
 
   if (qty === 0) {
-    btn.textContent   = 'OUT OF STOCK';
-    btn.disabled      = true;
-    btn.style.opacity = 0.6;
+    btn.textContent      = 'OUT OF STOCK';
+    btn.disabled         = true;
+    btn.style.opacity    = 0.6;
     btn.style.pointerEvents = 'none';
   } else {
-    btn.textContent   = 'Add to Cart';
-    btn.disabled      = false;
-    btn.style.opacity = 1;
+    btn.textContent      = 'Add to Cart';
+    btn.disabled         = false;
+    btn.style.opacity    = 1;
     btn.style.pointerEvents = 'auto';
   }
 }
@@ -2671,42 +2681,50 @@ function refreshDescStockUI(productName, size) {
   });
 }
 
-async function addToCart() {
-  /* 1️⃣ pull the values that live in the DOM */
-  const image = document.getElementById("descImage").src;
-  const title = document.getElementById("descName").innerText;
-  const size  = document.getElementById("selectedSize")?.value;
-  const color = document.getElementById("selectedColor")?.value;
+async function addToCart () {
+  await inventoryReady;                      // 🔑 makes getStock reliable
 
-  if (!size)  { alert("Please select a size.");  return; }
-  if (!color) { alert("Please select a color."); return; }
+  const imgSrc  = document.getElementById('descImage').src;
+  const title   = document.getElementById('descName').innerText;
+  const size    = document.getElementById('selectedSize')?.value;
+  const color   = document.getElementById('selectedColor')?.value;
 
-  /* 2️⃣ stock check AFTER you actually have a size */
+  if (!size)  { alert('Please select a size.');  return; }
+  if (!color) { alert('Please select a color.'); return; }
+
   if (getStock(title, size) === 0) {
-    alert("Sorry, that size is sold out.");
+    alert('Sorry, that size is sold out.');
+    refreshDescStockUI(title, size);
     return;
   }
 
-/* 3️⃣  Firestore reservation – **new** */
   try {
-    await reserveStock(title, size);              //  👈 NEW LINE
- } catch (err) {
+    await reserveStock(title, size);         // ⬅️ unchanged – still in Firestore
+  } catch (err) {
     alert(err);
-    refreshDescStockUI(title, size);              // reflect latest stock
-   return;
+    refreshDescStockUI(title, size);
+    return;
   }
-  
-  /* 3️⃣ base USD price is cached in data-attribute */
+
+  /* price comes from cached data‑attr exactly as before */
   const priceUSD = Number(
-    document.getElementById("descPrice").dataset.basePrice
+    document.getElementById('descPrice').dataset.basePrice
   );
 
-  /* 4️⃣ push to cart & update UI */
-  cart.push({ image, price: priceUSD, title, size, color });               // reserve that piece
-  refreshDescStockUI(title, size);          // disable button if sold out
-  updateCartAmounts();                      // keep totals in sync
-  alert("Item added to cart!");
+  cart.push({ image: imgSrc, price: priceUSD, title, size, color });
+  refreshDescStockUI(title, size);
+  updateCartAmounts();
+  alert('Item added to cart!');
 }
+
+async function seedInventory () {
+  /* example only – call once from DevTools or admin panel */
+  await db.collection('inventory').doc('BODAK #106').set({
+    sizes: { S: 1, M: 1, L: 1, XL: 0, XXL: 1 }
+  });
+  console.log('Inventory seeded');
+}
+
   
 document.addEventListener("DOMContentLoaded", function () {
    updateAllPrices(); // initial
