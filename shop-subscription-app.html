@@ -2342,6 +2342,11 @@ img.addEventListener('touchend', () => {
   }
 });
 const toNumber = v => Number(String(v).replace(/[^0-9.]/g, '')) || 0;
+  const inventory = {
+    "BODAK #106": { S: 1, M: 1, L: 1, XL: 0, XXL: 1 },
+    "BODAK #105": { S: 0, M: 0, L: 0, XL: 0, XXL: 0 },
+    "Ballucci®️ #201": { M: 4, L: 4, XL: 4, XXL: 0 },
+  };
 let cart = [];
 function showDescription(media = [],  priceUSD, title = "No title", sdes = "No short description", description = "No description", sizesAvailable = ["M", "L", "XL"], colorsAvailable = [], category = null) {
   if (category) {
@@ -2576,6 +2581,18 @@ if (!document.getElementById("descHeader")) {
     sizeContainer.appendChild(btn);
   });
 
+  refreshDescStockUI(title, selectedSize);
+
+/* then, inside the btn.onclick = … block that changes size → */
+btn.onclick = () => {
+  /* …existing styling work… */
+  selectedSize = size;
+  document.getElementById("selectedSize").value = size;
+
+  /*** NEW ***/
+  refreshDescStockUI(title, selectedSize);
+  };
+  
   let hiddenInput = document.getElementById("selectedSize");
   if (!hiddenInput) {
     hiddenInput = document.createElement("input");
@@ -2602,8 +2619,36 @@ if (!document.getElementById("descHeader")) {
   updateAllPrices();
 }
 
+  function getStock(productName, size) {
+  return inventory[productName]?.[size] ?? 0;
+}
+
+/* turn the “Add to Cart” button into an Out-of-Stock label */
+function refreshDescStockUI(productName, size) {
+  const btn = document.querySelector('#descriptionPage button');
+  const qty = getStock(productName, size);
+
+  if (qty === 0) {
+    btn.textContent   = 'OUT OF STOCK';
+    btn.disabled      = true;
+    btn.style.opacity = 0.6;
+    btn.style.pointerEvents = 'none';
+  } else {
+    btn.textContent   = 'Add to Cart';
+    btn.disabled      = false;
+    btn.style.opacity = 1;
+    btn.style.pointerEvents = 'auto';
+  }
+}
+
 
 function addToCart(image = null, priceUSD = null, title = null) {
+  
+  const onHand = getStock(title, size);
+if (onHand === 0) {
+  alert('Sorry, that size is sold out.');
+  return;
+}
   /* ────────────────── 1 · grab the media & text ────────────────── */
   if (!image) image = document.getElementById("descImage").src;
   if (!title) title = document.getElementById("descName").innerText;
@@ -2630,6 +2675,8 @@ function addToCart(image = null, priceUSD = null, title = null) {
   /* ────────────────── 4 · push & confirm ────────────────── */
   cart.push({ image, price: priceUSD, title, size, color });
   alert("Item added to cart!");
+  inventory[title][size] = onHand - 1;
+refreshDescStockUI(title, size);    
   
   updateCartAmounts?.();      // refresh totals if cart is visible
 }
@@ -2906,10 +2953,12 @@ function scrollIntoViewMobile(el) {
 }
 
 function removeFromCart(index) {
-  cart.splice(index, 1); // Remove item at the given index
-  showCart(); // Re-render the cart
+  const item = cart[index];
+  /* release the reservation */
+  inventory[item.title][item.size] += 1;
+  cart.splice(index, 1);
+  showCart();
 }
-
 function hideCart() {
   document.getElementById("cartPage").style.display = "none";
   document.getElementById("productList").style.display = "block";
