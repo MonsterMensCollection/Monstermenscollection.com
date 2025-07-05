@@ -2629,14 +2629,21 @@ async function loadInventory () {
   snap.forEach(doc => inventory[doc.data().title] = doc.data().sizes || {});
 }
 /* update Firestore & cache atomically */
-async function changeStock (title, size, delta) {
-  const ref  = db.collection("products").doc(title.replace(/[^A-Za-z0-9\-#]/g,""));
+async function changeStock(title, size, delta) {
+  const docId = title.replace(/[^A-Za-z0-9\-#]/g, "");
+  const ref   = db.collection("products").doc(docId);
+
   await db.runTransaction(async t => {
-    const doc = await t.get(ref);
-    const sizes = doc.data().sizes || {};
-    sizes[size] = Math.max(0, (sizes[size]||0) + delta);
-    t.update(ref, { sizes });
-    inventory[title][size] = sizes[size];        // sync local cache
+    const snap  = await t.get(ref);
+    const sizes = snap.exists ? (snap.data().sizes || {}) : {};
+
+    sizes[size] = Math.max(0, (sizes[size] || 0) + delta);
+
+    // `set(..., {merge:true})` creates the doc the first time and
+    // only updates the `sizes` map afterwards
+    t.set(ref, { sizes }, { merge: true });
+
+    inventory[title] = sizes;            // keep local cache in sync
   });
 }
   
