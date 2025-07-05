@@ -2576,6 +2576,7 @@ if (!document.getElementById("descHeader")) {
       btn.style.color = "#fff";
       selectedSize = size;
       document.getElementById("selectedSize").value = size;
+       refreshDescStockUI(title, selectedSize);  
     };
 
     sizeContainer.appendChild(btn);
@@ -2583,15 +2584,6 @@ if (!document.getElementById("descHeader")) {
 
   refreshDescStockUI(title, selectedSize);
 
-/* then, inside the btn.onclick = … block that changes size → */
-btn.onclick = () => {
-  /* …existing styling work… */
-  selectedSize = size;
-  document.getElementById("selectedSize").value = size;
-
-  /*** NEW ***/
-  refreshDescStockUI(title, selectedSize);
-  };
   
   let hiddenInput = document.getElementById("selectedSize");
   if (!hiddenInput) {
