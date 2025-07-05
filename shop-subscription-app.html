@@ -776,20 +776,33 @@
 
 
  <!-- 106 -->
-  <div class="product-card">
-     <div class="image-wrapper">
-<img src="https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/s6.png" alt="Shirt 1" onclick="showDescription([
-  { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/s6.png' },
-    { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/fullimage/refs/heads/main/s6b1.png' },
-],'$0.2', 'BODAK #106', 'ABSTRACT PRINT SHIRT', 'Relaxed fit collared shirt. Short sleeves. Split hem. Button-up front.', ['s','M','L','XL'],['Same'],'shirtsPage')">
-</div><div class=cardName>
-<h3>BODAK</h3> <!-- Product Title -->
-<p>ABSTRACT PRINT SHIRT</p>
-</div>
-    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 10px;">
-    <p class="price"> $0.2</p>
+<div class="product-card"  data-sku="BODAK #106">
+  <div class="image-wrapper">
+    <img src="https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/s6.png"
+         alt="BODAK #106"
+         onclick="showDescription([
+           {type:'image',src:'https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/s6.png'},
+           {type:'image',src:'https://raw.githubusercontent.com/MonsterMensCollection/fullimage/refs/heads/main/s6b1.png'}
+         ],
+         '$0.2',
+         'BODAK #106',
+         'ABSTRACT PRINT SHIRT',
+         'Relaxed fit collared shirt. Short sleeves. Split hem. Button-up front.',
+         ['S','M','L','XL','XXL'],
+         ['Same'],
+         'shirtsPage')">
+  </div>
+
+  <div class="cardName">
+    <h3>BODAK</h3>
+    <p>ABSTRACT PRINT SHIRT</p>
+  </div>
+
+  <div style="display:flex;justify-content:space-between;padding:0 10px;">
+    <p class="price" data-base-price="0.2">$0.2</p>
   </div>
 </div>
+
    
  <!-- 105 -->
   <div class="product-card">
@@ -2108,6 +2121,11 @@
   
 <script>
 
+  await db.collection('inventory')
+        .doc('BODAK #106')
+        .set({
+          sizes: { S:1, M:1, L:1, XL:0, XXL:1 }
+        });
       
       let lastCategoryPage = null;
 
@@ -2342,11 +2360,9 @@ img.addEventListener('touchend', () => {
   }
 });
 const toNumber = v => Number(String(v).replace(/[^0-9.]/g, '')) || 0;
-  const inventory = {
-    "BODAK #106": { S: 1, M: 1, L: 1, XL: 0, XXL: 1 },
-    "BODAK #105": { S: 0, M: 0, L: 0, XL: 0, XXL: 0 },
-    "Ballucci®️ #201": { M: 4, L: 4, XL: 4, XXL: 0 },
-  };
+
+  
+ 
 let cart = [];
 function showDescription(media = [],  priceUSD, title = "No title", sdes = "No short description", description = "No description", sizesAvailable = ["M", "L", "XL"], colorsAvailable = [], category = null) {
   if (category) {
@@ -2633,8 +2649,29 @@ function refreshDescStockUI(productName, size) {
   }
 }
 
+  async function reserveStock(productName, size) {
+  const ref = db.collection('inventory').doc(productName);
 
-function addToCart() {
+  await db.runTransaction(async (tx) => {
+    const snap = await tx.get(ref);
+    if (!snap.exists) throw `No inventory record for “${productName}”`;
+
+    const currentQty = snap.data().sizes?.[size] ?? 0;
+    if (currentQty <= 0) throw "Sorry, that size just sold out.";
+
+    /* build a field-path update:  sizes.S  or  sizes.M  … */
+    const update = {};
+    update[`sizes.${size}`] = firebase.firestore.FieldValue.increment(-1);
+    tx.update(ref, update);
+
+    /* keep local cache in sync so UI updates instantly */
+    if (inventory[productName]) {
+      inventory[productName][size] = currentQty - 1;
+    }
+  });
+}
+
+async function addToCart() {
   /* 1️⃣ pull the values that live in the DOM */
   const image = document.getElementById("descImage").src;
   const title = document.getElementById("descName").innerText;
@@ -2650,14 +2687,22 @@ function addToCart() {
     return;
   }
 
+/* 3️⃣  Firestore reservation – **new** */
+  try {
+    await reserveStock(title, size);              //  👈 NEW LINE
+ } catch (err) {
+    alert(err);
+    refreshDescStockUI(title, size);              // reflect latest stock
+   return;
+  }
+  
   /* 3️⃣ base USD price is cached in data-attribute */
   const priceUSD = Number(
     document.getElementById("descPrice").dataset.basePrice
   );
 
   /* 4️⃣ push to cart & update UI */
-  cart.push({ image, price: priceUSD, title, size, color });
-  inventory[title][size]--;                 // reserve that piece
+  cart.push({ image, price: priceUSD, title, size, color });               // reserve that piece
   refreshDescStockUI(title, size);          // disable button if sold out
   updateCartAmounts();                      // keep totals in sync
   alert("Item added to cart!");
@@ -3186,6 +3231,18 @@ function saveOrder(productName, uid) {
     const auth = firebase.auth();
     const db = firebase.firestore();
 
+let inventory = {};                   // will be filled from Firestore
+
+async function loadInventory() {
+  const snap = await db.collection('inventory').get();
+  snap.forEach(doc => {
+    inventory[doc.id] = doc.data().sizes;   // {S:…, M:…}
+  });
+  updateAllPrices();               // already redraws the UI
+}
+loadInventory();
+
+  
 function loadUserProfileAndOrders() {
     auth.onAuthStateChanged(async (user) => {
       if (user) {
