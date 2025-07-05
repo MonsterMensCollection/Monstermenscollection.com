@@ -2549,43 +2549,41 @@ if (!document.getElementById("descHeader")) {
 
 
 
-  // Size buttons logic
   const sizeContainer = document.getElementById("sizeButtons");
-  sizeContainer.innerHTML = "";
-  let selectedSize = null;
+sizeContainer.innerHTML = "";
 
-sizesAvailable.forEach(size => {
-  const stock = (inventory[title]?.[size] ?? 0);           // live count
+let selectedSize = null;
+
+sizesAvailable.forEach((size, index) => {           // ← index injected
+  const stock = (inventory[title]?.[size] ?? 0);
   const btn   = document.createElement("button");
   btn.textContent = `${size} (${stock})`;
 
-  btn.disabled = stock === 0;                              // sold-out?
-  if (stock === 0) { btn.style.opacity = .5; }
-  
-    btn.style.padding = "10px 20px";
-    btn.style.border = "1px solid #ccc";
-    btn.style.borderRadius = "0px";
-    btn.style.cursor = "pointer";
+  btn.disabled = stock === 0;
+  if (stock === 0) btn.style.opacity = .5;
 
-    if (index === 0) {
-      btn.style.backgroundColor = "#333";
-      btn.style.color = "#fff";
-      selectedSize = size;
-    }
+  /* select the first in-stock size by default */
+  if (selectedSize === null && stock > 0) {
+    btn.style.backgroundColor = "#333";
+    btn.style.color = "#fff";
+    selectedSize = size;
+  }
 
-    btn.onclick = () => {
-      document.querySelectorAll("#sizeButtons button").forEach(b => {
-        b.style.backgroundColor = "#f8f8f8";
-        b.style.color = "#000";
-      });
-      btn.style.backgroundColor = "#333";
-      btn.style.color = "#fff";
-      selectedSize = size;
-      document.getElementById("selectedSize").value = size;
-    };
+  btn.onclick = () => {
+    // clear previous highlight …
+    sizeContainer.querySelectorAll("button").forEach(b => {
+      b.style.backgroundColor = "#f8f8f8";
+      b.style.color = "#000";
+    });
+    // highlight the clicked one
+    btn.style.backgroundColor = "#333";
+    btn.style.color = "#fff";
+    selectedSize = size;
+    document.getElementById("selectedSize").value = size;
+  };
 
-    sizeContainer.appendChild(btn);
-  });
+  sizeContainer.appendChild(btn);
+});
 
   let hiddenInput = document.getElementById("selectedSize");
   if (!hiddenInput) {
