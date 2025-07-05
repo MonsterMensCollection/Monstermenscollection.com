@@ -643,6 +643,24 @@
     display: block;
   }
 }
+
+.product-card.sold-out {
+  position: relative;
+  opacity: .35;
+}
+
+.product-card.sold-out::after {
+  content: "SOLD OUT";
+  position: absolute;
+  top: 8px; left: 8px;
+  background: #c00;
+  color: #fff;
+  padding: 2px 6px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 2px;
+}     
+     
   
  </style>
 </head>
@@ -2663,8 +2681,6 @@ if ((stockObj[size] ?? 0) === 0) {
 
   /* ────────────────── 4 · push & confirm ────────────────── */
   cart.push({ image, price: priceUSD, title, size, color });
-stockObj[size]--;              // 🔹 decrement inventory
-updateStockUI?.();             // 🔹 refresh UI if still on page
 alert("Item added to cart!");
   updateCartAmounts?.();      // refresh totals if cart is visible
 }
@@ -2777,7 +2793,46 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 });
+  
+async function updateInventoryAfterPurchase (cart) {
+  const batch = db.batch();          // <-- only needed if you use Firestore
 
+  cart.forEach(item => {
+    /* ---------- A. mutate the in-memory map ---------- */
+    const sizes = inventory[item.title] || {};
+    if (sizes[item.size] !== undefined) {
+      sizes[item.size] = Math.max(0, sizes[item.size] - 1);
+    }
+
+    /* ---------- B. queue a Firestore decrement ---------- */
+    // comment this block out if you don’t store inventory in Firestore
+    const docRef = db.collection("inventory").doc(item.title);
+    batch.set(
+      docRef,
+      { [`${item.size}`]: firebase.firestore.FieldValue.increment(-1) },
+      { merge: true }
+    );
+  });
+
+  /* ---------- C. commit Firestore (optional) ---------- */
+  // comment out if you skipped part B
+  try   { await batch.commit(); }
+  catch (e) { console.warn("Stock update failed:", e); }
+
+  /* ---------- D. update every card that’s now sold-out ---------- */
+  document.querySelectorAll(".product-card").forEach(card => {
+    const t = card.querySelector(".cardName h3")?.textContent?.trim();
+    const allZero = Object.values(inventory[t] || {}).every(q => q === 0);
+    if (allZero) {
+      // card.style.display = "none";              // hard-hide
+      card.classList.add("sold-out");             // nicer: badge via CSS
+    }
+  });
+  
+  updateStockUI?.();  
+  
+}
+  
 function sortProductsByPrice(pageId) {
   const grid = document.querySelector(`#${pageId} .product-grid`);
   const products = Array.from(grid.getElementsByClassName("product-card"));
@@ -3043,6 +3098,8 @@ function checkoutCart () {
       document.getElementById("paymentSuccessPage").style.display = "block";
       document.getElementById("successPaymentId").textContent      = response.razorpay_payment_id;
 
+
+      await updateInventoryAfterPurchase(cart);
       /* clear cart */
       cart = [];
 
