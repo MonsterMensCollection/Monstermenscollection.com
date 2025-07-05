@@ -2643,7 +2643,7 @@ async function changeStock (title, size, delta) {
 }
   
 
-function addToCart(image = null, priceUSD = null, title = null) {
+async function addToCart(image = null, priceUSD = null, title = null) {
   /* ────────────────── 1 · grab the media & text ────────────────── */
   if (!image) image = document.getElementById("descImage").src;
   if (!title) title = document.getElementById("descName").innerText;
@@ -2946,7 +2946,7 @@ function scrollIntoViewMobile(el) {
   }, 300);
 }
 
-function removeFromCart(index) {
+async function removeFromCart(index) {
 const removed = cart[index];
 await changeStock(removed.title, removed.size, +1);
 cart.splice(index,1);
