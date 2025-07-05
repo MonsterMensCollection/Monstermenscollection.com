@@ -2650,7 +2650,7 @@ async function addToCart(image = null, priceUSD = null, title = null) {
   const sizeInput  = document.getElementById("selectedSize");
   const colorInput = document.getElementById("selectedColor");
 
-  const size  = sizeInput  ? sizeInput.value  : "";
+  const size  = sizeInput ? sizeInput.value : "";
   const color = colorInput ? colorInput.value : "";
 
   if (!size)  { alert("Please select a size.");  return; }
@@ -2665,7 +2665,7 @@ async function addToCart(image = null, priceUSD = null, title = null) {
    priceUSD = toNumber(priceUSD);                   // in case it was "$49"
  }
   
-await changeStock(title, selectedSize, -1);
+await changeStock(title, size, -1);
   /* ────────────────── 4 · push & confirm ────────────────── */
   cart.push({ image, price: priceUSD, title, size, color });
   alert("Item added to cart!");
