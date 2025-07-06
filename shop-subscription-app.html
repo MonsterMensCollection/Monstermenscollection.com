@@ -2240,6 +2240,17 @@ function reserveOneUnit(docId,size){
   }));
 }
 
+function releaseOneUnit (docId, size) {
+  const docRef = db.collection("products").doc(docId);
+  return db.runTransaction(tx =>
+    tx.get(docRef).then(snap => {
+      const sizes = snap.data().sizes || {};
+      sizes[size] = (sizes[size] || 0) + 1;      // ➕ add 1 back
+      tx.update(docRef, { sizes });
+    })
+  );
+}
+  
 /* After any change push the new numbers on-screen      */
 function updateStockUI(sizes){
   document.querySelectorAll("#sizeButtons button").forEach(btn=>{
