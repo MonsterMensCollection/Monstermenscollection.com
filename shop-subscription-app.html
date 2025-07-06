@@ -2900,9 +2900,26 @@ function scrollIntoViewMobile(el) {
   }, 300);
 }
 
-function removeFromCart(index) {
-  cart.splice(index, 1); // Remove item at the given index
-  showCart(); // Re-render the cart
+async function removeFromCart(index) {
+  const item = cart[index];
+  cart.splice(index, 1);                 // remove from local array
+
+  /* ⬅️ put the unit back in Firestore */
+  if (item?.docId && item?.size) {
+    try {
+      await restoreOneUnit(item.docId, item.size);
+      liveStock[item.docId][item.size] =
+        (liveStock[item.docId][item.size] || 0) + 1; // keep cache honest
+      if (document.getElementById("descriptionPage").style.display !== "none") {
+        updateStockUI(liveStock[item.docId]);        // refresh pills if open
+      }
+    } catch (err) {
+      console.error("Stock restore failed:", err);   // network-offline etc.
+    }
+  }
+
+  showCart();                         // re-render the cart totals/UI
+  updateCartAmounts?.();              // keep bottom bar in sync
 }
 
 function hideCart() {
