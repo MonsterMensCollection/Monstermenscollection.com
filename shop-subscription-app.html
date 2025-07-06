@@ -2978,7 +2978,7 @@ function hideCart() {
   document.getElementById("productList").style.display = "block";
   document.getElementById("sliderSection").style.display = "block";
 }
-function checkoutCart () {
+async function checkoutCart () {
 
   /* ---------- 1. Basic form validation ---------- */
   const name          = document.getElementById("checkoutName").value.trim();
@@ -3021,7 +3021,6 @@ function checkoutCart () {
 
   new Razorpay(options).open();
 
-  await Promise.all(cart.map(it => reserveOneUnit(it.title, it.size)));
 
   
   /* ---------- 4.  Success callback ---------- */
