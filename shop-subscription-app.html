@@ -2465,6 +2465,36 @@ async function showDescription(
   });
   updateStockUI(sizes);
 
+  /* ---------- disable/enable cart button depending on inventory ---------- */
+ const totalStock = sizesAvailable.reduce(
+   (sum, sz) => sum + (sizes[sz] || 0), 0
+ );
+ const cartBtn = document.querySelector(
+   '#descriptionPage button[onclick="addToCart()"]'
+ );
+
+if (totalStock === 0) {
+   cartBtn.textContent = 'Out of Stock';
+   cartBtn.disabled    = true;
+   cartBtn.style.opacity = 0.5;
+ } else {
+   cartBtn.textContent = 'Add to Cart';
+   cartBtn.disabled    = false;
+   cartBtn.style.opacity = 1;
+ }
+  
+  /* ----- guarantee a <input hidden id="selectedSize"> exists ----- */
+let sizeHidden = document.getElementById('selectedSize');
+if (!sizeHidden) {
+  sizeHidden       = document.createElement('input');
+  sizeHidden.type  = 'hidden';
+  sizeHidden.id    = 'selectedSize';
+  document.getElementById('descriptionPage').appendChild(sizeHidden);
+}
+sizeHidden.value = '';        // reset every time a new product opens
+
+
+
   /* ——— push history so the back-button works ——— */
   if (category){
     history.pushState({page: category}, "", "#" + category);
@@ -2481,6 +2511,9 @@ async function showDescription(
   document.getElementById("descName").textContent  = title;
   document.getElementById("descSText").textContent = sdes;
   document.getElementById("descText").textContent  = description;
+  if (docId) {
+   document.getElementById("descName").dataset.docid = docId;
+ }
 
   /* ——— media viewer (swipe + thumbs) ——— */
   let currentIndex = 0;
