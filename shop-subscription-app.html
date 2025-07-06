@@ -2897,12 +2897,18 @@ function scrollIntoViewMobile(el) {
   }, 300);
 }
 
-function removeFromCart(index) {
-  cart.splice(index, 1);
- showCart();
+async function removeFromCart(index) {
+  const removed = cart.splice(index, 1)[0];
 
+  if (removed && removed.docId) {          // ← no “?. ” anymore
+    await releaseOneUnit(removed.docId, removed.size);
+    // update the little “M · 3” counters if the PDP is open
+    updateStockUI(await fetchStockOnce(removed.docId));
+  }
+
+  showCart();                              // redraw the basket
 }
-
+  
 function hideCart() {
   document.getElementById("cartPage").style.display = "none";
   document.getElementById("productList").style.display = "block";
