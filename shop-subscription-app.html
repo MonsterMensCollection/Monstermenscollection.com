@@ -2908,10 +2908,10 @@ async function removeFromCart(index) {
   if (item?.docId && item?.size) {
     try {
       await restoreOneUnit(item.docId, item.size);
-      liveStock[item.docId][item.size] =
-        (liveStock[item.docId][item.size] || 0) + 1; // keep cache honest
+      +// pull the true count from Firestore once and repaint
+      await fetchStockOnce(item.docId, /*forceReload=*/true);
       if (document.getElementById("descriptionPage").style.display !== "none") {
-        updateStockUI(liveStock[item.docId]);        // refresh pills if open
+        updateStockUI(liveStock[item.docId]);       // refresh pills if open
       }
     } catch (err) {
       console.error("Stock restore failed:", err);   // network-offline etc.
