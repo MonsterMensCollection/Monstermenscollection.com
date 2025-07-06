@@ -2377,6 +2377,57 @@ img.addEventListener('touchend', () => {
   }
 });
 const toNumber = v => Number(String(v).replace(/[^0-9.]/g, '')) || 0;
+  
+  function buildColourPicker(colorsAvailable){
+  const descPage      = document.getElementById("descriptionPage");
+  let  colorContainer = document.getElementById("colorButtons");
+  if (!colorContainer){
+    colorContainer         = document.createElement("div");
+    colorContainer.id      = "colorButtons";
+    descPage.insertBefore(colorContainer, document.getElementById("descText"));
+  }
+  colorContainer.innerHTML = "";
+
+  let selectedColor        = colorsAvailable[0] || null;
+  const optionEls          = [];
+
+  colorsAvailable.forEach(color=>{
+    const opt   = document.createElement("div");
+    opt.style.cssText = `
+       display:flex;align-items:center;cursor:pointer;
+       background:#fff;padding:6px 10px;border-radius:0;
+       box-shadow:0 2px 6px rgba(0,0,0,.1);border:2px solid transparent;
+       margin:4px 6px;`;
+    const dot   = document.createElement("div");
+    dot.style.cssText = `
+       width:16px;height:16px;border-radius:50%;
+       border:1px solid #888;margin-right:8px;
+       background:${color.trim().toLowerCase()}`;
+    const label = document.createElement("span");
+    label.textContent = color;
+
+    opt.append(dot,label);
+    opt.onclick = () => {
+      selectedColor = color;
+      document.getElementById("selectedColor").value = color;
+      optionEls.forEach(el=>el.style.border="2px solid transparent");
+      opt.style.border = "2px solid #333";
+    };
+    optionEls.push(opt);
+    colorContainer.appendChild(opt);
+  });
+
+  /* hidden field for add-to-cart */
+  let hidden = document.getElementById("selectedColor");
+  if (!hidden){
+    hidden       = document.createElement("input");
+    hidden.type  = "hidden";
+    hidden.id    = "selectedColor";
+    descPage.appendChild(hidden);
+  }
+  hidden.value = selectedColor;
+}
+
 let cart = [];
 async function showDescription(
   media,            // [{type:'image'|'video',src:'…'}, …]
