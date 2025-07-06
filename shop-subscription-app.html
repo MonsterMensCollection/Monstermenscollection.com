@@ -2229,22 +2229,6 @@ async function fetchStockOnce (docId) {
   return liveStock[docId];
 }
 
-/* Decrement a size atomically in Firestore             */
-const reserveOneUnit = (docId,size)=>{
-  const docRef = db.collection("products").doc(docId);
-  return db.runTransaction(tx => tx.get(docRef).then(snap=>{
-    const s = snap.data().sizes || {};
-    if (!s[size] || s[size] <= 0) throw "OOS";
-    s[size]--;
-    tx.update(docRef,{ sizes: s });
-  })).then(()=>                       // 👇 add this
-    db.collection('holds').add({
-      docId, size,
-      expires: firebase.firestore.Timestamp.fromMillis(
-                 Date.now() + 30*60*1000)   // 30 min TTL
-    }));
-};
-
 
 function releaseOneUnit (docId, size) {
   const docRef = db.collection("products").doc(docId);
