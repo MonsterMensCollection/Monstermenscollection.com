@@ -643,7 +643,11 @@
     display: block;
   }
 }
-  
+     
+#sizeButtons button.active{
+  background:#000;color:#fff;
+}
+     
  </style>
 </head>
 <body>
@@ -2213,57 +2217,52 @@ function backToProducts() {
 /* ───────────  LIVE-INVENTORY HELPERS  ─────────── */
 
 /*  Cache that lives only in the current page session  */
-const liveStock = {};          // { "BODAK-106" : { S:10, M:4 … }, … }
+/* lives only for this page-session */
+const liveStock = {};          // { "BODAK-106": {S:3,M:7,…}, … }
 
-/*  Pull a product’s stock from Firestore (once per page-session)  */
-async function fetchStockOnce (docId) {
-  if (liveStock[docId]) return liveStock[docId];     // ↩︎ already cached
+/* pull stock once – then cache */
+async function fetchStockOnce(docId){
+  if (liveStock[docId]) return liveStock[docId];
 
-  try {                                              // ← NEW  try / catch
-    const snap = await db.collection("products").doc(docId).get();
-    liveStock[docId] = snap.exists ? (snap.data().sizes || {}) : {};
-  } catch (e) {                                      // ← NEW  fallback
-    console.warn("Firestore unreachable, faking stock", e);
-    liveStock[docId] = {};                           // empty ⇒ we’ll fake later
-  }
+  const snap = await db.collection("products").doc(docId).get();
+  liveStock[docId] = snap.exists ? (snap.data().sizes || {}) : {};
   return liveStock[docId];
 }
 
-/* Decrement a size atomically in Firestore             */
-function reserveOneUnit(docId,size){
-  const docRef = db.collection("products").doc(docId);
-  return db.runTransaction(tx => tx.get(docRef).then(snap=>{
-     const sizes = snap.data().sizes || {};
-     if (!sizes[size] || sizes[size] <= 0) throw "OOS";
-     sizes[size]--;
-     tx.update(docRef,{ sizes });
-  }));
-}
-
-  /* Increment a size atomically in Firestore (opposite of reserve) */
-function restoreOneUnit(docId, size) {
-  const docRef = db.collection("products").doc(docId);
-  return db.runTransaction(tx =>
-    tx.get(docRef).then(snap => {
-      const sizes = snap.data().sizes || {};
-      sizes[size] = (sizes[size] || 0) + 1;      // ➕ put it back
-      tx.update(docRef, { sizes });
-    })
-  );
-}
-
-
-  
-/* After any change push the new numbers on-screen      */
+/* paint the numbers on the pills */
 function updateStockUI(sizes){
   document.querySelectorAll("#sizeButtons button").forEach(btn=>{
-     const s  = btn.dataset.size; 
-     const n  = sizes[s] ?? 0;
-     btn.innerHTML = `${s}${n?" · "+n:""}`;          // “M · 3”
-     btn.disabled  = n===0;
-     btn.style.opacity = n===0 ? .4 : 1;
+    const s = btn.dataset.size;
+    const n = sizes[s] ?? 0;                     // undefined → 0
+    btn.textContent   = n ? `${s} · ${n}` : s;   // “M · 5”
+    btn.disabled      = n === 0;
+    btn.style.opacity = n === 0 ? .4 : 1;
   });
 }
+
+/* atomic decrement when you add-to-cart */
+function reserveOneUnit(docId,size){
+  const ref = db.collection("products").doc(docId);
+  return db.runTransaction(tx =>
+    tx.get(ref).then(snap=>{
+      const sizes = snap.data().sizes || {};
+      if (!sizes[size] || sizes[size] <= 0) throw "OOS";
+      sizes[size]--;
+      tx.update(ref,{ sizes });
+    }));
+}
+
+/* matching increment when you delete from cart */
+function restoreOneUnit(docId,size){
+  const ref = db.collection("products").doc(docId);
+  return db.runTransaction(tx =>
+    tx.get(ref).then(snap=>{
+      const sizes = snap.data().sizes || {};
+      sizes[size] = (sizes[size] || 0) + 1;
+      tx.update(ref,{ sizes });
+    }));
+}
+
 
   
 let isMessageVisible = false;
@@ -2468,29 +2467,27 @@ async function showDescription(
   const mainVideo       = document.getElementById("descVideo");
   const previewContainer= document.getElementById("descImagePreview");
 
-  /* ——— live inventory ——— */
- let sizes = await fetchStockOnce(docId ?? "");
+/* --------------- live inventory ---------------- */
+let sizes = await fetchStockOnce(docId);
 
-/* 🆕  If nothing came back, create temporary “99 pcs” for each declared size */
-if (Object.keys(sizes).length === 0) {
-  sizes = Object.fromEntries(sizesAvailable.map(S => [S, 99]));
-}    // ‹guard in case it's missing›
-  
-  sizesAvailable.forEach(size => {
-    const n   = sizes[size] ?? 0;
-    const btn = document.createElement("button");
-    btn.dataset.size = size;  
-    btn.textContent = n ? `${size} · ${n}` : size;
-    if (!n){ btn.disabled = true; btn.style.opacity = .4; }
-    /* highlight on click */
-    btn.onclick = () => {
-      [...sizeContainer.children].forEach(b=>{b.style.background="#f8f8f8";b.style.color="#000"});
-      btn.style.background = "#333"; btn.style.color="#fff";
-      document.getElementById("selectedSize").value = size;
-    };
-    sizeContainer.appendChild(btn);
-  });
-  updateStockUI(sizes);
+/* build / rebuild the pills */
+const container = document.getElementById("sizeButtons");
+container.innerHTML = "";                       // clear old pills
+sizesAvailable.forEach(sz=>{
+  const n   = sizes[sz] ?? 0;
+  const btn = document.createElement("button");
+  btn.dataset.size = sz;
+  btn.textContent   = n ? `${sz} · ${n}` : sz;
+  if (!n){ btn.disabled = true; btn.style.opacity = .4; }
+  btn.onclick = ()=>{                 // highlight selection
+    [...container.children].forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById("selectedSize").value = sz;
+  };
+  container.appendChild(btn);
+});
+updateStockUI(sizes);                 // initial paint
+
 
   /* ---------- disable/enable cart button depending on inventory ---------- */
  const totalStock = sizesAvailable.reduce(
@@ -2624,7 +2621,7 @@ async function addToCart (image = null, priceUSD = null, title = null) {
   /* 5 · push to cart & tidy up UI (unchanged) */
   cart.push({ image, price: priceUSD, title, size, color, docId });
   alert("Item added to cart!");
-
+  await reserveOneUnit(docId,size); 
   updateStockUI(await fetchStockOnce(docId));     // show one less
   updateCartAmounts?.();                          // refresh totals if cart open
 }
@@ -2900,26 +2897,19 @@ function scrollIntoViewMobile(el) {
   }, 300);
 }
 
-async function removeFromCart(index) {
+async function removeFromCart(index){
   const item = cart[index];
-  cart.splice(index, 1);                 // remove from local array
+  cart.splice(index,1);
 
-  /* ⬅️ put the unit back in Firestore */
-  if (item?.docId && item?.size) {
-    try {
-      await restoreOneUnit(item.docId, item.size);
-      +// pull the true count from Firestore once and repaint
-      await fetchStockOnce(item.docId, /*forceReload=*/true);
-      if (document.getElementById("descriptionPage").style.display !== "none") {
-        updateStockUI(liveStock[item.docId]);       // refresh pills if open
-      }
-    } catch (err) {
-      console.error("Stock restore failed:", err);   // network-offline etc.
-    }
-  }
+  /* put the unit back in Firestore */
+  await restoreOneUnit(item.docId,item.size);          // <── NEW
 
-  showCart();                         // re-render the cart totals/UI
-  updateCartAmounts?.();              // keep bottom bar in sync
+  /* repaint the size pills if the product page is still open */
+  updateStockUI(await fetchStockOnce(item.docId));
+
+  /* rebuild cart UI */
+  showCart();                         // re-render cart
+  updateCartAmounts?.();              // keep totals in sync
 }
 
 function hideCart() {
