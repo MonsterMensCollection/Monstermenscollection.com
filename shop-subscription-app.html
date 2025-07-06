@@ -2619,8 +2619,7 @@ async function addToCart (image = null, priceUSD = null, title = null) {
   }
 
   /* 5 · push to cart & tidy up UI (unchanged) */
- cart.push({ image, price: priceUSD, title, size, color});
-  
+ cart.push({ image, price: priceUSD, title,size,color,docId});
   alert("Item added to cart!");
 
   updateStockUI(await fetchStockOnce(docId));     // show one less
