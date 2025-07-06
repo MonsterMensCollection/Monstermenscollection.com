@@ -2213,13 +2213,19 @@ function backToProducts() {
 /* ───────────  LIVE-INVENTORY HELPERS  ─────────── */
 
 /*  Cache that lives only in the current page session  */
-const liveStock = {};   // { "BODAK #106" : {S:1,M:4...}, ... }
+const liveStock = {};          // { "BODAK-106" : { S:10, M:4 … }, … }
 
-/* Pull a product’s stock from Firestore (once)        */
-async function fetchStockOnce(docId){
-  if (liveStock[docId]) return liveStock[docId];           // cached
-  const snap = await db.collection("products").doc(docId).get();
-  liveStock[docId] = snap.exists ? (snap.data().sizes||{}) : {};
+/*  Pull a product’s stock from Firestore (once per page-session)  */
+async function fetchStockOnce (docId) {
+  if (liveStock[docId]) return liveStock[docId];     // ↩︎ already cached
+
+  try {                                              // ← NEW  try / catch
+    const snap = await db.collection("products").doc(docId).get();
+    liveStock[docId] = snap.exists ? (snap.data().sizes || {}) : {};
+  } catch (e) {                                      // ← NEW  fallback
+    console.warn("Firestore unreachable, faking stock", e);
+    liveStock[docId] = {};                           // empty ⇒ we’ll fake later
+  }
   return liveStock[docId];
 }
 
@@ -2449,7 +2455,13 @@ async function showDescription(
   const previewContainer= document.getElementById("descImagePreview");
 
   /* ——— live inventory ——— */
-  const sizes = await fetchStockOnce(docId ?? "");     // ‹guard in case it's missing›
+ let sizes = await fetchStockOnce(docId ?? "");
+
+/* 🆕  If nothing came back, create temporary “99 pcs” for each declared size */
+if (Object.keys(sizes).length === 0) {
+  sizes = Object.fromEntries(sizesAvailable.map(S => [S, 99]));
+}    // ‹guard in case it's missing›
+  
   sizesAvailable.forEach(size => {
     const n   = sizes[size] ?? 0;
     const btn = document.createElement("button");
@@ -2574,13 +2586,16 @@ async function addToCart (image = null, priceUSD = null, title = null) {
   if (!color) { alert("Please select a colour");return; }
 
   /* 3 · *reserve* one unit in Firestore (atomic transaction) */
+   if (docId) {                                  // 🆕 guard
   try {
-      await reserveOneUnit(docId, size);          // ← live lock
-  } catch (e) {
-      alert("Sorry, that size just sold out.");
-      updateStockUI(await fetchStockOnce(docId)); // refresh pills
-      return;
-  }
+     await reserveOneUnit(docId, size);        // live lock
+   } catch (e) {
+     console.warn("Stock reservation failed – dev fallback:", e);
+    // ── dev-time choices ──────────────────────────────────────────────
+      alert("Sorry, that size just sold out.");   // enable for prod
+      return;                                     // enable for prod
+   }
+ }
 
   /* 4 · figure out the raw USD price (identical to old code) */
   if (priceUSD === null) {
