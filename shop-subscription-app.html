@@ -2215,17 +2215,22 @@ function backToProducts() {
 /*  Cache that lives only in the current page session  */
 const liveStock = {};          // { "BODAK-106" : { S:10, M:4 … }, … }
 
-/*  Pull a product’s stock from Firestore (once per page-session)  */
-async function fetchStockOnce (docId) {
-  if (liveStock[docId]) return liveStock[docId];     // ↩︎ already cached
-
-  try {                                              // ← NEW  try / catch
-    const snap = await db.collection("products").doc(docId).get();
-    liveStock[docId] = snap.exists ? (snap.data().sizes || {}) : {};
-  } catch (e) {                                      // ← NEW  fallback
-    console.warn("Firestore unreachable, faking stock", e);
-    liveStock[docId] = {};                           // empty ⇒ we’ll fake later
+async function fetchStockOnce(docId, forceReload = false) {
+  // only skip the fetch if we've already got it *and* the caller didn't ask to reload
+  if (!forceReload && liveStock[docId]) {
+    return liveStock[docId];
   }
+
+  try {
+    const snap = await db.collection("products").doc(docId).get();
+    liveStock[docId] = snap.exists
+      ? (snap.data().sizes || {})
+      : {};
+  } catch (e) {
+    console.warn("Firestore unreachable, faking stock", e);
+    liveStock[docId] = {};  
+  }
+
   return liveStock[docId];
 }
 
@@ -2467,7 +2472,7 @@ async function showDescription(
   const previewContainer= document.getElementById("descImagePreview");
 
   /* ——— live inventory ——— */
-let sizes = await fetchStockOnce(docId);
+let sizes = await fetchStockOnce(docId, /* forceReload = */ true);
 
 /* ——— build the pills straight from Firestore ——— */
 const sizeContainer = document.getElementById("sizeButtons");
