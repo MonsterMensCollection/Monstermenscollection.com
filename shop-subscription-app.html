@@ -2243,7 +2243,7 @@ function reserveOneUnit(docId,size){
 /* After any change push the new numbers on-screen      */
 function updateStockUI(sizes){
   document.querySelectorAll("#sizeButtons button").forEach(btn=>{
-     const s  = btn.textContent.trim();
+     const s  = btn.dataset.size; 
      const n  = sizes[s] ?? 0;
      btn.innerHTML = `${s}${n?" · "+n:""}`;          // “M · 3”
      btn.disabled  = n===0;
@@ -2465,6 +2465,7 @@ if (Object.keys(sizes).length === 0) {
   sizesAvailable.forEach(size => {
     const n   = sizes[size] ?? 0;
     const btn = document.createElement("button");
+    btn.dataset.size = size;  
     btn.textContent = n ? `${size} · ${n}` : size;
     if (!n){ btn.disabled = true; btn.style.opacity = .4; }
     /* highlight on click */
@@ -2580,7 +2581,7 @@ async function addToCart (image = null, priceUSD = null, title = null) {
   const docId = document.getElementById("descName").dataset.docid;
 
   /* 2 · selected options */
-  const size  = document.getElementById("selectedSize") ?.value || "";
+  const size  = document.getElementById("selectedSize")?.value || "";
   const color = document.getElementById("selectedColor")?.value || "";
   if (!size)  { alert("Please select a size");  return; }
   if (!color) { alert("Please select a colour");return; }
