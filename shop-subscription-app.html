@@ -2461,36 +2461,35 @@ async function showDescription(
   docId             // Firestore doc-id (e.g. "BODAK-106")
 ){
   /* ——— grab the DOM refs up-front ——— */
-  const sizeContainer   = document.getElementById("sizeButtons");
-  sizeContainer.innerHTML = "";
   const descPriceEl     = document.getElementById("descPrice");
   const mainImage       = document.getElementById("descImage");
   const mainVideo       = document.getElementById("descVideo");
   const previewContainer= document.getElementById("descImagePreview");
 
   /* ——— live inventory ——— */
- let sizes = await fetchStockOnce(docId ?? "");
+let sizes = await fetchStockOnce(docId);
 
-/* 🆕  If nothing came back, create temporary “99 pcs” for each declared size */
-if (Object.keys(sizes).length === 0) {
-  sizes = Object.fromEntries(sizesAvailable.map(S => [S, 99]));
-}    // ‹guard in case it's missing›
-  
-  sizesAvailable.forEach(size => {
-    const n   = sizes[size] ?? 0;
-    const btn = document.createElement("button");
-    btn.dataset.size = size;  
-    btn.textContent = n ? `${size} · ${n}` : size;
-    if (!n){ btn.disabled = true; btn.style.opacity = .4; }
-    /* highlight on click */
-    btn.onclick = () => {
-      [...sizeContainer.children].forEach(b=>{b.style.background="#f8f8f8";b.style.color="#000"});
-      btn.style.background = "#333"; btn.style.color="#fff";
-      document.getElementById("selectedSize").value = size;
-    };
-    sizeContainer.appendChild(btn);
-  });
-  updateStockUI(sizes);
+/* ——— build the pills straight from Firestore ——— */
+const sizeContainer = document.getElementById("sizeButtons");
+sizeContainer.innerHTML = "";
+
+sizesAvailable.forEach(sz => {
+  const n   = sizes[sz] ?? 0;
+  const btn = document.createElement("button");
+  btn.dataset.size   = sz;
+  btn.textContent    = n ? `${sz} · ${n}` : sz;
+  btn.disabled       = n === 0;
+  btn.style.opacity  = n === 0 ? .4 : 1;
+  btn.onclick = () => {
+    Array.from(sizeContainer.children).forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById("selectedSize").value = sz;
+  };
+  sizeContainer.appendChild(btn);
+});
+
+/* paint them (in case you ever call updateStockUI again) */
+updateStockUI(sizes);
 
   /* ---------- disable/enable cart button depending on inventory ---------- */
  const totalStock = sizesAvailable.reduce(
