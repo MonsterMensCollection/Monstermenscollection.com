@@ -2378,47 +2378,70 @@ img.addEventListener('touchend', () => {
 });
 const toNumber = v => Number(String(v).replace(/[^0-9.]/g, '')) || 0;
 let cart = [];
-async function showDescription(media, priceUSD, title, sdes, description,
-                               sizesAvailable, colors, pageId, docId){
+async function showDescription(
+  media,            // [{type:'image'|'video',src:'…'}, …]
+  priceUSD,         // "56"  (pure USD number or "$56")
+  title,            // "BODAK #106"
+  sdes,             // short tag-line
+  description,      // long text
+  sizesAvailable,   // ["S","M","L","XL"]
+  colorsAvailable,  // ["Black","Olive",…]
+  category,         // "shirtsPage" | "pantsPage" | …
+  docId             // Firestore doc-id (e.g. "BODAK-106")
+){
+  /* ——— grab the DOM refs up-front ——— */
+  const sizeContainer   = document.getElementById("sizeButtons");
+  sizeContainer.innerHTML = "";
+  const descPriceEl     = document.getElementById("descPrice");
+  const mainImage       = document.getElementById("descImage");
+  const mainVideo       = document.getElementById("descVideo");
+  const previewContainer= document.getElementById("descImagePreview");
 
-
-  const sizes = await fetchStockOnce(docId);
-  sizesAvailable.forEach(size=>{
-      const n   = sizes[size] ?? 0;
-      const btn = document.createElement("button");
-      btn.textContent = n ? `${size} · ${n}` : size;
-      /* disable if OOS */
-      if(!n){ btn.disabled=true; btn.style.opacity=.4; }
-      /* … rest of your styling & click-handler … */
-      sizeContainer.appendChild(btn);
+  /* ——— live inventory ——— */
+  const sizes = await fetchStockOnce(docId ?? "");     // ‹guard in case it's missing›
+  sizesAvailable.forEach(size => {
+    const n   = sizes[size] ?? 0;
+    const btn = document.createElement("button");
+    btn.textContent = n ? `${size} · ${n}` : size;
+    if (!n){ btn.disabled = true; btn.style.opacity = .4; }
+    /* highlight on click */
+    btn.onclick = () => {
+      [...sizeContainer.children].forEach(b=>{b.style.background="#f8f8f8";b.style.color="#000"});
+      btn.style.background = "#333"; btn.style.color="#fff";
+      document.getElementById("selectedSize").value = size;
+    };
+    sizeContainer.appendChild(btn);
   });
-
-/* make sure pills can be refreshed later   */
   updateStockUI(sizes);
-  
-  if (category) {
-    // Push category state BEFORE description
-    history.pushState({ page: category }, "", "#" + category);
+
+  /* ——— push history so the back-button works ——— */
+  if (category){
+    history.pushState({page: category}, "", "#" + category);
     lastCategoryPage = category;
   }
+  history.pushState({page: "descriptionPage"}, "", "#description");
 
-  history.pushState({ page: "descriptionPage" }, "", "#description");
-  
-  const mainImage = document.getElementById("descImage");
-  const mainVideo = document.getElementById("descVideo");
-  const previewContainer = document.getElementById("descImagePreview");
+  /* ——— pricing (USD ➜ current currency) ——— */
+  const baseUSD = toNumber(priceUSD);           // helper you already have
+  descPriceEl.dataset.basePrice = baseUSD;
+  descPriceEl.textContent       = format(convert(baseUSD));
 
+  /* ——— product header text ——— */
+  document.getElementById("descName").textContent  = title;
+  document.getElementById("descSText").textContent = sdes;
+  document.getElementById("descText").textContent  = description;
+
+  /* ——— media viewer (swipe + thumbs) ——— */
   let currentIndex = 0;
-
-  const showMediaAt = (index) => {
-    currentIndex = index;
-    const item = media[index];
-    if (item.type === "video") {
+  const showMediaAt = idx => {
+    currentIndex = idx;
+    const item = media[idx];
+    if (item.type === "video"){
       mainImage.style.display = "none";
       mainVideo.style.display = "block";
-      mainVideo.src = item.src;
-      mainVideo.autoplay = true;
-      mainVideo.muted = true; // for autoplay to work on mobile
+      mainVideo.src     = item.src;
+      mainVideo.autoplay= true;
+      mainVideo.muted   = true;
       mainVideo.play();
     } else {
       mainVideo.style.display = "none";
@@ -2426,234 +2449,29 @@ async function showDescription(media, priceUSD, title, sdes, description,
       mainImage.src = item.src;
     }
   };
-
-  const setupSwipe = (container) => {
-    let startX = 0;
-    let endX = 0;
-
-    container.addEventListener("touchstart", e => {
-      startX = e.touches[0].clientX;
-    });
-
-    container.addEventListener("touchmove", e => {
-      endX = e.touches[0].clientX;
-    });
-
-    container.addEventListener("touchend", () => {
-      const diff = startX - endX;
-      if (Math.abs(diff) > 50) {
-        if (diff > 0 && currentIndex < media.length - 1) {
-          showMediaAt(currentIndex + 1);
-        } else if (diff < 0 && currentIndex > 0) {
-          showMediaAt(currentIndex - 1);
-        }
-      }
-    });
-  };
-
-  showMediaAt(0);
-
-  // Thumbnails preview
   previewContainer.innerHTML = "";
-  media.forEach((item, index) => {
-    let thumb;
-    if (item.type === "video") {
-      thumb = document.createElement("video");
-      thumb.src = item.src;
-      thumb.muted = true;
-      thumb.loop = true;
-      thumb.autoplay = true;
-    } else {
-      thumb = document.createElement("img");
-      thumb.src = item.src;
-    }
-
-    thumb.style.width = "70px";
-    thumb.style.height = "70px";
-    thumb.style.objectFit = "cover";
-    thumb.style.cursor = "pointer";
-    thumb.style.borderRadius = "8px";
-    thumb.style.flexShrink = "0";
-
-    // Tap thumbnail to show media
-    thumb.addEventListener("click", () => {
-      showMediaAt(index);
-    });
-
+  media.forEach((item,i)=>{
+    const thumb = document.createElement(item.type==="video"?"video":"img");
+    thumb.src = item.src;
+    if (item.type==="video"){ thumb.muted=true; thumb.loop=true; thumb.autoplay=true; }
+    Object.assign(thumb.style,{width:"70px",height:"70px",objectFit:"cover",borderRadius:"8px",cursor:"pointer",flexShrink:"0"});
+    thumb.onclick = ()=>showMediaAt(i);
     previewContainer.appendChild(thumb);
   });
+  showMediaAt(0);
 
-  // Update product info
-  const descPriceEl = document.getElementById("descPrice");
-const baseUSD = toNumber(priceUSD);                // 49
- descPriceEl.dataset.basePrice = baseUSD;           // cache clean USD
- descPriceEl.textContent       = format(convert(baseUSD));
+  /* ——— colour selector ——— */
+  buildColourPicker(colorsAvailable);           // extract your long colour code to a helper
 
-  document.getElementById("descName").textContent = title;
-  document.getElementById("descSText").textContent = sdes;
-  document.getElementById("descText").textContent = description;
+  /* ——— finally: show / hide pages ——— */
+  ["productList","shirtsPage","pantsPage","sliderSection",
+   "profilePage","tshirtsPage","cargosPage","detailsPage"]
+   .forEach(id=>document.getElementById(id).style.display="none");
+  document.getElementById("descriptionPage").style.display="block";
+  window.scrollTo(0,0);
 
-// Cool styled color dropdown
-
-
-// Circle preview color selector
-const colorContainer = document.getElementById("colorButtons") || document.createElement("div");
-colorContainer.id = "colorButtons";
-colorContainer.style.margin = "20px 0";
-colorContainer.innerHTML = "";
-
-// Create color option buttons with circle preview
-let selectedColor = colorsAvailable[0] || null;
-
-const customDropdown = document.createElement("div");
-customDropdown.style.display = "flex";
-customDropdown.style.flexWrap = "wrap";
-customDropdown.style.gap = "10px";
-
-// Track all colorOption elements to clear selection later
-let colorOptionElements = [];
-
-colorsAvailable.forEach(color => {
-  const colorOption = document.createElement("div");
-  colorOption.style.display = "flex";
-  colorOption.style.alignItems = "center";
-  colorOption.style.cursor = "pointer";
-  colorOption.style.border = "2px solid transparent"; // default border
-  colorOption.style.borderRadius = "0px";
-  colorOption.style.padding = "6px 10px";
-  colorOption.style.backgroundColor = "#fff";
-  colorOption.style.boxShadow = "0 2px 6px rgba(0,0,0,0.1)";
-
-  const colorCircle = document.createElement("div");
-  colorCircle.style.width = "16px";
-  colorCircle.style.height = "16px";
-  colorCircle.style.borderRadius = "50%";
-  colorCircle.style.marginRight = "8px";
-  colorCircle.style.border = "1px solid #888";
-  colorCircle.style.backgroundColor = color.trim().toLowerCase();
-
-  const colorLabel = document.createElement("span");
-  colorLabel.textContent = color;
-
-  colorOption.appendChild(colorCircle);
-  colorOption.appendChild(colorLabel);
-
-  colorOption.addEventListener("click", () => {
-    selectedColor = color;
-    document.getElementById("selectedColor").value = selectedColor;
-
-    // Clear previous selection
-    colorOptionElements.forEach(el => {
-      el.style.border = "2px solid transparent";
-    });
-
-    // Highlight selected color
-    colorOption.style.border = "2px solid #333";
-  });
-
-  customDropdown.appendChild(colorOption);
-  colorOptionElements.push(colorOption);
-});
-
-
-colorContainer.appendChild(customDropdown);
-
-// Hidden input to store selected color
-let hiddenColorInput = document.getElementById("selectedColor");
-if (!hiddenColorInput) {
-  hiddenColorInput = document.createElement("input");
-  hiddenColorInput.type = "hidden";
-  hiddenColorInput.id = "selectedColor";
-  colorContainer.appendChild(hiddenColorInput);
+  updateAllPrices();                            // keep everything in sync
 }
-hiddenColorInput.value = selectedColor;
-
-// Add label and container to the description section
-const descPage = document.getElementById("descriptionPage");
-if (!document.getElementById("colorSectionTitle")) {
-  const label = document.createElement("h3");
-  label.id = "colorSectionTitle";
-  label.textContent = "Select Color:";
-  label.style.marginBottom = "8px";
-  label.style.fontSize = "18px";
-  descPage.insertBefore(label, document.getElementById("descText"));
-  descPage.insertBefore(colorContainer, document.getElementById("descText"));
-}
-
-
-// 👉 Add centered "Description" heading
-if (!document.getElementById("descHeader")) {
-  const descHeading = document.createElement("h2");
-  descHeading.id = "descHeader";
-  descHeading.textContent = "Description";
-  descHeading.style.textAlign = "center";
-  descHeading.style.margin = "20px 0 10px";
-  descHeading.style.fontSize = "22px";
-  descHeading.style.fontWeight = "600";
-  descPage.insertBefore(descHeading, document.getElementById("descText"));
-}
-
-
-
-  // Size buttons logic
-  const sizeContainer = document.getElementById("sizeButtons");
-  sizeContainer.innerHTML = "";
-  let selectedSize = null;
-
-  sizesAvailable.forEach((size, index) => {
-    const btn = document.createElement("button");
-    btn.textContent = size;
-    btn.style.padding = "10px 20px";
-    btn.style.border = "1px solid #ccc";
-    btn.style.borderRadius = "0px";
-    btn.style.cursor = "pointer";
-
-    if (index === 0) {
-      btn.style.backgroundColor = "#333";
-      btn.style.color = "#fff";
-      selectedSize = size;
-    }
-
-    btn.onclick = () => {
-      document.querySelectorAll("#sizeButtons button").forEach(b => {
-        b.style.backgroundColor = "#f8f8f8";
-        b.style.color = "#000";
-      });
-      btn.style.backgroundColor = "#333";
-      btn.style.color = "#fff";
-      selectedSize = size;
-      document.getElementById("selectedSize").value = size;
-    };
-
-    sizeContainer.appendChild(btn);
-  });
-
-  let hiddenInput = document.getElementById("selectedSize");
-  if (!hiddenInput) {
-    hiddenInput = document.createElement("input");
-    hiddenInput.type = "hidden";
-    hiddenInput.id = "selectedSize";
-    sizeContainer.appendChild(hiddenInput);
-  }
-  hiddenInput.value = selectedSize;
-
-
-
-  // Show description page and hide others
-  document.getElementById("descriptionPage").style.display = "block";
-  document.getElementById("productList").style.display = "none";
-  document.getElementById("shirtsPage").style.display = "none";
-  document.getElementById("pantsPage").style.display = "none";
-  document.getElementById("sliderSection").style.display = "none";
-  document.getElementById("profilePage").style.display = "none";
-    document.getElementById("tshirtsPage").style.display = "none";
-    document.getElementById("cargosPage").style.display = "none";
-    
-    window.scrollTo(0, 0);
-
-  updateAllPrices();
-}
-
 
 async function addToCart (image = null, priceUSD = null, title = null) {
 
