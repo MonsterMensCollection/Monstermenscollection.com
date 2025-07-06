@@ -3412,13 +3412,16 @@ if (subscribed) {
 /* replace the old listener with this one */
 window.addEventListener('load', async () => {
 
-  /* 1 ─ release any “held” inventory from a previous, crashed session */
-  const stale = loadHoldsFromStorage();   // now contains the holds we saved
-  if (stale.length) {
+   const cameFromRefresh = sessionStorage.getItem("wasRefresh") === "true";
+  sessionStorage.removeItem("wasRefresh");          // one-shot flag ✔︎
+
+  if (!cameFromRefresh) {
+    /* brand-new session ─ release any orphaned holds */
+    const stale = loadHoldsFromStorage();
     await Promise.all(
       stale.map(h => releaseOneUnit(h.docId, h.size).catch(() => {}))
     );
-    localStorage.removeItem('pendingHolds');
+    localStorage.removeItem("pendingHolds");
   }
 
   /* 2 ─ fade-out the loading screen as before */
@@ -3505,6 +3508,7 @@ function loadHoldsFromStorage () {
 
   
 window.addEventListener('beforeunload', e => {
+   sessionStorage.setItem("wasRefresh", "true");
   saveHoldsToStorage();                   // make sure the list is persisted
   if (cart.some(it => it.docId)) {
     e.preventDefault();                   // ➟ keep the page alive ≤ 200 ms
