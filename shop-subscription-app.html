@@ -3406,11 +3406,29 @@ if (subscribed) {
       statusMessage.textContent = "";
     }
 
-  window.addEventListener('load', () => {
+
+
+/* replace the old listener with this one */
+window.addEventListener('load', async () => {
+
+  /* 1 ─ release any “held” inventory from a previous, crashed session */
+  const stale = loadHoldsFromStorage();
+  if (stale.length) {
+    await Promise.all(
+      stale.map(h =>
+        releaseOneUnit(h.docId, h.size)     // same txn you already use
+          .catch(()=>{/* ignore network errors */})
+      )
+    );
+    localStorage.removeItem('pendingHolds');
+  }
+
+  /* 2 ─ fade-out the loading screen as before */
   const loader = document.getElementById('loadingScreen');
-  /* fade first, then hard-remove to avoid catching tab-focus */
-  loader.classList.add('fade-out');
-  setTimeout(() => loader.remove(), 600);  // match CSS transition
+  if (loader) {
+    loader.classList.add('fade-out');
+    setTimeout(() => loader.remove(), 600);   // match the CSS transition
+  }
 });
   
   window.onpopstate = function (event) {
@@ -3474,14 +3492,31 @@ window.addEventListener("scroll", function () {
   lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
 });
 
-window.addEventListener("beforeunload", e => {
-  const promises = cart.map(it =>
-    it.docId ? releaseOneUnit(it.docId, it.size) : null
-  );
-  if (promises.some(Boolean)) {
-    // keep the tab open until Firestore finishes (Chrome ≤ 200 ms)
-    e.preventDefault();
-    Promise.all(promises).catch(()=>{});   // swallow network errors
+function saveHoldsToStorage() {
+  localStorage.setItem('pendingHolds', JSON.stringify(
+    cart.map(({docId,size}) => ({docId,size}))
+  ));
+}
+function loadHoldsFromStorage () {
+  try {
+    return JSON.parse(localStorage.getItem('pendingHolds') || '[]');
+  } catch (_) {
+    return [];
+  }
+}
+
+  
+window.addEventListener('pagehide', e => {
+  const holds = loadHoldsFromStorage();
+  if (!holds.length) return;
+
+  // fire-and-forget → hits even when the page is being frozen
+  navigator.sendBeacon('/release-stock',
+                       JSON.stringify(holds));
+
+  // optional fallback for browsers without Beacon support
+  if (!navigator.sendBeacon) {
+    holds.forEach(h => releaseOneUnit(h.docId, h.size));
   }
 });
 
