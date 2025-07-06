@@ -2619,9 +2619,7 @@ async function addToCart (image = null, priceUSD = null, title = null) {
   }
 
   /* 5 · push to cart & tidy up UI (unchanged) */
- cart.push({ image, price: priceUSD, title,
-             size, color, docId         // 👈 keep a pointer to Firestore
- });
+ cart.push({ image, price: priceUSD, title, size, color});
   
   alert("Item added to cart!");
 
