@@ -2240,17 +2240,6 @@ function reserveOneUnit(docId,size){
   }));
 }
 
-  function releaseOneUnit (docId, size) {
-  const docRef = db.collection("products").doc(docId);
-  return db.runTransaction(tx =>
-    tx.get(docRef).then(snap => {
-      const sizes = snap.data().sizes || {};
-      sizes[size] = (sizes[size] || 0) + 1;      // ➕ add 1 back
-      tx.update(docRef, { sizes });
-    })
-  );
-}
-  
 /* After any change push the new numbers on-screen      */
 function updateStockUI(sizes){
   document.querySelectorAll("#sizeButtons button").forEach(btn=>{
@@ -2619,9 +2608,7 @@ async function addToCart (image = null, priceUSD = null, title = null) {
   }
 
   /* 5 · push to cart & tidy up UI (unchanged) */
-  cart.push({ image, price: priceUSD, title,
-             size, color, docId         // 👈 keep a pointer to Firestore
- });
+  cart.push({ image, price: priceUSD, title, size, color });
   alert("Item added to cart!");
 
   updateStockUI(await fetchStockOnce(docId));     // show one less
@@ -2900,13 +2887,8 @@ function scrollIntoViewMobile(el) {
 }
 
 function removeFromCart(index) {
-   const removed = cart.splice(index, 1)[0];
-  if (removed?.docId) {
-    await releaseOneUnit(removed.docId, removed.size);
-    // update the little “M · 3” counters if the PDP is open
-   updateStockUI(await fetchStockOnce(removed.docId));
-  }
-  showCart();   // redraw the basket
+  cart.splice(index, 1); // Remove item at the given index
+  showCart(); // Re-render the cart
 }
 
 function hideCart() {
@@ -3474,16 +3456,7 @@ window.addEventListener("scroll", function () {
   lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
 });
 
-window.addEventListener("beforeunload", e => {
-  const promises = cart.map(it =>
-    it.docId ? releaseOneUnit(it.docId, it.size) : null
-  );
-  if (promises.some(Boolean)) {
-    // keep the tab open until Firestore finishes (Chrome ≤ 200 ms)
-    e.preventDefault();
-    Promise.all(promises).catch(()=>{});   // swallow network errors
-  }
-});
+
 
     // On initial load (login/signup page), add top margin
 document.getElementById("mainContainer").classList.add("with-top-margin");
