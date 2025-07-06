@@ -2620,6 +2620,7 @@ async function addToCart (image = null, priceUSD = null, title = null) {
 
   /* 5 · push to cart & tidy up UI (unchanged) */
  cart.push({ image, price: priceUSD, title,size,color,docId});
+  saveHoldsToStorage(); 
   alert("Item added to cart!");
 
   updateStockUI(await fetchStockOnce(docId));     // show one less
@@ -2905,7 +2906,7 @@ async function removeFromCart(index) {
     // update the little “M · 3” counters if the PDP is open
     updateStockUI(await fetchStockOnce(removed.docId));
   }
-
+  saveHoldsToStorage(); 
   showCart();                              // redraw the basket
 }
   
@@ -2992,7 +2993,7 @@ async function checkoutCart () {
 
       /* clear cart */
       cart = [];
-
+      localStorage.removeItem('pendingHolds'); 
       /* auto-return to storefront */
       setTimeout(() => {
         document.getElementById("paymentSuccessPage").style.display = "none";
@@ -3412,13 +3413,10 @@ if (subscribed) {
 window.addEventListener('load', async () => {
 
   /* 1 ─ release any “held” inventory from a previous, crashed session */
-  const stale = loadHoldsFromStorage();
+  const stale = loadHoldsFromStorage();   // now contains the holds we saved
   if (stale.length) {
     await Promise.all(
-      stale.map(h =>
-        releaseOneUnit(h.docId, h.size)     // same txn you already use
-          .catch(()=>{/* ignore network errors */})
-      )
+      stale.map(h => releaseOneUnit(h.docId, h.size).catch(() => {}))
     );
     localStorage.removeItem('pendingHolds');
   }
@@ -3506,17 +3504,10 @@ function loadHoldsFromStorage () {
 }
 
   
-window.addEventListener('pagehide', e => {
-  const holds = loadHoldsFromStorage();
-  if (!holds.length) return;
-
-  // fire-and-forget → hits even when the page is being frozen
-  navigator.sendBeacon('/release-stock',
-                       JSON.stringify(holds));
-
-  // optional fallback for browsers without Beacon support
-  if (!navigator.sendBeacon) {
-    holds.forEach(h => releaseOneUnit(h.docId, h.size));
+window.addEventListener('beforeunload', e => {
+  saveHoldsToStorage();                   // make sure the list is persisted
+  if (cart.some(it => it.docId)) {
+    e.preventDefault();                   // ➟ keep the page alive ≤ 200 ms
   }
 });
 
