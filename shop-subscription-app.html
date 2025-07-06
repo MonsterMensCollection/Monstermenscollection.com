@@ -2626,11 +2626,14 @@ async function addToCart (image = null, priceUSD = null, title = null) {
   }
 
   /* 5 · push to cart & tidy up UI (unchanged) */
-  cart.push({ image, price: priceUSD, title, size, color, docId });
+ cart.push({ image, price: priceUSD, title, size, color, docId });
   alert("Item added to cart!");
 
-  updateStockUI(await fetchStockOnce(docId));     // show one less
-  updateCartAmounts?.();                          // refresh totals if cart open
+  // ✨ FORCE-REFRESH the cache & repaint
+  const fresh = await fetchStockOnce(docId, true);
+  updateStockUI(fresh);
+
+  updateCartAmounts?.();                           // refresh totals if cart open
 }
   
 document.addEventListener("DOMContentLoaded", function () {
@@ -2911,13 +2914,13 @@ async function removeFromCart(index) {
   /* ⬅️ put the unit back in Firestore */
   if (item?.docId && item?.size) {
     try {
-      await restoreOneUnit(item.docId, item.size);
-      +// pull the true count from Firestore once and repaint
-      await fetchStockOnce(item.docId, /*forceReload=*/true);
-      if (document.getElementById("descriptionPage").style.display !== "none") {
-        updateStockUI(liveStock[item.docId]);       // refresh pills if open
-      }
-    } catch (err) {
+         await restoreOneUnit(item.docId, item.size);
+    // pull the true count from Firestore and repaint immediately
+    const fresh = await fetchStockOnce(item.docId, /* forceReload= */ true);
+    if (document.getElementById("descriptionPage").style.display !== "none") {
+     updateStockUI(fresh);
+    }
+   } catch (err) {
       console.error("Stock restore failed:", err);   // network-offline etc.
     }
   }
