@@ -2619,7 +2619,10 @@ async function addToCart (image = null, priceUSD = null, title = null) {
   }
 
   /* 5 · push to cart & tidy up UI (unchanged) */
-  cart.push({ image, price: priceUSD, title, size, color });
+ cart.push({ image, price: priceUSD, title,
+             size, color, docId         // 👈 keep a pointer to Firestore
+ });
+  
   alert("Item added to cart!");
 
   updateStockUI(await fetchStockOnce(docId));     // show one less
@@ -2898,8 +2901,13 @@ function scrollIntoViewMobile(el) {
 }
 
 function removeFromCart(index) {
-  cart.splice(index, 1); // Remove item at the given index
-  showCart(); // Re-render the cart
+   const removed = cart.splice(index, 1)[0];
+  if (removed?.docId) {
+    await releaseOneUnit(removed.docId, removed.size);
+    // update the little “M · 3” counters if the PDP is open
+    updateStockUI(await fetchStockOnce(removed.docId));
+  }
+  showCart();   // redraw the basket
 }
 
 function hideCart() {
