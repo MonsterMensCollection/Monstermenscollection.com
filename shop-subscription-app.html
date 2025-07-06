@@ -2898,8 +2898,13 @@ function scrollIntoViewMobile(el) {
 }
 
 function removeFromCart(index) {
- cart.splice(index, 1);
-  showCart();
+ const removed = cart.splice(index, 1)[0];
+  if (removed?.docId) {
+    await releaseOneUnit(removed.docId, removed.size);
+   // update the little “M · 3” counters if the PDP is open
+    updateStockUI(await fetchStockOnce(removed.docId));
+ }
+  showCart();   // redraw the basket
 }
 
 function hideCart() {
