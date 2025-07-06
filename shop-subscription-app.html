@@ -2898,13 +2898,9 @@ function scrollIntoViewMobile(el) {
 }
 
 function removeFromCart(index) {
- const removed = cart.splice(index, 1)[0];
-  if (removed?.docId) {
-    await releaseOneUnit(removed.docId, removed.size);
-   // update the little “M · 3” counters if the PDP is open
-    updateStockUI(await fetchStockOnce(removed.docId));
- }
-  showCart();   // redraw the basket
+  cart.splice(index, 1);
+ showCart();
+
 }
 
 function hideCart() {
@@ -3472,7 +3468,16 @@ window.addEventListener("scroll", function () {
   lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
 });
 
-
+window.addEventListener("beforeunload", e => {
+  const promises = cart.map(it =>
+    it.docId ? releaseOneUnit(it.docId, it.size) : null
+  );
+  if (promises.some(Boolean)) {
+    // keep the tab open until Firestore finishes (Chrome ≤ 200 ms)
+    e.preventDefault();
+    Promise.all(promises).catch(()=>{});   // swallow network errors
+  }
+});
 
     // On initial load (login/signup page), add top margin
 document.getElementById("mainContainer").classList.add("with-top-margin");
