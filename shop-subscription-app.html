@@ -2266,11 +2266,12 @@ function restoreOneUnit(docId, size) {
   
 window.restoreAndReport = async () => {
   try {
-    await restoreWholeCart();      // wait until the batch.commit() resolves
-    return 'OK';
+    await restoreWholeCart();
+    console.log("restoreAndReport → OK");
+    return "OK";
   } catch (e) {
     console.error(e);
-    return 'ERR';
+    return "ERR";
   }
 };
   
