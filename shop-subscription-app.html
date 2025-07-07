@@ -2483,7 +2483,15 @@ if (!sizeHidden) {
 sizeHidden.value = '';        // reset every time a new product opens
 
 
-
+let colorHidden = document.getElementById('selectedColor');
+if (!colorHidden) {
+  colorHidden       = document.createElement('input');
+  colorHidden.type  = 'hidden';
+  colorHidden.id    = 'selectedColor';
+  document.getElementById('descriptionPage').appendChild(colorHidden);
+}
+colorHidden.value = 'Same';    
+  
   /* ——— push history so the back-button works ——— */
   if (category){
     history.pushState({page: category}, "", "#" + category);
@@ -2558,10 +2566,8 @@ async function addToCart (image = null, priceUSD = null, title = null) {
 
   /* 2 · selected options */
   const size  = document.getElementById("selectedSize")?.value || "";
-  const color = document.getElementById("selectedColor")?.value || "";
+  const color = document.getElementById("selectedColor")?.value || "Same";
   if (!size)  { alert("Please select a size");  return; }
-  if (!color) { alert("Please select a colour");return; }
-
   /* 3 · *reserve* one unit in Firestore (atomic transaction) */
    if (docId) {                                  // 🆕 guard
   try {
