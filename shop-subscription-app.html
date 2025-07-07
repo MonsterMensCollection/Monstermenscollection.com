@@ -350,7 +350,8 @@
 
 :root{
   /* exact pixel height of the bottom-nav (adjust once here) */
-  --nav-h: 60px;     /* ≈ 6.5 % of 926-px iPhone viewport */
+  --nav-h: 60px; 
+  --banner-gap: 6px; /* ≈ 6.5 % of 926-px iPhone viewport */
 }
      
 .bottom-nav{
@@ -479,7 +480,7 @@
 
 .scrolling-banner{
   position: fixed;
-  bottom: calc(var(--nav-h) + env(safe-area-inset-bottom)+5px);
+  bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + var(--banner-gap));
   /* nothing else changes ↓ */
   width:100%;
   background:#000;
