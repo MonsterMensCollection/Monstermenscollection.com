@@ -482,13 +482,14 @@
   position: fixed;
   bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + var(--banner-gap));
   /* nothing else changes ↓ */
-  width:100%;
-  background:#000;
-  color:#fff;
-  font-size:14px;
-  white-space:nowrap;
-  overflow:hidden;
-  z-index:1001;          /* a tick higher so it’s never hidden */
+ width: 100%;
+  background: #000;
+  color: #fff;
+  font-size: 14px;
+  overflow: hidden;
+  z-index: 9999;
+  white-space: nowrap;
+  padding: 5px 0;
 }
 
 .scrolling-text {
