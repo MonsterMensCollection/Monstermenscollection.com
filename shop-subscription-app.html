@@ -2264,7 +2264,28 @@ function restoreOneUnit(docId, size) {
   );
 }
 
+async function restoreWholeCart() {
+  if (!cart?.length) return;                       // nothing to do
 
+  // Use a Write Batch so every size goes back in a single round-trip
+  const batch = db.batch();
+  cart.forEach(item => {
+    if (!item.docId || !item.size) return;         // safety
+    const ref   = db.collection("products").doc(item.docId);
+    batch.update(ref, {
+      [`sizes.${item.size}`]: firebase.firestore.FieldValue.increment(1)
+    });
+  });
+
+  try {
+    await batch.commit();                          // ⬅️ inventory unlocked
+    cart.length = 0;                               // flush local cart
+    localStorage.removeItem("enlyCart");   // if you cache it there
+  } catch (err) {
+    console.error("restoreWholeCart() failed:", err);
+    /* worst case the counts stay one short, but you won’t oversell */
+  }
+}
   
 /* After any change push the new numbers on-screen      */
 function updateStockUI(sizes){
@@ -3458,8 +3479,16 @@ window.addEventListener("scroll", function () {
   lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
 });
 
+  
+window.addEventListener("pagehide", restoreWholeCart, {once:true});
 
+/* 2️⃣  Fallback – not as reliable, but works on some old WebViews           */
+window.addEventListener("beforeunload", e => {
+  /* don’t await – just start it and let the promise finish in background */
+  restoreWholeCart();
+});
 
+  
     // On initial load (login/signup page), add top margin
 document.getElementById("mainContainer").classList.add("with-top-margin");
 document.getElementById("backToSubscription").addEventListener("click", () => {
