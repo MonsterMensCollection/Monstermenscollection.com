@@ -2263,7 +2263,17 @@ function restoreOneUnit(docId, size) {
     })
   );
 }
-
+  
+window.restoreAndReport = async () => {
+  try {
+    await restoreWholeCart();      // wait until the batch.commit() resolves
+    return 'OK';
+  } catch (e) {
+    console.error(e);
+    return 'ERR';
+  }
+};
+  
 async function restoreWholeCart() {
   if (!cart?.length) return;                       // nothing to do
 
