@@ -2444,6 +2444,35 @@ const toNumber = v => Number(String(v).replace(/[^0-9.]/g, '')) || 0;
   
 
 let cart = [];
+
+ function flushRestoreBeacon(cart) {
+    if (!cart.length) return;
+    const body = JSON.stringify(
+      cart.reduce((acc, it) => {
+        const k = `${it.docId}|${it.size}`;
+        acc[k] = (acc[k] || 0) + 1;
+        return acc;
+      }, {})
+    );
+    /* hit your HTTPS Cloud Function — make sure the URL matches your deploy */
+    navigator.sendBeacon('/restoreStock', body);
+  }
+
+  const handlePageHide = () => flushRestoreBeacon(cart);
+
+  ['visibilitychange', 'pagehide', 'freeze'].forEach(evt =>
+    addEventListener(
+      evt,
+      () => {
+        if (document.visibilityState === 'hidden' || evt === 'freeze') {
+          handlePageHide();
+        }
+      },
+      { capture: true }
+    )
+  );
+
+  
 async function showDescription(
   media,            // [{type:'image'|'video',src:'…'}, …]
   priceUSD,         // "56"  (pure USD number or "$56")
