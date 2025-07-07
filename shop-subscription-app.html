@@ -2274,28 +2274,28 @@ window.restoreAndReport = async () => {
   }
 };
   
-async function restoreWholeCart() {
-  if (!cart?.length) return;                       // nothing to do
+async function restoreWholeCart () {
+  if (!cart?.length) return;
 
-  // Use a Write Batch so every size goes back in a single round-trip
   const batch = db.batch();
   cart.forEach(item => {
-    if (!item.docId || !item.size) return;         // safety
-    const ref   = db.collection("products").doc(item.docId);
+    if (!item.docId || !item.size) return;
+    const ref = db.collection("products").doc(item.docId);
     batch.update(ref, {
-      [`sizes.${item.size}`]: firebase.firestore.FieldValue.increment(1)
+      [`sizes.${item.size}`]:
+        firebase.firestore.FieldValue.increment(1)
     });
   });
 
   try {
-    await batch.commit();                          // ⬅️ inventory unlocked
-    cart.length = 0;                               // flush local cart
-    localStorage.removeItem("enlyCart"); 
-    cart = JSON.parse(localStorage.getItem("enlyCart") || "[]");// if you cache it there
+    await batch.commit();              // 🔓 inventory unlocked
   } catch (err) {
-    console.error("restoreWholeCart() failed:", err);
-    /* worst case the counts stay one short, but you won’t oversell */
+    console.error("restoreWholeCart failed:", err);
   }
+
+  /* 🆕 wipe every local reference to the cart */
+  cart.length = 0;
+  localStorage.removeItem("enlyCart");
 }
   
 /* After any change push the new numbers on-screen      */
