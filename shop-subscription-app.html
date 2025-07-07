@@ -2280,7 +2280,8 @@ async function restoreWholeCart() {
   try {
     await batch.commit();                          // ⬅️ inventory unlocked
     cart.length = 0;                               // flush local cart
-    localStorage.removeItem("enlyCart");   // if you cache it there
+    localStorage.removeItem("enlyCart"); 
+    cart = JSON.parse(localStorage.getItem("enlyCart") || "[]");// if you cache it there
   } catch (err) {
     console.error("restoreWholeCart() failed:", err);
     /* worst case the counts stay one short, but you won’t oversell */
