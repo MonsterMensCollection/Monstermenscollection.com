@@ -2253,16 +2253,7 @@ function reserveOneUnit(docId,size){
 }
 
   /* Increment a size atomically in Firestore (opposite of reserve) */
-function restoreOneUnit(docId, size) {
-  const docRef = db.collection("products").doc(docId);
-  return db.runTransaction(tx =>
-    tx.get(docRef).then(snap => {
-      const sizes = snap.data().sizes || {};
-      sizes[size] = (sizes[size] || 0) + 1;      // ➕ put it back
-      tx.update(docRef, { sizes });
-    })
-  );
-}
+
   
 window.restoreAndReport = async () => {
   try {
@@ -2275,29 +2266,7 @@ window.restoreAndReport = async () => {
   }
 };
   
-async function restoreWholeCart () {
-  if (!cart?.length) return;
 
-  const batch = db.batch();
-  cart.forEach(item => {
-    if (!item.docId || !item.size) return;
-    const ref = db.collection("products").doc(item.docId);
-    batch.update(ref, {
-      [`sizes.${item.size}`]:
-        firebase.firestore.FieldValue.increment(1)
-    });
-  });
-
-  try {
-    await batch.commit();              // 🔓 inventory unlocked
-  } catch (err) {
-    console.error("restoreWholeCart failed:", err);
-  }
-
-  /* 🆕 wipe every local reference to the cart */
-  cart.length = 0;
-  localStorage.removeItem("enlyCart");
-}
   
 /* After any change push the new numbers on-screen      */
 function updateStockUI(sizes){
@@ -2446,18 +2415,6 @@ const toNumber = v => Number(String(v).replace(/[^0-9.]/g, '')) || 0;
 
 let cart = [];
 
- function flushRestoreBeacon(cart) {
-    if (!cart.length) return;
-    const body = JSON.stringify(
-      cart.reduce((acc, it) => {
-        const k = `${it.docId}|${it.size}`;
-        acc[k] = (acc[k] || 0) + 1;
-        return acc;
-      }, {})
-    );
-    /* hit your HTTPS Cloud Function — make sure the URL matches your deploy */
-    navigator.sendBeacon('/restoreStock', body);
-  }
 
   const handlePageHide = () => flushRestoreBeacon(cart);
 
@@ -2631,16 +2588,6 @@ async function addToCart (image = null, priceUSD = null, title = null) {
   const color = document.getElementById("selectedColor")?.value || "Same";
   if (!size)  { alert("Please select a size");  return; }
   /* 3 · *reserve* one unit in Firestore (atomic transaction) */
-   if (docId) {                                  // 🆕 guard
-  try {
-     await reserveOneUnit(docId, size);        // live lock
-   } catch (e) {
-     console.warn("Stock reservation failed – dev fallback:", e);
-    // ── dev-time choices ──────────────────────────────────────────────
-      alert("Sorry, that size just sold out.");   // enable for prod
-      return;                                     // enable for prod
-   }
- }
 
   /* 4 · figure out the raw USD price (identical to old code) */
   if (priceUSD === null) {
@@ -2661,6 +2608,21 @@ async function addToCart (image = null, priceUSD = null, title = null) {
 
   updateCartAmounts?.();                           // refresh totals if cart open
 }
+
+async function finalizeOrderStock(cart) {
+  const batch = db.batch();
+
+  cart.forEach(it => {
+    if (!it.docId || !it.size) return;          // safety
+    const ref = db.collection("products").doc(it.docId);
+    batch.update(ref, {
+      [`sizes.${it.size}`]: firebase.firestore.FieldValue.increment(-1)
+    });
+  });
+
+  await batch.commit();        // throws if any size < 0 → handle/refund
+}
+
   
 document.addEventListener("DOMContentLoaded", function () {
    updateAllPrices(); // initial
@@ -3006,50 +2968,60 @@ async function checkoutCart () {
 
   
   /* ---------- 4.  Success callback ---------- */
-  function handleSuccessfulPayment (response) {
-    const user = auth.currentUser;
-    if (!user) return;
+async function handleSuccessfulPayment(response) {
+  const user = auth.currentUser;
+  if (!user) return;
 
-    const orderData = {
-      uid        : user.uid,
-      name,
-      address,
-      pincode,
-      mobilenumber : mobileNumber,
-      cart,
-      totalUSD   : subtotalUSD,            // keep both figures for reporting
-      total      : grandTotalSelected,     // in currentCurrency
-      currency   : currentCurrency,
-      paymentId  : response.razorpay_payment_id,
-      paymentMode: "Razorpay",
-      timestamp  : firebase.firestore.FieldValue.serverTimestamp(),
-      orderNumber: `ORD-${Date.now()}`
-    };
+  /* build the order object once */
+  const orderData = {
+    uid         : user.uid,
+    name,
+    address,
+    pincode,
+    mobilenumber: mobileNumber,
+    cart        : [...cart],              // keep a snapshot
+    totalUSD    : subtotalUSD,
+    total       : grandTotalSelected,
+    currency    : currentCurrency,
+    paymentId   : response.razorpay_payment_id,
+    paymentMode : "Razorpay",
+    timestamp   : firebase.firestore.FieldValue.serverTimestamp(),
+    orderNumber : `ORD-${Date.now()}`
+  };
 
-    db.collection("orders").add(orderData).then(() => {
-      /* tidy up UI */
-      ["descriptionPage","productList","shirtsPage","pantsPage",
-       "sliderSection","cartPage","profilePage","tshirtsPage",
-       "cargosPage","detailsPage"].forEach(id =>
-         document.getElementById(id).style.display="none");
+  try {
+    /* 1️⃣ lock inventory – any failure aborts the flow */
+    await finalizeOrderStock(cart);
 
-      document.getElementById("paymentSuccessPage").style.display = "block";
-      document.getElementById("successPaymentId").textContent      = response.razorpay_payment_id;
+    /* 2️⃣ record the order */
+    await db.collection("orders").add(orderData);
 
-      /* clear cart */
-      cart = [];
+    /* 3️⃣ success UI (exactly what you already had) */
+    [
+      "descriptionPage","productList","shirtsPage","pantsPage",
+      "sliderSection","cartPage","profilePage","tshirtsPage",
+      "cargosPage","detailsPage"
+    ].forEach(id => (document.getElementById(id).style.display = "none"));
 
-      /* auto-return to storefront */
-      setTimeout(() => {
-        document.getElementById("paymentSuccessPage").style.display = "none";
-        document.getElementById("productList").style.display        = "block";
-        document.getElementById("sliderSection").style.display      = "block";
-      }, 5000);
+    document.getElementById("paymentSuccessPage").style.display = "block";
+    document.getElementById("successPaymentId").textContent =
+      response.razorpay_payment_id;
 
-    }).catch(err => {
-      console.error("FireStore order-save error:", err);
-      alert("Payment succeeded but order creation failed. Please contact support.");
-    });
+    cart = [];                        // clear local cart
+
+    setTimeout(() => {
+      document.getElementById("paymentSuccessPage").style.display = "none";
+      document.getElementById("productList").style.display        = "block";
+      document.getElementById("sliderSection").style.display      = "block";
+    }, 5000);
+
+  } catch (err) {
+    console.error("Checkout finalisation failed:", err);
+    alert(
+      "Payment received but an item just sold out. " +
+      "A full refund will be issued automatically."
+    );
+    /* 👉 here you would call your refund / support routine */
   }
 }
 
@@ -3521,13 +3493,10 @@ window.addEventListener("scroll", function () {
 });
 
   
-window.addEventListener("pagehide", restoreWholeCart, {once:true});
+
 
 /* 2️⃣  Fallback – not as reliable, but works on some old WebViews           */
-window.addEventListener("beforeunload", e => {
-  /* don’t await – just start it and let the promise finish in background */
-  restoreWholeCart();
-});
+
 
   
     // On initial load (login/signup page), add top margin
