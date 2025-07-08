@@ -3196,32 +3196,48 @@ function saveOrder(productName, uid) {
     const auth = firebase.auth();
     const db = firebase.firestore();
 
- db.collection("products").onSnapshot(snap => {
+db.collection("products").onSnapshot(snap => {
   snap.docChanges().forEach(ch => {
-    if (ch.type !== "modified") return;        // we only care about stock changes
+    if (ch.type !== "modified") return;          // only stock edits
 
     const docId = ch.doc.id;
-    const sizes = ch.doc.data().sizes || {};
+    const sizes = ch.doc.data().sizes || {};     // { M:3, L:0, … }
 
-    // for every size that is now zero → purge it from the local cart
+    /* ── walk through every size that changed ───────────────── */
     Object.entries(sizes).forEach(([sz, qty]) => {
-      if (qty > 0) return;                     // still in stock → keep
 
-      const oldLen = cart.length;
-      cart = cart.filter(it => !(it.docId === docId && it.size === sz));
+      /* 1️⃣ Trim the cart if we now hold more units than exist */
+      const matches = cart.filter(it => it.docId === docId && it.size === sz);
+      let toRemove   = Math.max(0, matches.length - qty);   // excess units
 
-      if (cart.length !== oldLen) {
-        console.warn(`⚠️ ${docId} · ${sz} just sold out – removed from cart`);
-        // persist the new state if you are using localStorage
-        localStorage.setItem("cart", JSON.stringify(cart));
+      if (toRemove > 0) {
+        cart = cart.filter(it => {
+          if (toRemove && it.docId === docId && it.size === sz) {
+            --toRemove;                // drop just enough copies
+            return false;              // ← removes this entry
+          }
+          return true;                 // keep the rest
+        });
 
-        // refresh whichever UI is currently on-screen
-        if (document.getElementById("cartPage").style.display !== "none") {
-          showCart();
-        }
-        updateCartAmounts?.();
+        alert(
+          `Heads-up! Another shopper just bought “${docId} – ${sz}”.\n` +
+          `Your quantity was reduced to ${qty}.`
+        );
+      }
+
+      /* 2️⃣ If stock hit zero, purge any remaining copies      */
+      if (qty === 0) {
+        cart = cart.filter(it => !(it.docId === docId && it.size === sz));
       }
     });
+
+    /* 3️⃣ Persist & refresh UI (runs once per document change) */
+    localStorage.setItem("cart", JSON.stringify(cart));
+
+    if (document.getElementById("cartPage").style.display !== "none") {
+      showCart();                       // rebuild list + totals
+    }
+    updateCartAmounts();                // keep bottom bar in-sync
   });
 });
 
