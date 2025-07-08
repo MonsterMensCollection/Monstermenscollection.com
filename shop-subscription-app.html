@@ -2575,40 +2575,44 @@ colorHidden.value = 'Same';
 
 async function addToCart (image = null, priceUSD = null, title = null) {
 
-  /* 1 · grab the media & basic text (same as before) */
+  /* ── 0 · duplicate guard ───────────────────────────────────────── */
+  const docId = document.getElementById("descName").dataset.docid;
+  const size  = document.getElementById("selectedSize")?.value || "";
+
+  if (cart.some(it => it.docId === docId && it.size === size)) {
+    alert("Only one piece is available – it’s already in your cart 😉");
+    return;                            // 🚫 nothing gets added twice
+  }
+
+  /* ── 1 · collect the usual fields ──────────────────────────────── */
   if (!image) image = document.getElementById("descImage").src;
   if (!title) title = document.getElementById("descName").innerText;
 
-  /*  — we stored the Firestore doc-id in showDescription() —               *
-   *    <h2 id="descName" data-docid="BODAK-106">BODAK #106</h2>            */
-  const docId = document.getElementById("descName").dataset.docid;
-
-  /* 2 · selected options */
-  const size  = document.getElementById("selectedSize")?.value || "";
+  if (!size) {                         // user forgot to pick a size
+    alert("Please select a size");
+    return;
+  }
   const color = document.getElementById("selectedColor")?.value || "Same";
-  if (!size)  { alert("Please select a size");  return; }
-  /* 3 · *reserve* one unit in Firestore (atomic transaction) */
 
-  /* 4 · figure out the raw USD price (identical to old code) */
+  /* ── 2 · figure out USD base price (unchanged) ─────────────────── */
   if (priceUSD === null) {
-      priceUSD = toNumber(
-        document.getElementById("descPrice").dataset.basePrice
-      );
+    priceUSD = toNumber(
+      document.getElementById("descPrice").dataset.basePrice
+    );
   } else {
-      priceUSD = toNumber(priceUSD);              // in case it was “$49”
+    priceUSD = toNumber(priceUSD);     // handles “$49” strings
   }
 
-  /* 5 · push to cart & tidy up UI (unchanged) */
- cart.push({ image, price: priceUSD, title, size, color, docId });
+  /* ── 3 · add to cart, but DON’T touch Firebase stock here ──────── */
+  cart.push({ image, price: priceUSD, title, size, color, docId });
   alert("Item added to cart!");
 
-  // ✨ FORCE-REFRESH the cache & repaint
-  const fresh = await fetchStockOnce(docId, true);
+  /* ── 4 · refresh live-stock badges & totals ────────────────────── */
+  const fresh = await fetchStockOnce(docId, /* forceReload = */ true);
   updateStockUI(fresh);
-
-  updateCartAmounts?.();                           // refresh totals if cart open
+  updateCartAmounts?.();
 }
-
+  
 async function finalizeOrderStock(cart) {
   const batch = db.batch();
 
