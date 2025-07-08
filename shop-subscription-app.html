@@ -3196,26 +3196,34 @@ function saveOrder(productName, uid) {
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-  db.collection("products").onSnapshot(snapshot => {
-    snapshot.docChanges().forEach(change => {
-      if (change.type === "removed") {
-        const removedId = change.doc.id;          // e.g. "BODAK-106"
+ db.collection("products").onSnapshot(snap => {
+  snap.docChanges().forEach(ch => {
+    if (ch.type !== "modified") return;        // we only care about stock changes
 
-        /* 1. drop every line that references this doc-id            */
-        const oldLen = cart.length;
-        cart = cart.filter(item => item.docId !== removedId);
+    const docId = ch.doc.id;
+    const sizes = ch.doc.data().sizes || {};
 
-        /* 2. if something actually disappeared, refresh the UI      */
-        if (cart.length !== oldLen) {
-          console.warn(`Product ${removedId} was deleted – purged from cart`);
-          if (document.getElementById("cartPage").style.display !== "none") {
-            showCart();          // re-render the cart view
-          }
-          updateCartAmounts?.(); // keep bottom-bar totals in sync
+    // for every size that is now zero → purge it from the local cart
+    Object.entries(sizes).forEach(([sz, qty]) => {
+      if (qty > 0) return;                     // still in stock → keep
+
+      const oldLen = cart.length;
+      cart = cart.filter(it => !(it.docId === docId && it.size === sz));
+
+      if (cart.length !== oldLen) {
+        console.warn(`⚠️ ${docId} · ${sz} just sold out – removed from cart`);
+        // persist the new state if you are using localStorage
+        localStorage.setItem("cart", JSON.stringify(cart));
+
+        // refresh whichever UI is currently on-screen
+        if (document.getElementById("cartPage").style.display !== "none") {
+          showCart();
         }
+        updateCartAmounts?.();
       }
     });
   });
+});
 
   
 function loadUserProfileAndOrders() {
