@@ -2573,45 +2573,51 @@ colorHidden.value = 'Same';
   updateAllPrices();                            // keep everything in sync
 }
 
+/* overwrite the old function with this one */
 async function addToCart (image = null, priceUSD = null, title = null) {
 
-  /* ── 0 · duplicate guard ───────────────────────────────────────── */
+  /* ── 0 · prelim checks ─────────────────────────────────────────── */
   const docId = document.getElementById("descName").dataset.docid;
   const size  = document.getElementById("selectedSize")?.value || "";
 
-  if (cart.some(it => it.docId === docId && it.size === size)) {
-    alert("Only one piece is available – it’s already in your cart 😉");
-    return;                            // 🚫 nothing gets added twice
-  }
-
-  /* ── 1 · collect the usual fields ──────────────────────────────── */
-  if (!image) image = document.getElementById("descImage").src;
-  if (!title) title = document.getElementById("descName").innerText;
-
-  if (!size) {                         // user forgot to pick a size
+  if (!size) {                            // no size picked
     alert("Please select a size");
     return;
   }
-  const color = document.getElementById("selectedColor")?.value || "Same";
 
-  /* ── 2 · figure out USD base price (unchanged) ─────────────────── */
-  if (priceUSD === null) {
-    priceUSD = toNumber(
-      document.getElementById("descPrice").dataset.basePrice
-    );
-  } else {
-    priceUSD = toNumber(priceUSD);     // handles “$49” strings
+  /* ── 1 · how many are still available? ─────────────────────────── */
+  const stock  = await fetchStockOnce(docId);      // cached after first hit
+  const avail  = stock[size] ?? 0;                 // 0 if size missing
+  const alreadyInCart = cart.filter(it => it.docId === docId && it.size === size).length;
+
+  if (avail === 0) {                               // just in case UI was stale
+    alert("Sorry, this size is out of stock.");
+    return;
+  }
+  if (alreadyInCart >= avail) {                    // no more left to add
+    alert(`Only ${avail} piece${avail>1?"s":""} available – you already have ${avail} in the cart 😉`);
+    return;
   }
 
-  /* ── 3 · add to cart, but DON’T touch Firebase stock here ──────── */
+  /* ── 2 · gather remaining fields (unchanged) ───────────────────── */
+  if (!image) image = document.getElementById("descImage").src;
+  if (!title) title = document.getElementById("descName").innerText;
+  const color = document.getElementById("selectedColor")?.value || "Same";
+
+  if (priceUSD === null) {
+    priceUSD = toNumber(document.getElementById("descPrice").dataset.basePrice);
+  } else {
+    priceUSD = toNumber(priceUSD);        // strips “$”
+  }
+
+  /* ── 3 · push & refresh UI (unchanged except for totals) ───────── */
   cart.push({ image, price: priceUSD, title, size, color, docId });
   alert("Item added to cart!");
 
-  /* ── 4 · refresh live-stock badges & totals ────────────────────── */
-  const fresh = await fetchStockOnce(docId, /* forceReload = */ true);
-  updateStockUI(fresh);
-  updateCartAmounts?.();
+  updateCartAmounts?.();                 // keep totals in sync
+  updateStockUI(stock);                  // still show live stock numbers
 }
+
   
 async function finalizeOrderStock(cart) {
   const batch = db.batch();
