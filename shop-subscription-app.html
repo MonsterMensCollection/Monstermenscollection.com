@@ -2266,7 +2266,19 @@ window.restoreAndReport = async () => {
   }
 };
   
+async function restoreWholeCart() {
+  const stored = JSON.parse(localStorage.getItem("cart") || "[]");
 
+  /* filter out docs that no longer exist */
+  const verified = [];
+  for (const item of stored) {
+    try {
+      const snap = await db.collection("products").doc(item.docId).get();
+      if (snap.exists) verified.push(item);
+    } catch (_) {}           // offline? keep the item for now
+  }
+  cart = verified;
+}
   
 /* After any change push the new numbers on-screen      */
 function updateStockUI(sizes){
@@ -3184,6 +3196,28 @@ function saveOrder(productName, uid) {
     const auth = firebase.auth();
     const db = firebase.firestore();
 
+  db.collection("products").onSnapshot(snapshot => {
+    snapshot.docChanges().forEach(change => {
+      if (change.type === "removed") {
+        const removedId = change.doc.id;          // e.g. "BODAK-106"
+
+        /* 1. drop every line that references this doc-id            */
+        const oldLen = cart.length;
+        cart = cart.filter(item => item.docId !== removedId);
+
+        /* 2. if something actually disappeared, refresh the UI      */
+        if (cart.length !== oldLen) {
+          console.warn(`Product ${removedId} was deleted – purged from cart`);
+          if (document.getElementById("cartPage").style.display !== "none") {
+            showCart();          // re-render the cart view
+          }
+          updateCartAmounts?.(); // keep bottom-bar totals in sync
+        }
+      }
+    });
+  });
+
+  
 function loadUserProfileAndOrders() {
     auth.onAuthStateChanged(async (user) => {
       if (user) {
