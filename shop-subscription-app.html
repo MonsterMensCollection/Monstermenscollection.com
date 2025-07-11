@@ -2468,22 +2468,32 @@ const sizeContainer = document.getElementById("sizeButtons");
 sizeContainer.innerHTML = "";
 
 sizesAvailable.forEach(sz => {
-  const n   = sizes[sz] ?? 0;
+  const n   = sizes[sz] ?? 0;            // live qty for this size
   const btn = document.createElement("button");
-  btn.dataset.size   = sz;
-  btn.textContent    = n ? `${sz} · ${n}` : sz;
-  btn.disabled       = n === 0;
-  btn.style.opacity  = n === 0 ? .4 : 1;
-  btn.onclick = () => {
-  Array.from(sizeContainer.children).forEach(b => b.classList.remove("active"));
-  btn.classList.add("active");
-  document.getElementById("selectedSize").value = sz;
 
-  /* 🔻 new — turn the button into “Add to Cart” */
-  cartBtn.textContent = 'Add to Cart';
-  cartBtn.disabled    = false;
-  cartBtn.style.opacity = 1;
-};
+  btn.dataset.size  = sz;
+  btn.textContent   = n ? `${sz} · ${n}` : sz;   // “M · 3”   /  “M”
+  btn.style.opacity = n === 0 ? 0.4 : 1;         // faded if 0
+
+  /* ⚡ click handler ---------------------------------------------------- */
+  btn.onclick = () => {
+    // 1⃣  highlight the selected pill
+    [...sizeContainer.children].forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById("selectedSize").value = sz;
+
+    // 2⃣  update the big button
+    if (n === 0) {                                // ← out of stock
+      cartBtn.textContent = "Out of Stock";
+      cartBtn.disabled    = true;
+      cartBtn.style.opacity = 0.5;
+    } else {                                      // ← in stock
+      cartBtn.textContent = "Add to Cart";
+      cartBtn.disabled    = false;
+      cartBtn.style.opacity = 1;
+    }
+  };
+
   sizeContainer.appendChild(btn);
 });
 
