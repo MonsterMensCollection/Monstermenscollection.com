@@ -2477,23 +2477,26 @@ sizesAvailable.forEach(sz => {
 
   /* ⚡ click handler ---------------------------------------------------- */
   btn.onclick = () => {
-    // 1⃣  highlight the selected pill
-    [...sizeContainer.children].forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-    document.getElementById("selectedSize").value = sz;
+  /* ❶ highlight the active pill */
+  [...sizeContainer.children].forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('selectedSize').value = sz;
 
-    // 2⃣  update the big button
-    if (n === 0) {                                // ← out of stock
-      cartBtn.textContent = "Out of Stock";
-      cartBtn.disabled    = true;
-      cartBtn.style.opacity = 0.5;
-    } else {                                      // ← in stock
-      cartBtn.textContent = "Add to Cart";
-      cartBtn.disabled    = false;
-      cartBtn.style.opacity = 1;
-    }
-  };
+  /* ❷ toggle the main “Add to Cart” button */
+  const cartBtn = document.querySelector(
+    '#descriptionPage button[onclick="addToCart()"]'
+  );
 
+  if (n === 0) {                 // 👈  this size is out-of-stock
+    cartBtn.textContent = 'Out of Stock';
+    cartBtn.disabled    = true;
+    cartBtn.style.opacity = 0.5; // optional: fade it a little
+  } else {
+    cartBtn.textContent = 'Add to Cart';
+    cartBtn.disabled    = false;
+    cartBtn.style.opacity = 1;
+  }
+};
   sizeContainer.appendChild(btn);
 });
 
