@@ -2476,21 +2476,23 @@ sizesAvailable.forEach(sz => {
   btn.style.opacity = n === 0 ? 0.4 : 1;         // faded if 0
 
   /* ⚡ click handler ---------------------------------------------------- */
-  btn.onclick = () => {
-  /* ❶ highlight the active pill */
+btn.onclick = () => {
+  // ❶ highlight the selected pill
   [...sizeContainer.children].forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
+
+  // ❷ remember which size the user picked
   document.getElementById('selectedSize').value = sz;
 
-  /* ❷ toggle the main “Add to Cart” button */
+  // ❸ toggle the main “Add to Cart” button
   const cartBtn = document.querySelector(
     '#descriptionPage button[onclick="addToCart()"]'
   );
 
-  if (n === 0) {                 // 👈  this size is out-of-stock
+  if ((sizes[sz] ?? 0) === 0) {            // ← out-of-stock?
     cartBtn.textContent = 'Out of Stock';
     cartBtn.disabled    = true;
-    cartBtn.style.opacity = 0.5; // optional: fade it a little
+    cartBtn.style.opacity = .5;            // (optional) dim it
   } else {
     cartBtn.textContent = 'Add to Cart';
     cartBtn.disabled    = false;
