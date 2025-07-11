@@ -2475,10 +2475,15 @@ sizesAvailable.forEach(sz => {
   btn.disabled       = n === 0;
   btn.style.opacity  = n === 0 ? .4 : 1;
   btn.onclick = () => {
-    Array.from(sizeContainer.children).forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-    document.getElementById("selectedSize").value = sz;
-  };
+  Array.from(sizeContainer.children).forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  document.getElementById("selectedSize").value = sz;
+
+  /* 🔻 new — turn the button into “Add to Cart” */
+  cartBtn.textContent = 'Add to Cart';
+  cartBtn.disabled    = false;
+  cartBtn.style.opacity = 1;
+};
   sizeContainer.appendChild(btn);
 });
 
@@ -2498,10 +2503,10 @@ if (totalStock === 0) {
    cartBtn.disabled    = true;
    cartBtn.style.opacity = 0.5;
  } else {
-   cartBtn.textContent = 'Add to Cart';
-   cartBtn.disabled    = false;
-   cartBtn.style.opacity = 1;
- }
+     cartBtn.textContent = 'Select Size';
+  cartBtn.disabled    = true;    // keep it inactive for now
+  cartBtn.style.opacity = 0.6;   // a little dimmed
+}
   
   /* ----- guarantee a <input hidden id="selectedSize"> exists ----- */
 let sizeHidden = document.getElementById('selectedSize');
