@@ -2966,54 +2966,49 @@ function hideCart() {
 }
 async function checkoutCart () {
 
-  /* 0.  Validate the address fields exactly like before */
-  const name         = document.getElementById("checkoutName").value.trim();
-  const address      = document.getElementById("checkoutAddress").value.trim();
-  const pincode      = document.getElementById("checkoutPincode").value.trim();
-  const mobileNumber = document.getElementById("checkoutMobileNumber").value.trim();
+  /* ---------- 1. Basic form validation ---------- */
+  const name          = document.getElementById("checkoutName").value.trim();
+  const address       = document.getElementById("checkoutAddress").value.trim();
+  const pincode       = document.getElementById("checkoutPincode").value.trim();
+  const mobileNumber  = document.getElementById("checkoutMobileNumber").value.trim();
 
   if (!name || !address || !pincode || !mobileNumber) {
     alert("Please complete all address fields.");
     return;
   }
 
-  /* 1.  What’s the cart worth in *USD*?  (cart prices are stored in USD) */
-  const grandTotalUSD = cart.reduce((sum, it) => sum + it.price, 0);
-  if (!grandTotalUSD) {
+  /* ---------- 2.  Work out totals in *both* currencies ---------- */
+  const subtotalUSD        = cart.reduce((sum, item) => sum + item.price, 0); // prices are stored in USD
+  const subtotalSelected   = convert(subtotalUSD);                            // in currentCurrency
+  const shippingSelected   = subtotalSelected >= convert(0) ? 0 : convert(0);
+  const grandTotalSelected = subtotalSelected + shippingSelected;
+
+  if (grandTotalSelected === 0) {
     alert("Cart is empty!");
     return;
   }
 
-  /* 2.  Decide the flow: PayPal only when user chose USD */
-  const wantsPayPal = currentCurrency === "USD";
+  /* Razorpay expects “smallest currency unit” (paise / cents etc.) */
+  const amountForGateway = Math.round(grandTotalSelected * 100); //  e.g. ₹799.56 ➜ 79956
 
-  /* 3.  Ask the Netlify Function to create a Razorpay order */
-  const order = await fetch("/.netlify/functions/create-order", {
-    method : "POST",
-    headers: { "Content-Type": "application/json" },
-    body   : JSON.stringify({
-      amount  : Math.round(grandTotalUSD * 100),      // smallest unit
-      currency: wantsPayPal ? "USD" : currentCurrency // "USD", "INR", …
-    })
-  }).then(r => r.json());
-
-  /* 4.  Razorpay Checkout options */
-  const opts = {
-    key       : "rzp_live_u6z4G2762EuQ4E",            // ← **your public key**
-    order_id  : order.id,                             // from step 3
-    currency  : order.currency,
-    amount    : order.amount,                         // Razorpay still wants it
-    name      : "Monster Men's Collection",
-    handler   : handleSuccessfulPayment,              // you already have this
-    redirect  : wantsPayPal,                          // PayPal needs redirect
-    method    : wantsPayPal ? { wallet: ["paypal"] } : undefined,
-    theme     : { color: "#000000" },
-    prefill   : { name, contact: mobileNumber }
+  /* ---------- 3.  Open Razorpay checkout ---------- */
+  const options = {
+    key        : "rzp_live_u6z4G2762EuQ4E",
+    amount     : amountForGateway,
+    currency   : currentCurrency,                          // ←  USD / INR / EUR (comes from selector)
+    name       : "Monster Men's Collection",
+    description: "Cart Checkout",
+    image      : "https://your-logo-url.com/logo.png",
+    handler    : handleSuccessfulPayment,                  // defined below
+    prefill    : { name },
+    theme      : { color: "#007bff" },
+    webview_intent: true
   };
 
-  new Razorpay(opts).open();
+  new Razorpay(options).open();
 
-}
+
+  
   /* ---------- 4.  Success callback ---------- */
 async function handleSuccessfulPayment(response) {
   const user = auth.currentUser;
@@ -3071,7 +3066,7 @@ async function handleSuccessfulPayment(response) {
     /* 👉 here you would call your refund / support routine */
   }
 }
-
+}
 function checkoutCOD() {
   const name = document.getElementById("checkoutName").value.trim();
   const address = document.getElementById("checkoutAddress").value.trim();
@@ -3488,7 +3483,7 @@ if (subscribed) {
     e.preventDefault(); // Prevent page reload
 
     const razorpayOptions = {
-      key: "rzp_live_u6z4G2762EuQ4E", // Replace with your Razorpay test key
+      key: "rzp_live_0M0qHSpzByvZAr", // Replace with your Razorpay test key
       amount: 200, // ₹2 in paise
       currency: "INR",
       name: "Monster Men's Collection",
