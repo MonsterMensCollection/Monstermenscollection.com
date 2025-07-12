@@ -2992,29 +2992,20 @@ async function checkoutCart () {
   const amountForGateway = Math.round(grandTotalSelected * 100); //  e.g. ₹799.56 ➜ 79956
 
   /* ---------- 3.  Open Razorpay checkout ---------- */
- const options = {
-  key: "rzp_live_0M0qHSpzByvZAr",
-  amount: amountForGateway,          // already in paise / cents
-  currency: currentCurrency,         // USD, INR, … the one you calculated
-  order_id: razorpayOrderId,         // (you are already passing this)
-  name: "ENLY",
-  description: "Cart checkout",
-  handler: handleSuccessfulPayment,
+  const options = {
+    key        : "rzp_live_0M0qHSpzByvZAr",
+    amount     : amountForGateway,
+    currency   : currentCurrency,                          // ←  USD / INR / EUR (comes from selector)
+    name       : "Monster Men's Collection",
+    description: "Cart Checkout",
+    image      : "https://your-logo-url.com/logo.png",
+    handler    : handleSuccessfulPayment,                  // defined below
+    prefill    : { name },
+    theme      : { color: "#007bff" },
+    webview_intent: true
+  };
 
-  /* 👇 NEW: lets Razorpay open UPI‐INTENT links out of the WebView */
-  webview_intent : true,             // mandatory for GPay/PhonePe etc. in WebView
-
-  /* 👇 NEW: forces redirect-style methods (PayPal, Net-banking, …) to
-            leave the modal and open the real website in a tab */
-  redirect       : true,             // PayPal page opens in a regular tab
-  callback_url   : "https://yoursite.com/payment-status",   // required when redirect=true
-
-  /* (everything else you already had) */
-  prefill  : { name, email : auth.currentUser.email },
-  theme    : { color : "#000" }
-};
-
-new Razorpay(options).open();
+  new Razorpay(options).open();
 
 
   
