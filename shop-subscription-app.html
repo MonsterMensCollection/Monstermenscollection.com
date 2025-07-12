@@ -3028,19 +3028,24 @@ async function checkoutCart () {
  }).then(r => r.json());
 
 // 2️⃣  Pass the order_id to Razorpay and expose only PayPal
- const options = {
-   key        : "rzp_live_u6z4G2762EuQ4E",   // LIVE key
-   order_id   : order.id,                    // << IMPORTANT
-   amount     : order.amount,                // already in cents
-   currency   : order.currency,              // "USD"
-   name       : "ENLY",
-   description: "Cart Checkout",
-   external   : { wallets: ['paypal'] },     // only PayPal tile
-   redirect   : true,                        // mandatory for PayPal
-   handler    : handleSuccessfulPayment,
-   prefill    : { name },
-   theme      : { color: "#007bff" }
- };
+const options = {
+  key        : "rzp_live_u6z4G2762EuQ4E",
+  order_id   : order.id,                // created in INR on the server
+  name       : "ENLY",
+  description: "Cart Checkout",
+
+ // 🔑 NEW – use the modern `method.wallet` filter
+  method     : { wallet: ["paypal"] },  // show **only** the PayPal tile
+
+  currency   : "INR",                   // must match `order.currency`
+  amount     : order.amount,            // paise returned by your API
+  international: 1,                     // <— safe-guard, optional
+
+  redirect   : true,                    // mandatory for PayPal on mobile
+  handler    : handleSuccessfulPayment, // unchanged
+  prefill    : { name },                // unchanged
+  theme      : { color: "#007bff" }
+}; 
 
 const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);  // ③
  if (isMobile) {
