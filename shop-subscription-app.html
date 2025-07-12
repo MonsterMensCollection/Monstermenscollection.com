@@ -2922,7 +2922,7 @@ function showCart () {
   /* Show the shipping/total row in the selected currency */
   updateCartAmounts();  // <-- this uses convert() & format() inside
 }
-  
+
 
 
 
@@ -2991,36 +2991,26 @@ async function checkoutCart () {
   /* Razorpay expects “smallest currency unit” (paise / cents etc.) */
   const amountForGateway = Math.round(grandTotalSelected * 100); //  e.g. ₹799.56 ➜ 79956
 
-  /* ---------- 3.  Build base options (common to every currency) ---------- */
+  /* ---------- 3.  Open Razorpay checkout ---------- */
   const options = {
     key        : "rzp_live_0M0qHSpzByvZAr",
     amount     : amountForGateway,
-    currency   : currentCurrency,            // "INR" | "USD" | "EUR"…
+    currency   : currentCurrency,                          // ←  USD / INR / EUR (comes from selector)
     name       : "Monster Men's Collection",
     description: "Cart Checkout",
     image      : "https://your-logo-url.com/logo.png",
-    handler    : handleSuccessfulPayment,
+    handler    : handleSuccessfulPayment,                  // defined below
     prefill    : { name },
-    theme      : { color: "#007bff" }
+    theme      : { color: "#007bff" },
+    webview_intent: true
   };
 
-  /* ---------- 4.  Open checkout differently for INR vs. others ---------- */
-  const isINR = currentCurrency === "INR";
+  new Razorpay(options).open();
 
-  if (isINR) {
-    /* normal in-page popup */
-    new Razorpay(options).open();
-  } else {
-    /* pay in PayPal → new tab */
-    options.method   = { paypal: "paypal" };   // 🟡 force PayPal
-    options.redirect = true;                   // full-page redirect
-    openCheckoutInNewTab(options);             // helper defined just below
-  }
 
   
   /* ---------- 4.  Success callback ---------- */
 async function handleSuccessfulPayment(response) {
-  
   const user = auth.currentUser;
   if (!user) return;
 
@@ -3076,32 +3066,7 @@ async function handleSuccessfulPayment(response) {
     /* 👉 here you would call your refund / support routine */
   }
 }
-  
-+/* ❷ Helper that spawns a blank tab and loads Razorpay there */
-function openCheckoutInNewTab(rzpOpts) {
-  const payTab = window.open("", "_blank", "noopener,noreferrer");
-  payTab.document.write(`
-    <!doctype html>
-    <html>
-    <head>
-      <meta charset="utf-8"/>
-      <title>Secure Checkout</title>
-      <script src="https://checkout.razorpay.com/v1/checkout.js"><\/script>
-    </head>
-    <body style="margin:0">
-      <script>
-        window.addEventListener('load', function () {
-          var rzp = new Razorpay(${JSON.stringify(rzpOpts)});
-          rzp.open();
-        });
-     <\/script>
-    </body>
-    </html>
-  `);
-  payTab.document.close();
 }
-}
-  
 function checkoutCOD() {
   const name = document.getElementById("checkoutName").value.trim();
   const address = document.getElementById("checkoutAddress").value.trim();
