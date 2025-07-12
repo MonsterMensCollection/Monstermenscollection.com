@@ -2964,84 +2964,48 @@ function hideCart() {
   document.getElementById("productList").style.display = "block";
   document.getElementById("sliderSection").style.display = "block";
 }
-
-
-  function openCheckoutInNewTab (rzpOpts) {
-  const payTab = window.open('', '_blank', 'noopener,noreferrer'); // 100 % empty
-  payTab.document.write(`
-    <!doctype html>
-    <html><head>
-      <meta charset="utf-8">
-      <title>Secure Checkout</title>
-      <script src="https://checkout.razorpay.com/v1/checkout.js"><\/script>
-    </head><body style="margin:0">
-      <script>
-        window.addEventListener('load',function () {
-          new Razorpay(${JSON.stringify(rzpOpts)}).open();
-        });
-      <\/script>
-    </body></html>
-  `);
-  payTab.document.close();
-}
-
-
-  
 async function checkoutCart () {
 
-  /* 1. your original field-checks ………………………………………… */
-  const name         = document.getElementById("checkoutName").value.trim();
-  const address      = document.getElementById("checkoutAddress").value.trim();
-  const pincode      = document.getElementById("checkoutPincode").value.trim();
-  const mobileNumber = document.getElementById("checkoutMobileNumber").value.trim();
-  if (!name || !address || !pincode || !mobileNumber) { alert("Please complete all address fields."); return; }
+  /* ---------- 1. Basic form validation ---------- */
+  const name          = document.getElementById("checkoutName").value.trim();
+  const address       = document.getElementById("checkoutAddress").value.trim();
+  const pincode       = document.getElementById("checkoutPincode").value.trim();
+  const mobileNumber  = document.getElementById("checkoutMobileNumber").value.trim();
 
-  /* 2. your original totals ……………………………………………………… */
-  const subtotalUSD        = cart.reduce((sum, it) => sum + it.price, 0);
-  const subtotalSelected   = convert(subtotalUSD);
+  if (!name || !address || !pincode || !mobileNumber) {
+    alert("Please complete all address fields.");
+    return;
+  }
+
+  /* ---------- 2.  Work out totals in *both* currencies ---------- */
+  const subtotalUSD        = cart.reduce((sum, item) => sum + item.price, 0); // prices are stored in USD
+  const subtotalSelected   = convert(subtotalUSD);                            // in currentCurrency
   const shippingSelected   = subtotalSelected >= convert(0) ? 0 : convert(0);
   const grandTotalSelected = subtotalSelected + shippingSelected;
-  if (grandTotalSelected === 0) { alert("Cart is empty!"); return; }
 
-  const amountForGateway = Math.round(grandTotalSelected * 100);   // minor unit
+  if (grandTotalSelected === 0) {
+    alert("Cart is empty!");
+    return;
+  }
 
-  /* 3. build the **common** Razorpay options object ………………… */
+  /* Razorpay expects “smallest currency unit” (paise / cents etc.) */
+  const amountForGateway = Math.round(grandTotalSelected * 100); //  e.g. ₹799.56 ➜ 79956
+
+  /* ---------- 3.  Open Razorpay checkout ---------- */
   const options = {
     key        : "rzp_live_0M0qHSpzByvZAr",
     amount     : amountForGateway,
-    currency   : currentCurrency,              // "INR", "USD", "EUR" …
-    name       : "ENLY",
+    currency   : currentCurrency,                          // ←  USD / INR / EUR (comes from selector)
+    name       : "Monster Men's Collection",
     description: "Cart Checkout",
-    handler    : handleSuccessfulPayment,      // you already have this
+    image      : "https://your-logo-url.com/logo.png",
+    handler    : handleSuccessfulPayment,                  // defined below
     prefill    : { name },
     theme      : { color: "#007bff" },
-    webview_intent : true                      // lets RZP trigger UPI / PayPal apps
+    webview_intent: true
   };
 
-  /* 4. branch by currency & device ………………………………………… */
-  const isINR    = currentCurrency === "INR";
-  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-
-  if (isINR) {                          /* == INDIA ⇒ UPI-Intent flow == */
-    options.method   = { upi: "upi" };     // lock to UPI
-    options.upi      = { flow: "intent" }; // jump straight to UPI app
-    options.redirect = true;               // leave our site → app
-    new Razorpay(options).open();
-    return;                                // done
-  }
-
-  /* everything else → PayPal only */
-  options.method   = { paypal: "paypal" };
-  options.redirect = true;                 // PayPal requires redirect
-
-  if (isMobile) {
-    /* open in a pristine tab so PayPal gets the full viewport
-       and the browser’s deep-link to its own app isn’t blocked */
-    openCheckoutInNewTab(options);
-  } else {
-    /* desktop can stay right here */
-    new Razorpay(options).open();
-  }
+  new Razorpay(options).open();
 
 
   
