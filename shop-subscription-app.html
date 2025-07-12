@@ -3025,7 +3025,7 @@ async function checkoutCart () {
     handler    : handleSuccessfulPayment,    // see below
     prefill    : { name },
     theme      : { color: "#007bff" },
-    webview_intent: true
+   
   };
 
   new Razorpay(options).open();
