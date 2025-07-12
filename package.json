@@ -2,6 +2,6 @@
   "name": "monster-mens-functions",
   "private": true,
   "dependencies": {
-    "razorpay": "^2.15.0"
+    "razorpay": "latest"
   }
 }
