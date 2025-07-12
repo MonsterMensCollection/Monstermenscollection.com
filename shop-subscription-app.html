@@ -3021,7 +3021,7 @@ async function checkoutCart () {
   /* ----------  Every NON-INR currency  → PayPal flow ---------- */
 
  // 1️⃣  Ask our Node API to create the order **in USD**
- const order = await fetch('http://localhost:5000/api/create-order', {
+ const order = await fetch('/api/create-order', { 
    method : 'POST',
    headers: { 'Content-Type': 'application/json' },
    body   : JSON.stringify({ amountUSD: subtotalUSD })       // e.g. 29.95
@@ -3042,7 +3042,12 @@ async function checkoutCart () {
    theme      : { color: "#007bff" }
  };
 
- new Razorpay(options).open()
+const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);  // ③
+ if (isMobile) {
+   openCheckoutInNewTab(options);
+ } else {
+   new Razorpay(options).open();
+ }
 
 
   
