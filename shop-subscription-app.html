@@ -2964,48 +2964,73 @@ function hideCart() {
   document.getElementById("productList").style.display = "block";
   document.getElementById("sliderSection").style.display = "block";
 }
+
+  /* ── helper: opens Razorpay Checkout in a blank, sandboxed tab ── */
+function openCheckoutInNewTab (rzpOpts) {
+  const payTab = window.open('', '_blank', 'noopener,noreferrer');
+  payTab.document.write(`
+    <!doctype html><html><head>
+      <meta charset="utf-8"><title>Secure Pay</title>
+      <script src="https://checkout.razorpay.com/v1/checkout.js"><\/script>
+    </head><body style="margin:0">
+      <script>
+        window.addEventListener('load',()=>new Razorpay(${JSON.stringify(rzpOpts)}).open());
+      <\/script>
+    </body></html>`);
+  payTab.document.close();
+}
+  
 async function checkoutCart () {
+  /* ── 1 · existing basic validation ─────────────────────────── */
+  const name         = document.getElementById("checkoutName").value.trim();
+  const address      = document.getElementById("checkoutAddress").value.trim();
+  const pincode      = document.getElementById("checkoutPincode").value.trim();
+  const mobileNumber = document.getElementById("checkoutMobileNumber").value.trim();
+  if (!name || !address || !pincode || !mobileNumber) { alert("Please complete all address fields."); return; }
 
-  /* ---------- 1. Basic form validation ---------- */
-  const name          = document.getElementById("checkoutName").value.trim();
-  const address       = document.getElementById("checkoutAddress").value.trim();
-  const pincode       = document.getElementById("checkoutPincode").value.trim();
-  const mobileNumber  = document.getElementById("checkoutMobileNumber").value.trim();
+  /* ── 2 · work out totals (unchanged) ───────────────────────── */
+  const subtotalUSD        = cart.reduce((s,it)=>s+it.price,0);
+  const subtotalSelected   = convert(subtotalUSD);
+  const grandTotalSelected = subtotalSelected;         // free-shipping above ₹0
+  if (grandTotalSelected === 0) { alert("Cart is empty!"); return; }
+  const amountForGateway   = Math.round(grandTotalSelected * 100); // minor unit
 
-  if (!name || !address || !pincode || !mobileNumber) {
-    alert("Please complete all address fields.");
-    return;
-  }
-
-  /* ---------- 2.  Work out totals in *both* currencies ---------- */
-  const subtotalUSD        = cart.reduce((sum, item) => sum + item.price, 0); // prices are stored in USD
-  const subtotalSelected   = convert(subtotalUSD);                            // in currentCurrency
-  const shippingSelected   = subtotalSelected >= convert(0) ? 0 : convert(0);
-  const grandTotalSelected = subtotalSelected + shippingSelected;
-
-  if (grandTotalSelected === 0) {
-    alert("Cart is empty!");
-    return;
-  }
-
-  /* Razorpay expects “smallest currency unit” (paise / cents etc.) */
-  const amountForGateway = Math.round(grandTotalSelected * 100); //  e.g. ₹799.56 ➜ 79956
-
-  /* ---------- 3.  Open Razorpay checkout ---------- */
+  /* ── 3 · common Razorpay options ───────────────────────────── */
   const options = {
-    key        : "rzp_live_0M0qHSpzByvZAr",
-    amount     : amountForGateway,
-    currency   : currentCurrency,                          // ←  USD / INR / EUR (comes from selector)
-    name       : "Monster Men's Collection",
-    description: "Cart Checkout",
-    image      : "https://your-logo-url.com/logo.png",
-    handler    : handleSuccessfulPayment,                  // defined below
-    prefill    : { name },
-    theme      : { color: "#007bff" },
-    webview_intent: true
+    key           : "rzp_live_0M0qHSpzByvZAr",
+    amount        : amountForGateway,
+    currency      : currentCurrency,          // "INR" | "USD" | "EUR" …
+    name          : "Monster Men's Collection",
+    description   : "Cart Checkout",
+    handler       : handleSuccessfulPayment,  // you already defined this below
+    prefill       : { name },
+    theme         : { color: "#007bff" },
+    webview_intent: true                      // let RZP trigger native apps
   };
 
-  new Razorpay(options).open();
+  /* ── 4 · branch by currency & device ───────────────────────── */
+  const isINR    = currentCurrency === "INR";
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+  if (isINR) {                            /* === INDIA → UPI intent === */
+    options.method   = { upi : "upi" };      // only UPI
+    options.upi      = { flow : "intent" };  // jump straight to UPI app
+    options.redirect = true;
+    new Razorpay(options).open();
+    return;
+  }
+
+  /* === EVERY non-INR currency → PayPal ======================== */
+  options.method   = { paypal : "paypal" };  // only PayPal
+  options.redirect = true;                   // mandatory for PayPal flow
+
+  if (isMobile) {
+    /* pop a pristine tab so browser popup-blockers stay quiet */
+    openCheckoutInNewTab(options);
+  } else {
+    /* desktop can stay in the same tab */
+    new Razorpay(options).open();
+  }
 
 
   
