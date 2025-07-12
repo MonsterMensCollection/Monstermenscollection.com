@@ -2993,7 +2993,7 @@ async function checkoutCart () {
 
   /* ---------- 3.  Open Razorpay checkout ---------- */
   const options = {
-    key        : "rzp_live_u6z4G2762EuQ4E",
+    key        : "rzp_live_0M0qHSpzByvZAr",
     amount     : amountForGateway,
     currency   : currentCurrency,                          // ←  USD / INR / EUR (comes from selector)
     name       : "Monster Men's Collection",
@@ -3002,6 +3002,7 @@ async function checkoutCart () {
     handler    : handleSuccessfulPayment,                  // defined below
     prefill    : { name },
     theme      : { color: "#007bff" },
+    webview_intent: true
   };
 
   new Razorpay(options).open();
