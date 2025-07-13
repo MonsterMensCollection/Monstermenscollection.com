@@ -7,7 +7,7 @@
     "build": "netlify build"
   },
   "dependencies": {
-    "razorpay": "^2.9.6"
+    "razorpay": "^2.9.6",
     "firebase-admin": "^11.11.0" 
   }
 }
