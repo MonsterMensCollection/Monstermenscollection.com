@@ -8,7 +8,6 @@
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-firestore-compat.js"></script>
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-   <script type="module" src="/main.js"></script>
    <style>
   @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400&display=swap');
     * {
@@ -2965,36 +2964,22 @@ function hideCart() {
   document.getElementById("productList").style.display = "block";
   document.getElementById("sliderSection").style.display = "block";
 }
-
-  async function makeOrderUSD (amountUSD) {
-    const res = await fetch('/.netlify/functions/create-order', {
-      method : 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body   : JSON.stringify({ amountUSD })
-    });
-
-    if (!res.ok) throw new Error('Order creation failed');
-    return res.json();           // { id, amount, currency, … }
-  }
-
-
-  
 async function checkoutCart () {
 
-  /* ---------- 1.  Basic form validation (unchanged) ---------- */
-  const name         = document.getElementById("checkoutName").value.trim();
-  const address      = document.getElementById("checkoutAddress").value.trim();
-  const pincode      = document.getElementById("checkoutPincode").value.trim();
-  const mobileNumber = document.getElementById("checkoutMobileNumber").value.trim();
+  /* ---------- 1. Basic form validation ---------- */
+  const name          = document.getElementById("checkoutName").value.trim();
+  const address       = document.getElementById("checkoutAddress").value.trim();
+  const pincode       = document.getElementById("checkoutPincode").value.trim();
+  const mobileNumber  = document.getElementById("checkoutMobileNumber").value.trim();
 
   if (!name || !address || !pincode || !mobileNumber) {
     alert("Please complete all address fields.");
     return;
   }
 
-  /* ---------- 2.  Cart totals (still useful for Firestore/UI) ---------- */
-  const subtotalUSD        = cart.reduce((s, i) => s + i.price, 0);  // prices kept in USD
-  const subtotalSelected   = convert(subtotalUSD);                   // convert() = helper you already have
+  /* ---------- 2.  Work out totals in *both* currencies ---------- */
+  const subtotalUSD        = cart.reduce((sum, item) => sum + item.price, 0); // prices are stored in USD
+  const subtotalSelected   = convert(subtotalUSD);                            // in currentCurrency
   const shippingSelected   = subtotalSelected >= convert(0) ? 0 : convert(0);
   const grandTotalSelected = subtotalSelected + shippingSelected;
 
@@ -3003,85 +2988,85 @@ async function checkoutCart () {
     return;
   }
 
-  /* ---------- 3.  Mint a Razorpay *order* on Netlify ---------- */
-  let order;
-  try {
-    // makeOrderUSD lives in the big <script> tag (or an external JS file)
-    order = await makeOrderUSD(subtotalUSD);          // { id, amount, currency }
-  } catch (err) {
-    alert("Couldn’t start payment: " + err.message);
-    return;
-  }
+  /* Razorpay expects “smallest currency unit” (paise / cents etc.) */
+  const amountForGateway = Math.round(grandTotalSelected * 100); //  e.g. ₹799.56 ➜ 79956
 
-  /* ---------- 4.  Pass that order straight to Razorpay ---------- */
+  /* ---------- 3.  Open Razorpay checkout ---------- */
   const options = {
-    key       : "rzp_live_u6z4G2762EuQ4E",   // ✅ publishable key only
-    order_id  : order.id,                    // 🔑 fresh from Lambda
-    amount    : order.amount,                // already in cents / paise
-    currency  : order.currency,              // USD (or whatever you create)
-    name      : "Monster Men's Collection",
+    key        : "rzp_live_0M0qHSpzByvZAr",
+    amount     : amountForGateway,
+    currency   : currentCurrency,                          // ←  USD / INR / EUR (comes from selector)
+    name       : "Monster Men's Collection",
     description: "Cart Checkout",
     image      : "https://your-logo-url.com/logo.png",
-    handler    : handleSuccessfulPayment,    // see below
+    handler    : handleSuccessfulPayment,                  // defined below
     prefill    : { name },
     theme      : { color: "#007bff" },
-   
+    webview_intent: true
   };
 
   new Razorpay(options).open();
 
-  /* ---------- 5.  Success callback (tweaked only slightly) ---------- */
-  async function handleSuccessfulPayment (response) {
-    const user = auth.currentUser;
-    if (!user) return;
 
-    const orderData = {
-      uid         : user.uid,
-      name, address, pincode, mobilenumber: mobileNumber,
-      cart        : [...cart],
-      totalUSD    : subtotalUSD,                // what you charged in USD
-      total       : grandTotalSelected,         // in currentCurrency
-      currency    : currentCurrency,
-      razorpayOrderId: order.id,                // 🔍 for reconciliation
-      paymentId   : response.razorpay_payment_id,
-      paymentMode : "Razorpay",
-      timestamp   : firebase.firestore.FieldValue.serverTimestamp(),
-      orderNumber : `ORD-${Date.now()}`
-    };
+  
+  /* ---------- 4.  Success callback ---------- */
+async function handleSuccessfulPayment(response) {
+  const user = auth.currentUser;
+  if (!user) return;
 
-    try {
-      await finalizeOrderStock(cart);           // your existing helper
-      await db.collection("orders").add(orderData);
+  /* build the order object once */
+  const orderData = {
+    uid         : user.uid,
+    name,
+    address,
+    pincode,
+    mobilenumber: mobileNumber,
+    cart        : [...cart],              // keep a snapshot
+    totalUSD    : subtotalUSD,
+    total       : grandTotalSelected,
+    currency    : currentCurrency,
+    paymentId   : response.razorpay_payment_id,
+    paymentMode : "Razorpay",
+    timestamp   : firebase.firestore.FieldValue.serverTimestamp(),
+    orderNumber : `ORD-${Date.now()}`
+  };
 
-      /* …all your existing success-UI code… */
-      [
-        "descriptionPage","productList","shirtsPage","pantsPage",
-        "sliderSection","cartPage","profilePage","tshirtsPage",
-        "cargosPage","detailsPage"
-      ].forEach(id => (document.getElementById(id).style.display = "none"));
+  try {
+    /* 1️⃣ lock inventory – any failure aborts the flow */
+    await finalizeOrderStock(cart);
 
-      document.getElementById("paymentSuccessPage").style.display = "block";
-      document.getElementById("successPaymentId").textContent =
-        response.razorpay_payment_id;
+    /* 2️⃣ record the order */
+    await db.collection("orders").add(orderData);
 
-      cart = [];   // clear local cart
+    /* 3️⃣ success UI (exactly what you already had) */
+    [
+      "descriptionPage","productList","shirtsPage","pantsPage",
+      "sliderSection","cartPage","profilePage","tshirtsPage",
+      "cargosPage","detailsPage"
+    ].forEach(id => (document.getElementById(id).style.display = "none"));
 
-      setTimeout(() => {
-        document.getElementById("paymentSuccessPage").style.display = "none";
-        document.getElementById("productList").style.display        = "block";
-        document.getElementById("sliderSection").style.display      = "block";
-      }, 5000);
+    document.getElementById("paymentSuccessPage").style.display = "block";
+    document.getElementById("successPaymentId").textContent =
+      response.razorpay_payment_id;
 
-    } catch (err) {
-      console.error("Checkout finalisation failed:", err);
-      alert(
-        "Payment received but an item just sold out. " +
-        "A full refund will be issued automatically."
-      );
-    }
+    cart = [];                        // clear local cart
+
+    setTimeout(() => {
+      document.getElementById("paymentSuccessPage").style.display = "none";
+      document.getElementById("productList").style.display        = "block";
+      document.getElementById("sliderSection").style.display      = "block";
+    }, 5000);
+
+  } catch (err) {
+    console.error("Checkout finalisation failed:", err);
+    alert(
+      "Payment received but an item just sold out. " +
+      "A full refund will be issued automatically."
+    );
+    /* 👉 here you would call your refund / support routine */
   }
 }
-  
+}
 function checkoutCOD() {
   const name = document.getElementById("checkoutName").value.trim();
   const address = document.getElementById("checkoutAddress").value.trim();
@@ -3513,7 +3498,7 @@ if (subscribed) {
       theme: {
         color: "#007bff",
       },  
-     
+      webview_intent: true
     };
 
     const rzp = new Razorpay(razorpayOptions);
