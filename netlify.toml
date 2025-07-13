@@ -2,6 +2,9 @@
   node_bundler = "esbuild"
  external_node_modules = ["firebase-admin","razorpay"]   # optional
 
+ [build]
+  node_version = "18"
+
 [[redirects]]
   from   = "/verify-signature"
   to     = "/.netlify/functions/verify-signature"
