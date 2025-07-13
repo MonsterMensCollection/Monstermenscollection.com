@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+<title>Verifying…</title>
+
+<script>
+  // Razorpay appends ➜  ?razorpay_payment_id=...&razorpay_order_id=...&razorpay_signature=...
+  const q     = new URLSearchParams(location.search);
+  const body  = JSON.stringify({
+    payId : q.get("razorpay_payment_id"),
+    ordId : q.get("razorpay_order_id"),
+    sign  : q.get("razorpay_signature")
+  });
+
+  /* 🔒 hit your backend (Cloud Function, Express, etc.) that owns the secret key */
+  fetch("/verify-signature", { method:"POST", headers:{ "Content-Type":"application/json" }, body })
+    .then(() => location.href = "/#paymentSuccess")   // back to the WebView / SPA
+    .catch(() => location.href = "/#paymentError");
+</script>
+
+<style>
+  body{margin:0;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif}
+</style>
