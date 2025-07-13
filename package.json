@@ -1,7 +1,0 @@
-{
-  "name": "monster-mens-functions",
-  "private": true,
-  "dependencies": {
-    "razorpay": "latest"
-  }
-}
