@@ -2,8 +2,12 @@
   "name": "my-netlify-site",
   "version": "1.0.0",
   "type": "module",
-    "dependencies": {
-    "razorpay": "2.10.0"   // ← pin to the latest existing version
+  "scripts": {
+    "start": "node index.js",
+    "build": "netlify build"
+  },
+  "dependencies": {
+    "razorpay": "2.10.0"
   }
-  }
+}
 
