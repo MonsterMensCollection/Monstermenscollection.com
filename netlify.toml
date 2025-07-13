@@ -1,6 +1,6 @@
 [functions]
   node_bundler = "esbuild"
-  # external_node_modules = ["razorpay"]   # optional
+ external_node_modules = ["razorpay"]   # optional
 
 [[redirects]]
   from   = "/verify-signature"
