@@ -1,28 +1,23 @@
-/* /netlify/functions/verify-signature.js */
+// netlify/functions/verify-signature.js
 const Razorpay = require("razorpay");
 
-/* Netlify gives you env vars via process.env */
 const razorpay = new Razorpay({
-  key_id    : process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_KEY_SECRET
+  key_id    : process.env.RZP_KEY,
+  key_secret: process.env.RZP_SECRET,
 });
 
 exports.handler = async (event) => {
-  if (event.httpMethod !== "POST") {
-    return { statusCode: 405, body: "Method Not Allowed" };
-  }
-
   try {
     const { payId, ordId, sign } = JSON.parse(event.body);
 
     razorpay.utils.verifyPaymentSignature({
       razorpay_payment_id: payId,
       razorpay_order_id  : ordId,
-      razorpay_signature : sign
+      razorpay_signature : sign,
     });
 
-    return { statusCode: 200, body: "OK" };
+    return { statusCode: 200 };
   } catch (err) {
-    return { statusCode: 400, body: "Signature mismatch" };
+    return { statusCode: 400 };
   }
 };
