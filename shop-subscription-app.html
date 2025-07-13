@@ -2991,23 +2991,41 @@ async function checkoutCart () {
   /* Razorpay expects “smallest currency unit” (paise / cents etc.) */
   const amountForGateway = Math.round(grandTotalSelected * 100); //  e.g. ₹799.56 ➜ 79956
 
-  /* ---------- 3.  Open Razorpay checkout ---------- */
+  /* ---------- 3.  Open Razorpay checkout (Chrome Custom Tab) ---------- */
+  /* (a)  call your Cloud Function / backend here and create an order */
+  const { id: orderId } = await fetch("/create-order", {
+        method : "POST",
+        headers: { "Content-Type": "application/json" },
+        body   : JSON.stringify({
+          amount  : amountForGateway,          // still in paise / cents
+          currency: currentCurrency
+        })
+  }).then(r => r.json());
+
   const options = {
-    key        : "rzp_live_u6z4G2762EuQ4E",
-    amount     : amountForGateway,
-    currency   : currentCurrency,                          // ←  USD / INR / EUR (comes from selector)
-    name       : "Monster Men's Collection",
-    description: "Cart Checkout",
-    image      : "https://your-logo-url.com/logo.png",
-    handler    : handleSuccessfulPayment,                  // defined below
-    prefill    : { name },
-    theme      : { color: "#007bff" },
-    method    : { wallet: ["paypal"] },   // ★ show only PayPal
-    redirect  : true,   
-    webview_intent: true
+    key         : "rzp_live_u6z4G2762EuQ4E",
+    order_id    : orderId,                    // ★ use order_id, not amount
+    currency    : currentCurrency,
+
+    /* restrict to flows that *need* the external jump (optional) */
+    method      : { wallet: ["paypal"] },
+
+    /* these two flags force the Chrome Custom Tab */
+    redirect        : true,                   // must be true for wallets
+    webview_intent  : true,                   // tells Android SDK to expect an external jump
+
+    /* business details */
+    name        : "Monster Men's Collection",
+    description : "Cart Checkout",
+    image       : "https://your-logo-url.com/logo.png",
+    prefill     : { name },
+    theme       : { color: "#007bff" },
+
+    /* where Razorpay will *return* after the user pays */
+    callback_url: "https://monster-mens-collection.netlify.app/razorpay-success.html"
   };
 
-  new Razorpay(options).open();
+  new Razorpay(options).open();              // opens Chrome Custom Tab on Android
 
 
   
