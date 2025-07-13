@@ -1,5 +1,12 @@
 [functions]
   node_bundler = "esbuild"
+  # external_node_modules = ["razorpay"]   # optional
+
+[[redirects]]
+  from   = "/verify-signature"
+  to     = "/.netlify/functions/verify-signature"
+  status = 200
+  force  = true
 
 [[redirects]]
   from   = "/*"
