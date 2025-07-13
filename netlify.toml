@@ -1,9 +1,6 @@
 [functions]
   node_bundler = "esbuild"
- external_node_modules = ["firebase-admin","razorpay"]   # optional
-
- [build]
-  node_version = "18"
+ external_node_modules = ["razorpay"]   # optional
 
 [[redirects]]
   from   = "/verify-signature"
