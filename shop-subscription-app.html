@@ -2993,7 +2993,7 @@ async function checkoutCart () {
 
   /* ---------- 3.  Open Razorpay checkout (Chrome Custom Tab) ---------- */
   /* (a)  call your Cloud Function / backend here and create an order */
-  const { id: orderId } = await fetch("/create-order", {
+  const { id: orderId } = await fetch("/.netlify/functions/create-order", {
         method : "POST",
         headers: { "Content-Type": "application/json" },
         body   : JSON.stringify({
