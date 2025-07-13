@@ -2,12 +2,6 @@
   node_bundler = "esbuild"
 
 [[redirects]]
-  from   = "/verify-signature"
-  to     = "/.netlify/functions/verify-signature"
-  status = 200
-  force  = true   # optional: skip any cached file with same name
-
-[[redirects]]
   from   = "/*"
   to     = "/shop-subscription-app.html"
   status = 200
