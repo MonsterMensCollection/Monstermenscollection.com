@@ -3,7 +3,6 @@
 ############################################
 [functions]
   # folder that contains  verify-signature.js  (and others)
-  directory     = "netlify/functions"
   node_bundler  = "esbuild"        # or "zisi"
   external_node_modules = ["razorpay"]   # if you import the SDK
 
