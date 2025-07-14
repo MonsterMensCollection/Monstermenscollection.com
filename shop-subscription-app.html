@@ -788,13 +788,13 @@
 <img src="https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/s6.png" alt="Shirt 1" onclick="showDescription([
   { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/s6.png' },
     { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/fullimage/refs/heads/main/s6b1.png' },
-],'$ 0.01', 'BODAK #106', 'ABSTRACT PRINT SHIRT', 'Relaxed fit collared shirt. Short sleeves. Split hem. Button-up front.', ['S','M','L','XL'],['Same'],'shirtsPage', 'BODAK-106')">
+],'$ 1.01', 'BODAK #106', 'ABSTRACT PRINT SHIRT', 'Relaxed fit collared shirt. Short sleeves. Split hem. Button-up front.', ['S','M','L','XL'],['Same'],'shirtsPage', 'BODAK-106')">
 </div><div class=cardName>
 <h3>BODAK</h3> <!-- Product Title -->
 <p>ABSTRACT PRINT SHIRT</p>
 </div>
     <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 10px;">
-    <p class="price"> $ 0.01</p>
+    <p class="price"> $ 1.01</p>
   </div>
 </div>
    
@@ -2966,20 +2966,20 @@ function hideCart() {
 }
 async function checkoutCart () {
 
-  /* ────────── 1. Basic form validation ────────── */
-  const name         = document.getElementById("checkoutName").value.trim();
-  const address      = document.getElementById("checkoutAddress").value.trim();
-  const pincode      = document.getElementById("checkoutPincode").value.trim();
-  const mobileNumber = document.getElementById("checkoutMobileNumber").value.trim();
+  /* ---------- 1. Basic form validation ---------- */
+  const name          = document.getElementById("checkoutName").value.trim();
+  const address       = document.getElementById("checkoutAddress").value.trim();
+  const pincode       = document.getElementById("checkoutPincode").value.trim();
+  const mobileNumber  = document.getElementById("checkoutMobileNumber").value.trim();
 
   if (!name || !address || !pincode || !mobileNumber) {
     alert("Please complete all address fields.");
     return;
   }
 
-  /* ────────── 2. Totals in USD + selected currency ────────── */
-  const subtotalUSD        = cart.reduce((s, it) => s + it.price, 0);     // stored as USD
-  const subtotalSelected   = convert(subtotalUSD);                        // currentCurrency
+  /* ---------- 2.  Work out totals in *both* currencies ---------- */
+  const subtotalUSD        = cart.reduce((sum, item) => sum + item.price, 0); // prices are stored in USD
+  const subtotalSelected   = convert(subtotalUSD);                            // in currentCurrency
   const shippingSelected   = subtotalSelected >= convert(0) ? 0 : convert(0);
   const grandTotalSelected = subtotalSelected + shippingSelected;
 
@@ -2988,104 +2988,86 @@ async function checkoutCart () {
     return;
   }
 
-  /* ✨ Save a resumable “pending order” snapshot – runs before any redirect */
-  sessionStorage.setItem(
-    "pendingOrder",
-    JSON.stringify({
-      cart,
-      addr : { name, address, pincode, mobileNumber },
-      uid  : auth.currentUser.uid,
-      totals : {
-        usd : subtotalUSD,            // raw USD (for reference)
-        sel : grandTotalSelected,     // in the currency the user picked
-        curr: currentCurrency
-      }
-    })
-  );
+  /* Razorpay expects “smallest currency unit” (paise / cents etc.) */
+  const amountForGateway = Math.round(grandTotalSelected * 100); //  e.g. ₹799.56 ➜ 79956
 
-  /* Razorpay expects smallest unit (paise / cents) */
-  const amountForGateway = Math.round(grandTotalSelected * 100);
-
-  /* ────────── 3. Create Razorpay order on your backend ────────── */
-  const { id: orderId } = await fetch("/.netlify/functions/create-order", {
-    method  : "POST",
-    headers : { "Content-Type": "application/json" },
-    body    : JSON.stringify({
-      amount   : amountForGateway,
-      currency : currentCurrency
-    })
-  }).then(r => r.json());
-
-  /* ────────── 4. Open Razorpay checkout (Chrome Custom Tab) ────────── */
+  /* ---------- 3.  Open Razorpay checkout ---------- */
   const options = {
-    key            : "rzp_live_u6z4G2762EuQ4E",
-    order_id       : orderId,          // ★ always pass order_id
-    currency       : currentCurrency,
-    method         : { wallet: ["paypal"] },
+    key        : "rzp_live_0M0qHSpzByvZAr",
+    amount     : amountForGateway,
+    currency   : currentCurrency,                          // ←  USD / INR / EUR (comes from selector)
+    name       : "Monster Men's Collection",
+    description: "Cart Checkout",
+    image      : "https://your-logo-url.com/logo.png",
+    handler    : handleSuccessfulPayment,                  // defined below
+    prefill    : { name },
+    theme      : { color: "#007bff" },
     redirect       : true,
-    webview_intent : true,
-    name           : "Monster Men's Collection",
-    description    : "Cart Checkout",
-    image          : "https://your-logo-url.com/logo.png",
-    prefill        : { name },
-    theme          : { color: "#007bff" },
-    callback_url   : "https://monster-mens-collection.netlify.app/razorpay-success.html"
+    webview_intent: true
   };
 
-  new Razorpay(options).open();        // snapshot is already in sessionStorage
+  new Razorpay(options).open();
 
-  /* ────────── 5. Success callback stays unchanged ────────── */
-  async function handleSuccessfulPayment (response) {
-    const user = auth.currentUser;
-    if (!user) return;
 
-    const orderData = {
-      uid         : user.uid,
-      name, address, pincode, mobilenumber: mobileNumber,
-      cart        : [...cart],
-      totalUSD    : subtotalUSD,
-      total       : grandTotalSelected,
-      currency    : currentCurrency,
-      paymentId   : response.razorpay_payment_id,
-      paymentMode : "Razorpay",
-      timestamp   : firebase.firestore.FieldValue.serverTimestamp(),
-      orderNumber : `ORD-${Date.now()}`
-    };
+  
+  /* ---------- 4.  Success callback ---------- */
+async function handleSuccessfulPayment(response) {
+  const user = auth.currentUser;
+  if (!user) return;
 
-    try {
-      await finalizeOrderStock(cart);                 // lock inventory
-      await db.collection("orders").add(orderData);   // record order
-      sessionStorage.removeItem("pendingOrder");      // 🔑 clear snapshot
+  /* build the order object once */
+  const orderData = {
+    uid         : user.uid,
+    name,
+    address,
+    pincode,
+    mobilenumber: mobileNumber,
+    cart        : [...cart],              // keep a snapshot
+    totalUSD    : subtotalUSD,
+    total       : grandTotalSelected,
+    currency    : currentCurrency,
+    paymentId   : response.razorpay_payment_id,
+    paymentMode : "Razorpay",
+    timestamp   : firebase.firestore.FieldValue.serverTimestamp(),
+    orderNumber : `ORD-${Date.now()}`
+  };
 
-      /* success UI (unchanged) */
-      [
-        "descriptionPage","productList","shirtsPage","pantsPage",
-        "sliderSection","cartPage","profilePage","tshirtsPage",
-        "cargosPage","detailsPage"
-      ].forEach(id => (document.getElementById(id).style.display = "none"));
+  try {
+    /* 1️⃣ lock inventory – any failure aborts the flow */
+    await finalizeOrderStock(cart);
 
-      document.getElementById("paymentSuccessPage").style.display = "block";
-      document.getElementById("successPaymentId").textContent =
-        response.razorpay_payment_id;
+    /* 2️⃣ record the order */
+    await db.collection("orders").add(orderData);
 
-      cart = [];   // clear local cart
+    /* 3️⃣ success UI (exactly what you already had) */
+    [
+      "descriptionPage","productList","shirtsPage","pantsPage",
+      "sliderSection","cartPage","profilePage","tshirtsPage",
+      "cargosPage","detailsPage"
+    ].forEach(id => (document.getElementById(id).style.display = "none"));
 
-      setTimeout(() => {
-        document.getElementById("paymentSuccessPage").style.display = "none";
-        document.getElementById("productList").style.display        = "block";
-        document.getElementById("sliderSection").style.display      = "block";
-      }, 5000);
+    document.getElementById("paymentSuccessPage").style.display = "block";
+    document.getElementById("successPaymentId").textContent =
+      response.razorpay_payment_id;
 
-    } catch (err) {
-      console.error("Checkout finalisation failed:", err);
-      alert(
-        "Payment received but an item just sold out. " +
-        "A full refund will be issued automatically."
-      );
-    }
+    cart = [];                        // clear local cart
+
+    setTimeout(() => {
+      document.getElementById("paymentSuccessPage").style.display = "none";
+      document.getElementById("productList").style.display        = "block";
+      document.getElementById("sliderSection").style.display      = "block";
+    }, 5000);
+
+  } catch (err) {
+    console.error("Checkout finalisation failed:", err);
+    alert(
+      "Payment received but an item just sold out. " +
+      "A full refund will be issued automatically."
+    );
+    /* 👉 here you would call your refund / support routine */
   }
 }
-
+}
 function checkoutCOD() {
   const name = document.getElementById("checkoutName").value.trim();
   const address = document.getElementById("checkoutAddress").value.trim();
@@ -3502,7 +3484,7 @@ if (subscribed) {
     e.preventDefault(); // Prevent page reload
 
     const razorpayOptions = {
-      key: "rzp_live_u6z4G2762EuQ4E", // Replace with your Razorpay test key
+      key: "rzp_live_0M0qHSpzByvZAr", // Replace with your Razorpay test key
       amount: 200, // ₹2 in paise
       currency: "INR",
       name: "Monster Men's Collection",
