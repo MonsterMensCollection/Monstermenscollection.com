@@ -1,8 +1,8 @@
-/* /verify-signature  – Netlify Function (CommonJS)  */
-const admin    = require("firebase-admin");
-const Razorpay = require("razorpay");
-const qs       = require("querystring");
-const crypto   = require("crypto");
+/* /verify-signature  – Netlify Function (CommonJS) */
+const admin      = require("firebase-admin");
+const Razorpay   = require("razorpay");
+const querystring = require("querystring");      // renamed to avoid collision
+const crypto     = require("crypto");
 
 /* ── NEW: filter the noisy DEP0040 warning ─────────────────────────── */
 process.on("warning", (w) => {
@@ -13,27 +13,27 @@ process.on("warning", (w) => {
 
 /* ─────────────── initialise SDKs ─────────────── */
 const serviceAccount = {
-  projectId  : process.env.FIREBASE_PROJECT_ID,
-  clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-  // Netlify stores the literal "\n" in env vars → turn them into real new-lines
-  privateKey : process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+  projectId   : process.env.FIREBASE_PROJECT_ID,
+  clientEmail : process.env.FIREBASE_CLIENT_EMAIL,
+  // Netlify stores the literal "\n" in env vars → turn them into real new‑lines
+  privateKey  : process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
 };
 
-if (!admin.apps.length) {            // ✅ only once, even after re-bundles
+if (!admin.apps.length) {         // ✅ only once, even after re‑bundles
   admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-    projectId : process.env.FIREBASE_PROJECT_ID,
+    credential : admin.credential.cert(serviceAccount),
+    projectId  : process.env.FIREBASE_PROJECT_ID,
   });
 }
-const db  = admin.firestore();
+const db = admin.firestore();
 db.settings({ ignoreUndefinedProperties: true });
 
 const rzp = new Razorpay({
-  key_id    : process.env.RZP_KEY,
-  key_secret: process.env.RZP_SECRET,
+  key_id     : process.env.RZP_KEY,
+  key_secret : process.env.RZP_SECRET,
 });
 
-/* helper: HMAC-SHA256 signature check (kept for reference) */
+/* helper: HMAC‑SHA256 signature check (kept for reference) */
 function verifySignature({ order_id, payment_id, signature }) {
   const expected = crypto
     .createHmac("sha256", process.env.RZP_SECRET)
@@ -44,13 +44,13 @@ function verifySignature({ order_id, payment_id, signature }) {
 
 /* ─────────────────── main handler ─────────────────── */
 exports.handler = async (event) => {
-  /* reject non-POST just in case Netlify ever routes it */
+  /* reject non‑POST just in case Netlify ever routes it */
   if (event.httpMethod && event.httpMethod !== "POST") {
     return { statusCode: 405, body: "Method not allowed" };
   }
 
   try {
-    /* 1️⃣ decode & normalise body (JSON ⇆ url-encoded) */
+    /* 1️⃣ decode & normalise body (JSON ⇆ url‑encoded) */
     const rawBody = event.isBase64Encoded
       ? Buffer.from(event.body || "", "base64").toString("utf8")
       : (event.body || "");
@@ -58,9 +58,9 @@ exports.handler = async (event) => {
     const cType = (event.headers["content-type"] || "").toLowerCase();
     const body  = cType.includes("application/json") || rawBody.trim().startsWith("{")
       ? JSON.parse(rawBody || "{}")
-      : qs.parse(rawBody);
+      : querystring.parse(rawBody);                     // ← use renamed helper
 
-    /* 2️⃣ extract Razorpay params */
+    /* 2️⃣ extract Razorpay params */
     const payId = body.razorpay_payment_id || body.payId;
     const ordId = body.razorpay_order_id   || body.ordId;
     const sign  = body.razorpay_signature  || body.sign;
@@ -74,7 +74,7 @@ exports.handler = async (event) => {
     const totals = typeof body.totals === "string" ? JSON.parse(body.totals) : (body.totals || {});
     const uid    = body.uid || "";
 
-    /* 3️⃣ verify the signature with Razorpay helper */
+    /* 3️⃣ verify the signature with Razorpay helper */
     const { validatePaymentVerification } = require("razorpay/dist/utils/razorpay-utils");
     const isValid = validatePaymentVerification(
       { order_id: ordId, payment_id: payId },
@@ -85,28 +85,28 @@ exports.handler = async (event) => {
       return { statusCode: 400, body: "Invalid payment signature" };
     }
 
-    /* 4️⃣ decrement stock atomically */
+    /* 4️⃣ decrement stock atomically */
     await decrementStock(cart);
 
-    /* 5️⃣ write order document */
+    /* 5️⃣ write order document */
     const { name = "", address = "", pincode = "", mobileNumber = "" } = addr;
 
-      const ref  = db.collection("orders").doc(ordId);   // use RZP order-id
+    const ref  = db.collection("orders").doc(ordId);   // use RZP order‑id
     const data = {
       uid,
       name,
       address,
       pincode,
-      mobileNumber,                // keep the same camel-case everywhere
+      mobileNumber,               // keep the same camel‑case everywhere
       cart,
-      totalUSD     : totals.usd,
-      total        : totals.sel,
-      currency     : totals.curr,
-      paymentId    : payId,
-      paymentMode  : "Razorpay",
-      timestamp    : admin.firestore.FieldValue.serverTimestamp(),
-      orderNumber  : `ORD-${Date.now()}`,
-     };
+      totalUSD   : totals.usd,
+      total      : totals.sel,
+      currency   : totals.curr,
+      paymentId  : payId,
+      paymentMode: "Razorpay",
+      timestamp  : admin.firestore.FieldValue.serverTimestamp(),
+      orderNumber: `ORD-${Date.now()}`,
+    };
 
     if ((await ref.get()).exists) {
       await ref.update(data);      // ← second hit enriches the doc
@@ -114,19 +114,16 @@ exports.handler = async (event) => {
       await ref.set(data);         // ← first hit creates the doc
     }
 
-        /* Let Razorpay send the shopper to our static success page.
-       We pass the three signature fields in the query-string so
-       the page’s script can immediately forward them together
-       with the session-snapshot (addr, cart, totals …).            */
-    const qs =
+    /* STEP 6 – build query‑string for the success page */
+    const redirectQS =
         `?razorpay_payment_id=${payId}` +
         `&razorpay_order_id=${ordId}`   +
         `&razorpay_signature=${sign}`;
 
-   return {
+    return {
       statusCode : 302,
-      headers    : { Location: `/razorpay-success.html${qs}` },
-      body       : ""
+      headers    : { Location: `/razorpay-success.html${redirectQS}` },
+      body       : "",
     };
   } catch (err) {
     console.error("verify-signature failed:", err);
