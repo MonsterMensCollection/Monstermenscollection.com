@@ -1,6 +1,6 @@
-import Razorpay from "razorpay";
+const Razorpay = require("razorpay");     // CommonJS works with the default bundler
 
-const rzp = new Razorpay({
+exports.handler = async (event) => {
   key_id    : process.env.RZP_KEY,
   key_secret: process.env.RZP_SECRET
 });
