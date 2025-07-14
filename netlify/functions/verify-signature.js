@@ -91,12 +91,13 @@ exports.handler = async (event) => {
     /* 5️⃣ write order document */
     const { name = "", address = "", pincode = "", mobileNumber = "" } = addr;
 
-    await db.collection("orders").add({
+      const ref  = db.collection("orders").doc(ordId);   // use RZP order-id
+    const data = {
       uid,
       name,
       address,
       pincode,
-      mobilenumber : mobileNumber,
+      mobileNumber,                // keep the same camel-case everywhere
       cart,
       totalUSD     : totals.usd,
       total        : totals.sel,
@@ -105,9 +106,28 @@ exports.handler = async (event) => {
       paymentMode  : "Razorpay",
       timestamp    : admin.firestore.FieldValue.serverTimestamp(),
       orderNumber  : `ORD-${Date.now()}`,
-    });
+     };
 
-    return { statusCode: 200, body: "OK" };
+    if ((await ref.get()).exists) {
+      await ref.update(data);      // ← second hit enriches the doc
+    } else {
+      await ref.set(data);         // ← first hit creates the doc
+    }
+
+        /* Let Razorpay send the shopper to our static success page.
+       We pass the three signature fields in the query-string so
+       the page’s script can immediately forward them together
+       with the session-snapshot (addr, cart, totals …).            */
+    const qs =
+        `?razorpay_payment_id=${payId}` +
+        `&razorpay_order_id=${ordId}`   +
+        `&razorpay_signature=${sign}`;
+
+   return {
+      statusCode : 302,
+      headers    : { Location: `/razorpay-success.html${qs}` },
+      body       : ""
+    };
   } catch (err) {
     console.error("verify-signature failed:", err);
     return { statusCode: 400, body: err.message || "Bad request" };
