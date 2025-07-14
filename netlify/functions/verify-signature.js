@@ -2,12 +2,34 @@
    /verify-signature   (CommonJS – Netlify Functions)
    ────────────────────────────────────────────────────────── */
 
-const admin     = require("firebase-admin");
-const Razorpay  = require("razorpay");
-const qs        = require("querystring");   // ← tiny helper for url-encoded
-const crypto    = require("crypto");          // ← new
+const admin    = require("firebase-admin");
+const Razorpay = require("razorpay");
+const qs       = require("querystring");
+const crypto   = require("crypto");
 
-/* helper: HMAC-SHA256 signature check */
+/* ─────────────── initialise SDKs ─────────────── */
+const serviceAccount = {
+  projectId  : process.env.FIREBASE_PROJECT_ID,
+  clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+  // Netlify stores the literal "\n" in env vars → turn them into real new-lines
+  privateKey : process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+};
+
+if (!admin.apps.length) {            // ✅ only once, even after re-bundles
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    projectId : process.env.FIREBASE_PROJECT_ID,
+  });
+}
+const db  = admin.firestore();
+db.settings({ ignoreUndefinedProperties: true });
+
+const rzp = new Razorpay({
+  key_id    : process.env.RZP_KEY,
+  key_secret: process.env.RZP_SECRET,
+});
+
+/* helper: HMAC-SHA256 signature check (kept for reference) */
 function verifySignature({ order_id, payment_id, signature }) {
   const expected = crypto
     .createHmac("sha256", process.env.RZP_SECRET)
@@ -16,72 +38,54 @@ function verifySignature({ order_id, payment_id, signature }) {
   return expected === signature;
 }
 
-/* ─────────────── initialise SDKs ─────────────── */
-admin.initializeApp();                         // creds come from env vars
-const db  = admin.firestore();
-db.settings({ ignoreUndefinedProperties: true });  // ← new
-const rzp = new Razorpay({
-  key_id    : process.env.RZP_KEY,
-  key_secret: process.env.RZP_SECRET,
-});
-
 /* ─────────────────── main handler ─────────────────── */
 exports.handler = async (event) => {
-  /* Netlify always invokes the file; reject non-POSTs just in case */
+  /* reject non-POST just in case Netlify ever routes it */
   if (event.httpMethod && event.httpMethod !== "POST") {
     return { statusCode: 405, body: "Method not allowed" };
   }
 
   try {
-    /* ── 1. Decode + normalise incoming body ─────────────────── */
+    /* 1️⃣ decode & normalise body (JSON ⇆ url-encoded) */
     const rawBody = event.isBase64Encoded
       ? Buffer.from(event.body || "", "base64").toString("utf8")
       : (event.body || "");
 
-    let body;
     const cType = (event.headers["content-type"] || "").toLowerCase();
+    const body  = cType.includes("application/json") || rawBody.trim().startsWith("{")
+      ? JSON.parse(rawBody || "{}")
+      : qs.parse(rawBody);
 
-    if (cType.includes("application/json") || rawBody.trim().startsWith("{")) {
-      body = JSON.parse(rawBody || "{}");
-    } else {
-      body = qs.parse(rawBody);                // url-encoded  a=b&c=d
-    }
-
-    /* ── 2. Pull out the fields we care about ────────────────── */
+    /* 2️⃣ extract Razorpay params */
     const payId = body.razorpay_payment_id || body.payId;
     const ordId = body.razorpay_order_id   || body.ordId;
     const sign  = body.razorpay_signature  || body.sign;
-
     if (!payId || !ordId || !sign) {
       return { statusCode: 400, body: "Missing payment parameters" };
     }
 
-    /* optional JSON blobs posted from the success page */
+    /* optional JSON blobs from success page */
     const cart   = typeof body.cart   === "string" ? JSON.parse(body.cart)   : (body.cart   || []);
     const addr   = typeof body.addr   === "string" ? JSON.parse(body.addr)   : (body.addr   || {});
     const totals = typeof body.totals === "string" ? JSON.parse(body.totals) : (body.totals || {});
     const uid    = body.uid || "";
 
-   // utils moved – pull the helper directly from the package
-      const { validatePaymentVerification } =
-      require("razorpay/dist/utils/razorpay-utils");
-
-const isValid = validatePaymentVerification(
-  { order_id: ordId, payment_id: payId },   // object *keys* must be order_id / payment_id
-  sign,                                     // razorpay_signature
-  process.env.RZP_SECRET                    // your secret key
-);
-
+    /* 3️⃣ verify the signature with Razorpay helper */
+    const { validatePaymentVerification } = require("razorpay/dist/utils/razorpay-utils");
+    const isValid = validatePaymentVerification(
+      { order_id: ordId, payment_id: payId },
+      sign,
+      process.env.RZP_SECRET
+    );
     if (!isValid) {
-     return { statusCode: 400, body: "Invalid payment signature" };
-   }
-    /* ── 4. Decrement live stock atomically ──────────────────── */
+      return { statusCode: 400, body: "Invalid payment signature" };
+    }
+
+    /* 4️⃣ decrement stock atomically */
     await decrementStock(cart);
 
-    /* ── 5. Build + write the order document ─────────────────── */
-    const {
-      name = "", address = "", pincode = "", mobileNumber = ""
-    } = addr;
+    /* 5️⃣ write order document */
+    const { name = "", address = "", pincode = "", mobileNumber = "" } = addr;
 
     await db.collection("orders").add({
       uid,
@@ -109,7 +113,6 @@ const isValid = validatePaymentVerification(
 /* ───────────── helper: batch update all affected SKUs ───────────── */
 async function decrementStock(cart = []) {
   if (!cart.length) return;
-
   const batch = db.batch();
   cart.forEach(({ docId, size }) => {
     if (!docId || !size) return;
