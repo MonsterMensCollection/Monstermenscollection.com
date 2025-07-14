@@ -4,7 +4,17 @@
 
 const admin     = require("firebase-admin");
 const Razorpay  = require("razorpay");
-const qs        = require("querystring");      // ← tiny helper for url-encoded
+const qs        = require("querystring");   // ← tiny helper for url-encoded
+const crypto    = require("crypto");          // ← new
+
+/* helper: HMAC-SHA256 signature check */
+function verifySignature({ order_id, payment_id, signature }) {
+  const expected = crypto
+    .createHmac("sha256", process.env.RZP_SECRET)
+    .update(`${order_id}|${payment_id}`)
+    .digest("hex");
+  return expected === signature;
+}
 
 /* ─────────────── initialise SDKs ─────────────── */
 admin.initializeApp();                         // creds come from env vars
@@ -51,13 +61,15 @@ exports.handler = async (event) => {
     const totals = typeof body.totals === "string" ? JSON.parse(body.totals) : (body.totals || {});
     const uid    = body.uid || "";
 
-    /* ── 3. Verify the HMAC signature from Razorpay ──────────── */
- /* ── 3. Verify the HMAC signature from Razorpay ──────────── */
-    const isValid = rzp.utility.verifyPaymentSignature({
-      razorpay_payment_id: payId,
-      razorpay_order_id  : ordId,
-      razorpay_signature : sign,
-    });
+   // utils moved – pull the helper directly from the package
+      const { validatePaymentVerification } =
+      require("razorpay/dist/utils/razorpay-utils");
+
+const isValid = validatePaymentVerification(
+  { order_id: ordId, payment_id: payId },   // object *keys* must be order_id / payment_id
+  sign,                                     // razorpay_signature
+  process.env.RZP_SECRET                    // your secret key
+);
 
     if (!isValid) {
      return { statusCode: 400, body: "Invalid payment signature" };
