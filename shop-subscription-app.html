@@ -2994,7 +2994,7 @@ async function checkoutCart () {
   /* ---------- 3.  Open Razorpay checkout ---------- */
   const options = {
     key        : "rzp_live_u6z4G2762EuQ4E",
-    order_id   : `ORD-${Date.now()}`,
+    
     amount     : amountForGateway,
     currency   : currentCurrency,                          // ←  USD / INR / EUR (comes from selector)
     name       : "Monster Men's Collection",
