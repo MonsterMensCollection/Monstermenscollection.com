@@ -1,21 +1,37 @@
+############################################
+# 1️⃣  Netlify Functions
+############################################
 [functions]
-  node_bundler          = "esbuild"
-  external_node_modules = ["razorpay"]   # optional
+  # folder that contains  verify-signature.js  (and others)
+  directory     = "netlify/functions"
+  node_bundler  = "esbuild"        # or "zisi"
+  external_node_modules = ["razorpay"]   # if you import the SDK
 
-# --- Razorpay webhook / signature verification -------------
+############################################
+# 2️⃣  Razorpay callback  →  serverless fn
+############################################
+# Razorpay’s Checkout will POST to /verify-signature
+# We forward the POST verb & body **unchanged** with a 307.
 [[redirects]]
-  from = "/razorpay-success.html"
-  to   = "/razorpay-success.html"
-  status = 200          # ← keep this first
+  from   = "/verify-signature"
+  to     = "/.netlify/functions/verify-signature"
+  status = 307          # preserves method + body
+  force  = true         # skip any existing file
 
+############################################
+# 3️⃣  (Optional) keep your static success page
+############################################
+# Only needed if you *still* want to land users here
+# after the function 302’s them back.
 [[redirects]]
-  from = "/verify-signature"
-  to   = "/.netlify/functions/verify-signature"
+  from   = "/razorpay-success.html"
+  to     = "/razorpay-success.html"
   status = 200
-  force  = true
 
-# ⬇️ keep the SPA catch-all last
+############################################
+# 4️⃣  Catch-all for the single-page app
+############################################
 [[redirects]]
-  from = "/*"
-  to   = "/shop-subscription-app.html"
+  from   = "/*"
+  to     = "/shop-subscription-app.html"
   status = 200
