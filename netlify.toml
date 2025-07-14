@@ -4,26 +4,18 @@
 
 # --- Razorpay webhook / signature verification -------------
 [[redirects]]
-  from   = "/verify-signature"
-  to     = "/.netlify/functions/verify-signature"
+  from = "/razorpay-success.html"
+  to   = "/razorpay-success.html"
+  status = 200          # ← keep this first
+
+[[redirects]]
+  from = "/verify-signature"
+  to   = "/.netlify/functions/verify-signature"
   status = 200
-  force  = true          # keep this
+  force  = true
 
-# --- Razorpay browser-return page ---------------------------
-# Serve the static file *as-is* so the <script> can run.
+# ⬇️ keep the SPA catch-all last
 [[redirects]]
-  from   = "/razorpay-success.html"
-  to     = "/razorpay-success.html"
-  status = 200           # MUST be before the /* rule
-
-# (optional) If you also have a failure page:
-# [[redirects]]
-#   from   = "/razorpay-error.html"
-#   to     = "/razorpay-error.html"
-#   status = 200
-
-# --- Everything else falls back to your SPA ----------------
-[[redirects]]
-  from   = "/*"
-  to     = "/shop-subscription-app.html"
+  from = "/*"
+  to   = "/shop-subscription-app.html"
   status = 200
