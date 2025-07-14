@@ -3281,92 +3281,85 @@ db.collection("products").onSnapshot(snap => {
 });
 
   
+/* helper – keep it once, outside the function if you prefer */
+const currencySymbol = code => ({ USD:"$", INR:"₹", EUR:"€" }[code] || "");
+
 function loadUserProfileAndOrders () {
-
-  /* — helper to show the right money symbol — */
-  const currencySymbol = c => ({ USD: "$", INR: "₹", EUR: "€" }[c] || "");
-
   auth.onAuthStateChanged(async (user) => {
-    if (!user) return;                                 // not signed-in
+    if (!user) return;
 
-    /* show the user’s email */
+    /* header */
     document.getElementById("profileEmail").innerText = user.email;
 
-    /* prepare the list container */
     const orderList = document.getElementById("orderList");
-    orderList.innerHTML = "<li>Loading orders...</li>";
+    orderList.innerHTML = "<li>Loading orders…</li>";
 
     try {
-      /* grab the user’s orders, latest first */
-      const ordersSnapshot = await db
-        .collection("orders")
-        .where("uid", "==", user.uid)
-        .orderBy("timestamp", "desc")
-        .get();
+      const snap = await db.collection("orders")
+                           .where("uid","==",user.uid)
+                           .orderBy("timestamp","desc")
+                           .get();
 
-      orderList.innerHTML = "";
-
-      if (ordersSnapshot.empty) {
+      if (snap.empty) {
         orderList.innerHTML = "<li>No orders found.</li>";
         return;
       }
+      orderList.innerHTML = "";                // clear the “Loading…”
 
-      /* build one card per order */
-      ordersSnapshot.forEach((doc, index) => {
-        const order = doc.data();
+      snap.forEach((doc, idx) => {
+        const o   = doc.data();
+        const div = document.createElement("div");
+        div.style.cssText =
+          "border:1px solid #ccc;padding:10px;margin-bottom:15px";
 
-        /* basic styling */
-        const orderDiv = document.createElement("div");
-        orderDiv.style.border       = "1px solid #ccc";
-        orderDiv.style.borderRadius = "0px";
-        orderDiv.style.padding      = "10px";
-        orderDiv.style.marginBottom = "15px";
+        const sym = currencySymbol(o.currency || "USD");
+        const pay = o.paymentMode || "Online Paid";
 
-        const sym = currencySymbol(order.currency || "USD");
-        const paymentInfo = order.paymentMode || "Online Paid";
-
-        /* list of items inside this order */
-        let itemsHTML = "";
-        (order.cart || []).forEach(item => {
-          itemsHTML += `
+        /* items list */
+        let items = "";
+        (o.cart||[]).forEach(it => {
+          items += `
             <div style="margin-left:10px;margin-top:5px;">
-              🔹 <strong>${item.title}</strong> – ${sym}${item.price}
-              <div style="font-size:12px;color:#555;">Size: ${item.size || "N/A"}</div>
+              🔹 <strong>${it.title}</strong> – ${sym}${it.price}
+              <div style="font-size:12px;color:#555;">Size: ${it.size||"N/A"}</div>
             </div>`;
         });
 
-        /* full HTML block */
-        orderDiv.innerHTML = `
+        /* escape the nested template with \\` */
+        div.innerHTML = `
           <div style="font-size:12px;color:gray;">
-            Placed on: ${order.timestamp?.toDate().toLocaleString() || "Unknown"}
+            Placed on: ${o.timestamp?.toDate().toLocaleString() || "Unknown"}
           </div>
 
-          <div><strong>Order No:</strong> ${order.orderNumber || \`#\${index + 1}\`}</div>
+          <div><strong>Order No:</strong> ${
+              o.orderNumber || ("#"+(idx+1))
+          }</div>
 
-          <!-- customer details -->
-          <div style="margin-top:8px;"><strong>Name:</strong> ${order.name || "—"}</div>
-          <div><strong>Address:</strong> ${order.address || "—"}</div>
-          <div><strong>Pincode:</strong> ${order.pincode || "—"}</div>
-          <div><strong>Mobile:</strong> ${order.mobilenumber || "—"}</div>
+          <div style="margin-top:8px;"><strong>Name:</strong> ${o.name||"—"}</div>
+          <div><strong>Address:</strong> ${o.address||"—"}</div>
+          <div><strong>Pincode:</strong> ${o.pincode||"—"}</div>
+          <div><strong>Mobile:</strong> ${o.mobilenumber||"—"}</div>
 
-          <div><strong>Payment:</strong> ${paymentInfo}</div>
-          <div><strong>Payment ID:</strong> ${order.paymentId}</div>
+          <div><strong>Payment:</strong> ${pay}</div>
+          <div><strong>Payment ID:</strong> ${o.paymentId}</div>
 
-          <div style="margin-top:10px;">${itemsHTML}</div>
+          <div style="margin-top:10px;">${items}</div>
 
           <br>
-          <div><strong>Total:</strong> ${sym}${order.total}</div>
+          <div><strong>Total:</strong> ${sym}${o.total}</div>
         `;
 
-        orderList.appendChild(orderDiv);
+        orderList.appendChild(div);
       });
 
-    } catch (error) {
-      console.error("Error loading orders:", error);
-      orderList.innerHTML = `<li>Error loading orders: ${error.message}</li>`;
+    } catch (err) {
+      console.error("Error loading orders:", err);
+      orderList.innerHTML =
+        `<li>Error loading orders: ${err.message}</li>`;
     }
   });
 }
+
 
   
     const loginSection = document.getElementById("loginSection");
