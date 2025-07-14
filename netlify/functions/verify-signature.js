@@ -1,44 +1,69 @@
-// netlify/functions/verify-signature.js  (CJS version)
+/* ──────────────────────────────────────────────────────────
+   /verify-signature  (CJS)
+   ────────────────────────────────────────────────────────── */
 
-const admin     = require("firebase-admin");
-const Razorpay  = require("razorpay");
+const admin    = require("firebase-admin");
+const Razorpay = require("razorpay");
 
-/* ---------- initialise helpers ---------- */
-admin.initializeApp();                            // uses the service-account env vars
+/* initialise SDKs -------------------------------------------------- */
+admin.initializeApp();                                   // service-account env vars
 const db  = admin.firestore();
 const rzp = new Razorpay({
   key_id    : process.env.RZP_KEY,
   key_secret: process.env.RZP_SECRET,
 });
 
-/* ---------- POST /verify-signature ---------- */
+/* main handler ----------------------------------------------------- */
 exports.handler = async (event) => {
-  try {
-    /* 1️⃣  grab payload sent from razorpay-success.html */
-    const { payId, ordId, sign, cart, addr, uid, totals } = JSON.parse(event.body);
+  /* Netlify always invokes the file; reject non-POSTs just in case */
+  if (event.httpMethod && event.httpMethod !== "POST") {
+    return { statusCode: 405, body: "Method not allowed" };
+  }
 
-    /* 2️⃣  verify signature – NOTE the **rzp** utils object */
+  try {
+    /* 1️⃣  payload sent from /razorpay-success.html ---------------- */
+    const {
+      payId,             // razorpay_payment_id
+      ordId,             // razorpay_order_id
+      sign,              // razorpay_signature
+      cart  = [],        // [{ docId, size, … }]
+      addr  = {},        // { name, address, pincode, mobileNumber }
+      uid,
+      totals = {}        // { usd, sel, curr }
+    } = JSON.parse(event.body || "{}");
+
+    /* 2️⃣  verify the HMAC signature ------------------------------- */
     rzp.utils.verifyPaymentSignature({
       razorpay_payment_id: payId,
       razorpay_order_id  : ordId,
       razorpay_signature : sign,
     });
 
-    /* 3️⃣  lock stock atomically on the server side ---------------- */
-    await finalizeOrderStockServerSide(cart);      // <- helper is inlined below
+    /* 3️⃣  decrement live stock atomically ------------------------- */
+    await decrementStock(cart);
 
-    /* 4️⃣  create the order document -------------------------------- */
+    /* 4️⃣  build + write the order document ------------------------ */
+    const {
+      name = "",
+      address = "",
+      pincode = "",
+      mobileNumber = ""
+    } = addr;
+
     await db.collection("orders").add({
       uid,
+      name,
+      address,
+      pincode,
+      mobilenumber: mobileNumber,           // ← same snake-case as client
       cart,
-      ...addr,                                     // name, address, pin, phone
       totalUSD  : totals.usd,
       total     : totals.sel,
       currency  : totals.curr,
       paymentId : payId,
-      paymentMode:"Razorpay",
+      paymentMode: "Razorpay",
       timestamp : admin.firestore.FieldValue.serverTimestamp(),
-      orderNumber:`ORD-${Date.now()}`,
+      orderNumber: `ORD-${Date.now()}`
     });
 
     return { statusCode: 200 };
@@ -48,17 +73,17 @@ exports.handler = async (event) => {
   }
 };
 
-/* ---------- helper: decrement sizes in a single batch ------------- */
-async function finalizeOrderStockServerSide(cart) {
-  const batch = db.batch();
+/* helper: batch update all affected SKUs --------------------------- */
+async function decrementStock(cart) {
+  if (!cart.length) return;
 
+  const batch = db.batch();
   cart.forEach(({ docId, size }) => {
-    if (!docId || !size) return;                   // safety check
+    if (!docId || !size) return;                 // guard
     const ref = db.collection("products").doc(docId);
     batch.update(ref, {
-      [`sizes.${size}`]: admin.firestore.FieldValue.increment(-1),
+      [`sizes.${size}`]: admin.firestore.FieldValue.increment(-1)
     });
   });
-
-  await batch.commit();                            // throws if any path missing
+  await batch.commit();
 }
