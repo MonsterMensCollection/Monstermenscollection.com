@@ -1,17 +1,26 @@
 <script>
+  /* 🚚 1. Grab the “pending order” snapshot we stored before redirecting */
   const local = JSON.parse(sessionStorage.getItem("pendingOrder") || "{}");
-  const q     = new URLSearchParams(location.search);
 
+  /* 🚚 2. Read the Razorpay query-string parameters that Razorpay just sent */
+  const q = new URLSearchParams(location.search);
+
+  /* 🚚 3. POST them - together with the local snapshot - to your backend
+         (the path now points to your Netlify Function that holds the secret key) */
   fetch("/.netlify/functions/verify-signature", {
     method : "POST",
-    headers: { "Content-Type":"application/json" },
+    headers: { "Content-Type": "application/json" },
     body   : JSON.stringify({
       payId : q.get("razorpay_payment_id"),
       ordId : q.get("razorpay_order_id"),
       sign  : q.get("razorpay_signature"),
-      ...local                          // cart, addr, uid, totals
+      ...local            // → cart, addr, uid, totals
     })
   })
-  .then(() => location.href = "/#paymentSuccess")
+  /* 🚚 4. On success let the SPA know and clear the snapshot */
+  .then(() => {
+    sessionStorage.removeItem("pendingOrder");
+    location.href = "/#paymentSuccess";
+  })
   .catch(() => location.href = "/#paymentError");
 </script>
