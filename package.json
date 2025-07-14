@@ -1,6 +1,7 @@
 {
   "name": "my-app",
   "version": "1.0.0",
+  "type": "module",
   "scripts": {
     "start": "node index.js",
     "build": "netlify build"
@@ -9,4 +10,3 @@
     "razorpay": "^2.9.6"
   }
 }
-
