@@ -1,11 +1,15 @@
-/* ──────────────────────────────────────────────────────────
-   /verify-signature   (CommonJS – Netlify Functions)
-   ────────────────────────────────────────────────────────── */
-
+/* /verify-signature  – Netlify Function (CommonJS)  */
 const admin    = require("firebase-admin");
 const Razorpay = require("razorpay");
 const qs       = require("querystring");
 const crypto   = require("crypto");
+
+/* ── NEW: filter the noisy DEP0040 warning ─────────────────────────── */
+process.on("warning", (w) => {
+  if (w.code === "DEP0040" && w.message.includes("punycode")) return;
+  console.warn(w);
+});
+/* ──────────────────────────────────────────────────────────────────── */
 
 /* ─────────────── initialise SDKs ─────────────── */
 const serviceAccount = {
