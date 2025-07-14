@@ -3029,7 +3029,7 @@ async function checkoutCart () {
     image          : "https://your-logo-url.com/logo.png",
     prefill        : { name },
     theme          : { color: "#007bff" },
-     callback_url   : "https://monster-mens-collection.netlify.app/razorpay-success.html"
+     callback_url   : "https://monster-mens-collection.netlify.app/.netlify/functions/verify-signature"
   };
 
   new Razorpay(options).open();        // snapshot is already in sessionStorage
