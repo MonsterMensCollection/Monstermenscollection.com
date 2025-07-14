@@ -2993,19 +2993,17 @@ async function checkoutCart () {
 
   /* ---------- 3.  Open Razorpay checkout ---------- */
   const options = {
-    key        : "rzp_live_u6z4G2762EuQ4E",
-    
-    amount     : amountForGateway,
-    currency   : currentCurrency,                          // ←  USD / INR / EUR (comes from selector)
-    name       : "Monster Men's Collection",
-    description: "Cart Checkout",
-    image      : "https://your-logo-url.com/logo.png",
-    handler    : handleSuccessfulPayment,                  // defined below
-    prefill    : { name },
-    theme      : { color: "#007bff" },
+    key            : "rzp_live_u6z4G2762EuQ4E",
+    order_id       : `ORD-${Date.now()}`,          // ★ always pass order_id
+    currency       : currentCurrency,
     method         : { wallet: ["paypal"] },
     redirect       : true,
-    webview_intent: true
+    webview_intent : true,
+    name           : "Monster Men's Collection",
+    description    : "Cart Checkout",
+    image          : "https://your-logo-url.com/logo.png",
+    prefill        : { name },
+    theme          : { color: "#007bff" },
   };
 
   new Razorpay(options).open();
@@ -3031,7 +3029,7 @@ async function handleSuccessfulPayment(response) {
     paymentId   : response.razorpay_payment_id,
     paymentMode : "Razorpay",
     timestamp   : firebase.firestore.FieldValue.serverTimestamp(),
-    orderNumber : order_id
+    orderNumber : `ORD-${Date.now()}`
   };
 
   try {
