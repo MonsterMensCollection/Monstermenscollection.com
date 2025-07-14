@@ -52,12 +52,16 @@ exports.handler = async (event) => {
     const uid    = body.uid || "";
 
     /* ── 3. Verify the HMAC signature from Razorpay ──────────── */
-    rzp.utils.verifyPaymentSignature({
+ /* ── 3. Verify the HMAC signature from Razorpay ──────────── */
+    const isValid = rzp.utility.verifyPaymentSignature({
       razorpay_payment_id: payId,
       razorpay_order_id  : ordId,
       razorpay_signature : sign,
     });
 
+    if (!isValid) {
+     return { statusCode: 400, body: "Invalid payment signature" };
+   }
     /* ── 4. Decrement live stock atomically ──────────────────── */
     await decrementStock(cart);
 
