@@ -19,6 +19,7 @@ function verifySignature({ order_id, payment_id, signature }) {
 /* ─────────────── initialise SDKs ─────────────── */
 admin.initializeApp();                         // creds come from env vars
 const db  = admin.firestore();
+db.settings({ ignoreUndefinedProperties: true });  // ← new
 const rzp = new Razorpay({
   key_id    : process.env.RZP_KEY,
   key_secret: process.env.RZP_SECRET,
