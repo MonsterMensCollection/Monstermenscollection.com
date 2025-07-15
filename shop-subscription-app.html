@@ -3015,7 +3015,13 @@ async function checkoutCart () {
       currency : currentCurrency
     })
   }).then(r => r.json());
-
+  
+// decide at runtime which payment methods to expose
+const walletOpts =
+  currentCurrency === 'USD'     // PayPal works only for non‑INR
+    ? { wallet: ['paypal'] }
+    : undefined;
+  
   /* ────────── 4. Open Razorpay checkout (Chrome Custom Tab) ────────── */
   const options = {
     key            : "rzp_live_u6z4G2762EuQ4E",
