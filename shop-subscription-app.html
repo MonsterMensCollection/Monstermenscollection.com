@@ -3003,44 +3003,49 @@ async function checkoutCart () {
     })
   );
 
-  /* Razorpay expects smallest unit (paise / cents) */
-  const amountForGateway = Math.round(grandTotalSelected * 100);
+  /* ---------- Razorpay order on your backend ---------- */
+  let orderId, amountForGateway, gatewayCurrency;
 
-  /* ────────── 3. Create Razorpay order on your backend ────────── */
-  const { id: orderId } = await fetch("/.netlify/functions/create-order", {
-    method  : "POST",
-    headers : { "Content-Type": "application/json" },
-    body    : JSON.stringify({
-      amount   : amountForGateway,
-      currency : currentCurrency
+  if (currentCurrency === "USD") {      // 👈 user picked PayPal
+    amountForGateway = +grandTotalSelected.toFixed(2); // dollars
+    gatewayCurrency  = "USD";
+  } else {                              // 👈 all INR / UPI / cards
+    amountForGateway = Math.round(grandTotalSelected * 100); // paise
+    gatewayCurrency  = "INR";
+  }
+
+  ({ id: orderId } = await fetch("/.netlify/functions/create-order", {
+    method : "POST",
+    headers: { "Content-Type": "application/json" },
+    body   : JSON.stringify({
+      amount  : amountForGateway,
+      currency: gatewayCurrency
     })
-  }).then(r => r.json());
-  
-// decide at runtime which payment methods to expose
-const walletOpts =
-  currentCurrency === 'USD'     // PayPal works only for non‑INR
-    ? { wallet: ['paypal'] }
-    : undefined;
-  
-  /* ────────── 4. Open Razorpay checkout (Chrome Custom Tab) ────────── */
+  }).then(r => r.json()));
+
+  /* ────────── 4. Open Razorpay checkout ────────── */
   const options = {
-    key            : "rzp_live_u6z4G2762EuQ4E",
-    order_id       : orderId,          // ★ always pass order_id
-    currency       : currentCurrency,
-    method         : { wallet: ["paypal"] },
+    key      : "rzp_live_u6z4G2762EuQ4E",
+    order_id : orderId,
+    currency : gatewayCurrency,            // USD or INR
+
+    /* show PayPal **only** when you asked for a USD order */
+    ...(gatewayCurrency === "USD"
+        ? { method: { wallet: ["paypal"] } }
+        : {}),
+
     redirect       : true,
     webview_intent : true,
     name           : "Monster Men's Collection",
     description    : "Cart Checkout",
-    image          : "https://your-logo-url.com/logo.png",
     prefill        : { name },
     theme          : { color: "#007bff" },
-     callback_url   : "https://monster-mens-collection.netlify.app/.netlify/functions/verify-signature"
+    callback_url   : "https://monster-mens-collection.netlify.app/.netlify/functions/verify-signature"
   };
 
-  new Razorpay(options).open();        // snapshot is already in sessionStorage
+  new Razorpay(options).open();          // snapshot is already in sessionStorage
 
-  /* ────────── 5. Success callback stays unchanged ────────── */
+  /* ────────── 5. Success callback (unchanged) ────────── */
   async function handleSuccessfulPayment (response) {
     const user = auth.currentUser;
     if (!user) return;
@@ -3091,6 +3096,7 @@ const walletOpts =
     }
   }
 }
+
 
 function checkoutCOD() {
   const name = document.getElementById("checkoutName").value.trim();
