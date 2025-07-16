@@ -1,23 +1,29 @@
 <script>
-  /* 🚚 1. Grab the “pending order” snapshot we stored before redirecting */
+  /* 0️⃣  local snapshot you stored before redirecting */
   const local = JSON.parse(sessionStorage.getItem("pendingOrder") || "{}");
 
-  /* 🚚 2. Read the Razorpay query-string parameters that Razorpay just sent */
-  const q = new URLSearchParams(location.search);
+  /* 1️⃣  read Razorpay query-string */
+  const q     = new URLSearchParams(location.search);
+  const payId = q.get("razorpay_payment_id");
+  const ordId = q.get("razorpay_order_id");
+  const sign  = q.get("razorpay_signature");
 
-  /* 🚚 3. POST them - together with the local snapshot - to your backend
-         (the path now points to your Netlify Function that holds the secret key) */
+  /* 2️⃣  buyer cancelled or PayPal failed → skip verification */
+  if (!payId) {
+    sessionStorage.removeItem("pendingOrder");
+    location.replace("/#paymentCancelled");   // show your own “cancelled” view
+    return;
+  }
+
+  /* 3️⃣  payment succeeded → verify & store order on Firestore */
   fetch("/.netlify/functions/verify-signature", {
     method : "POST",
     headers: { "Content-Type": "application/json" },
     body   : JSON.stringify({
-      payId : q.get("razorpay_payment_id"),
-      ordId : q.get("razorpay_order_id"),
-      sign  : q.get("razorpay_signature"),
-      ...local            // → cart, addr, uid, totals
+      payId, ordId, sign,
+      ...local                // cart, addr, uid, totals
     })
   })
-  /* 🚚 4. On success let the SPA know and clear the snapshot */
   .then(() => {
     sessionStorage.removeItem("pendingOrder");
     location.href = "/#paymentSuccess";
