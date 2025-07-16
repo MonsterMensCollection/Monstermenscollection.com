@@ -3009,13 +3009,9 @@ async function checkoutCart () {
   if (currentCurrency === "USD") {      // 👈 user picked PayPal
     amountForGateway = +grandTotalSelected.toFixed(2); // dollars
     gatewayCurrency  = "USD";
-   } else if (currentCurrency === "EUR") {
-    /* Razorpay supports EUR on international‑enabled accounts           */
-    amountForGateway = +grandTotalSelected.toFixed(2);  // euros
-    gatewayCurrency  = "EUR";
   } else {                              // 👈 all INR / UPI / cards
-     amountForGateway = +grandTotalSelected.toFixed(2);       // rupees ✅
-  gatewayCurrency  = "INR";
+    amountForGateway = Math.round(grandTotalSelected); // paise
+    gatewayCurrency  = "INR";
   }
 
   ({ id: orderId } = await fetch("/.netlify/functions/create-order", {
