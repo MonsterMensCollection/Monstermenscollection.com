@@ -3010,8 +3010,8 @@ async function checkoutCart () {
     amountForGateway = +grandTotalSelected.toFixed(2); // dollars
     gatewayCurrency  = "USD";
   } else {                              // 👈 all INR / UPI / cards
-    amountForGateway = Math.round(grandTotalSelected * 100); // paise
-    gatewayCurrency  = "INR";
+     amountForGateway = +grandTotalSelected.toFixed(2);       // rupees ✅
+  gatewayCurrency  = "INR";
   }
 
   ({ id: orderId } = await fetch("/.netlify/functions/create-order", {
