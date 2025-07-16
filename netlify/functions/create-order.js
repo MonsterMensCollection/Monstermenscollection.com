@@ -23,7 +23,13 @@ exports.handler = async event => {
     */
     const { amount = 0, currency = "INR" } = JSON.parse(event.body || "{}");
     const cur = currency.toUpperCase();
+   /* 2️⃣  accept only the currencies you support ------------------- */
+   const allowed = ["USD", "EUR", "INR"];          // add / remove here
+   const cur = allowed.includes(currency.toUpperCase())
+                ? currency.toUpperCase()
+                : "INR";   
 
+    
     /*  Razorpay expects the *smallest* unit:  cents, paise, euro‑cents …  */
     const amountSmallest =
       cur === "USD"
