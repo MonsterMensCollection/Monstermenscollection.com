@@ -21,16 +21,16 @@ exports.handler = async event => {
                                  // "INR"   for the usual UPI / cards flow
           }
     */
-    const { amount = 0, currency = "INR" } = JSON.parse(event.body || "{}");
-    const cur = currency.toUpperCase();
+    const { amount = 0 } = JSON.parse(event.body || "{}");
+    const cur = "USD";                           // 👈🏾 force USD
 
     /*  Razorpay expects the *smallest* unit:  cents, paise, euro‑cents …  */
      const amountSmallest = amount;   // already the right unit – don’t touch
 
     /*  IMPORTANT: pass USD when you want the PayPal wallet to show up   */
     const order = await rzp.orders.create({
-      amount:          amountSmallest,
-      currency:        cur === "USD" ? "USD" : cur, // force‑USD only when needed
+       amount:          amountSmallest,             // already cents
+       currency:        "USD", // force‑USD only when needed
       payment_capture: 1,                           // auto‑capture
     });
 
