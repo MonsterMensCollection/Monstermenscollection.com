@@ -788,13 +788,13 @@
 <img src="https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/s6.png" alt="Shirt 1" onclick="showDescription([
   { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/s6.png' },
     { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/fullimage/refs/heads/main/s6b1.png' },
-],'$1.01', 'BODAK #106', 'ABSTRACT PRINT SHIRT', 'Relaxed fit collared shirt. Short sleeves. Split hem. Button-up front.', ['S','M','L','XL'],['Same'],'shirtsPage', 'BODAK-106')">
+],'$ 1.01', 'BODAK #106', 'ABSTRACT PRINT SHIRT', 'Relaxed fit collared shirt. Short sleeves. Split hem. Button-up front.', ['S','M','L','XL'],['Same'],'shirtsPage', 'BODAK-106')">
 </div><div class=cardName>
 <h3>BODAK</h3> <!-- Product Title -->
 <p>ABSTRACT PRINT SHIRT</p>
 </div>
     <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 10px;">
-    <p class="price"> $1.01</p>
+    <p class="price"> $ 1.01</p>
   </div>
 </div>
    
@@ -1978,8 +1978,8 @@
             color: #333;
           ">
     <option value="USD">$ USD</option>
-    <option value="IN">₹ INR</option>
-    <option value="EU">€ EUR</option>
+    <option value="INR">₹ INR</option>
+    <option value="EUR">€ EUR</option>
   </select>
 </div>
 
@@ -2807,10 +2807,10 @@ function filterProductsBySize(pageId) {
 }
 
 
-const RATES = { USD: 1 };
+const RATES = { USD: 1, INR: 83, EUR: 0.92 };
 let currentCurrency = "USD";
 
-const currencySymbol = c => ({ USD: "$" }[c] || "");
+const currencySymbol = c => ({ USD: "$", INR: "₹", EUR: "€" }[c] || "");
 const convert  = usd => usd * RATES[currentCurrency];
 const format   = v   => currencySymbol(currentCurrency) + v.toFixed(0);
 
@@ -2848,7 +2848,13 @@ function updateCartAmounts () {
       el.dataset.basePrice=usd;
       el.textContent=format(convert(usd));
     }
-  };
+  }
+
+  // Hook selector
+  document.getElementById('currencySelector').addEventListener('change',e=>{
+    currentCurrency=e.target.value;
+    updateAllPrices();
+  });
 
 
 
@@ -2997,50 +3003,38 @@ async function checkoutCart () {
     })
   );
 
-  /* ---------- Razorpay order on your backend ---------- */
- let orderId;
- const gatewayCurrency  = "USD";     // lock it once
- const amountForGateway = Math.round(grandTotalSelected * 100);
- /* 12.34 USD → 1234 ¢   ·   1749 INR → 174 900 paise */
-  
-  ({ id: orderId } = await fetch("/.netlify/functions/create-order", {
-    method : "POST",
-    headers: { "Content-Type": "application/json" },
-    body   : JSON.stringify({
-      amount  : amountForGateway,
-      currency: gatewayCurrency
+  /* Razorpay expects smallest unit (paise / cents) */
+  const amountForGateway = Math.round(grandTotalSelected * 100);
+
+  /* ────────── 3. Create Razorpay order on your backend ────────── */
+  const { id: orderId } = await fetch("/.netlify/functions/create-order", {
+    method  : "POST",
+    headers : { "Content-Type": "application/json" },
+    body    : JSON.stringify({
+      amount   : amountForGateway,
+      currency : currentCurrency
     })
-  }).then(r => r.json()));
+  }).then(r => r.json());
 
- /* ────────── 4. Open Razorpay checkout ────────── */
-const currencySel = document.getElementById("currencySelector");
-if (currencySel) currencySel.disabled = true;   // 🔒 lock picker
+  /* ────────── 4. Open Razorpay checkout (Chrome Custom Tab) ────────── */
+  const options = {
+    key            : "rzp_live_u6z4G2762EuQ4E",
+    order_id       : orderId,          // ★ always pass order_id
+    currency       : currentCurrency,
+    method         : { wallet: ["paypal"] },
+    redirect       : true,
+    webview_intent : true,
+    name           : "Monster Men's Collection",
+    description    : "Cart Checkout",
+    image          : "https://your-logo-url.com/logo.png",
+    prefill        : { name },
+    theme          : { color: "#007bff" },
+     callback_url   : "https://monster-mens-collection.netlify.app/.netlify/functions/verify-signature"
+  };
 
-const options = {
-  key      : "rzp_live_u6z4G2762EuQ4E",
-  order_id : orderId,
-  currency : gatewayCurrency,
+  new Razorpay(options).open();        // snapshot is already in sessionStorage
 
- 
-
-  redirect       : true,
-  webview_intent : true,
-  name           : "Monster Men's Collection",
-  description    : "Cart Checkout",
-  prefill        : { name },
-  theme          : { color: "#007bff" },
-  callback_url   : "https://monster-mens-collection.netlify.app/verify-signature",
-
-  /* if the shopper closes the popup, unlock the picker again */
-  modal: {
-    ondismiss () { currencySel && (currencySel.disabled = false); }
-  }
-};
-
-new Razorpay(options).open();               // ⬅️ launches the gateway
-/* nothing after this line will run until the page comes back */      // snapshot is already in sessionStorage
-
-  /* ────────── 5. Success callback (unchanged) ────────── */
+  /* ────────── 5. Success callback stays unchanged ────────── */
   async function handleSuccessfulPayment (response) {
     const user = auth.currentUser;
     if (!user) return;
@@ -3089,11 +3083,8 @@ new Razorpay(options).open();               // ⬅️ launches the gateway
         "A full refund will be issued automatically."
       );
     }
-    
-    if (currencySel) currencySel.disabled = false; // 🔓 unlock here too
   }
 }
-
 
 function checkoutCOD() {
   const name = document.getElementById("checkoutName").value.trim();
