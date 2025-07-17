@@ -9,7 +9,18 @@ const sign   = qs.get('razorpay_signature')  || qs.get('signature');
 const local  = JSON.parse(sessionStorage.getItem('pendingOrder') || '{}');
 
 /* 3️⃣ fire the serverless function that does the real work */
-+// PayPal flow: Razorpay has already POSTed to verify‑signature for us.
-+// Just show the thank‑you page:
-location.href = '/#paymentSuccess';
+fetch('/.netlify/functions/verify-signature', {
+  method : 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body   : JSON.stringify({
+    payId, ordId, sign,              //  ← the three critical fields
+    ...local                         //  ← cart, uid, address, totals, …
+  })
+})
+.then(() => {
+  sessionStorage.removeItem('pendingOrder');
+  // optional: show a “Thank‑you” message or bounce home
+  location.href = '/#paymentSuccess';
+})
+.catch(() => location.href = '/#paymentError');
 </script>
