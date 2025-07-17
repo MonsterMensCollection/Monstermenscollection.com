@@ -1,9 +1,9 @@
 <script>
 /* 1️⃣ pull them out of the URL */
 const qs     = new URLSearchParams(location.search);
-const payId  = qs.get('razorpay_payment_id');
-const ordId  = qs.get('razorpay_order_id');
-const sign   = qs.get('razorpay_signature');
+const payId  = qs.get('razorpay_payment_id') || qs.get('payment_id');
+const ordId  = qs.get('razorpay_order_id')   || qs.get('order_id');
+const sign   = qs.get('razorpay_signature')  || qs.get('signature');
 
 /* 2️⃣ gather whatever you stored locally before redirecting */
 const local  = JSON.parse(sessionStorage.getItem('pendingOrder') || '{}');
