@@ -1,26 +1,26 @@
 <script>
-/* 1️⃣ pull them out of the URL */
-const qs     = new URLSearchParams(location.search);
-const payId  = qs.get('razorpay_payment_id') || qs.get('payment_id');
-const ordId  = qs.get('razorpay_order_id')   || qs.get('order_id');
-const sign   = qs.get('razorpay_signature')  || qs.get('signature');
+  /* 🚚 1. Grab the “pending order” snapshot we stored before redirecting */
+  const local = JSON.parse(sessionStorage.getItem("pendingOrder") || "{}");
 
-/* 2️⃣ gather whatever you stored locally before redirecting */
-const local  = JSON.parse(sessionStorage.getItem('pendingOrder') || '{}');
+  /* 🚚 2. Read the Razorpay query-string parameters that Razorpay just sent */
+  const q = new URLSearchParams(location.search);
 
-/* 3️⃣ fire the serverless function that does the real work */
-fetch('/.netlify/functions/verify-signature', {
-  method : 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body   : JSON.stringify({
-    payId, ordId, sign,              //  ← the three critical fields
-    ...local                         //  ← cart, uid, address, totals, …
+  /* 🚚 3. POST them - together with the local snapshot - to your backend
+         (the path now points to your Netlify Function that holds the secret key) */
+  fetch("/.netlify/functions/verify-signature", {
+    method : "POST",
+    headers: { "Content-Type": "application/json" },
+    body   : JSON.stringify({
+      payId : q.get("razorpay_payment_id"),
+      ordId : q.get("razorpay_order_id"),
+      sign  : q.get("razorpay_signature"),
+      ...local            // → cart, addr, uid, totals
+    })
   })
-})
-.then(() => {
-  sessionStorage.removeItem('pendingOrder');
-  // optional: show a “Thank‑you” message or bounce home
-  location.href = '/#paymentSuccess';
-})
-.catch(() => location.href = '/#paymentError');
+  /* 🚚 4. On success let the SPA know and clear the snapshot */
+  .then(() => {
+    sessionStorage.removeItem("pendingOrder");
+    location.href = "/#paymentSuccess";
+  })
+  .catch(() => location.href = "/#paymentError");
 </script>
