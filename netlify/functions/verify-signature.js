@@ -61,9 +61,9 @@ exports.handler = async (event) => {
       : querystring.parse(rawBody);                     // ← use renamed helper
 
     /* 2️⃣ extract Razorpay params */
-    const payId = body.razorpay_payment_id || body.payment_id || body.payId;
- const ordId = body.razorpay_order_id   || body.order_id   || body.ordId;
- const sign  = body.razorpay_signature  || body.signature  || body.sign;
+    const payId = body.razorpay_payment_id || body.payId;
+    const ordId = body.razorpay_order_id   || body.ordId;
+    const sign  = body.razorpay_signature  || body.sign;
     if (!payId || !ordId || !sign) {
       return { statusCode: 400, body: "Missing payment parameters" };
     }
@@ -73,7 +73,6 @@ exports.handler = async (event) => {
     const addr   = typeof body.addr   === "string" ? JSON.parse(body.addr)   : (body.addr   || {});
     const totals = typeof body.totals === "string" ? JSON.parse(body.totals) : (body.totals || {});
     const uid    = body.uid || "";
-    const currency = totals.curr || "USD";
 
     /* 3️⃣ verify the signature with Razorpay helper */
     const { validatePaymentVerification } = require("razorpay/dist/utils/razorpay-utils");
@@ -102,7 +101,7 @@ exports.handler = async (event) => {
       cart,
       totalUSD   : totals.usd,
       total      : totals.sel,
-      currency,          // always "USD"
+      currency   : totals.curr,
       paymentId  : payId,
       paymentMode: "Razorpay",
       timestamp  : admin.firestore.FieldValue.serverTimestamp(),
