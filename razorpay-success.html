@@ -9,7 +9,7 @@ const sign   = qs.get('razorpay_signature');
 const local  = JSON.parse(sessionStorage.getItem('pendingOrder') || '{}');
 
 /* 3️⃣ fire the serverless function that does the real work */
-fetch('/.netlify/functions/verify-signature', {
+fetch('https://monster-mens-collection.netlify.app/.netlify/functions/verify-signature', {
   method : 'POST',
   headers: { 'Content-Type': 'application/json' },
   body   : JSON.stringify({
