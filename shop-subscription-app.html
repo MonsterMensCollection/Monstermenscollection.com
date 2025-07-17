@@ -3022,7 +3022,7 @@ async function checkoutCart () {
   const options = {
     key      : "rzp_live_u6z4G2762EuQ4E",
     order_id : orderId,
-    currency : gatewayCurrency,            // USD or INR
+    currency : gatewayCurrency,            // MUST match order.currency above           // USD or INR
 
     /* show PayPal **only** when you asked for a USD order */
     ...(gatewayCurrency === "USD"
