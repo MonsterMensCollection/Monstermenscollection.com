@@ -3004,23 +3004,20 @@ async function checkoutCart () {
   );
 
   /* Razorpay expects smallest unit (paise / cents) */
-  const amountForGateway = Math.round(grandTotalSelected * 100);
+  const amountForGateway = Math.round(subtotalUSD * 100);  
 
   /* ────────── 3. Create Razorpay order on your backend ────────── */
   const { id: orderId } = await fetch("/.netlify/functions/create-order", {
     method  : "POST",
     headers : { "Content-Type": "application/json" },
-    body    : JSON.stringify({
-      amount   : amountForGateway,
-      currency : currentCurrency
-    })
+    body: JSON.stringify({ amount: amountForGateway })
   }).then(r => r.json());
 
   /* ────────── 4. Open Razorpay checkout (Chrome Custom Tab) ────────── */
   const options = {
     key            : "rzp_live_u6z4G2762EuQ4E",
     order_id       : orderId,          // ★ always pass order_id
-    currency       : currentCurrency,
+    currency       : "USD",
     method         : { wallet: ["paypal"] },
     redirect       : true,
     webview_intent : true,
