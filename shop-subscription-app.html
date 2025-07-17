@@ -3004,16 +3004,11 @@ async function checkoutCart () {
   );
 
   /* ---------- Razorpay order on your backend ---------- */
-  let orderId, amountForGateway, gatewayCurrency;
-
-  if (currentCurrency === "USD") {      // 👈 user picked PayPal
-    amountForGateway = +grandTotalSelected.toFixed(2); // dollars
-    gatewayCurrency  = "USD";
-  } else {                              // 👈 all INR / UPI / cards
-    amountForGateway = Math.round(grandTotalSelected); // paise
-    gatewayCurrency  = "INR";
-  }
-
+ let orderId;
+ const gatewayCurrency  = currentCurrency.toUpperCase();     // lock it once
+ const amountForGateway = Math.round(grandTotalSelected * 100);
+ /* 12.34 USD → 1234 ¢   ·   1749 INR → 174 900 paise */
+  
   ({ id: orderId } = await fetch("/.netlify/functions/create-order", {
     method : "POST",
     headers: { "Content-Type": "application/json" },
