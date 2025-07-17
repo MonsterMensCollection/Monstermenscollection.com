@@ -16,7 +16,7 @@
   }
 
   /* 3️⃣  payment succeeded → verify & store order on Firestore */
-  fetch("/.netlify/functions/verify-signature", {
+  fetch("https://monster-mens-collection.netlify.app/.netlify/functions/verify-signature", {
     method : "POST",
     headers: { "Content-Type": "application/json" },
     body   : JSON.stringify({
