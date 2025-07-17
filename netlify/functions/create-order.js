@@ -13,14 +13,15 @@ exports.handler = async (event) => {
     return { statusCode: 405, body: "Method Not Allowed" };
   }
 
-  try {
-    const { amount, currency } = JSON.parse(event.body || "{}");
+try {
+    /* amount arrives already in *USD cents* (see client patch) */
+    const { amount } = JSON.parse(event.body || "{}");
 
-    /* create the Razorpay order (amount is in the *smallest* unit) */
+    /* 🔑 PayPal wallet requires USD */
     const order = await rzp.orders.create({
-      amount,
-      currency,
-      payment_capture: 1, // auto-capture
+      amount,               // e.g. 1234  =  USD 12.34
+      currency: "USD",      // hard‑coded
+      payment_capture: 1,   // auto‑capture
     });
 
     return {
