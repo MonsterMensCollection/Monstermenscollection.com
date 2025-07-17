@@ -44,35 +44,48 @@ function verifySignature({ order_id, payment_id, signature }) {
 
 /* ─────────────────── main handler ─────────────────── */
 exports.handler = async (event) => {
-  /* reject non‑POST just in case Netlify ever routes it */
-  if (event.httpMethod && event.httpMethod !== "POST") {
-    return { statusCode: 405, body: "Method not allowed" };
-  }
+ /* PayPal wallet hits us first with a GET (no body yet) and then
+    with a POST.  Accept both verbs. */
+const isPost = event.httpMethod === "POST";
+const isGet  = event.httpMethod === "GET";
+if (!isPost && !isGet) {
+  return { statusCode: 405, body: "Method not allowed" };
+}
 
   try {
-    /* 1️⃣ decode & normalise body (JSON ⇆ url‑encoded) */
-    const rawBody = event.isBase64Encoded
-      ? Buffer.from(event.body || "", "base64").toString("utf8")
-      : (event.body || "");
+  /* 1️⃣ decode & normalise body (JSON ⇆ url‑encoded) */
+  const rawBody = event.isBase64Encoded
+    ? Buffer.from(event.body || "", "base64").toString("utf8")
+    : (event.body || "");
 
-    const cType = (event.headers["content-type"] || "").toLowerCase();
-    const body  = cType.includes("application/json") || rawBody.trim().startsWith("{")
-      ? JSON.parse(rawBody || "{}")
-      : querystring.parse(rawBody);                     // ← use renamed helper
+  const cType = (event.headers["content-type"] || "").toLowerCase();
+  const body  = cType.includes("application/json") || rawBody.trim().startsWith("{")
+    ? JSON.parse(rawBody || "{}")          // POSTed as JSON
+    : querystring.parse(rawBody);          // POSTed as x‑www‑form‑urlencoded
 
-    /* 2️⃣ extract Razorpay params */
-    const payId = body.razorpay_payment_id || body.payId;
-    const ordId = body.razorpay_order_id   || body.ordId;
-    const sign  = body.razorpay_signature  || body.sign;
-    if (!payId || !ordId || !sign) {
-      return { statusCode: 400, body: "Missing payment parameters" };
-    }
+  /* 2️⃣ Merge: query‑string + POST body (if any) → one params object */
+  const params = {
+    ...(event.queryStringParameters || {}),
+    ...(isPost ? body : {})
+  };
 
-    /* optional JSON blobs from success page */
-    const cart   = typeof body.cart   === "string" ? JSON.parse(body.cart)   : (body.cart   || []);
-    const addr   = typeof body.addr   === "string" ? JSON.parse(body.addr)   : (body.addr   || {});
-    const totals = typeof body.totals === "string" ? JSON.parse(body.totals) : (body.totals || {});
-    const uid    = body.uid || "";
+  /* 3️⃣ extract Razorpay params (a few aliases just in case) */
+  const payId = params.razorpay_payment_id || params.payment_id || params.payId;
+  const ordId = params.razorpay_order_id   || params.order_id   || params.ordId;
+  const sign  = params.razorpay_signature  || params.signature  || params.sign;
+
+  /* 4️⃣ PayPal wallet often calls us once *before* capture.
+         If payment_id or signature are still missing, respond 202 so
+         Razorpay will POST again (with all three fields) in a moment. */
+  if (!payId || !sign) {
+    return { statusCode: 202, body: "Payment pending – trying again…" };
+  }
+
+  /* 5️⃣ optional JSON blobs coming from your success page */
+  const cart   = typeof params.cart   === "string" ? JSON.parse(params.cart)   : (params.cart   || []);
+  const addr   = typeof params.addr   === "string" ? JSON.parse(params.addr)   : (params.addr   || {});
+  const totals = typeof params.totals === "string" ? JSON.parse(params.totals) : (params.totals || {});
+  const uid    = params.uid || "";
 
     /* 3️⃣ verify the signature with Razorpay helper */
     const { validatePaymentVerification } = require("razorpay/dist/utils/razorpay-utils");
