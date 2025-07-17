@@ -25,10 +25,7 @@ exports.handler = async event => {
     const cur = currency.toUpperCase();
 
     /*  Razorpay expects the *smallest* unit:  cents, paise, euro‑cents …  */
-    const amountSmallest =
-      cur === "USD"
-        ? Math.round(amount * 100) // $12.34 → 1234 ¢  (💵 PayPal path)
-        : Math.round(amount * 100); // ₹12.34 → 1234 paise, €12.34 → 1234 ct
+     const amountSmallest = amount;   // already the right unit – don’t touch
 
     /*  IMPORTANT: pass USD when you want the PayPal wallet to show up   */
     const order = await rzp.orders.create({
