@@ -1,32 +1,26 @@
 <script>
-  /* 0️⃣  local snapshot you stored before redirecting */
-  const local = JSON.parse(sessionStorage.getItem("pendingOrder") || "{}");
+/* 1️⃣ pull them out of the URL */
+const qs     = new URLSearchParams(location.search);
+const payId  = qs.get('razorpay_payment_id');
+const ordId  = qs.get('razorpay_order_id');
+const sign   = qs.get('razorpay_signature');
 
-  /* 1️⃣  read Razorpay query-string */
-  const q     = new URLSearchParams(location.search);
-  const payId = q.get("razorpay_payment_id");
-  const ordId = q.get("razorpay_order_id");
-  const sign  = q.get("razorpay_signature");
+/* 2️⃣ gather whatever you stored locally before redirecting */
+const local  = JSON.parse(sessionStorage.getItem('pendingOrder') || '{}');
 
-  /* 2️⃣  buyer cancelled or PayPal failed → skip verification */
-  if (!payId) {
-    sessionStorage.removeItem("pendingOrder");
-    location.replace("/#paymentCancelled");   // show your own “cancelled” view
-    return;
-  }
-
-  /* 3️⃣  payment succeeded → verify & store order on Firestore */
-  fetch("https://monster-mens-collection.netlify.app/.netlify/functions/verify-signature", {
-    method : "POST",
-    headers: { "Content-Type": "application/json" },
-    body   : JSON.stringify({
-      payId, ordId, sign,
-      ...local                // cart, addr, uid, totals
-    })
+/* 3️⃣ fire the serverless function that does the real work */
+fetch('/.netlify/functions/verify-signature', {
+  method : 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body   : JSON.stringify({
+    payId, ordId, sign,              //  ← the three critical fields
+    ...local                         //  ← cart, uid, address, totals, …
   })
-  .then(() => {
-    sessionStorage.removeItem("pendingOrder");
-    location.href = "/#paymentSuccess";
-  })
-  .catch(() => location.href = "/#paymentError");
+})
+.then(() => {
+  sessionStorage.removeItem('pendingOrder');
+  // optional: show a “Thank‑you” message or bounce home
+  location.href = '/#paymentSuccess';
+})
+.catch(() => location.href = '/#paymentError');
 </script>
