@@ -26,7 +26,11 @@ try {
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ id: order.id }),
+       body: JSON.stringify({
+       id:       order.id,
+       amount:   order.amount,
+       currency: order.currency      // ← will show “USD” if everything is right
+     }),
     };
   } catch (err) {
     console.error("create-order failed:", err);
