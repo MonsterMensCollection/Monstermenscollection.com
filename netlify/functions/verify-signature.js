@@ -61,9 +61,9 @@ exports.handler = async (event) => {
       : querystring.parse(rawBody);                     // ← use renamed helper
 
     /* 2️⃣ extract Razorpay params */
-    const payId = body.razorpay_payment_id || body.payId;
-    const ordId = body.razorpay_order_id   || body.ordId;
-    const sign  = body.razorpay_signature  || body.sign;
+    const payId = body.razorpay_payment_id || body.payment_id || body.payId;
+    const ordId = body.razorpay_order_id   || body.order_id   || body.ordId;
+    const sign  = body.razorpay_signature  || body.signature  || body.sign;
     if (!payId || !ordId || !sign) {
       return { statusCode: 400, body: "Missing payment parameters" };
     }
