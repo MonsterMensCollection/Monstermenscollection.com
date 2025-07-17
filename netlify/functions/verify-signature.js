@@ -73,6 +73,7 @@ exports.handler = async (event) => {
     const addr   = typeof body.addr   === "string" ? JSON.parse(body.addr)   : (body.addr   || {});
     const totals = typeof body.totals === "string" ? JSON.parse(body.totals) : (body.totals || {});
     const uid    = body.uid || "";
+    const currency = totals.curr || "USD";
 
     /* 3️⃣ verify the signature with Razorpay helper */
     const { validatePaymentVerification } = require("razorpay/dist/utils/razorpay-utils");
@@ -101,7 +102,7 @@ exports.handler = async (event) => {
       cart,
       totalUSD   : totals.usd,
       total      : totals.sel,
-      currency   : totals.curr,
+      currency,          // always "USD"
       paymentId  : payId,
       paymentMode: "Razorpay",
       timestamp  : admin.firestore.FieldValue.serverTimestamp(),
