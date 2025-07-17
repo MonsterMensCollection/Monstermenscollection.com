@@ -3018,27 +3018,35 @@ async function checkoutCart () {
     })
   }).then(r => r.json()));
 
-  /* ────────── 4. Open Razorpay checkout ────────── */
-  const options = {
-    key      : "rzp_live_u6z4G2762EuQ4E",
-    order_id : orderId,
-    currency : gatewayCurrency,            // MUST match order.currency above           // USD or INR
+ /* ────────── 4. Open Razorpay checkout ────────── */
+const currencySel = document.getElementById("currencySelector");
+if (currencySel) currencySel.disabled = true;   // 🔒 lock picker
 
-    /* show PayPal **only** when you asked for a USD order */
-    ...(gatewayCurrency === "USD"
-        ? { method: { wallet: ["paypal"] } }
-        : {}),
+const options = {
+  key      : "rzp_live_u6z4G2762EuQ4E",
+  order_id : orderId,
+  currency : gatewayCurrency,
 
-    redirect       : true,
-    webview_intent : true,
-    name           : "Monster Men's Collection",
-    description    : "Cart Checkout",
-    prefill        : { name },
-    theme          : { color: "#007bff" },
-    callback_url : "https://monster-mens-collection.netlify.app/verify-signature"
-  };
+  ...(gatewayCurrency === "USD"
+      ? { method: { wallet: ["paypal"] } }
+      : {}),
 
-  new Razorpay(options).open();          // snapshot is already in sessionStorage
+  redirect       : true,
+  webview_intent : true,
+  name           : "Monster Men's Collection",
+  description    : "Cart Checkout",
+  prefill        : { name },
+  theme          : { color: "#007bff" },
+  callback_url   : "https://monster-mens-collection.netlify.app/verify-signature",
+
+  /* if the shopper closes the popup, unlock the picker again */
+  modal: {
+    ondismiss () { currencySel && (currencySel.disabled = false); }
+  }
+};
+
+new Razorpay(options).open();               // ⬅️ launches the gateway
+/* nothing after this line will run until the page comes back */      // snapshot is already in sessionStorage
 
   /* ────────── 5. Success callback (unchanged) ────────── */
   async function handleSuccessfulPayment (response) {
@@ -3089,6 +3097,8 @@ async function checkoutCart () {
         "A full refund will be issued automatically."
       );
     }
+    
+    if (currencySel) currencySel.disabled = false; // 🔓 unlock here too
   }
 }
 
