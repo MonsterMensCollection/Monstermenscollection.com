@@ -16,7 +16,7 @@ const serviceAccount = {
   projectId   : process.env.FIREBASE_PROJECT_ID,
   clientEmail : process.env.FIREBASE_CLIENT_EMAIL,
   // Netlify stores the literal "\n" in env vars → turn them into real new‑lines
-  privateKey  : process.env.SERVICE_ACCOUNT_KEY?.replace(/\\n/g, "\n"),
+  privateKey  : process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
 };
 
 if (!admin.apps.length) {         // ✅ only once, even after re‑bundles
