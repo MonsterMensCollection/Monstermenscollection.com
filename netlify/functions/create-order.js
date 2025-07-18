@@ -1,39 +1,35 @@
-// netlify/functions/create-order.js
 const Razorpay = require("razorpay");
 
-/* ── 1. instantiate the SDK once ─────────────────────────────── */
 const rzp = new Razorpay({
-  key_id: process.env.RZP_KEY,
+  key_id:     process.env.RZP_KEY,
   key_secret: process.env.RZP_SECRET,
 });
 
-/* ── 2. Lambda entry-point ───────────────────────────────────── */
 exports.handler = async (event) => {
-  if (event.httpMethod && event.httpMethod !== "POST") {
+  if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: "Method Not Allowed" };
   }
 
-try {
-    /* amount arrives already in *USD cents* (see client patch) */
+  try {
+    // amount comes from the SPA in *USD cents*
     const { amount } = JSON.parse(event.body || "{}");
 
-    /* 🔑 PayPal wallet requires USD */
     const order = await rzp.orders.create({
-      amount,               // e.g. 1234  =  USD 12.34
-      currency: "USD",      // hard‑coded
-      payment_capture: 1,   // auto‑capture
+      amount,                 // 1234 = USD 12.34
+      currency: "USD",        // PayPal wallet insists on USD
+      payment_capture: 1,
     });
 
     return {
       statusCode: 200,
-       body: JSON.stringify({
-       id:       order.id,
-       amount:   order.amount,
-       currency: order.currency      // ← will show “USD” if everything is right
-     }),
+      body: JSON.stringify({
+        id:       order.id,
+        amount:   order.amount,
+        currency: order.currency,   // → "USD"
+      }),
     };
   } catch (err) {
-    console.error("create-order failed:", err);
+    console.error("create‑order failed:", err);
     return { statusCode: 500, body: err.message };
   }
 };
