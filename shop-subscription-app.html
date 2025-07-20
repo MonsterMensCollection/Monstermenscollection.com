@@ -2980,7 +2980,7 @@ async function checkoutCart () {
   /* ────────── 2. Totals in USD + selected currency ────────── */
   const subtotalUSD        = cart.reduce((s, it) => s + it.price, 0);     // stored as USD
   const subtotalSelected   = convert(subtotalUSD);                        // currentCurrency
-  const shippingSelected   = subtotalSelected >= convert(0) ? 0 : convert(0);
+  const shippingSelected   = subtotalSelected >= convert(99) ? 0 : convert(1);
   const grandTotalSelected = subtotalSelected + shippingSelected;
 
   if (grandTotalSelected === 0) {
