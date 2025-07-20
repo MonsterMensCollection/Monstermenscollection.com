@@ -2820,7 +2820,7 @@ function updateCartAmounts () {
   if (!amountEl) return;
 
   const subUSD     = cart.reduce((s, it) => s + it.price, 0);   // cart prices are USD
-  const shipUSD    = subUSD >= 0 ? 0 : 0;                     // free ≥ $99
+  const shipUSD    = subUSD >= 11 ? 0 : 11;                     // free ≥ $99
   const grandUSD   = subUSD + shipUSD;
 
   const shipDisplay  = format(convert(shipUSD));
