@@ -2806,7 +2806,11 @@ function filterProductsBySize(pageId) {
   });
 }
 
+function shippingFeeUSD(subtotalUSD){
+  return subtotalUSD > 99 ? 0 : 1;   // <= 99 ⇒ $1 shipping
+}
 
+  
 const RATES = { USD: 1, INR: 83, EUR: 0.92 };
 let currentCurrency = "USD";
 
@@ -2820,7 +2824,7 @@ function updateCartAmounts () {
   if (!amountEl) return;
 
   const subUSD     = cart.reduce((s, it) => s + it.price, 0);   // cart prices are USD
-  const shipUSD    = subUSD >= 99 ? 0 : 1;                     // free ≥ $99
+  const shipUSD  = shippingFeeUSD(subUSD);                   // free ≥ $99
   const grandUSD   = subUSD + shipUSD;
 
   const shipDisplay  = format(convert(shipUSD));
@@ -2978,11 +2982,12 @@ async function checkoutCart () {
   }
 
   /* ────────── 2. Totals in USD + selected currency ────────── */
-  const subtotalUSD        = cart.reduce((s, it) => s + it.price, 0);     // stored as USD
-  const subtotalSelected   = convert(subtotalUSD);                        // currentCurrency
-  const shippingSelected   = subtotalSelected >= convert(99) ? 0 : convert(1);
+  const subtotalUSD      = cart.reduce((s, it) => s + it.price, 0);
+  const shipUSD          = shippingFeeUSD(subtotalUSD);    // 🔹 use helper
+  const subtotalSelected = convert(subtotalUSD);
+  const shippingSelected = convert(shipUSD);
   const grandTotalSelected = subtotalSelected + shippingSelected;
-
+  
   if (grandTotalSelected === 0) {
     alert("Cart is empty!");
     return;
@@ -3501,7 +3506,7 @@ if (subscribed) {
     const razorpayOptions = {
       key: "rzp_live_u6z4G2762EuQ4E", // Replace with your Razorpay test key
       amount: 200, // ₹2 in paise
-      currency: "INR",
+      currency: "USD",
       name: "Monster Men's Collection",
       description: "Monthly Subscription",
       handler: function (response) {
