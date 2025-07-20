@@ -3014,10 +3014,12 @@ async function checkoutCart () {
 
   /* ────────── 3. Create Razorpay order on your backend ────────── */
   const { id: orderId } = await fetch("/.netlify/functions/create-order", {
-    method  : "POST",
-    headers : { "Content-Type": "application/json" },
-    body: JSON.stringify({ amount: amountForGateway })
-  }).then(r => r.json());
+    method : 'POST',
+    body   : JSON.stringify({                 // on your server
+    amount  : 1999,                        // = $19.99 in cents
+    currency: 'USD'                        // ⚠️ USD, not INR
+  })
+}).then(r => r.json());
 
   /* ────────── 4. Open Razorpay checkout (Chrome Custom Tab) ────────── */
   const options = {
