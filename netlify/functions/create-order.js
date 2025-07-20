@@ -16,7 +16,7 @@ exports.handler = async (event) => {
 
     const order = await rzp.orders.create({
       amount,                 // 1234 = USD 12.34
-      currency: "USD",        // PayPal wallet insists on USD
+      currency: 'USD',        // PayPal wallet insists on USD
       receipt : `rcpt_${Date.now()}`
     });
 
