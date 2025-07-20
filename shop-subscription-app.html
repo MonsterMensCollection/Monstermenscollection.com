@@ -2987,6 +2987,7 @@ async function checkoutCart () {
   const subtotalSelected = convert(subtotalUSD);
   const shippingSelected = convert(shipUSD);
   const grandTotalSelected = subtotalSelected + shippingSelected;
+  const grandUSD         = subtotalUSD + shipUSD;            
   
   if (grandTotalSelected === 0) {
     alert("Cart is empty!");
@@ -3001,7 +3002,7 @@ async function checkoutCart () {
       addr : { name, address, pincode, mobileNumber },
       uid  : auth.currentUser.uid,
       totals : {
-        usd : subtotalUSD,            // raw USD (for reference)
+        usd : grandUSD,             // raw USD (for reference)
         sel : grandTotalSelected,     // in the currency the user picked
         curr: currentCurrency
       }
@@ -3009,7 +3010,7 @@ async function checkoutCart () {
   );
 
   /* Razorpay expects smallest unit (paise / cents) */
-  const amountForGateway = Math.round(subtotalUSD * 100);  
+  const amountForGateway = Math.round(grandUSD * 100);  
 
   /* ────────── 3. Create Razorpay order on your backend ────────── */
   const { id: orderId } = await fetch("/.netlify/functions/create-order", {
@@ -3045,7 +3046,7 @@ async function checkoutCart () {
       uid         : user.uid,
       name, address, pincode, mobilenumber: mobileNumber,
       cart        : [...cart],
-      totalUSD    : subtotalUSD,
+      totalUSD    : grandUSD,
       total       : grandTotalSelected,
       currency    : currentCurrency,
       paymentId   : response.razorpay_payment_id,
