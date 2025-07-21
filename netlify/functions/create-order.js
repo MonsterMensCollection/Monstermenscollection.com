@@ -12,11 +12,11 @@ exports.handler = async (event) => {
 
   try {
     // amount comes from the SPA in *USD cents*
-    const { amount } = JSON.parse(event.body || "{}");
+    const { amount, currency = "USD" } = JSON.parse(event.body || "{}");
 
     const order = await rzp.orders.create({
-      amount,                 // 1234 = USD 12.34
-      currency: 'USD',        // PayPal wallet insists on USD
+      amount,                 // already in smallest unit
+      currency,               // "USD", "INR", "EUR" …       // PayPal wallet insists on USD
       receipt : `rcpt_${Date.now()}`
     });
 
