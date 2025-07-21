@@ -2806,11 +2806,7 @@ function filterProductsBySize(pageId) {
   });
 }
 
-function shippingFeeUSD(subtotalUSD){
-  return subtotalUSD > 99 ? 0 : 1;   // <= 99 ⇒ $1 shipping
-}
 
-  
 const RATES = { USD: 1, INR: 83, EUR: 0.92 };
 let currentCurrency = "USD";
 
@@ -2824,7 +2820,7 @@ function updateCartAmounts () {
   if (!amountEl) return;
 
   const subUSD     = cart.reduce((s, it) => s + it.price, 0);   // cart prices are USD
-  const shipUSD  = shippingFeeUSD(subUSD);                   // free ≥ $99
+  const shipUSD    = subUSD >= 0 ? 0 : 0;                     // free ≥ $99
   const grandUSD   = subUSD + shipUSD;
 
   const shipDisplay  = format(convert(shipUSD));
@@ -2982,13 +2978,11 @@ async function checkoutCart () {
   }
 
   /* ────────── 2. Totals in USD + selected currency ────────── */
-  const subtotalUSD      = cart.reduce((s, it) => s + it.price, 0);
-  const shipUSD          = shippingFeeUSD(subtotalUSD);    // 🔹 use helper
-  const subtotalSelected = convert(subtotalUSD);
-  const shippingSelected = convert(shipUSD);
+  const subtotalUSD        = cart.reduce((s, it) => s + it.price, 0);     // stored as USD
+  const subtotalSelected   = convert(subtotalUSD);                        // currentCurrency
+  const shippingSelected   = subtotalSelected >= convert(0) ? 0 : convert(0);
   const grandTotalSelected = subtotalSelected + shippingSelected;
-  const grandUSD         = subtotalUSD + shipUSD;            
-  
+
   if (grandTotalSelected === 0) {
     alert("Cart is empty!");
     return;
@@ -3002,7 +2996,7 @@ async function checkoutCart () {
       addr : { name, address, pincode, mobileNumber },
       uid  : auth.currentUser.uid,
       totals : {
-        usd : grandUSD,             // raw USD (for reference)
+        usd : subtotalUSD,            // raw USD (for reference)
         sel : grandTotalSelected,     // in the currency the user picked
         curr: currentCurrency
       }
@@ -3010,22 +3004,20 @@ async function checkoutCart () {
   );
 
   /* Razorpay expects smallest unit (paise / cents) */
-  const amountForGateway = Math.round(grandUSD * 100);  
+  const amountForGateway = Math.round(subtotalUSD * 100);  
 
   /* ────────── 3. Create Razorpay order on your backend ────────── */
   const { id: orderId } = await fetch("/.netlify/functions/create-order", {
-    method : 'POST',
-    body   : JSON.stringify({                 // on your server
-    amount  : 1999,                        // = $19.99 in cents
-    currency: 'USD'                        // ⚠️ USD, not INR
-  })
-}).then(r => r.json());
+    method  : "POST",
+    headers : { "Content-Type": "application/json" },
+    body: JSON.stringify({ amount: amountForGateway })
+  }).then(r => r.json());
 
   /* ────────── 4. Open Razorpay checkout (Chrome Custom Tab) ────────── */
   const options = {
     key            : "rzp_live_u6z4G2762EuQ4E",
     order_id       : orderId,          // ★ always pass order_id
-    currency       : 'USD',
+    currency       : "USD",
     method         : { wallet: ["paypal"] },
     redirect       : true,
     webview_intent : true,
@@ -3048,7 +3040,7 @@ async function checkoutCart () {
       uid         : user.uid,
       name, address, pincode, mobilenumber: mobileNumber,
       cart        : [...cart],
-      totalUSD    : grandUSD,
+      totalUSD    : subtotalUSD,
       total       : grandTotalSelected,
       currency    : currentCurrency,
       paymentId   : response.razorpay_payment_id,
@@ -3509,7 +3501,7 @@ if (subscribed) {
     const razorpayOptions = {
       key: "rzp_live_u6z4G2762EuQ4E", // Replace with your Razorpay test key
       amount: 200, // ₹2 in paise
-      currency: "USD",
+      currency: "INR",
       name: "Monster Men's Collection",
       description: "Monthly Subscription",
       handler: function (response) {
