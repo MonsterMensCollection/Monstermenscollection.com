@@ -1980,6 +1980,7 @@
     <option value="USD">$ USD</option>
     <option value="INR">₹ INR</option>
     <option value="EUR">€ EUR</option>
+    <option value="OMR">﷼ OMR</option>
   </select>
 </div>
 
@@ -2807,10 +2808,10 @@ function filterProductsBySize(pageId) {
 }
 
 
-const RATES = { USD: 1, INR: 83, EUR: 0.92 };
+const RATES = { USD: 1, INR: 83, EUR: 0.92 , OMR : 0.385 };
 let currentCurrency = "USD";
 
-const currencySymbol = c => ({ USD: "$", INR: "₹", EUR: "€" }[c] || "");
+const currencySymbol = c => ({ USD: "$", INR: "₹", EUR: "€" , OMR : "﷼"  }[c] || "");
 const convert  = usd => usd * RATES[currentCurrency];
 const format   = v   => currencySymbol(currentCurrency) + v.toFixed(0);
 
@@ -3005,7 +3006,8 @@ async function checkoutCart () {
 
    /* ────────── 3. Amount & currency that the user picked ───────── */
   const smallestUnit = currentCurrency === "INR" ? 100   // ₹ -> paise
-                    : currentCurrency === "EUR" ? 100    // € -> cents
+                    : currentCurrency === "EUR" ? 100 // € -> cents
+                    : currentCurrency === "OMR" ? 1000  
                     : 100;                               // $ -> cents
 
   const amountForGateway = Math.round(
