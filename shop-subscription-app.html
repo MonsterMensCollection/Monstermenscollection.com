@@ -3003,22 +3003,31 @@ async function checkoutCart () {
     })
   );
 
-  /* Razorpay expects smallest unit (paise / cents) */
-  const amountForGateway = Math.round(subtotalUSD * 100);  
+   /* ────────── 3. Amount & currency that the user picked ───────── */
+  const smallestUnit = currentCurrency === "INR" ? 100   // ₹ -> paise
+                    : currentCurrency === "EUR" ? 100    // € -> cents
+                    : 100;                               // $ -> cents
 
-  /* ────────── 3. Create Razorpay order on your backend ────────── */
+  const amountForGateway = Math.round(
+       (subtotalUSD * RATES[currentCurrency]) * smallestUnit
+  );
+    /* ────────── 4. Create Razorpay order on your backend ────────── */
   const { id: orderId } = await fetch("/.netlify/functions/create-order", {
     method  : "POST",
     headers : { "Content-Type": "application/json" },
-    body: JSON.stringify({ amount: amountForGateway })
+        body   : JSON.stringify({
+       amount  : amountForGateway,
+       currency: currentCurrency       // ★ new
+      })
   }).then(r => r.json());
 
   /* ────────── 4. Open Razorpay checkout (Chrome Custom Tab) ────────── */
   const options = {
     key            : "rzp_live_u6z4G2762EuQ4E",
     order_id       : orderId,          // ★ always pass order_id
-    currency       : "USD",
-    method         : { wallet: ["paypal"] },
+   currency : currentCurrency,
+      /* PayPal only works with USD — fall back to normal flow otherwise */
+    ...(currentCurrency === "USD" && { method: { wallet: ["paypal"] } }),
     redirect       : true,
     webview_intent : true,
     name           : "Monster Men's Collection",
