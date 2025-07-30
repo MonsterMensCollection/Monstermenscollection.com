@@ -650,6 +650,27 @@
     display: block;
   }
 }
+      .countdown-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      color: white;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 30px 40px;
+      border-radius: 12px;
+    }
+
+    .countdown-overlay h1 {
+      font-size: 2.5em;
+      margin-bottom: 15px;
+    }
+
+    .countdown {
+      font-size: 2em;
+      font-weight: bold;
+    }
   
  </style>
 </head>
@@ -1860,10 +1881,17 @@
 
           <div id="sliderSection" class="slider-wrapper">
     <div class="slider1">
+      
   <video id="slide-1" autoplay muted loop playsinline style="width: 100%; height: auto;">
     <source src="https://videos.pexels.com/video-files/33129399/14120167_1440_2560_30fps.mp4" type="video/mp4" />
     Your browser does not support the video tag.
   </video>
+
+      <div class="countdown-overlay">
+    <h1>Product Coming Soon</h1>
+    <div class="countdown" id="countdown">Loading...</div>
+  </div>
+      
 </div>
     <div class="slider-nav">
       <a href="#slide-1"></a>
@@ -2220,6 +2248,27 @@ function backToProducts() {
     document.getElementById("detailsPage").style.display = "block";
 }
 
+const launchDate = new Date("2025-08-30T00:00:00").getTime();
+
+  const countdownEl = document.getElementById("countdown");
+
+  setInterval(() => {
+    const now = new Date().getTime();
+    const distance = launchDate - now;
+
+    if (distance <= 0) {
+      countdownEl.innerHTML = "Launched!";
+      return;
+    }
+
+    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+    countdownEl.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+  }, 1000);
+  
 /* ───────────  LIVE-INVENTORY HELPERS  ─────────── */
 
 /*  Cache that lives only in the current page session  */
@@ -2255,6 +2304,8 @@ function reserveOneUnit(docId,size){
   }));
 }
 
+
+  
   /* Increment a size atomically in Firestore (opposite of reserve) */
 
   
@@ -2294,6 +2345,7 @@ function updateStockUI(sizes){
   });
 }
 
+  
   
 let isMessageVisible = false;
 
