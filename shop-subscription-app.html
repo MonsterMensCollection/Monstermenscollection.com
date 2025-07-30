@@ -2246,28 +2246,55 @@ function backToProducts() {
   document.getElementById("tshirtsPage").style.display = "none";
   document.getElementById("cargosPage").style.display = "none";
     document.getElementById("detailsPage").style.display = "block";
+
 }
 
-const launchDate = new Date("2025-08-30T00:00:00").getTime();
+
+  const launchDate = new Date("2025-08-30T00:00:00Z").getTime(); // Target UTC time
 
   const countdownEl = document.getElementById("countdown");
 
-  setInterval(() => {
-    const now = new Date().getTime();
-    const distance = launchDate - now;
+  let serverNow = null;
 
-    if (distance <= 0) {
-      countdownEl.innerHTML = "Launched!";
-      return;
-    }
+  // Step 1: Get user's local timezone
+  const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+  // Step 2: Fetch current time in user's timezone
+  fetch(`https://worldtimeapi.org/api/timezone/${encodeURIComponent(userTimezone)}`)
+    .then((res) => res.json())
+    .then((data) => {
+      serverNow = new Date(data.datetime).getTime(); // Local time as per time zone
+      startCountdown(serverNow);
+    })
+    .catch((err) => {
+      countdownEl.innerHTML = "Failed to get accurate time";
+      console.error("Time API error:", err);
+    });
 
-    countdownEl.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
-  }, 1000);
+  function startCountdown(initialTime) {
+    let currentTime = initialTime;
+
+    const interval = setInterval(() => {
+      const distance = launchDate - currentTime;
+
+      if (distance <= 0) {
+        countdownEl.innerHTML = "Launched!";
+        clearInterval(interval);
+        return;
+      }
+
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      countdownEl.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+
+      currentTime += 1000;
+    }, 1000);
+  }
+
+
   
 /* ───────────  LIVE-INVENTORY HELPERS  ─────────── */
 
