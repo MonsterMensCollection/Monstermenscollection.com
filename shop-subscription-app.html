@@ -2708,7 +2708,7 @@ async function addToCart (image = null, priceUSD = null, title = null) {
   const size  = document.getElementById("selectedSize")?.value || "";
 
   if (!size) {                            // no size picked
-    showCartToast("Please select a size");
+    alert("Please select a size");
     return;
   }
 
@@ -2718,7 +2718,7 @@ async function addToCart (image = null, priceUSD = null, title = null) {
   const alreadyInCart = cart.filter(it => it.docId === docId && it.size === size).length;
 
   if (avail === 0) {                               // just in case UI was stale
-    showCartToast("Sorry, this size is out of stock.");
+    alert("Sorry, this size is out of stock.");
     return;
   }
   if (alreadyInCart >= avail) {                    // no more left to add
@@ -3173,7 +3173,7 @@ async function checkoutCart () {
 
     } catch (err) {
       console.error("Checkout finalisation failed:", err);
-      showCartToast(
+      alert(
         "Payment received but an item just sold out. " +
         "A full refund will be issued automatically."
       );
@@ -3244,7 +3244,7 @@ function checkoutCOD() {
     cart = []; // Return to main page
   }).catch(error => {
     console.error("Error placing COD order:", error);
-    showCartToast("Error placing order. Please try again.");
+    alert("Error placing order. Please try again.");
   });
 }
 
@@ -3353,7 +3353,7 @@ db.collection("products").onSnapshot(snap => {
           return true;                 // keep the rest
         });
 
-        showCartToast(
+        alert(
           `Heads-up! Another shopper just bought “${docId} – ${sz}”.\n` +
           `Your quantity was reduced to ${qty}.`
         );
