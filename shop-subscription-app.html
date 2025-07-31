@@ -2708,7 +2708,7 @@ async function addToCart (image = null, priceUSD = null, title = null) {
   const size  = document.getElementById("selectedSize")?.value || "";
 
   if (!size) {                            // no size picked
-    alert("Please select a size");
+    showCartToast("Please select a size");
     return;
   }
 
@@ -2718,11 +2718,11 @@ async function addToCart (image = null, priceUSD = null, title = null) {
   const alreadyInCart = cart.filter(it => it.docId === docId && it.size === size).length;
 
   if (avail === 0) {                               // just in case UI was stale
-    alert("Sorry, this size is out of stock.");
+    showCartToast("Sorry, this size is out of stock.");
     return;
   }
   if (alreadyInCart >= avail) {                    // no more left to add
-    showCartToast(`Only ${avail} piece${avail>1?"s":""} available – you already have ${avail} in the cart 😉`);
+    showCartToast(`Only ${avail} left — you have them all 😉.`);
     return;
   }
 
@@ -3068,7 +3068,7 @@ async function checkoutCart () {
   const mobileNumber = document.getElementById("checkoutMobileNumber").value.trim();
 
   if (!name || !address || !pincode || !mobileNumber) {
-    alert("Please complete all address fields.");
+    showCartToast("Please complete all address fields.");
     return;
   }
 
@@ -3079,7 +3079,7 @@ async function checkoutCart () {
   const grandTotalSelected = subtotalSelected + shippingSelected;
 
   if (grandTotalSelected === 0) {
-    alert("Cart is empty!");
+    showCartToast("Cart is empty!");
     return;
   }
 
@@ -3173,7 +3173,7 @@ async function checkoutCart () {
 
     } catch (err) {
       console.error("Checkout finalisation failed:", err);
-      alert(
+      showCartToast(
         "Payment received but an item just sold out. " +
         "A full refund will be issued automatically."
       );
@@ -3188,20 +3188,20 @@ function checkoutCOD() {
   const mobilenumber  = document.getElementById("checkoutMobileNumber").value.trim();
 
   if (!name || !address) {
-    alert("Please enter name and address to continue.");
+    showCartToast("Please enter name and address to continue.");
     return;
   }
 
   const totalAmount = cart.reduce((sum, item) => sum + item.price, 0);
 
   if (totalAmount === 0) {
-    alert("Cart is empty!");
+    showCartToast("Cart is empty!");
     return;
   }
 
   const user = auth.currentUser;
   if (!user) {
-    alert("You must be logged in to place an order.");
+    showCartToast("You must be logged in to place an order.");
     return;
   }
 
@@ -3244,7 +3244,7 @@ function checkoutCOD() {
     cart = []; // Return to main page
   }).catch(error => {
     console.error("Error placing COD order:", error);
-    alert("Error placing order. Please try again.");
+    showCartToast("Error placing order. Please try again.");
   });
 }
 
@@ -3353,7 +3353,7 @@ db.collection("products").onSnapshot(snap => {
           return true;                 // keep the rest
         });
 
-        alert(
+        showCartToast(
           `Heads-up! Another shopper just bought “${docId} – ${sz}”.\n` +
           `Your quantity was reduced to ${qty}.`
         );
@@ -3462,7 +3462,7 @@ ordersSnapshot.forEach((doc, index) => {
     async function updatePageForUser(user) {
       await user.reload();
       if (!user.emailVerified) {
-        alert("Please verify your email address before continuing.");
+        showCartToast("Please verify your email address before continuing.");
         auth.signOut();
         return;
       }
@@ -3657,7 +3657,7 @@ function positionCartToast(){
   // If shipping bar is visible, use its real height; else 0
   const shipVisible = ship && getComputedStyle(ship).display !== 'none';
   const shipH = shipVisible ? (ship.offsetHeight || 32) : 0;
-  const gap = 8; // small gap above the shipping bar
+  const gap = 20; // small gap above the shipping bar
 
   toast.style.bottom = `calc(var(--nav-h) + env(safe-area-inset-bottom) + ${shipH + gap}px)`;
 }
