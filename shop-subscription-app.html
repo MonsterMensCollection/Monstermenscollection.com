@@ -2375,15 +2375,40 @@ async function restoreWholeCart() {
 }
   
 /* After any change push the new numbers on-screen      */
-function updateStockUI(sizes){
-  document.querySelectorAll("#sizeButtons button").forEach(btn=>{
-     const s  = btn.dataset.size; 
-     const n  = sizes[s] ?? 0;
-     btn.innerHTML = `${s}${n?" · "+n:""}`;          // “M · 3”
-     btn.disabled  = n===0;
-     btn.style.opacity = n===0 ? .4 : 1;
+function updateStockUI(sizes) {
+  const cartBtn = document.querySelector('#descriptionPage button[onclick="addToCart()"]');
+
+  document.querySelectorAll("#sizeButtons button").forEach(btn => {
+    const s = btn.dataset.size;
+    const n = sizes[s] ?? 0;
+
+    // Show live qty like “M · 3”
+    btn.innerHTML = `${s}${n ? " · " + n : ""}`;
+
+    // ❌ Do NOT disable; we want the click to run so we can show “Out of Stock”
+    // btn.disabled = n === 0;
+
+    // Visual + a11y flag instead
+    btn.classList.toggle("oos", n === 0);
+    btn.setAttribute("aria-disabled", n === 0 ? "true" : "false");
   });
+
+  // If the currently selected size just went OOS, reflect it on the button
+  const selected = document.getElementById("selectedSize")?.value;
+  if (selected) {
+    const qty = sizes[selected] ?? 0;
+    if (qty === 0) {
+      cartBtn.textContent = "Out of Stock";
+      cartBtn.disabled = true;
+      cartBtn.style.opacity = 0.5;
+    } else {
+      cartBtn.textContent = "Add to Cart";
+      cartBtn.disabled = false;
+      cartBtn.style.opacity = 1;
+    }
+  }
 }
+
 
   
   
