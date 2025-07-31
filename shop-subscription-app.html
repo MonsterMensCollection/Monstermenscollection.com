@@ -2262,23 +2262,37 @@ function backToProducts() {
     document.getElementById("detailsPage").style.display = "none";
 }
 
-  function goToDetailsPage() {
+ function goToDetailsPage() {
+    // ⛔ Block if cart is empty
+    if (!Array.isArray(cart) || cart.length === 0) {
+      // keep the user on the cart page and show the empty message/toast
+      showCart(); 
+      showCartToast("Your cart is empty");
+      return;
+    }
 
- history.pushState({ page: "detailsPage" }, "", "#details");
+    // (defensive) also block if total is 0
+    const totalUSD = cart.reduce((s, it) => s + Number(it.price || 0), 0);
+    if (totalUSD <= 0) {
+      showCart();
+      showCartToast("Your cart is empty");
+      return;
+    }
 
-    
-  document.getElementById("descriptionPage").style.display = "none";
-  document.getElementById("productList").style.display = "none";
-  document.getElementById("shirtsPage").style.display = "none";
-  document.getElementById("pantsPage").style.display = "none";
-  document.getElementById("sliderSection").style.display = "none";
-  document.getElementById("cartPage").style.display = "none";
-  document.getElementById("profilePage").style.display = "none";
-  document.getElementById("tshirtsPage").style.display = "none";
-  document.getElementById("cargosPage").style.display = "none";
+    // ✅ proceed to details page
+    history.pushState({ page: "detailsPage" }, "", "#details");
+
+    document.getElementById("descriptionPage").style.display = "none";
+    document.getElementById("productList").style.display = "none";
+    document.getElementById("shirtsPage").style.display = "none";
+    document.getElementById("pantsPage").style.display = "none";
+    document.getElementById("sliderSection").style.display = "none";
+    document.getElementById("cartPage").style.display = "none";
+    document.getElementById("profilePage").style.display = "none";
+    document.getElementById("tshirtsPage").style.display = "none";
+    document.getElementById("cargosPage").style.display = "none";
     document.getElementById("detailsPage").style.display = "block";
-
-}
+  }
 
 
 const launchDate = new Date("2025-08-30T00:00:00Z").getTime(); // Target UTC time
