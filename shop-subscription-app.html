@@ -671,6 +671,33 @@
       font-size: 1.5em;
       font-weight: bold;
     }
+
+     #cartToast{
+  position: fixed;
+  left: 50%;
+  /* start off-screen, slide up when .show is added */
+  transform: translate(-50%, 140%);
+  opacity: 0;
+  transition: transform .35s cubic-bezier(.2,.7,.2,1), opacity .35s;
+  /* will be set precisely by JS, default keeps it above nav+shipping */
+  bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + var(--banner-gap) + 40px);
+
+  z-index: 10001;            /* above shipping (9999) and nav (1000) */
+  pointer-events: none;      /* taps go through; this is passive info */
+
+  background: #111;
+  color: #fff;
+  font-size: 14px;
+  line-height: 1;
+  padding: 12px 16px;
+  border-radius: 999px;      /* pill */
+  box-shadow: 0 6px 30px rgba(0,0,0,.25);
+  white-space: nowrap;
+}
+#cartToast.show{
+  transform: translate(-50%, 0);
+  opacity: 1;
+}
   
  </style>
 </head>
@@ -2055,6 +2082,10 @@
   </div>
 </div>
 
+     <!-- Slide-up toast shown after “Add to Cart” -->
+<div id="cartToast" role="status" aria-live="polite">✅ Item added to cart</div>
+
+
 <!-- Bottom Navigation Bar -->
 <div class="bottom-nav" id="bottomNav" style="position: fixed; bottom: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 10px 0 env(safe-area-inset-bottom); border-top: 1px solid #ccc; z-index: 10000;">
   <a href="#" onclick="backToProducts()">
@@ -2708,7 +2739,7 @@ async function addToCart (image = null, priceUSD = null, title = null) {
 
   /* ── 3 · push & refresh UI (unchanged except for totals) ───────── */
   cart.push({ image, price: priceUSD, title, size, color, docId });
-  alert("Item added to cart!");
+  showCartToast("Item added to cart!");
 
   updateCartAmounts?.();                 // keep totals in sync
   updateStockUI(stock);                  // still show live stock numbers
@@ -3615,6 +3646,43 @@ if (subscribed) {
   }
 };
 
+/* —— Position the toast exactly above the shipping bar ——— */
+let cartToastTimer;
+
+function positionCartToast(){
+  const toast = document.getElementById('cartToast');
+  if (!toast) return;
+  const ship = document.getElementById('shippingBar');
+
+  // If shipping bar is visible, use its real height; else 0
+  const shipVisible = ship && getComputedStyle(ship).display !== 'none';
+  const shipH = shipVisible ? (ship.offsetHeight || 32) : 0;
+  const gap = 8; // small gap above the shipping bar
+
+  toast.style.bottom = `calc(var(--nav-h) + env(safe-area-inset-bottom) + ${shipH + gap}px)`;
+}
+
+function showCartToast(message = "Item added to cart"){
+  const toast = document.getElementById('cartToast');
+  if (!toast) return;
+
+  toast.textContent = `✅ ${message}`;
+  positionCartToast();
+
+  // restart animation if already visible
+  toast.classList.remove('show');
+  // force reflow to allow the animation to replay
+  void toast.offsetWidth;
+  toast.classList.add('show');
+
+  clearTimeout(cartToastTimer);
+  cartToastTimer = setTimeout(() => {
+    toast.classList.remove('show');
+  }, 1600); // visible for ~1.6s
+}
+
+window.addEventListener('resize', positionCartToast);
+document.addEventListener('DOMContentLoaded', positionCartToast);
 
 
 
