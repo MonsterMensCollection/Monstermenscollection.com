@@ -2722,7 +2722,7 @@ async function addToCart (image = null, priceUSD = null, title = null) {
     return;
   }
   if (alreadyInCart >= avail) {                    // no more left to add
-    alert(`Only ${avail} piece${avail>1?"s":""} available – you already have ${avail} in the cart 😉`);
+    showCartToast(`Only ${avail} piece${avail>1?"s":""} available – you already have ${avail} in the cart 😉`);
     return;
   }
 
