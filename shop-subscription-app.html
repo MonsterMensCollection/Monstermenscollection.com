@@ -373,7 +373,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center; /* ✅ vertical center inside nav */
+  justify-content: center; /*  vertical center inside nav */
   height: 100%; /* occupy full nav height */
   text-decoration: none;
   color: #007bff;
@@ -565,7 +565,7 @@
 .image-wrapper {
   position: relative;
   width: 100%;
-  padding-bottom: 125%; /* ✅ 1:1 square ratio */
+  padding-bottom: 125%; /*  1:1 square ratio */
   overflow: hidden;
   background-color: #f8f8f8;
 }
@@ -1953,7 +1953,7 @@
   <br>
 
   
-  <!-- ✅ Fixed bottom bar wrapper -->
+  <!--  Fixed bottom bar wrapper -->
   <div class="cart-bottom-bar">
     <div class="cart-bar-inner">
       <div class="total-row">
@@ -2083,7 +2083,7 @@
 </div>
 
      <!-- Slide-up toast shown after “Add to Cart” -->
-<div id="cartToast" role="status" aria-live="polite">✅ Item added to cart</div>
+<div id="cartToast" role="status" aria-live="polite"> Item added to cart</div>
 
 
 <!-- Bottom Navigation Bar -->
@@ -2111,7 +2111,7 @@
 
 <div id="paymentSuccessPage" style="display:none; margin-top:40%;padding: 30px; text-align: center;">
   <div style="padding: 20px; border: 2px solid green; background-color: #d4fcd4; color: green; border-radius: 10px;">
-    ✅ Payment successful!<br>
+     Payment successful!<br>
     Payment ID: <strong id="successPaymentId">Loading...</strong><br>
     Your order has been placed. Thank you!
   </div>
@@ -2119,7 +2119,7 @@
 
 <div id="paymentSuccessPageCOD" style="display:none; margin-top:40%;padding: 30px; text-align: center;">
   <div style="padding: 20px; border: 2px solid green; background-color: #d4fcd4; color: green; border-radius: 10px;">
-     ✅ Order successful!<br>
+      Order successful!<br>
      Payment ID:<strong> CASH ON DELIVERY </strong><br>
     Your order has been placed. Thank you!
   </div>
@@ -2233,7 +2233,7 @@ function showPantsPage() {
 
 function showCargosPage() {
     
-  lastCategoryPage = "cargosPage"; // ✅ Add this line
+  lastCategoryPage = "cargosPage"; //  Add this line
  history.pushState({ page: "cargosPage" }, "", "#cargos");
 
   document.getElementById("productList").style.display = "none";
@@ -2279,7 +2279,7 @@ function backToProducts() {
       return;
     }
 
-    // ✅ proceed to details page
+    //  proceed to details page
     history.pushState({ page: "detailsPage" }, "", "#details");
 
     document.getElementById("descriptionPage").style.display = "none";
@@ -3260,7 +3260,7 @@ function checkoutCOD() {
 
   db.collection("orders").add(orderData).then(() => {
 
-      // ✅ UI changes after successful order
+      //  UI changes after successful order
           document.getElementById("descriptionPage").style.display = "none";
           document.getElementById("productList").style.display = "none";
           document.getElementById("shirtsPage").style.display = "none";
@@ -3343,7 +3343,7 @@ function logout() {
 
 function saveOrder(productName, uid) {
   db.collection("orders").add({
-    uid, // ✅ match field used in query
+    uid, //  match field used in query
     productName,
     status: "Pending",
     timestamp: firebase.firestore.FieldValue.serverTimestamp()
@@ -3705,7 +3705,7 @@ function showCartToast(message = "Item added to cart"){
   const toast = document.getElementById('cartToast');
   if (!toast) return;
 
-  toast.textContent = `✅ ${message}`;
+  toast.textContent = ` ${message}`;
   positionCartToast();
 
   // restart animation if already visible
