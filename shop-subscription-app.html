@@ -2761,7 +2761,7 @@ async function addToCart (image = null, priceUSD = null, title = null) {
     return;
   }
   if (alreadyInCart >= avail) {                    // no more left to add
-    showCartToast(`Only ${avail} left — you have them all 😉.`);
+    showCartToast(`Only ${avail} left — you have them all 😉`);
     return;
   }
 
@@ -3107,7 +3107,7 @@ async function checkoutCart () {
   const mobileNumber = document.getElementById("checkoutMobileNumber").value.trim();
 
   if (!name || !address || !pincode || !mobileNumber) {
-    showCartToast("Please complete all address fields.");
+    showCartToast("Please complete all address fields");
     return;
   }
 
@@ -3227,7 +3227,7 @@ function checkoutCOD() {
   const mobilenumber  = document.getElementById("checkoutMobileNumber").value.trim();
 
   if (!name || !address) {
-    showCartToast("Please enter name and address to continue.");
+    showCartToast("Please enter name and address to continue");
     return;
   }
 
@@ -3240,7 +3240,7 @@ function checkoutCOD() {
 
   const user = auth.currentUser;
   if (!user) {
-    showCartToast("You must be logged in to place an order.");
+    showCartToast("You must be logged in to place an order");
     return;
   }
 
@@ -3501,7 +3501,7 @@ ordersSnapshot.forEach((doc, index) => {
     async function updatePageForUser(user) {
       await user.reload();
       if (!user.emailVerified) {
-        showCartToast("Please verify your email address before continuing.");
+        showCartToast("Please verify your email address before continuing");
         auth.signOut();
         return;
       }
