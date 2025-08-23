@@ -2012,16 +2012,44 @@
     </div>
   </div>
   
+ <div style="
+     margin-top: 25px;
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+     gap: 10px;
+">
+  <label for="currencySelector"
+         style="font-size: 14px; color: #777; white-space: nowrap;">
+    Currency
+  </label>
+
+  <select id="currencySelector"
+          style="
+            flex: 1 1 auto;               /* grows to fill remaining line */
+            padding: 10px 12px;
+            border: 0px solid #ccc;
+            border-radius: 0;
+            background: #fafafa;
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+          ">
+    <option value="USD">$ USD</option>
+    <option value="INR">₹ INR</option>
+    <option value="EUR">€ EUR</option>
+  </select>
+</div>
 
   <!-- Why It Takes Time Button -->
   <button onclick="toggleWhyTime()" style="margin-top: 30px; padding: 12px 20px; background-color: #eee; color: #000; border: none; border-radius: 0px; cursor: pointer; font-weight: bold; width: 100%;">
-    About us
+    About Us
   </button>
 
   <!-- Hidden Explanation Text -->
 <div id="whyTimeMessage" style="max-height: 0; overflow: hidden; transition: max-height 0.5s ease-out, padding 0.5s ease-out; background-color: #f0f0f0; border-left: 4px solid #000; font-size: 14px; line-height: 1.6; color: #333; padding: 0 15px;">
   <div style="padding-top: 15px; padding-bottom: 15px;">
-  I’m a dropout with a crazy love for streetwear and formal fits. Out of that passion, I started Enly—a space where style meets attitude. We mix street energy with sharp classics, built for guys who want to stand out and keep it real.
+    I’m a dropout with a crazy love for streetwear and formal fits. Out of that passion, I started Enly—a space where style meets attitude. We mix street energy with sharp classics, built for guys who want to stand out and keep it real.
   </div>
 </div>
 
