@@ -1,0 +1,30 @@
+{
+  "shirts": [
+    {
+      "id": 106,
+      "brand": "BODAK",
+      "name": "ABSTRACT PRINT SHIRT",
+      "price": "₹1",
+      "images": [
+        "https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/s6.png",
+        "https://raw.githubusercontent.com/MonsterMensCollection/fullimage/refs/heads/main/s6b1.png"
+      ],
+      "description": "Relaxed fit collared shirt. Short sleeves. Split hem. Button-up front.",
+      "sizes": ["S","M","L","XL"]
+    }
+  ],
+  "tshirts": [
+    {
+      "id": 201,
+      "brand": "Ballucci®️",
+      "name": "FIVE SLEEVES BACK PRINT",
+      "price": "₹39",
+      "images": [
+        "https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/t8b.png",
+        "https://raw.githubusercontent.com/MonsterMensCollection/fullimage/refs/heads/main/t8b1.png"
+      ],
+      "description": "Oversized Backprinted T-Shirt with premium-quality cotton.",
+      "sizes": ["M","L","XL","XXL"]
+    }
+  ]
+}
