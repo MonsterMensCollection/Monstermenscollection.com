@@ -3677,32 +3677,24 @@ document.getElementById("backToSubscription").addEventListener("click", () => {
   document.getElementById("mainContainer").classList.add("with-top-margin");
 });
 
-  async function loadProducts() {
-  try {
-    // fetch the JSON file
-    const res = await fetch("products.json");
-    const data = await res.json();
+  // 🆕 Product Loader
+async function loadProducts() {
+  const res = await fetch("products.json");
+  const data = await res.json();
 
-    // render shirts
-    renderCategory(data.shirts, "shirtsPage");
-    renderCategory(data.tshirts, "tshirtsPage");
-    renderCategory(data.pants, "pantsPage");
-    renderCategory(data.cargos, "cargosPage");
-
-  } catch (err) {
-    console.error("Error loading products:", err);
-  }
+  renderCategory(data.shirts, "shirtsPage");
+  renderCategory(data.tshirts, "tshirtsPage");
+  renderCategory(data.pants, "pantsPage");
+  renderCategory(data.cargos, "cargosPage");
 }
 
 function renderCategory(products, categoryId) {
-  if (!products) return;
   const container = document.querySelector(`#${categoryId} .product-grid`);
-  if (!container) return;
+  if (!products || !container) return;
 
   products.forEach(product => {
     const card = document.createElement("div");
     card.classList.add("product-card");
-
     card.innerHTML = `
       <div class="image-wrapper">
         <img src="${product.images[0]}" 
@@ -3723,17 +3715,16 @@ function renderCategory(products, categoryId) {
         <h3>${product.brand}</h3>
         <p>${product.name}</p>
       </div>
-      <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 10px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:0 10px;">
         <p class="price">${product.price}</p>
       </div>
     `;
-
     container.appendChild(card);
   });
 }
 
-// Run on page load
 document.addEventListener("DOMContentLoaded", loadProducts);
+
   
 </script>
 
