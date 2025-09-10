@@ -4,27 +4,107 @@
       "id": 106,
       "brand": "BODAK",
       "name": "ABSTRACT PRINT SHIRT",
-      "price": "₹1",
+      "price": "₹999",
       "images": [
         "https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/s6.png",
         "https://raw.githubusercontent.com/MonsterMensCollection/fullimage/refs/heads/main/s6b1.png"
       ],
       "description": "Relaxed fit collared shirt. Short sleeves. Split hem. Button-up front.",
-      "sizes": ["S","M","L","XL"]
+      "sizes": ["S", "M", "L", "XL"]
+    },
+    {
+      "id": 107,
+      "brand": "Enly",
+      "name": "CLASSIC WHITE SHIRT",
+      "price": "₹799",
+      "images": [
+        "https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/s1.png",
+        "https://raw.githubusercontent.com/MonsterMensCollection/fullimage/refs/heads/main/s1b.png"
+      ],
+      "description": "A timeless slim-fit white shirt for both formal and casual wear.",
+      "sizes": ["M", "L", "XL"]
     }
   ],
+
   "tshirts": [
     {
       "id": 201,
       "brand": "Ballucci®️",
       "name": "FIVE SLEEVES BACK PRINT",
-      "price": "₹39",
+      "price": "₹699",
       "images": [
         "https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/t8b.png",
         "https://raw.githubusercontent.com/MonsterMensCollection/fullimage/refs/heads/main/t8b1.png"
       ],
       "description": "Oversized Backprinted T-Shirt with premium-quality cotton.",
-      "sizes": ["M","L","XL","XXL"]
+      "sizes": ["M", "L", "XL", "XXL"]
+    },
+    {
+      "id": 202,
+      "brand": "Enly",
+      "name": "GRAPHIC OVERSIZED TEE",
+      "price": "₹599",
+      "images": [
+        "https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/t2.png",
+        "https://raw.githubusercontent.com/MonsterMensCollection/fullimage/refs/heads/main/t2b.png"
+      ],
+      "description": "Streetwear-inspired oversized tee with bold graphics.",
+      "sizes": ["M", "L", "XL"]
+    }
+  ],
+
+  "pants": [
+    {
+      "id": 324,
+      "brand": "Man & Moda",
+      "name": "WIDE LEG BAGGY FIT",
+      "price": "₹1299",
+      "images": [
+        "https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/p24.png",
+        "https://raw.githubusercontent.com/MonsterMensCollection/fullimage/refs/heads/main/p24b1.png"
+      ],
+      "description": "Baggy wide-leg jeans designed for comfort and edgy street style.",
+      "sizes": ["28", "30", "32", "34", "36"]
+    },
+    {
+      "id": 325,
+      "brand": "Enly",
+      "name": "BLACK SLIM-FIT TROUSERS",
+      "price": "₹999",
+      "images": [
+        "https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/p10.png",
+        "https://raw.githubusercontent.com/MonsterMensCollection/fullimage/refs/heads/main/p10b.png"
+      ],
+      "description": "Sleek black slim-fit trousers that pair with anything.",
+      "sizes": ["30", "32", "34", "36", "38"]
+    }
+  ],
+
+  "cargos": [
+    {
+      "id": 406,
+      "brand": "Ballucci®️",
+      "name": "RELAXED FIT BERMUDA SHORTS",
+      "price": "₹799",
+      "images": [
+        "https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/sh6.png",
+        "https://raw.githubusercontent.com/MonsterMensCollection/fullimage/refs/heads/main/sh6b1.png"
+      ],
+      "description": "Relaxed fit Bermuda shorts featuring an elasticated waistband and side pockets.",
+      "sizes": ["28", "30", "32", "34"]
+    },
+    {
+      "id": 407,
+      "brand": "Enly",
+      "name": "UTILITY CARGO PANTS",
+      "price": "₹1199",
+      "images": [
+        "https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/c1.png",
+        "https://raw.githubusercontent.com/MonsterMensCollection/fullimage/refs/heads/main/c1b.png"
+      ],
+      "description": "Utility-style cargo pants with multiple pockets and relaxed fit.",
+      "sizes": ["30", "32", "34", "36", "38"]
     }
   ]
 }
+
