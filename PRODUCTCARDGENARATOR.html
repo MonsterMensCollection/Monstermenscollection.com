@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Product Card Generator</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    .form-group { margin-bottom: 10px; }
+    label { display: block; margin-bottom: 5px; }
+    input, textarea { width: 100%; padding: 5px; }
+    #output { margin-top: 20px; white-space: pre-wrap; background: #f7f7f7; padding: 10px; border: 1px solid #ddd; }
+    .product-card { border: 1px solid #ddd; border-radius: 10px; margin: 10px; overflow: hidden; max-width: 250px; }
+    .image-wrapper img { width: 100%; cursor: pointer; }
+    .cardName { padding: 10px; }
+    .price { font-weight: bold; }
+  </style>
+</head>
+<body>
+
+  <h2>Product Card Generator</h2>
+
+  <div class="form-group">
+    <label>Product ID (e.g., 106):</label>
+    <input type="text" id="productId">
+  </div>
+
+  <div class="form-group">
+    <label>Price (e.g., ₹499):</label>
+    <input type="text" id="price">
+  </div>
+
+  <div class="form-group">
+    <label>Brand (e.g., BODAK):</label>
+    <input type="text" id="brand">
+  </div>
+
+  <div class="form-group">
+    <label>Title (e.g., ABSTRACT PRINT SHIRT):</label>
+    <input type="text" id="title">
+  </div>
+
+  <div class="form-group">
+    <label>Description:</label>
+    <textarea id="description"></textarea>
+  </div>
+
+  <div class="form-group">
+    <label>Thumbnail Image URL:</label>
+    <input type="text" id="thumbnail">
+  </div>
+
+  <div class="form-group">
+    <label>Additional Images (comma separated URLs):</label>
+    <input type="text" id="images">
+  </div>
+
+  <div class="form-group">
+    <label>Sizes (comma separated, e.g., S,M,L,XL):</label>
+    <input type="text" id="sizes">
+  </div>
+
+  <div class="form-group">
+    <label>Tags (comma separated, e.g., Same,New):</label>
+    <input type="text" id="tags">
+  </div>
+
+  <button onclick="generateCard()">Generate Product Card</button>
+
+  <h3>Output HTML:</h3>
+  <div id="output"></div>
+
+  <script>
+    function generateCard() {
+      const id = document.getElementById('productId').value;
+      const price = document.getElementById('price').value;
+      const brand = document.getElementById('brand').value;
+      const title = document.getElementById('title').value;
+      const desc = document.getElementById('description').value;
+      const thumbnail = document.getElementById('thumbnail').value;
+      const images = document.getElementById('images').value.split(',').map(img => img.trim()).filter(Boolean);
+      const sizes = document.getElementById('sizes').value.split(',').map(s => `'${s.trim()}'`).join(',');
+      const tags = document.getElementById('tags').value.split(',').map(t => `'${t.trim()}'`).join(',');
+
+      let imageArray = `[{ type: 'image', src: '${thumbnail}' }`;
+      images.forEach(img => { imageArray += `,\n    { type: 'image', src: '${img}' }`; });
+      imageArray += `]`;
+
+      const html = `<!-- ${id} -->
+<div class="product-card">
+  <div class="image-wrapper">
+    <img src="${thumbnail}" alt="${title}" onclick="showDescription(${imageArray}, '${price}', '${brand} #${id}', '${title}', '${desc}', [${sizes}], [${tags}], 'shirtsPage', '${brand}-${id}')">
+  </div>
+  <div class="cardName">
+    <h3>${brand}</h3>
+    <p>${title}</p>
+  </div>
+  <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 10px;">
+    <p class="price">${price}</p>
+  </div>
+</div>`;
+
+      document.getElementById('output').textContent = html;
+    }
+  </script>
+
+</body>
+</html>
