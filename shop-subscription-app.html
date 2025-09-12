@@ -3156,7 +3156,7 @@ async function checkoutCart () {
   }).then(r => r.json());
 
   /* ────────── 4. Open Razorpay checkout (Chrome Custom Tab) ────────── */
- const options = {
+const options = {
   key: "rzp_live_u6z4G2762EuQ4E",
   order_id: orderId,
   amount: amountForGateway,
@@ -3167,20 +3167,23 @@ async function checkoutCart () {
   prefill: { name },
   theme: { color: "#007bff" },
 
-  // ✅ Enable UPI intent flow
   method: {
-    upi:true, // opens Google Pay, PhonePe, Paytm etc.
+    upi: { flow: "intent" },  // ✅ Intent flow for UPI apps
     card: true,
     netbanking: true,
     wallet: true
   },
 
+  // ✅ Required in WebView
+  redirect: true,
+  webview_intent: true,
+
   callback_url: "https://monster-mens-collection.netlify.app/.netlify/functions/verify-signature"
 };
 
 console.log("Razorpay options:", options);
-  
-  new Razorpay(options).open();        // snapshot is already in sessionStorage
+
+new Razorpay(options).open();        // snapshot is already in sessionStorage
 
   /* ────────── 5. Success callback stays unchanged ────────── */
   async function handleSuccessfulPayment (response) {
