@@ -3156,31 +3156,50 @@ async function checkoutCart () {
   }).then(r => r.json());
 
   /* ────────── 4. Open Razorpay checkout (Chrome Custom Tab) ────────── */
+/* ────────── 4. Open Razorpay checkout (Chrome Custom Tab) ────────── */
 const options = {
-  key            : "rzp_live_u6z4G2762EuQ4E",  // live key
-  order_id       : orderId,
-  currency       : currentCurrency,            // must be "INR" for UPI
-  amount         : amountForGateway,
-  name           : "Monster Men's Collection",
-  description    : "Cart Checkout",
-  image          : "https://your-logo-url.com/logo.png",
+  key: "rzp_live_u6z4G2762EuQ4E",        // your live Razorpay key
+  amount: amountForGateway,              // amount in paise
+  currency: "INR",                       // force INR for UPI
+  name: "Monster Men's Collection",
+  description: "Cart Checkout",
+  image: "https://your-logo-url.com/logo.png",
+  order_id: orderId,
 
-  // ✅ REMOVE this line → method: { wallet: ["paypal"] },
-  // ✅ Let Razorpay show all available methods including UPI
+  prefill: {
+    name: name,
+    email: firebase.auth().currentUser?.email || "",
+    contact: mobileNumber
+  },
+  theme: {
+    color: "#007bff"
+  },
 
-  prefill        : { name, contact: mobileNumber },
-  theme          : { color: "#007bff" },
+  // ✅ enable all payment methods
+  method: {
+    upi: true,
+    card: true,
+    netbanking: true,
+    wallet: true
+  },
 
-  // For UPI intent (works on Android)
-  redirect       : false,           // ❌ set false → opens native Razorpay checkout
-  webview_intent : true,            // ✅ keep this true for UPI intent support
+  redirect: false,       // ⬅️ must be false for UPI intent
+  send_sms_hash: true,
+  webview_intent: true,
 
-  callback_url   : "https://monster-mens-collection.netlify.app/.netlify/functions/verify-signature",
+  handler: function (response) {
+    handleSuccessfulPayment(response);
+  },
+  modal: {
+    ondismiss: function () {
+      console.log("Checkout form closed");
+    }
+  }
 };
 
-console.log("Razorpay options:", options);
-
-new Razorpay(options).open();        // snapshot is already in sessionStorage
+const rzp = new Razorpay(options);
+rzp.open();
+      // snapshot is already in sessionStorage
 
   /* ────────── 5. Success callback stays unchanged ────────── */
   async function handleSuccessfulPayment (response) {
