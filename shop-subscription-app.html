@@ -3156,25 +3156,28 @@ async function checkoutCart () {
   }).then(r => r.json());
 
   /* ────────── 4. Open Razorpay checkout (Chrome Custom Tab) ────────── */
-  const options = {
-    key            : "rzp_live_u6z4G2762EuQ4E",
-    order_id       : orderId,          // ★ always pass order_id
-    currency       : currentCurrency,
-     method: {
-    upi: true,        // allow UPI apps
-    card: true,       // allow cards
-    netbanking: true, // allow net banking
-    wallet: true      // allow wallets
+ const options = {
+  key: "rzp_live_u6z4G2762EuQ4E",
+  order_id: orderId,
+  amount: amountForGateway,
+  currency: currentCurrency,
+  name: "Monster Men's Collection",
+  description: "Cart Checkout",
+  image: "https://your-logo-url.com/logo.png",
+  prefill: { name },
+  theme: { color: "#007bff" },
+
+  // ✅ Enable UPI intent flow
+  method: {
+    upi: { flow: "intent" }, // opens Google Pay, PhonePe, Paytm etc.
+    card: true,
+    netbanking: true,
+    wallet: true
   },
-    redirect       : true,
-    webview_intent : true,
-    name           : "Monster Men's Collection",
-    description    : "Cart Checkout",
-    image          : "https://your-logo-url.com/logo.png",
-    prefill        : { name },
-    theme          : { color: "#007bff" },
-     callback_url   : "https://monster-mens-collection.netlify.app/.netlify/functions/verify-signature"
-  };
+
+  callback_url: "https://monster-mens-collection.netlify.app/.netlify/functions/verify-signature"
+};
+
 
   new Razorpay(options).open();        // snapshot is already in sessionStorage
 
