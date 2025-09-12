@@ -3155,12 +3155,10 @@ async function checkoutCart () {
     })
   }).then(r => r.json());
 
-  /* ────────── 4. Open Razorpay checkout (Chrome Custom Tab) ────────── */
-/* ────────── 4. Open Razorpay checkout (Chrome Custom Tab) ────────── */
-const options = {
-  key: "rzp_live_u6z4G2762EuQ4E",        // your live Razorpay key
-  amount: amountForGateway,              // amount in paise
-  currency: "INR",                       // force INR for UPI
+ const options = {
+  key: "rzp_live_u6z4G2762EuQ4E",
+  amount: amountForGateway,   // paise
+  currency: "INR",
   name: "Monster Men's Collection",
   description: "Cart Checkout",
   image: "https://your-logo-url.com/logo.png",
@@ -3171,11 +3169,11 @@ const options = {
     email: firebase.auth().currentUser?.email || "",
     contact: mobileNumber
   },
+
   theme: {
     color: "#007bff"
   },
 
-  // ✅ enable all payment methods
   method: {
     upi: true,
     card: true,
@@ -3183,11 +3181,13 @@ const options = {
     wallet: true
   },
 
-  redirect: false,       // ⬅️ must be false for UPI intent
+  // 🔑 For WebView UPI flow:
+  redirect: false,        // keep false
   send_sms_hash: true,
-  webview_intent: true,
+  webview_intent: true,   // must be true for UPI apps
 
   handler: function (response) {
+    // will be called only after successful payment
     handleSuccessfulPayment(response);
   },
   modal: {
@@ -3199,6 +3199,7 @@ const options = {
 
 const rzp = new Razorpay(options);
 rzp.open();
+
       // snapshot is already in sessionStorage
 
   /* ────────── 5. Success callback stays unchanged ────────── */
