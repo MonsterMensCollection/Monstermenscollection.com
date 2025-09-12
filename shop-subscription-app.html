@@ -3155,30 +3155,6 @@ async function checkoutCart () {
     })
   }).then(r => r.json());
 
-  const options = {
-  key: "rzp_live_XXXX", // your key
-  amount: amountForGateway,
-  currency: "INR",
-  name: "Monster Men's Collection",
-  description: "Cart Checkout",
-  order_id: orderId,
-  prefill: {
-    name: name,
-    email: firebase.auth().currentUser?.email || "",
-    contact: mobileNumber,
-  },
-  theme: { color: "#007bff" },
-  method: { upi: true, card: true, netbanking: true, wallet: true },
-
-  // 🔑 Required for UPI in WebView
-  redirect: false,
-  send_sms_hash: true,
-  webview_intent: true,
-
-  handler: function (response) {
-    handleSuccessfulPayment(response);
-  },
-};
 const options = {
   key: "rzp_live_u6z4G2762EuQ4E", // your key
   amount: amountForGateway,
