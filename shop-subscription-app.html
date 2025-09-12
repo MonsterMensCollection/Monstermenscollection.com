@@ -3157,19 +3157,25 @@ async function checkoutCart () {
 
   /* ────────── 4. Open Razorpay checkout (Chrome Custom Tab) ────────── */
 const options = {
-  key: "rzp_live_u6z4G2762EuQ4E",
-  order_id: orderId,
-  amount: amountForGateway,
-  currency: currentCurrency,
-  name: "Monster Men's Collection",
-  description: "Cart Checkout",
-  image: "https://your-logo-url.com/logo.png",
-  prefill: { name },
-  theme: { color: "#007bff" },
-  redirect: true,
-  webview_intent: true,
+  key            : "rzp_live_u6z4G2762EuQ4E",  // live key
+  order_id       : orderId,
+  currency       : currentCurrency,            // must be "INR" for UPI
+  amount         : amountForGateway,
+  name           : "Monster Men's Collection",
+  description    : "Cart Checkout",
+  image          : "https://your-logo-url.com/logo.png",
 
-  callback_url: "https://monster-mens-collection.netlify.app/.netlify/functions/verify-signature"
+  // ✅ REMOVE this line → method: { wallet: ["paypal"] },
+  // ✅ Let Razorpay show all available methods including UPI
+
+  prefill        : { name, contact: mobileNumber },
+  theme          : { color: "#007bff" },
+
+  // For UPI intent (works on Android)
+  redirect       : false,           // ❌ set false → opens native Razorpay checkout
+  webview_intent : true,            // ✅ keep this true for UPI intent support
+
+  callback_url   : "https://monster-mens-collection.netlify.app/.netlify/functions/verify-signature",
 };
 
 console.log("Razorpay options:", options);
