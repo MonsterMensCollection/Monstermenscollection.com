@@ -825,26 +825,11 @@
   </select>
 </div>
   </div>
-<div style="margin-top: 18%;"></div>
+<div style="height: 60px;"></div>
 
  <div class="product-grid" >
 
-<!-- 106 -->
-<div class="product-card">
-  <div class="image-wrapper">
-    <img src="https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/s6.png" alt=" ABSTRACT PRINT SHIRT" onclick="showDescription([{ type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/s6.png' },
-    { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/fullimage/refs/heads/main/s6b1.png' }], '1', 'BODAK #106', ' ABSTRACT PRINT SHIRT', 'NC SHIRT', ['S','M','L'], ['SAME'], 'shirtsPage', 'BODAK-106')">
-  </div>
-  <div class="cardName">
-    <h3>BODAK</h3>
-    <p> ABSTRACT PRINT SHIRT</p>
-  </div>
-  <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 10px;">
-    <p class="price">1</p>
-  </div>
-</div>
 
-   
  <!-- 106 -->
   <div class="product-card">
      <div class="image-wrapper">
@@ -1013,7 +998,7 @@
   </select>
 </div>
   </div>
-<div style="margin-top: 18%;"></div>
+<div style="height: 60px;"></div>
 
 
   <div class="product-grid" >
@@ -1211,7 +1196,7 @@
   </select>
 </div>
   </div>
-<div style="margin-top: 22%;"></div>
+<div style="height: 60px;"></div>
 
 
   <div class="product-grid">
@@ -1694,7 +1679,7 @@
   </select>
 </div>
   </div>
-<div style="margin-top: 18%;"></div>
+<div style="height: 60px;"></div>
 
 
   <div class="product-grid">
@@ -2148,7 +2133,7 @@
 
  <div id="detailsPage" class="form-section" style="
   display: none; 
-  margin-top: 22%; 
+  margin-top: 13%; 
   padding: 20px; 
   width: 100%; 
   max-width: 500px; 
@@ -3143,7 +3128,7 @@ async function checkoutCart () {
   );
 
   /* Razorpay expects smallest unit (paise / cents) */
-  const amountForGateway = Math.round(grandTotalSelected*1);
+  const amountForGateway = Math.round(grandTotalSelected * 100);
 
   /* ────────── 3. Create Razorpay order on your backend ────────── */
   const { id: orderId } = await fetch("/.netlify/functions/create-order", {
