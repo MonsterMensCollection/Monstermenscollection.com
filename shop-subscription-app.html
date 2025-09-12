@@ -3143,7 +3143,7 @@ async function checkoutCart () {
   );
 
   /* Razorpay expects smallest unit (paise / cents) */
-  const amountForGateway = Math.round(grandTotalSelected * 100);
+  const amountForGateway = Math.round(grandTotalSelected);
 
   /* ────────── 3. Create Razorpay order on your backend ────────── */
   const { id: orderId } = await fetch("/.netlify/functions/create-order", {
