@@ -3166,15 +3166,6 @@ const options = {
   image: "https://your-logo-url.com/logo.png",
   prefill: { name },
   theme: { color: "#007bff" },
-
-  method: {
-    upi: { flow: "intent" },  // ✅ Intent flow for UPI apps
-    card: true,
-    netbanking: true,
-    wallet: true
-  },
-
-  // ✅ Required in WebView
   redirect: true,
   webview_intent: true,
 
