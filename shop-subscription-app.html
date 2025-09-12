@@ -3169,7 +3169,7 @@ async function checkoutCart () {
 
   // ✅ Enable UPI intent flow
   method: {
-    upi: { flow: "intent" }, // opens Google Pay, PhonePe, Paytm etc.
+    upi:true, // opens Google Pay, PhonePe, Paytm etc.
     card: true,
     netbanking: true,
     wallet: true
@@ -3178,7 +3178,8 @@ async function checkoutCart () {
   callback_url: "https://monster-mens-collection.netlify.app/.netlify/functions/verify-signature"
 };
 
-
+console.log("Razorpay options:", options);
+  
   new Razorpay(options).open();        // snapshot is already in sessionStorage
 
   /* ────────── 5. Success callback stays unchanged ────────── */
