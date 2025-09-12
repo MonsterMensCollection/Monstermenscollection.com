@@ -3155,46 +3155,53 @@ async function checkoutCart () {
     })
   }).then(r => r.json());
 
- const options = {
-  key: "rzp_live_u6z4G2762EuQ4E",
-  amount: amountForGateway,   // paise
+  const options = {
+  key: "rzp_live_XXXX", // your key
+  amount: amountForGateway,
   currency: "INR",
   name: "Monster Men's Collection",
   description: "Cart Checkout",
-  image: "https://your-logo-url.com/logo.png",
   order_id: orderId,
-
   prefill: {
     name: name,
     email: firebase.auth().currentUser?.email || "",
-    contact: mobileNumber
+    contact: mobileNumber,
   },
+  theme: { color: "#007bff" },
+  method: { upi: true, card: true, netbanking: true, wallet: true },
 
-  theme: {
-    color: "#007bff"
-  },
-
-  method: {
-    upi: true,
-    card: true,
-    netbanking: true,
-    wallet: true
-  },
-
-  // 🔑 For WebView UPI flow:
-  redirect: false,        // keep false
+  // 🔑 Required for UPI in WebView
+  redirect: false,
   send_sms_hash: true,
-  webview_intent: true,   // must be true for UPI apps
+  webview_intent: true,
 
   handler: function (response) {
-    // will be called only after successful payment
     handleSuccessfulPayment(response);
   },
-  modal: {
-    ondismiss: function () {
-      console.log("Checkout form closed");
-    }
-  }
+};
+const options = {
+  key: "rzp_live_u6z4G2762EuQ4E", // your key
+  amount: amountForGateway,
+  currency: "INR",
+  name: "Monster Men's Collection",
+  description: "Cart Checkout",
+  order_id: orderId,
+  prefill: {
+    name: name,
+    email: firebase.auth().currentUser?.email || "",
+    contact: mobileNumber,
+  },
+  theme: { color: "#007bff" },
+  method: { upi: true, card: true, netbanking: true, wallet: true },
+
+  // 🔑 Required for UPI in WebView
+  redirect: true,
+  send_sms_hash: true,
+  webview_intent: true,
+
+  handler: function (response) {
+    handleSuccessfulPayment(response);
+  },
 };
 
 const rzp = new Razorpay(options);
