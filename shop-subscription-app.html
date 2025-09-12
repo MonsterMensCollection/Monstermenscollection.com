@@ -2130,6 +2130,28 @@
   </div>
 </div>
 
+  <div id="paymentMethodModal" style="display:none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; 
+     background: rgba(0,0,0,0.5);">
+  <div style="background: #fff; margin: 20% auto; padding: 20px; width: 90%; max-width: 400px; 
+              border-radius: 10px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+    <h3 style="margin-bottom: 20px;">Choose Payment Method</h3>
+    
+    <button onclick="proceedWithUPI()" style="
+      width: 100%; padding: 12px; margin-bottom: 15px;
+      background: #007bff; color: #fff; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;
+    ">Pay with UPI</button>
+
+    <button onclick="confirmCOD()" style="
+      width: 100%; padding: 12px;
+      background: #28a745; color: #fff; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;
+    ">Cash on Delivery</button>
+
+    <button onclick="closePaymentMethodModal()" style="
+      margin-top: 15px; background: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;
+    ">Cancel</button>
+  </div>
+</div>
+
   <div id="loadingScreen">
   <!-- Centered logo -->
   <img src="https://see.fontimg.com/api/rf5/woG33/N2Y3Y2RhYTdiOGMwNGVjOGE5MWE1MTFiNGJjM2E4Y2Iub3Rm/RU5MWQ/redtrap-expanded-puo.png?r=fs&h=29&w=1000&fg=FFFFFF&bg=FFFFFF&tb=1&s=29"
@@ -2172,10 +2194,10 @@
   <input type="text" id="checkoutMobileNumber" placeholder="Mobile Number"
          style="padding: 12px; width: 100%; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 0px; box-sizing: border-box;" />
 
-  <button onclick="checkoutCart()" 
-          style="width: 100%; padding: 14px; background-color: #000; color: white; border: none; border-radius: 0px; font-size: 16px; font-weight: bold; cursor: pointer; box-sizing: border-box;">
-    SUBMIT & PAY
-  </button>
+  <button onclick="openPaymentMethodModal()" 
+        style="width: 100%; padding: 14px; background-color: #000; color: white; border: none; font-size: 16px; font-weight: bold; cursor: pointer;">
+  SUBMIT & PAY
+</button>
 </div>
 
 
@@ -2267,6 +2289,31 @@ function backToProducts() {
     document.getElementById("detailsPage").style.display = "none";
 }
 
+function openPaymentMethodModal() {
+  // validate form first
+  const name = document.getElementById("checkoutName").value.trim();
+  const address = document.getElementById("checkoutAddress").value.trim();
+  const pincode = document.getElementById("checkoutPincode").value.trim();
+  const mobileNumber = document.getElementById("checkoutMobileNumber").value.trim();
+
+  if (!name || !address || !pincode || !mobileNumber) {
+    showCartToast("Please complete all address fields");
+    return;
+  }
+
+  document.getElementById("paymentMethodModal").style.display = "block";
+}
+
+function closePaymentMethodModal() {
+  document.getElementById("paymentMethodModal").style.display = "none";
+}
+
+function proceedWithUPI() {
+  closePaymentMethodModal();
+  checkoutCart();  // existing Razorpay flow
+}
+
+  
  function goToDetailsPage() {
     // ⛔ Block if cart is empty
     if (!Array.isArray(cart) || cart.length === 0) {
