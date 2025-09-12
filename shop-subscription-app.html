@@ -3160,7 +3160,12 @@ async function checkoutCart () {
     key            : "rzp_live_u6z4G2762EuQ4E",
     order_id       : orderId,          // ★ always pass order_id
     currency       : currentCurrency,
-    method         : { wallet: ["paypal"] },
+     method: {
+    upi: true,        // allow UPI apps
+    card: true,       // allow cards
+    netbanking: true, // allow net banking
+    wallet: true      // allow wallets
+  },
     redirect       : true,
     webview_intent : true,
     name           : "Monster Men's Collection",
