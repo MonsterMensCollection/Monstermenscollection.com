@@ -3103,12 +3103,11 @@ function hideCart() {
   document.getElementById("productList").style.display = "block";
   document.getElementById("sliderSection").style.display = "block";
 }
-async function checkoutCart () {
-
-  /* ────────── 1. Basic form validation ────────── */
-  const name         = document.getElementById("checkoutName").value.trim();
-  const address      = document.getElementById("checkoutAddress").value.trim();
-  const pincode      = document.getElementById("checkoutPincode").value.trim();
+async function checkoutCart() {
+  /*──────────1.Basic form validation──────────*/
+  const name = document.getElementById("checkoutName").value.trim();
+  const address = document.getElementById("checkoutAddress").value.trim();
+  const pincode = document.getElementById("checkoutPincode").value.trim();
   const mobileNumber = document.getElementById("checkoutMobileNumber").value.trim();
 
   if (!name || !address || !pincode || !mobileNumber) {
@@ -3116,10 +3115,10 @@ async function checkoutCart () {
     return;
   }
 
-  /* ────────── 2. Totals in USD + selected currency ────────── */
-  const subtotalUSD        = cart.reduce((s, it) => s + it.price, 0);     // stored as USD
-  const subtotalSelected   = convert(subtotalUSD);                        // currentCurrency
-  const shippingSelected   = subtotalSelected >= convert(0) ? 0 : convert(0);
+  /*──────────2.Totals in USD + selected currency──────────*/
+  const subtotalUSD = cart.reduce((s, it) => s + it.price, 0);
+  const subtotalSelected = convert(subtotalUSD);
+  const shippingSelected = subtotalSelected >= convert(0) ? 0 : convert(0);
   const grandTotalSelected = subtotalSelected + shippingSelected;
 
   if (grandTotalSelected === 0) {
@@ -3127,116 +3126,123 @@ async function checkoutCart () {
     return;
   }
 
-  /* ✨ Save a resumable “pending order” snapshot – runs before any redirect */
+  /*✨ Save a resumable "pending order" snapshot */
   sessionStorage.setItem(
     "pendingOrder",
     JSON.stringify({
       cart,
-      addr : { name, address, pincode, mobileNumber },
-      uid  : auth.currentUser.uid,
-      totals : {
-        usd : subtotalUSD,            // raw USD (for reference)
-        sel : grandTotalSelected,     // in the currency the user picked
+      addr: { name, address, pincode, mobileNumber },
+      uid: auth.currentUser.uid,
+      totals: {
+        usd: subtotalUSD,
+        sel: grandTotalSelected,
         curr: currentCurrency
       }
     })
   );
 
-  /* Razorpay expects smallest unit (paise / cents) */
+  /* Razorpay expects smallest unit (paise/cents) */
   const amountForGateway = Math.round(grandTotalSelected * 100);
 
-  /* ────────── 3. Create Razorpay order on your backend ────────── */
+  /*──────────3. Create Razorpay order on your backend──────────*/
   const { id: orderId } = await fetch("/.netlify/functions/create-order", {
-    method  : "POST",
-    headers : { "Content-Type": "application/json" },
-    body    : JSON.stringify({
-      amount   : amountForGateway,
-      currency : currentCurrency
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      amount: amountForGateway,
+      currency: currentCurrency
     })
   }).then(r => r.json());
 
-const options = {
-  key: "rzp_live_u6z4G2762EuQ4E", // your key
-  amount: amountForGateway,
-  currency: "INR",
-  name: "Monster Men's Collection",
-  description: "Cart Checkout",
-  order_id: orderId,
-  prefill: {
-    name: name,
-    email: firebase.auth().currentUser?.email || "",
-    contact: mobileNumber,
-  },
-  theme: { color: "#007bff" },
-  method: { upi: true, card: true, netbanking: true, wallet: true },
+  const options = {
+    key: "rzp_live_u6z4G2762EuQ4E",
+    amount: amountForGateway,
+    currency: "INR",
+    name: "Monster Men's Collection",
+    description: "Cart Checkout",
+    order_id: orderId,
+    prefill: {
+      name: name,
+      email: firebase.auth().currentUser?.email || "",
+      contact: mobileNumber,
+    },
+    theme: { color: "#007bff" },
+    method: { upi: true, card: true, netbanking: true, wallet: true },
 
-  // 🔑 Required for UPI in WebView
-  redirect: false,
-  send_sms_hash: true,
-  webview_intent: true,
+    //🔑 Required for UPI in WebView
+    redirect: true, // Changed from false to true
+    send_sms_hash: true,
+    handler: function(response) {
+      handleSuccessfulPayment(response);
+    },
+    modal: {
+      ondismiss: function() {
+        console.log("Payment modal dismissed");
+      }
+    }
+  };
 
-  handler: function (response) {
-    handleSuccessfulPayment(response);
-  },
-};
-
-const rzp = new Razorpay(options);
-rzp.open();
-
-      // snapshot is already in sessionStorage
-
-  /* ────────── 5. Success callback stays unchanged ────────── */
-  async function handleSuccessfulPayment (response) {
+  const rzp = new Razorpay(options);
+  
+  // Add error handler
+  rzp.on('payment.failed', function(response) {
+    console.error(response.error);
+    alert("Payment failed: " + response.error.description);
+  });
+  
+  rzp.open();
+  
+  /*──────────5. Success callback stays unchanged──────────*/
+  async function handleSuccessfulPayment(response) {
     const user = auth.currentUser;
     if (!user) return;
 
     const orderData = {
-      uid         : user.uid,
+      uid: user.uid,
       name, address, pincode, mobilenumber: mobileNumber,
-      cart        : [...cart],
-      totalUSD    : subtotalUSD,
-      total       : grandTotalSelected,
-      currency    : currentCurrency,
-      paymentId   : response.razorpay_payment_id,
-      paymentMode : "Razorpay",
-      timestamp   : firebase.firestore.FieldValue.serverTimestamp(),
-      orderNumber : `ORD-${Date.now()}`
+      cart: [...cart],
+      totalUSD: subtotalUSD,
+      total: grandTotalSelected,
+      currency: currentCurrency,
+      paymentId: response.razorpay_payment_id,
+      paymentMode: "Razorpay",
+      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+      orderNumber: `ORD-${Date.now()}`
     };
 
     try {
-      await finalizeOrderStock(cart);                 // lock inventory
-      await db.collection("orders").add(orderData);   // record order
-      sessionStorage.removeItem("pendingOrder");      // 🔑 clear snapshot
+      await finalizeOrderStock(cart);
+      await db.collection("orders").add(orderData);
+      sessionStorage.removeItem("pendingOrder");
 
       /* success UI (unchanged) */
       [
-        "descriptionPage","productList","shirtsPage","pantsPage",
-        "sliderSection","cartPage","profilePage","tshirtsPage",
-        "cargosPage","detailsPage"
+        "descriptionPage", "productList", "shirtsPage", "pantsPage",
+        "sliderSection", "cartPage", "profilePage", "tshirtsPage",
+        "cargosPage", "detailsPage"
       ].forEach(id => (document.getElementById(id).style.display = "none"));
 
       document.getElementById("paymentSuccessPage").style.display = "block";
-      document.getElementById("successPaymentId").textContent =
+      document.getElementById("successPaymentId").textContent = 
         response.razorpay_payment_id;
 
-      cart = [];   // clear local cart
+      cart = [];
 
       setTimeout(() => {
         document.getElementById("paymentSuccessPage").style.display = "none";
-        document.getElementById("productList").style.display        = "block";
-        document.getElementById("sliderSection").style.display      = "block";
+        document.getElementById("productList").style.display = "block";
+        document.getElementById("sliderSection").style.display = "block";
       }, 5000);
 
     } catch (err) {
       console.error("Checkout finalisation failed:", err);
       alert(
-        "Payment received but an item just sold out. " +
+        "Payment received but an item just sold out." +
         "A full refund will be issued automatically."
       );
     }
   }
 }
-
 function checkoutCOD() {
   const name = document.getElementById("checkoutName").value.trim();
   const address = document.getElementById("checkoutAddress").value.trim();
