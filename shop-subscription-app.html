@@ -3167,39 +3167,10 @@ async function checkoutCart() {
       contact: mobileNumber,
     },
     theme: { color: "#007bff" },
-    
-    // FIXED: Proper UPI configuration
-    method: {
-      upi: true,
-      card: true,
-      netbanking: true,
-      wallet: true
-    },
-    
-    // UPI-specific settings
-    notes: {
-      description: "Cart Checkout"
-    },
-    modal: {
-      ondismiss: function() {
-        console.log("Payment modal dismissed");
-      },
-      escape: true,
-      handleback: true
-    },
-    handler: function(response) {
-      handleSuccessfulPayment(response);
-    }
+    webview_intent: true
   };
 
-  const rzp = new Razorpay(options);
-  
-  // Add error handler
-  rzp.on('payment.failed', function(response) {
-    console.error(response.error);
-    alert("Payment failed: " + response.error.description);
-  });
-  
+  const rzp = new Razorpay(options); 
   rzp.open();
   
   /*──────────5. Success callback stays unchanged──────────*/
