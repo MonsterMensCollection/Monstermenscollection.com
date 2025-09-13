@@ -3167,18 +3167,28 @@ async function checkoutCart() {
       contact: mobileNumber,
     },
     theme: { color: "#007bff" },
-    method: { upi: true, card: true, netbanking: true, wallet: true },
-
-    //🔑 Required for UPI in WebView
-    redirect: true, // Changed from false to true
-    send_sms_hash: true,
-    handler: function(response) {
-      handleSuccessfulPayment(response);
+    
+    // FIXED: Proper UPI configuration
+    method: {
+      upi: true,
+      card: true,
+      netbanking: true,
+      wallet: true
+    },
+    
+    // UPI-specific settings
+    notes: {
+      description: "Cart Checkout"
     },
     modal: {
       ondismiss: function() {
         console.log("Payment modal dismissed");
-      }
+      },
+      escape: true,
+      handleback: true
+    },
+    handler: function(response) {
+      handleSuccessfulPayment(response);
     }
   };
 
