@@ -3104,10 +3104,10 @@ function hideCart() {
   document.getElementById("sliderSection").style.display = "block";
 }
 async function checkoutCart() {
-  /*──────────1.Basic form validation──────────*/
-  const name = document.getElementById("checkoutName").value.trim();
-  const address = document.getElementById("checkoutAddress").value.trim();
-  const pincode = document.getElementById("checkoutPincode").value.trim();
+  /*──────────1. Basic form validation ──────────*/
+  const name         = document.getElementById("checkoutName").value.trim();
+  const address      = document.getElementById("checkoutAddress").value.trim();
+  const pincode      = document.getElementById("checkoutPincode").value.trim();
   const mobileNumber = document.getElementById("checkoutMobileNumber").value.trim();
 
   if (!name || !address || !pincode || !mobileNumber) {
@@ -3115,7 +3115,7 @@ async function checkoutCart() {
     return;
   }
 
-  /*──────────2.Totals in USD + selected currency──────────*/
+  /*──────────2. Totals ──────────*/
   const subtotalUSD = cart.reduce((s, it) => s + it.price, 0);
   const subtotalSelected = convert(subtotalUSD);
   const shippingSelected = subtotalSelected >= convert(0) ? 0 : convert(0);
@@ -3126,25 +3126,20 @@ async function checkoutCart() {
     return;
   }
 
-  /*✨ Save a resumable "pending order" snapshot */
-  sessionStorage.setItem(
-    "pendingOrder",
-    JSON.stringify({
-      cart,
-      addr: { name, address, pincode, mobileNumber },
-      uid: auth.currentUser.uid,
-      totals: {
-        usd: subtotalUSD,
-        sel: grandTotalSelected,
-        curr: currentCurrency
-      }
-    })
-  );
+  sessionStorage.setItem("pendingOrder", JSON.stringify({
+    cart,
+    addr: { name, address, pincode, mobileNumber },
+    uid: auth.currentUser.uid,
+    totals: {
+      usd: subtotalUSD,
+      sel: grandTotalSelected,
+      curr: currentCurrency
+    }
+  }));
 
-  /* Razorpay expects smallest unit (paise/cents) */
   const amountForGateway = Math.round(grandTotalSelected * 100);
 
-  /*──────────3. Create Razorpay order on your backend──────────*/
+  /*──────────3. Create Razorpay order ──────────*/
   const { id: orderId } = await fetch("/.netlify/functions/create-order", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -3172,8 +3167,8 @@ async function checkoutCart() {
 
   const rzp = new Razorpay(options); 
   rzp.open();
-  
-  /*──────────5. Success callback stays unchanged──────────*/
+
+  /*──────────5. Success callback ──────────*/
   async function handleSuccessfulPayment(response) {
     const user = auth.currentUser;
     if (!user) return;
@@ -3196,7 +3191,6 @@ async function checkoutCart() {
       await db.collection("orders").add(orderData);
       sessionStorage.removeItem("pendingOrder");
 
-      /* success UI (unchanged) */
       [
         "descriptionPage", "productList", "shirtsPage", "pantsPage",
         "sliderSection", "cartPage", "profilePage", "tshirtsPage",
@@ -3204,8 +3198,7 @@ async function checkoutCart() {
       ].forEach(id => (document.getElementById(id).style.display = "none"));
 
       document.getElementById("paymentSuccessPage").style.display = "block";
-      document.getElementById("successPaymentId").textContent = 
-        response.razorpay_payment_id;
+      document.getElementById("successPaymentId").textContent = response.razorpay_payment_id;
 
       cart = [];
 
@@ -3217,13 +3210,25 @@ async function checkoutCart() {
 
     } catch (err) {
       console.error("Checkout finalisation failed:", err);
-      alert(
-        "Payment received but an item just sold out." +
-        "A full refund will be issued automatically."
-      );
+      alert("Payment received but an item just sold out. A full refund will be issued automatically.");
     }
   }
+
+  /*──────────6. Expose success handler for WebView injection ──────────*/
+  window.onPaymentSuccess = function () {
+    console.log("✅ Payment success detected in WebView!");
+    // here we simulate Razorpay response object minimally
+    handleSuccessfulPayment({
+      razorpay_payment_id: "webview_callback_" + Date.now()
+    });
+  };
+
+  window.onPaymentFailure = function () {
+    console.log("❌ Payment failed detected in WebView!");
+    alert("Payment failed or cancelled. Please try again.");
+  };
 }
+
 function checkoutCOD() {
   const name = document.getElementById("checkoutName").value.trim();
   const address = document.getElementById("checkoutAddress").value.trim();
