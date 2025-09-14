@@ -3162,71 +3162,61 @@ async function checkoutCart() {
       contact: mobileNumber,
     },
     theme: { color: "#007bff" },
-    webview_intent: true
-  };
+    webview_intent: true,
+    callback_url   : "https://monster-mens-collection.netlify.app/.netlify/functions/verify-signature"
+       };
+  new Razorpay(options).open();        // snapshot is already in sessionStorage
 
-  const rzp = new Razorpay(options); 
-  rzp.open();
-
-  /*──────────5. Success callback ──────────*/
-  async function handleSuccessfulPayment(response) {
+  /* ────────── 5. Success callback stays unchanged ────────── */
+  async function handleSuccessfulPayment (response) {
     const user = auth.currentUser;
     if (!user) return;
 
     const orderData = {
-      uid: user.uid,
+      uid         : user.uid,
       name, address, pincode, mobilenumber: mobileNumber,
-      cart: [...cart],
-      totalUSD: subtotalUSD,
-      total: grandTotalSelected,
-      currency: currentCurrency,
-      paymentId: response.razorpay_payment_id,
-      paymentMode: "Razorpay",
-      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-      orderNumber: `ORD-${Date.now()}`
+      cart        : [...cart],
+      totalUSD    : subtotalUSD,
+      total       : grandTotalSelected,
+      currency    : currentCurrency,
+      paymentId   : response.razorpay_payment_id,
+      paymentMode : "Razorpay",
+      timestamp   : firebase.firestore.FieldValue.serverTimestamp(),
+      orderNumber : `ORD-${Date.now()}`
     };
 
     try {
-      await finalizeOrderStock(cart);
-      await db.collection("orders").add(orderData);
-      sessionStorage.removeItem("pendingOrder");
+      await finalizeOrderStock(cart);                 // lock inventory
+      await db.collection("orders").add(orderData);   // record order
+      sessionStorage.removeItem("pendingOrder");      // 🔑 clear snapshot
 
+      /* success UI (unchanged) */
       [
-        "descriptionPage", "productList", "shirtsPage", "pantsPage",
-        "sliderSection", "cartPage", "profilePage", "tshirtsPage",
-        "cargosPage", "detailsPage"
+        "descriptionPage","productList","shirtsPage","pantsPage",
+        "sliderSection","cartPage","profilePage","tshirtsPage",
+        "cargosPage","detailsPage"
       ].forEach(id => (document.getElementById(id).style.display = "none"));
 
       document.getElementById("paymentSuccessPage").style.display = "block";
-      document.getElementById("successPaymentId").textContent = response.razorpay_payment_id;
+      document.getElementById("successPaymentId").textContent =
+        response.razorpay_payment_id;
 
-      cart = [];
+      cart = [];   // clear local cart
 
       setTimeout(() => {
         document.getElementById("paymentSuccessPage").style.display = "none";
-        document.getElementById("productList").style.display = "block";
-        document.getElementById("sliderSection").style.display = "block";
+        document.getElementById("productList").style.display        = "block";
+        document.getElementById("sliderSection").style.display      = "block";
       }, 5000);
 
     } catch (err) {
       console.error("Checkout finalisation failed:", err);
-      alert("Payment received but an item just sold out. A full refund will be issued automatically.");
+      alert(
+        "Payment received but an item just sold out. " +
+        "A full refund will be issued automatically."
+      );
     }
   }
-
-  /*──────────6. Expose success handler for WebView injection ──────────*/
-  window.onPaymentSuccess = function () {
-    console.log("✅ Payment success detected in WebView!");
-    // here we simulate Razorpay response object minimally
-    handleSuccessfulPayment({
-      razorpay_payment_id: "webview_callback_" + Date.now()
-    });
-  };
-
-  window.onPaymentFailure = function () {
-    console.log("❌ Payment failed detected in WebView!");
-    alert("Payment failed or cancelled. Please try again.");
-  };
 }
 
 function checkoutCOD() {
