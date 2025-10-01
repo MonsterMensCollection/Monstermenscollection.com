@@ -2311,12 +2311,19 @@ function backToProducts() {
   const container = document.getElementById(pageId);
   container.innerHTML = "";
 
+  if (!allProducts[pageId]) {
+    console.error("No products found for pageId:", pageId);
+    return;
+  }
+
   for (const product of allProducts[pageId]) {
     const sizes = await fetchStockOnce(product.docId);
-    const totalStock = Object.values(sizes).reduce((a, b) => a + b, 0);
+    console.log("Product:", product.title, "sizes:", sizes);
 
-    if (totalStock === 0) continue;
-    if (selectedSize !== "all" && (sizes[selectedSize] ?? 0) <= 0) continue;
+    const totalStock = Object.values(sizes).reduce((a, b) => a + b, 0);
+    // 🔴 Remove skip for testing
+    // if (totalStock === 0) continue;
+    // if (selectedSize !== "all" && (sizes[selectedSize] ?? 0) <= 0) continue;
 
     const card = document.createElement("div");
     card.className = "product-card";
