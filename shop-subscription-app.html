@@ -2646,16 +2646,6 @@ let sizes = await fetchStockOnce(docId, /* forceReload = */ true);
 const sizeContainer = document.getElementById("sizeButtons");
 sizeContainer.innerHTML = "";
 
-  // rebuild the filter dropdown too
-const filter = document.querySelector(".filterSize");
-filter.innerHTML = '<option value="all">All</option>'; // reset first
-
-sizesAvailable.forEach(sz => {
-  const n = sizes[sz] ?? 0;
-
-  if (n <= 0) return;   // ⬅ skip out-of-stock sizes
-
-
 sizesAvailable.forEach(sz => {
   const n   = sizes[sz] ?? 0;            // live qty for this size
   const btn = document.createElement("button");
