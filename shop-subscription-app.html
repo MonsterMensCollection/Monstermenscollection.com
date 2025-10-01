@@ -2887,14 +2887,14 @@ document.addEventListener("DOMContentLoaded", function () {
   const filterControls = document.querySelectorAll(".filter-controls");
 
   filterControls.forEach(control => {
-    const targetPageId = control.getAttribute("data-target");
+  const targetPageId = control.getAttribute("data-target");
 
-    const sortSelect = control.querySelector(".sortPrice");
-    const sizeSelect = control.querySelector(".filterSize");
+  const sortSelect = control.querySelector(".sortPrice");
+  const sizeSelect = control.querySelector(".filterSize");
 
-    sortSelect.addEventListener("change", () => sortProductsByPrice(targetPageId));
-    sizeSelect.addEventListener("change", () => filterProductsBySize(targetPageId));
-  });
+  sortSelect.addEventListener("change", () => sortProductsByPrice(targetPageId));
+  sizeSelect.addEventListener("change", () => filterProductsBySize(targetPageId)); // ✅ async one
+});
 
   // 🔹 New Zoom + Pan Image Code
   const img = document.getElementById('descImage');
