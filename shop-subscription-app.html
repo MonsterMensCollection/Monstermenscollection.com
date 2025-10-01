@@ -2307,29 +2307,38 @@ function backToProducts() {
     document.getElementById("detailsPage").style.display = "none";
 }
 
-  async function renderProducts(categoryPage, filterSize = "all") {
-  const container = document.getElementById(categoryPage);
-  container.innerHTML = "";  // clear old list
+  // ✅ Single function to render products with optional size filter
+async function renderProducts(pageId, selectedSize = "all") {
+  const container = document.getElementById(pageId);
+  container.innerHTML = ""; // clear old list
 
-  for (const product of allProducts[categoryPage]) {
-    const sizes = await fetchStockOnce(product.docId); // 👈 live stock
-    const totalStock = Object.values(sizes).reduce((a,b)=>a+b,0);
+  for (const product of allProducts[pageId]) {
+    const sizes = await fetchStockOnce(product.docId); // live stock
+    const totalStock = Object.values(sizes).reduce((a, b) => a + b, 0);
 
-    // 🔴 Skip product if completely out of stock
+    // Skip if completely out of stock
     if (totalStock === 0) continue;
 
-    // 🔴 If filtering by a size, skip if that size is empty
-    if (filterSize !== "all" && (sizes[filterSize] ?? 0) <= 0) {
+    // Skip if filtering and this size is empty
+    if (selectedSize !== "all" && (sizes[selectedSize] ?? 0) <= 0) {
       continue;
     }
 
-    // ✅ Build the card normally
+    // Build the product card
     const card = document.createElement("div");
     card.className = "product-card";
     card.innerHTML = `
       <div class="image-wrapper">
         <img src="${product.image}" 
-             onclick="showDescription(${JSON.stringify(product.media)},'${product.price}','${product.title}','${product.sdes}','${product.desc}',${JSON.stringify(product.sizes)},${JSON.stringify(product.colors)},'${categoryPage}','${product.docId}')">
+             onclick="showDescription(${JSON.stringify(product.media)},
+                                      '${product.price}',
+                                      '${product.title}',
+                                      '${product.sdes}',
+                                      '${product.desc}',
+                                      ${JSON.stringify(product.sizes)},
+                                      ${JSON.stringify(product.colors)},
+                                      '${pageId}',
+                                      '${product.docId}')">
       </div>
       <div class="cardName">
         <h3>${product.brand}</h3>
@@ -2892,8 +2901,13 @@ document.addEventListener("DOMContentLoaded", function () {
   const sortSelect = control.querySelector(".sortPrice");
   const sizeSelect = control.querySelector(".filterSize");
 
+  // Sorting (unchanged)
   sortSelect.addEventListener("change", () => sortProductsByPrice(targetPageId));
-  sizeSelect.addEventListener("change", () => filterProductsBySize(targetPageId)); // ✅ async one
+
+  // Size filter now just re-renders products
+  sizeSelect.addEventListener("change", e => {
+    renderProducts(targetPageId, e.target.value);
+  });
 });
 
   // 🔹 New Zoom + Pan Image Code
