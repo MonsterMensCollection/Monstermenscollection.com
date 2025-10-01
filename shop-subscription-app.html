@@ -952,7 +952,7 @@
 </div>
 
        <!-- 102 -->
-  <div class="product-card">
+  <div class="product-card" data-docid="F20 #102">
      <div class="image-wrapper">
 <img src="https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/s2.jpg" alt="Shirt 1" onclick="showDescription([
   { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/s2.jpg' },
@@ -967,7 +967,7 @@
 </div>
    
      <!-- 101 -->
-  <div class="product-card">
+  <div class="product-card" data-docid="PALIHILLS #101">
      <div class="image-wrapper">
 <img src="https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/s1.jpg" alt="Shirt 1" onclick="showDescription([
   { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/s1.jpg' },
@@ -2374,19 +2374,23 @@ const launchDate = new Date("2025-12-30T00:00:00Z").getTime(); // Target UTC tim
 const liveStock = {};          // { "BODAK-106" : { S:10, M:4 … }, … }
 
 async function fetchStockOnce(docId, forceReload = false) {
-  // only skip the fetch if we've already got it *and* the caller didn't ask to reload
+  // Return cached data if available and not forcing reload
   if (!forceReload && liveStock[docId]) {
     return liveStock[docId];
   }
 
   try {
     const snap = await db.collection("products").doc(docId).get();
-    liveStock[docId] = snap.exists
-      ? (snap.data().sizes || {})
-      : {};
-  } catch (e) {
-    console.warn("Firestore unreachable, faking stock", e);
-    liveStock[docId] = {};  
+    if (snap.exists) {
+      liveStock[docId] = snap.data().sizes || {};
+    } else {
+      console.warn(`Document ${docId} not found in Firestore`);
+      liveStock[docId] = {};
+    }
+  } catch (error) {
+    console.error("Firestore unreachable for doc", docId, error);
+    // Return empty object if offline or error
+    liveStock[docId] = {};
   }
 
   return liveStock[docId];
@@ -2979,13 +2983,30 @@ async function filterProductsBySize(pageId) {
   const cards = document.querySelectorAll(`#${pageId} .product-card`);
 
   for (const card of cards) {
-    const docId = card.getAttribute("data-docid");
-    const stock = await fetchStockOnce(docId);  // fetch sizes from Firestore
+    // Get the product ID from the onclick attribute
+    const onclickAttr = card.querySelector('img').getAttribute('onclick');
+    const docIdMatch = onclickAttr.match(/'([^']+)'\)$/);
+    const docId = docIdMatch ? docIdMatch[1] : null;
 
-    const sizesAvailable = Object.keys(stock).filter(size => stock[size] > 0);
-    const hasSize = selectedSize === "all" || sizesAvailable.includes(selectedSize);
+    if (!docId) {
+      console.warn('No docId found for card:', card);
+      card.style.display = "none";
+      continue;
+    }
 
-    card.style.display = hasSize ? "block" : "none";
+    try {
+      const stock = await fetchStockOnce(docId);
+      
+      // Check if the selected size is available
+      const hasSize = selectedSize === "all" || 
+                     (stock[selectedSize] && stock[selectedSize] > 0);
+
+      card.style.display = hasSize ? "block" : "none";
+    } catch (error) {
+      console.error('Error fetching stock for', docId, error);
+      // If there's an error, show the card by default
+      card.style.display = selectedSize === "all" ? "block" : "none";
+    }
   }
 }
 
