@@ -2307,24 +2307,17 @@ function backToProducts() {
     document.getElementById("detailsPage").style.display = "none";
 }
 
-  // ✅ Single function to render products with optional size filter
-async function renderProducts(pageId, selectedSize = "all") {
+  async function renderProducts(pageId, selectedSize = "all") {
   const container = document.getElementById(pageId);
-  container.innerHTML = ""; // clear old list
+  container.innerHTML = "";
 
   for (const product of allProducts[pageId]) {
-    const sizes = await fetchStockOnce(product.docId); // live stock
+    const sizes = await fetchStockOnce(product.docId);
     const totalStock = Object.values(sizes).reduce((a, b) => a + b, 0);
 
-    // Skip if completely out of stock
     if (totalStock === 0) continue;
+    if (selectedSize !== "all" && (sizes[selectedSize] ?? 0) <= 0) continue;
 
-    // Skip if filtering and this size is empty
-    if (selectedSize !== "all" && (sizes[selectedSize] ?? 0) <= 0) {
-      continue;
-    }
-
-    // Build the product card
     const card = document.createElement("div");
     card.className = "product-card";
     card.innerHTML = `
@@ -2901,10 +2894,9 @@ document.addEventListener("DOMContentLoaded", function () {
   const sortSelect = control.querySelector(".sortPrice");
   const sizeSelect = control.querySelector(".filterSize");
 
-  // Sorting (unchanged)
   sortSelect.addEventListener("change", () => sortProductsByPrice(targetPageId));
-
-  // Size filter now just re-renders products
+  
+  // ✅ now correctly calls renderProducts
   sizeSelect.addEventListener("change", e => {
     renderProducts(targetPageId, e.target.value);
   });
@@ -3024,53 +3016,6 @@ function sortProductsByPrice(pageId) {
   products.forEach(p => grid.appendChild(p));
 }
 
-async function filterProductsBySize(pageId) {
-  const selectedSize = document.querySelector(
-    `[data-target="${pageId}"] .filterSize`
-  ).value;
-
-  const container = document.getElementById(pageId);
-  container.innerHTML = ""; // clear old list
-
-  for (const product of allProducts[pageId]) {
-    const sizes = await fetchStockOnce(product.docId); // live stock
-    const totalStock = Object.values(sizes).reduce((a, b) => a + b, 0);
-
-    // 🔴 Skip if completely out of stock
-    if (totalStock === 0) continue;
-
-    // 🔴 Skip if filtering and this size is empty
-    if (selectedSize !== "all" && (sizes[selectedSize] ?? 0) <= 0) {
-      continue;
-    }
-
-    // ✅ Build the card
-    const card = document.createElement("div");
-    card.className = "product-card";
-    card.innerHTML = `
-      <div class="image-wrapper">
-        <img src="${product.image}" 
-             onclick="showDescription(${JSON.stringify(product.media)},
-                                      '${product.price}',
-                                      '${product.title}',
-                                      '${product.sdes}',
-                                      '${product.desc}',
-                                      ${JSON.stringify(product.sizes)},
-                                      ${JSON.stringify(product.colors)},
-                                      '${pageId}',
-                                      '${product.docId}')">
-      </div>
-      <div class="cardName">
-        <h3>${product.brand}</h3>
-        <p>${product.name}</p>
-      </div>
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:0 10px;">
-        <p class="price">₹${product.price}</p>
-      </div>
-    `;
-    container.appendChild(card);
-  }
-}
 
 
 const RATES = { USD: 1, INR: 1, EUR: 0.92 };
