@@ -3010,15 +3010,52 @@ function sortProductsByPrice(pageId) {
   products.forEach(p => grid.appendChild(p));
 }
 
-function filterProductsBySize(pageId) {
-  const selectedSize = document.querySelector(`[data-target="${pageId}"] .filterSize`).value;
-  const cards = document.querySelectorAll(`#${pageId} .product-card`);
+async function filterProductsBySize(pageId) {
+  const selectedSize = document.querySelector(
+    `[data-target="${pageId}"] .filterSize`
+  ).value;
 
-  cards.forEach(card => {
-    const onclickAttr = card.querySelector("img").getAttribute("onclick");
-    const hasSize = selectedSize === "all" || onclickAttr.includes(`'${selectedSize}'`);
-    card.style.display = hasSize ? "block" : "none";
-  });
+  const container = document.getElementById(pageId);
+  container.innerHTML = ""; // clear old list
+
+  for (const product of allProducts[pageId]) {
+    const sizes = await fetchStockOnce(product.docId); // live stock
+    const totalStock = Object.values(sizes).reduce((a, b) => a + b, 0);
+
+    // 🔴 Skip if completely out of stock
+    if (totalStock === 0) continue;
+
+    // 🔴 Skip if filtering and this size is empty
+    if (selectedSize !== "all" && (sizes[selectedSize] ?? 0) <= 0) {
+      continue;
+    }
+
+    // ✅ Build the card
+    const card = document.createElement("div");
+    card.className = "product-card";
+    card.innerHTML = `
+      <div class="image-wrapper">
+        <img src="${product.image}" 
+             onclick="showDescription(${JSON.stringify(product.media)},
+                                      '${product.price}',
+                                      '${product.title}',
+                                      '${product.sdes}',
+                                      '${product.desc}',
+                                      ${JSON.stringify(product.sizes)},
+                                      ${JSON.stringify(product.colors)},
+                                      '${pageId}',
+                                      '${product.docId}')">
+      </div>
+      <div class="cardName">
+        <h3>${product.brand}</h3>
+        <p>${product.name}</p>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:0 10px;">
+        <p class="price">₹${product.price}</p>
+      </div>
+    `;
+    container.appendChild(card);
+  }
 }
 
 
