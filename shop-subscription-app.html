@@ -956,7 +956,7 @@
      <div class="image-wrapper">
 <img src="https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/s2.jpg" alt="Shirt 1" onclick="showDescription([
   { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/s2.jpg' },
-],'₹420', 'F20 #102', 'ABSTRACT PRINTED SHIRT', 'F20 Abstract Printed Shirt – a trendy blend of vibrant patterns and soft fabric, perfect for a bold and stylish look.', ['S','M','L','XL','XXL'],['Same'],'shirtsPage','F20 #102')">
+],'₹420', 'F20 #102', 'ABSTRACT PRINTED SHIRT', 'F20 Abstract Printed Shirt – a trendy blend of vibrant patterns and soft fabric, perfect for a bold and stylish look.', ['S','M','L','XL'],['Same'],'shirtsPage','F20 #102')">
 </div><div class=cardName>
 <h3>F20</h3> <!-- Product Title -->
 <p>ABSTRACT PRINTED SHIRT</p>
@@ -971,7 +971,7 @@
      <div class="image-wrapper">
 <img src="https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/s1.jpg" alt="Shirt 1" onclick="showDescription([
   { type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/s1.jpg' },
-],'₹370', 'PALIHILLS #101', 'JUTE FABRIC SHIRT', 'Palihills Jute Fabric Shirt – crafted from natural jute blend, offering a stylish, breathable, and eco-friendly choice for everyday comfort.', ['S','M','L','XL','XXL'],['Same'],'shirtsPage','PALIHILLS #101')">
+],'₹370', 'PALIHILLS #101', 'JUTE FABRIC SHIRT', 'Palihills Jute Fabric Shirt – crafted from natural jute blend, offering a stylish, breathable, and eco-friendly choice for everyday comfort.', ['S','M','L','XL'],['Same'],'shirtsPage','PALIHILLS #101')">
 </div><div class=cardName>
 <h3>PALIHILLS</h3> <!-- Product Title -->
 <p>JUTE FABRIC SHIRT</p>
@@ -2307,51 +2307,6 @@ function backToProducts() {
     document.getElementById("detailsPage").style.display = "none";
 }
 
-  async function renderProducts(pageId, selectedSize = "all") {
-  const container = document.getElementById(pageId);
-  container.innerHTML = "";
-
-  if (!allProducts[pageId]) {
-    console.error("No products found for pageId:", pageId);
-    return;
-  }
-
-  for (const product of allProducts[pageId]) {
-    const sizes = await fetchStockOnce(product.docId);
-    console.log("Product:", product.title, "sizes:", sizes);
-
-    const totalStock = Object.values(sizes).reduce((a, b) => a + b, 0);
-    // 🔴 Remove skip for testing
-    // if (totalStock === 0) continue;
-    // if (selectedSize !== "all" && (sizes[selectedSize] ?? 0) <= 0) continue;
-
-    const card = document.createElement("div");
-    card.className = "product-card";
-    card.innerHTML = `
-      <div class="image-wrapper">
-        <img src="${product.image}" 
-             onclick="showDescription(${JSON.stringify(product.media)},
-                                      '${product.price}',
-                                      '${product.title}',
-                                      '${product.sdes}',
-                                      '${product.desc}',
-                                      ${JSON.stringify(product.sizes)},
-                                      ${JSON.stringify(product.colors)},
-                                      '${pageId}',
-                                      '${product.docId}')">
-      </div>
-      <div class="cardName">
-        <h3>${product.brand}</h3>
-        <p>${product.name}</p>
-      </div>
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:0 10px;">
-        <p class="price">₹${product.price}</p>
-      </div>
-    `;
-    container.appendChild(card);
-  }
-}
-  
  function goToDetailsPage() {
     // ⛔ Block if cart is empty
     if (!Array.isArray(cart) || cart.length === 0) {
@@ -2896,18 +2851,14 @@ document.addEventListener("DOMContentLoaded", function () {
   const filterControls = document.querySelectorAll(".filter-controls");
 
   filterControls.forEach(control => {
-  const targetPageId = control.getAttribute("data-target");
+    const targetPageId = control.getAttribute("data-target");
 
-  const sortSelect = control.querySelector(".sortPrice");
-  const sizeSelect = control.querySelector(".filterSize");
+    const sortSelect = control.querySelector(".sortPrice");
+    const sizeSelect = control.querySelector(".filterSize");
 
-  sortSelect.addEventListener("change", () => sortProductsByPrice(targetPageId));
-  
-  // ✅ now correctly calls renderProducts
-  sizeSelect.addEventListener("change", e => {
-    renderProducts(targetPageId, e.target.value);
+    sortSelect.addEventListener("change", () => sortProductsByPrice(targetPageId));
+    sizeSelect.addEventListener("change", () => filterProductsBySize(targetPageId));
   });
-});
 
   // 🔹 New Zoom + Pan Image Code
   const img = document.getElementById('descImage');
@@ -3023,6 +2974,16 @@ function sortProductsByPrice(pageId) {
   products.forEach(p => grid.appendChild(p));
 }
 
+function filterProductsBySize(pageId) {
+  const selectedSize = document.querySelector(`[data-target="${pageId}"] .filterSize`).value;
+  const cards = document.querySelectorAll(`#${pageId} .product-card`);
+
+  cards.forEach(card => {
+    const onclickAttr = card.querySelector("img").getAttribute("onclick");
+    const hasSize = selectedSize === "all" || onclickAttr.includes(`'${selectedSize}'`);
+    card.style.display = hasSize ? "block" : "none";
+  });
+}
 
 
 const RATES = { USD: 1, INR: 1, EUR: 0.92 };
