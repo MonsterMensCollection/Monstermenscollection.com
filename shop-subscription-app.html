@@ -2307,6 +2307,42 @@ function backToProducts() {
     document.getElementById("detailsPage").style.display = "none";
 }
 
+  async function renderProducts(categoryPage, filterSize = "all") {
+  const container = document.getElementById(categoryPage);
+  container.innerHTML = "";  // clear old list
+
+  for (const product of allProducts[categoryPage]) {
+    const sizes = await fetchStockOnce(product.docId); // 👈 live stock
+    const totalStock = Object.values(sizes).reduce((a,b)=>a+b,0);
+
+    // 🔴 Skip product if completely out of stock
+    if (totalStock === 0) continue;
+
+    // 🔴 If filtering by a size, skip if that size is empty
+    if (filterSize !== "all" && (sizes[filterSize] ?? 0) <= 0) {
+      continue;
+    }
+
+    // ✅ Build the card normally
+    const card = document.createElement("div");
+    card.className = "product-card";
+    card.innerHTML = `
+      <div class="image-wrapper">
+        <img src="${product.image}" 
+             onclick="showDescription(${JSON.stringify(product.media)},'${product.price}','${product.title}','${product.sdes}','${product.desc}',${JSON.stringify(product.sizes)},${JSON.stringify(product.colors)},'${categoryPage}','${product.docId}')">
+      </div>
+      <div class="cardName">
+        <h3>${product.brand}</h3>
+        <p>${product.name}</p>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:0 10px;">
+        <p class="price">₹${product.price}</p>
+      </div>
+    `;
+    container.appendChild(card);
+  }
+}
+  
  function goToDetailsPage() {
     // ⛔ Block if cart is empty
     if (!Array.isArray(cart) || cart.length === 0) {
