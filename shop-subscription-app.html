@@ -2846,19 +2846,23 @@ async function finalizeOrderStock(cart) {
 
   
 document.addEventListener("DOMContentLoaded", function () {
-   updateAllPrices(); // initial
-  // 🔹 Existing Filter Controls
+  updateAllPrices(); // initial
+
   const filterControls = document.querySelectorAll(".filter-controls");
 
   filterControls.forEach(control => {
     const targetPageId = control.getAttribute("data-target");
-
     const sortSelect = control.querySelector(".sortPrice");
     const sizeSelect = control.querySelector(".filterSize");
 
     sortSelect.addEventListener("change", () => sortProductsByPrice(targetPageId));
-    sizeSelect.addEventListener("change", () => filterProductsBySize(targetPageId));
+
+    // handle async properly
+    sizeSelect.addEventListener("change", async () => {
+      await filterProductsBySize(targetPageId);
+    });
   });
+});
 
   // 🔹 New Zoom + Pan Image Code
   const img = document.getElementById('descImage');
@@ -2980,9 +2984,13 @@ async function filterProductsBySize(pageId) {
 
   for (const card of cards) {
     const docId = card.getAttribute("data-docid");
-    const stock = await fetchStockOnce(docId);  // fetch sizes from Firestore
+    if (!docId) continue; // skip if no docId
 
-    const sizesAvailable = Object.keys(stock).filter(size => stock[size] > 0);
+    const stock = await fetchStockOnce(docId); // fetch live stock from Firebase
+
+    // sizes with quantity > 0
+    const sizesAvailable = Object.keys(stock).filter(sz => stock[sz] > 0);
+
     const hasSize = selectedSize === "all" || sizesAvailable.includes(selectedSize);
 
     card.style.display = hasSize ? "block" : "none";
