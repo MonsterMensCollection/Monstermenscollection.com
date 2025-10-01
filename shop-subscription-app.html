@@ -2974,15 +2974,19 @@ function sortProductsByPrice(pageId) {
   products.forEach(p => grid.appendChild(p));
 }
 
-function filterProductsBySize(pageId) {
+async function filterProductsBySize(pageId) {
   const selectedSize = document.querySelector(`[data-target="${pageId}"] .filterSize`).value;
   const cards = document.querySelectorAll(`#${pageId} .product-card`);
 
-  cards.forEach(card => {
-    const sizes = JSON.parse(card.getAttribute("data-sizes")); // get sizes array
-    const hasSize = selectedSize === "all" || sizes.includes(selectedSize);
+  for (const card of cards) {
+    const docId = card.getAttribute("data-docid");
+    const stock = await fetchStockOnce(docId);  // fetch sizes from Firestore
+
+    const sizesAvailable = Object.keys(stock).filter(size => stock[size] > 0);
+    const hasSize = selectedSize === "all" || sizesAvailable.includes(selectedSize);
+
     card.style.display = hasSize ? "block" : "none";
-  });
+  }
 }
 
 
