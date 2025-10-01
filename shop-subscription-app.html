@@ -2979,8 +2979,8 @@ function filterProductsBySize(pageId) {
   const cards = document.querySelectorAll(`#${pageId} .product-card`);
 
   cards.forEach(card => {
-    const onclickAttr = card.querySelector("img").getAttribute("onclick");
-    const hasSize = selectedSize === "all" || onclickAttr.includes(`'${selectedSize}'`);
+    const sizes = JSON.parse(card.getAttribute("data-sizes")); // get sizes array
+    const hasSize = selectedSize === "all" || sizes.includes(selectedSize);
     card.style.display = hasSize ? "block" : "none";
   });
 }
