@@ -6192,11 +6192,13 @@ function proceedWithCOD() {
 }
 
 // Function to save guest order to localStorage
+// Function to save guest order to localStorage
 function saveGuestOrder(orderData) {
   try {
     const guestOrders = JSON.parse(localStorage.getItem("guestOrders") || "[]");
     guestOrders.push(orderData);
     localStorage.setItem("guestOrders", JSON.stringify(guestOrders));
+    console.log("Order saved to localStorage:", orderData.orderNumber);
     return true;
   } catch (error) {
     console.error("Error saving guest order:", error);
@@ -6205,8 +6207,14 @@ function saveGuestOrder(orderData) {
 }
 
 // Function to load orders from localStorage for guest users
+// Function to load orders from localStorage for guest users
 function loadGuestOrders() {
   const orderList = document.getElementById("orderList");
+  if (!orderList) {
+    console.error("Order list element not found");
+    return;
+  }
+  
   orderList.innerHTML = "<li>Loading orders...</li>";
 
   try {
@@ -6254,7 +6262,7 @@ function loadGuestOrders() {
     }
   } catch (error) {
     console.error("Error loading guest orders:", error);
-    document.getElementById("orderList").innerHTML = `<li>Error loading orders: ${error.message}</li>`;
+    orderList.innerHTML = `<li>Error loading orders: ${error.message}</li>`;
   }
 }
 
