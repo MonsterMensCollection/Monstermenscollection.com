@@ -4894,7 +4894,19 @@
 
 <div id="profilePage" class="form-section" style="display: none; margin-top: 22%; padding: 20px; max-width: 90%; margin-left: auto; margin-right: auto; background-color: #fff; border-radius: 0px;">
   <!-- Logo -->
-  <img src="https://see.fontimg.com/api/rf5/woG33/N2Y3Y2RhYTdiOGMwNGVjOGE5MWE1MTFiNGJjM2E4Y2Iub3Rm/b3JkZXJz/redtrap-expanded-puo.png?r=fs&h=30&w=1000&fg=000000&bg=FFFFFF&tb=1&s=30" style="display: block; margin-left: auto; margin-right: auto;"><br><br>
+  <img src="https://see.fontimg.com/api/rf5/woG33/N2Y3Y2RhYTdiOGMwNGVjOGE5MWE1MTFiNGJjM2E4Y2Iub3Rm/UFJPRklMRQ/redtrap-expanded-puo.png?r=fs&h=30&w=1000&fg=000000&bg=FFFFFF&tb=1&s=30" style="display: block; margin-left: auto; margin-right: auto;"><br><br>
+
+  <!-- Profile Info -->
+  <div style="width: 100%; background-color: #f9f9f9; padding: 15px 20px; border-radius: 0px; box-sizing: border-box;">
+    <div style="margin-bottom: 15px;">
+      <label style="font-size: 14px; color: #777;">Name</label>
+      <div id="profileName" style="font-size: 18px; font-weight: bold; color: #333;">Loading...</div>
+    </div>
+    <div>
+      <label style="font-size: 14px; color: #777;">Email</label>
+      <div id="profileEmail" style="font-size: 18px; font-weight: bold; color: #333;">Loading...</div>
+    </div>
+  </div>
   
  <div style="display: none;">
   <label for="currencySelector"
@@ -4916,6 +4928,23 @@
     <option value="INR">₹ INR</option>
   </select>
 </div>
+
+  <!-- Why It Takes Time Button -->
+  <button onclick="toggleWhyTime()" style="margin-top: 30px; padding: 12px 20px; background-color: #eee; color: #000; border: none; border-radius: 0px; cursor: pointer; font-weight: bold; width: 100%;">
+    About Us
+  </button>
+
+  <!-- Hidden Explanation Text -->
+<div id="whyTimeMessage" style="max-height: 0; overflow: hidden; transition: max-height 0.5s ease-out, padding 0.5s ease-out; background-color: #f0f0f0; border-left: 4px solid #000; font-size: 14px; line-height: 1.6; color: #333; padding: 0 15px;">
+  <div style="padding-top: 15px; padding-bottom: 15px;">
+    I’m a dropout with a crazy love for streetwear and formal fits. Out of that passion, I started Enly—a space where style meets attitude. We mix street energy with sharp classics, built for guys who want to stand out and keep it real.
+  </div>
+</div>
+
+  <!-- Logout Button -->
+  <button onclick="logout()" style="margin-top: 20px; padding: 12px 20px; background-color: #000; color: white; border: none; border-radius: 0px; cursor: pointer; font-weight: bold; width: 100%;">
+    Logout
+  </button>
 
   <!-- Orders Section -->
   <div style="margin-top: 30px;">
@@ -5982,9 +6011,9 @@ function hideCart() {
 }
 async function checkoutCart() {
   /*──────────1. Basic form validation ──────────*/
-  const name = document.getElementById("checkoutName").value.trim();
-  const address = document.getElementById("checkoutAddress").value.trim();
-  const pincode = document.getElementById("checkoutPincode").value.trim();
+  const name         = document.getElementById("checkoutName").value.trim();
+  const address      = document.getElementById("checkoutAddress").value.trim();
+  const pincode      = document.getElementById("checkoutPincode").value.trim();
   const mobileNumber = document.getElementById("checkoutMobileNumber").value.trim();
 
   if (!name || !address || !pincode || !mobileNumber) {
@@ -6003,33 +6032,15 @@ async function checkoutCart() {
     return;
   }
 
-  // Generate guest user ID
-  const guestUID = 'guest_' + Date.now();
-
-  // Prepare order data for localStorage
-  const guestOrderData = {
-    uid: guestUID,
-    name: name,
-    address: address,
-    pincode: pincode,
-    mobilenumber: mobileNumber,
-    cart: [...cart],
-    total: grandTotalSelected,
-    currency: currentCurrency,
-    timestamp: new Date().toISOString(),
-    orderNumber: `ORD-GUEST-${Date.now()}`
-  };
-
   sessionStorage.setItem("pendingOrder", JSON.stringify({
     cart,
     addr: { name, address, pincode, mobileNumber },
-    uid: guestUID,
+    uid: auth.currentUser.uid,
     totals: {
       usd: subtotalUSD,
       sel: grandTotalSelected,
       curr: currentCurrency
-    },
-    guestOrderData: guestOrderData // Include guest order data for later saving
+    }
   }));
 
   const amountForGateway = Math.round(grandTotalSelected * 100);
@@ -6053,75 +6064,75 @@ async function checkoutCart() {
     order_id: orderId,
     prefill: {
       name: name,
-      email: "", // No email for guest users
+      email: firebase.auth().currentUser?.email || "",
       contact: mobileNumber,
     },
     theme: { color: "#007bff" },
     webview_intent: true,
-    callback_url: "https://monster-mens-collection.netlify.app/.netlify/functions/verify-signature",
-    handler: function(response) {
-      // Save the order to localStorage when payment is successful
-      const pendingOrder = JSON.parse(sessionStorage.getItem("pendingOrder") || "{}");
-      if (pendingOrder.guestOrderData) {
-        pendingOrder.guestOrderData.paymentId = response.razorpay_payment_id;
-        pendingOrder.guestOrderData.paymentMode = "Razorpay";
-        saveGuestOrder(pendingOrder.guestOrderData);
-      }
-      handleSuccessfulPayment(response);
+    callback_url   : "https://monster-mens-collection.netlify.app/.netlify/functions/verify-signature"
+       };
+  new Razorpay(options).open();        // snapshot is already in sessionStorage
+
+  /* ────────── 5. Success callback stays unchanged ────────── */
+  async function handleSuccessfulPayment (response) {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const orderData = {
+      uid         : user.uid,
+      name, address, pincode, mobilenumber: mobileNumber,
+      cart        : [...cart],
+      totalUSD    : subtotalUSD,
+      total       : grandTotalSelected,
+      currency    : currentCurrency,
+      paymentId   : response.razorpay_payment_id,
+      paymentMode : "Razorpay",
+      timestamp   : firebase.firestore.FieldValue.serverTimestamp(),
+      orderNumber : `ORD-${Date.now()}`
+    };
+
+    try {
+      await finalizeOrderStock(cart);                 // lock inventory
+      await db.collection("orders").add(orderData);   // record order
+      sessionStorage.removeItem("pendingOrder");      // 🔑 clear snapshot
+
+      /* success UI (unchanged) */
+      [
+        "descriptionPage","productList","shirtsPage","pantsPage",
+        "sliderSection","cartPage","profilePage","tshirtsPage",
+        "cargosPage","detailsPage"
+      ].forEach(id => (document.getElementById(id).style.display = "none"));
+
+      document.getElementById("paymentSuccessPage").style.display = "block";
+      document.getElementById("successPaymentId").textContent =
+        response.razorpay_payment_id;
+
+      cart = [];   // clear local cart
+
+      setTimeout(() => {
+        document.getElementById("paymentSuccessPage").style.display = "none";
+        document.getElementById("productList").style.display        = "block";
+        document.getElementById("sliderSection").style.display      = "block";
+      }, 5000);
+
+    } catch (err) {
+      console.error("Checkout finalisation failed:", err);
+      alert(
+        "Payment received but an item just sold out. " +
+        "A full refund will be issued automatically."
+      );
     }
-  };
-  
-  new Razorpay(options).open();
-}
-
-// Updated handleSuccessfulPayment function for guest users
-async function handleSuccessfulPayment(response) {
-  const pendingOrder = JSON.parse(sessionStorage.getItem("pendingOrder") || "{}");
-  
-  try {
-    // Update inventory in Firestore
-    await finalizeOrderStock(cart);
-    
-    // The order is already saved to localStorage via the handler
-    sessionStorage.removeItem("pendingOrder");
-
-    /* success UI */
-    [
-      "descriptionPage","productList","shirtsPage","pantsPage",
-      "sliderSection","cartPage","profilePage","tshirtsPage",
-      "cargosPage","detailsPage"
-    ].forEach(id => (document.getElementById(id).style.display = "none"));
-
-    document.getElementById("paymentSuccessPage").style.display = "block";
-    document.getElementById("successPaymentId").textContent =
-      response.razorpay_payment_id;
-
-    cart = [];   // clear local cart
-    localStorage.setItem("cart", "[]");
-
-    setTimeout(() => {
-      document.getElementById("paymentSuccessPage").style.display = "none";
-      document.getElementById("productList").style.display = "block";
-      document.getElementById("sliderSection").style.display = "block";
-    }, 5000);
-
-  } catch (err) {
-    console.error("Checkout finalisation failed:", err);
-    alert(
-      "Payment received but an item just sold out. " +
-      "A full refund will be issued automatically."
-    );
   }
 }
 
 function checkoutCOD() {
   const name = document.getElementById("checkoutName").value.trim();
   const address = document.getElementById("checkoutAddress").value.trim();
-  const pincode = document.getElementById("checkoutPincode").value.trim();
-  const mobilenumber = document.getElementById("checkoutMobileNumber").value.trim();
+   const pincode = document.getElementById("checkoutPincode").value.trim();
+  const mobilenumber  = document.getElementById("checkoutMobileNumber").value.trim();
 
-  if (!name || !address || !pincode || !mobilenumber) {
-    showCartToast("Please enter name, address, pincode and mobile number to continue");
+  if (!name || !address) {
+    showCartToast("Please enter name and address to continue");
     return;
   }
 
@@ -6132,50 +6143,53 @@ function checkoutCOD() {
     return;
   }
 
-  // Prepare guest order data for COD
-  const guestOrderData = {
-    uid: 'guest_' + Date.now(),
+  const user = auth.currentUser;
+  if (!user) {
+    showCartToast("You must be logged in to place an order");
+    return;
+  }
+
+  const orderData = {
+    uid: user.uid,
     name: name,
     address: address,
     pincode: pincode,
     mobilenumber: mobilenumber,
-    cart: [...cart],
+    cart: cart,
     total: totalAmount,
     paymentId: "COD",
     paymentMode: "Cash on Delivery",
-    timestamp: new Date().toISOString(),
-    orderNumber: `ORD-GUEST-COD-${Date.now()}`
+    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+    orderNumber: `ORD-${Date.now()}`
   };
 
-  // Save to localStorage
-  if (saveGuestOrder(guestOrderData)) {
-    // Success UI
-    document.getElementById("descriptionPage").style.display = "none";
-    document.getElementById("productList").style.display = "none";
-    document.getElementById("shirtsPage").style.display = "none";
-    document.getElementById("pantsPage").style.display = "none";
-    document.getElementById("sliderSection").style.display = "none";
-    document.getElementById("cartPage").style.display = "none";
-    document.getElementById("profilePage").style.display = "none";
-    document.getElementById("tshirtsPage").style.display = "none";
-    document.getElementById("cargosPage").style.display = "none";
+  db.collection("orders").add(orderData).then(() => {
 
-    // Show success page
-    document.getElementById("paymentSuccessPageCOD").style.display = "block";
+      //  UI changes after successful order
+          document.getElementById("descriptionPage").style.display = "none";
+          document.getElementById("productList").style.display = "none";
+          document.getElementById("shirtsPage").style.display = "none";
+          document.getElementById("pantsPage").style.display = "none";
+          document.getElementById("sliderSection").style.display = "none";
+          document.getElementById("cartPage").style.display = "none";
+          document.getElementById("profilePage").style.display = "none";
+            document.getElementById("tshirtsPage").style.display = "none";
+             document.getElementById("cargosPage").style.display = "none";
 
-    // Clear cart
-    cart = [];
-    localStorage.setItem("cart", "[]");
+          // Show success page
+          document.getElementById("paymentSuccessPageCOD").style.display = "block";
 
-    // Hide after 5 seconds and go back to products
-    setTimeout(() => {
-      document.getElementById("paymentSuccessPageCOD").style.display = "none";
-      document.getElementById("productList").style.display = "block";
-      document.getElementById("sliderSection").style.display = "block";
-    }, 5000);
-  } else {
+          // Hide after 5 seconds and go back to products
+          setTimeout(() => {
+            document.getElementById("paymentSuccessPageCOD").style.display = "none";
+            document.getElementById("productList").style.display = "block";
+            document.getElementById("sliderSection").style.display = "block";
+          }, 5000);
+    cart = []; // Return to main page
+  }).catch(error => {
+    console.error("Error placing COD order:", error);
     alert("Error placing order. Please try again.");
-  }
+  });
 }
 
 function confirmCOD() {
@@ -6191,129 +6205,62 @@ function proceedWithCOD() {
   checkoutCOD(); // existing function
 }
 
-// Function to save guest order to localStorage
-// Function to save guest order to localStorage
-function saveGuestOrder(orderData) {
-  try {
-    const guestOrders = JSON.parse(localStorage.getItem("guestOrders") || "[]");
-    guestOrders.push(orderData);
-    localStorage.setItem("guestOrders", JSON.stringify(guestOrders));
-    console.log("Order saved to localStorage:", orderData.orderNumber);
-    return true;
-  } catch (error) {
-    console.error("Error saving guest order:", error);
-    return false;
-  }
-}
 
-// Function to load orders from localStorage for guest users
-// Function to load orders from localStorage for guest users
-// Function to load orders from localStorage for guest users
-function loadGuestOrders() {
-  const orderList = document.getElementById("orderList");
-  if (!orderList) {
-    console.error("Order list element not found");
-    return;
-  }
-  
-  // Show loading state
-  orderList.innerHTML = "<div style='text-align: center; padding: 20px; color: #666;'>Loading orders...</div>";
-
-  // Small delay to ensure DOM is ready
-  setTimeout(() => {
-    try {
-      // Get orders from localStorage
-      const guestOrders = JSON.parse(localStorage.getItem("guestOrders") || "[]");
-      
-      orderList.innerHTML = "";
-
-      if (guestOrders.length === 0) {
-        orderList.innerHTML = "<div style='text-align: center; padding: 20px; color: #666;'>No orders found.</div>";
-      } else {
-        // Sort orders by timestamp (newest first)
-        guestOrders.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-        
-        guestOrders.forEach((order, index) => {
-          const orderDiv = document.createElement("div");
-          orderDiv.style.border = "1px solid #e0e0e0";
-          orderDiv.style.borderRadius = "8px";
-          orderDiv.style.padding = "15px";
-          orderDiv.style.marginBottom = "15px";
-          orderDiv.style.backgroundColor = "#f9f9f9";
-          
-          const paymentInfo = order.paymentMode || "Online Paid";
-          const orderDate = order.timestamp ? new Date(order.timestamp).toLocaleString() : "Unknown date";
-
-          let itemsHTML = "";
-          (order.cart || []).forEach((item, itemIndex) => {
-            itemsHTML += `
-              <div style="margin: 8px 0; padding: 8px; background: white; border-radius: 4px;">
-                <div style="font-weight: bold;">${item.title}</div>
-                <div style="font-size: 14px; color: #555;">
-                  Size: ${item.size || "N/A"} | Price: ₹${item.price}
-                </div>
-              </div>
-            `;
-          });
-
-          orderDiv.innerHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
-              <div>
-                <div style="font-size: 12px; color: #666; margin-bottom: 4px;">${orderDate}</div>
-                <div style="font-weight: bold; font-size: 16px;">${order.orderNumber || `Order #${index + 1}`}</div>
-              </div>
-              <div style="text-align: right;">
-                <div style="font-size: 14px; color: #666;">${paymentInfo}</div>
-                <div style="font-size: 18px; font-weight: bold; color: #000;">₹${order.total}</div>
-              </div>
-            </div>
-            <div style="margin-top: 10px;">
-              <div style="font-size: 12px; color: #666; margin-bottom: 5px;">Payment ID: ${order.paymentId}</div>
-              <div style="margin-top: 15px;">
-                <div style="font-size: 14px; font-weight: bold; margin-bottom: 8px;">Items (${(order.cart || []).length}):</div>
-                ${itemsHTML}
-              </div>
-            </div>
-          `;
-
-          orderList.appendChild(orderDiv);
-        });
-      }
-    } catch (error) {
-      console.error("Error loading guest orders:", error);
-      orderList.innerHTML = `<div style='text-align: center; padding: 20px; color: #ff4444;'>Error loading orders: ${error.message}</div>`;
-    }
-  }, 100);
-}
-  
 function showProfilePage() {
-  // Hide all pages, show profile
-  document.getElementById("productList").style.display = "none";
-  document.getElementById("sliderSection").style.display = "none";
-  document.getElementById("cartPage").style.display = "none";
-  document.getElementById("profilePage").style.display = "block";
-  document.getElementById("shirtsPage").style.display = "none";
-  document.getElementById("pantsPage").style.display = "none";
-  document.getElementById("descriptionPage").style.display = "none";
-  document.getElementById("tshirtsPage").style.display = "none";
-  document.getElementById("cargosPage").style.display = "none";
-  document.getElementById("detailsPage").style.display = "none";
-  
-  // Show guest message instead of user data
-  document.getElementById("profileEmail").textContent = "Guest User";
-  document.getElementById("profileName").textContent = "Shopping as Guest";
-  
-  // Load orders from localStorage for guest users
-  setTimeout(() => {
-    loadGuestOrders();
-  }, 200); // Small delay to ensure DOM is fully rendered
+ const user = auth.currentUser;
+ console.log(auth.currentUser?.email);
+  console.log("Current user:", user?.email, user?.uid);
+  if (user) {
+    document.getElementById("profileEmail").textContent = user.email;
+
+db.collection("users").doc(user.uid).get().then(doc => {
+  let name = "Not available";
+
+  if (doc.exists && doc.data().name) {
+    name = doc.data().name;
+  } else if (user.displayName) {
+    name = user.displayName;
+  }
+
+  document.getElementById("profileName").textContent = name;
+  loadUserProfileAndOrders();
+});
+
+
+    // Hide all pages, show profile
+    document.getElementById("productList").style.display = "none";
+    document.getElementById("sliderSection").style.display = "none";
+    document.getElementById("cartPage").style.display = "none";
+    document.getElementById("profilePage").style.display = "block";
+    document.getElementById("shirtsPage").style.display = "none";
+    document.getElementById("pantsPage").style.display = "none";
+    document.getElementById("descriptionPage").style.display = "none";
+      document.getElementById("tshirtsPage").style.display = "none";
+       document.getElementById("cargosPage").style.display = "none";
+     document.getElementById("detailsPage").style.display = "none";
+  }
 }
 function logout() {
-  // For guest users, just reload the page
-  location.reload();
+  auth.signOut().then(() => {
+    location.reload(); // Reload to return to login screen
+  });
 }
 
-const firebaseConfig = {
+function saveOrder(productName, uid) {
+  db.collection("orders").add({
+    uid, //  match field used in query
+    productName,
+    status: "Pending",
+    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+  }).then(docRef => {
+    console.log("Simple order saved:", docRef.id);
+  }).catch(error => {
+    console.error("Error saving simple order:", error);
+  });
+}
+
+
+  const firebaseConfig = {
   apiKey: "AIzaSyDzW8XuqrxM47W42HcIUXifa_X8tnfrLkY",
   authDomain: "monster-mens-collection.firebaseapp.com",
   projectId: "monster-mens-collection",
@@ -6404,7 +6351,97 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 });
 
-// Toast positioning and other utility functions
+// Modified profile page function to handle guest users
+function showProfilePage() {
+  // Hide all pages, show profile
+  document.getElementById("productList").style.display = "none";
+  document.getElementById("sliderSection").style.display = "none";
+  document.getElementById("cartPage").style.display = "none";
+  document.getElementById("profilePage").style.display = "block";
+  document.getElementById("shirtsPage").style.display = "none";
+  document.getElementById("pantsPage").style.display = "none";
+  document.getElementById("descriptionPage").style.display = "none";
+  document.getElementById("tshirtsPage").style.display = "none";
+  document.getElementById("cargosPage").style.display = "none";
+  document.getElementById("detailsPage").style.display = "none";
+  
+  // Show guest message instead of user data
+  document.getElementById("profileEmail").textContent = "Guest User";
+  document.getElementById("profileName").textContent = "Shopping as Guest";
+  
+  // Clear order list for guest users
+  document.getElementById("orderList").innerHTML = "<li>Sign in to view order history</li>";
+}
+
+// Modified checkout function for guest users
+async function checkoutCart() {
+  const name = document.getElementById("checkoutName").value.trim();
+  const address = document.getElementById("checkoutAddress").value.trim();
+  const pincode = document.getElementById("checkoutPincode").value.trim();
+  const mobileNumber = document.getElementById("checkoutMobileNumber").value.trim();
+
+  if (!name || !address || !pincode || !mobileNumber) {
+    showCartToast("Please complete all address fields");
+    return;
+  }
+
+  const subtotalUSD = cart.reduce((s, it) => s + it.price, 0);
+  const subtotalSelected = convert(subtotalUSD);
+  const shippingSelected = subtotalSelected >= convert(0) ? 0 : convert(0);
+  const grandTotalSelected = subtotalSelected + shippingSelected;
+
+  if (grandTotalSelected === 0) {
+    showCartToast("Cart is empty!");
+    return;
+  }
+
+  // Generate guest user ID
+  const guestUID = 'guest_' + Date.now();
+
+  sessionStorage.setItem("pendingOrder", JSON.stringify({
+    cart,
+    addr: { name, address, pincode, mobileNumber },
+    uid: guestUID,
+    totals: {
+      usd: subtotalUSD,
+      sel: grandTotalSelected,
+      curr: currentCurrency
+    }
+  }));
+
+  const amountForGateway = Math.round(grandTotalSelected * 100);
+
+  // Create Razorpay order
+  const { id: orderId } = await fetch("/.netlify/functions/create-order", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      amount: amountForGateway,
+      currency: currentCurrency
+    })
+  }).then(r => r.json());
+
+  const options = {
+    key: "rzp_live_u6z4G2762EuQ4E",
+    amount: amountForGateway,
+    currency: "INR",
+    name: "Monster Men's Collection",
+    description: "Cart Checkout",
+    order_id: orderId,
+    prefill: {
+      name: name,
+      email: "", // No email for guest users
+      contact: mobileNumber,
+    },
+    theme: { color: "#007bff" },
+    webview_intent: true,
+    callback_url: "https://monster-mens-collection.netlify.app/.netlify/functions/verify-signature"
+  };
+  
+  new Razorpay(options).open();
+}
+
+// Toast positioning and other utility functions remain the same
 let cartToastTimer;
 
 function positionCartToast(){
@@ -6439,7 +6476,7 @@ function showCartToast(message = "Item added to cart"){
 window.addEventListener('resize', positionCartToast);
 document.addEventListener('DOMContentLoaded', positionCartToast);
 
-// Scroll behavior
+// Scroll behavior remains the same
 let lastScrollTop = 0;
 const bottomNav = document.getElementById("bottomNav");
 const shippingBar = document.getElementById("shippingBar");
