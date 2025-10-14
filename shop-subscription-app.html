@@ -6522,6 +6522,83 @@ window.addEventListener("scroll", function () {
   lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
 });
 
+  // Simple back button handler - add this to your existing JavaScript
+window.addEventListener('popstate', function(event) {
+    // Get the current hash from URL
+    const hash = window.location.hash;
+    
+    // Map URL hashes to page display functions
+    const pageMap = {
+        '#home': backToProducts,
+        '#shirts': showShirtsPage,
+        '#tshirts': showTshirtsPage,
+        '#pants': showPantsPage,
+        '#cargos': showCargosPage,
+        '#cart': showCart,
+        '#profile': showProfilePage,
+        '#description': function() {
+            // Can't easily go back to description, so go home
+            backToProducts();
+        },
+        '#details': function() {
+            // Go back to cart from details page
+            showCart();
+        }
+    };
+    
+    // If we have a handler for this hash, use it
+    if (hash && pageMap[hash]) {
+        pageMap[hash]();
+    } else {
+        // Default to home
+        backToProducts();
+    }
+});
+
+// Update your existing navigation functions to use pushState
+// Modify your existing page navigation functions like this:
+const originalShowShirtsPage = showShirtsPage;
+showShirtsPage = function() {
+    history.pushState({}, '', '#shirts');
+    originalShowShirtsPage();
+};
+
+// Do the same for other navigation functions...
+const originalShowTshirtsPage = showTshirtsPage;
+showTshirtsPage = function() {
+    history.pushState({}, '', '#tshirts');
+    originalShowTshirtsPage();
+};
+
+const originalShowPantsPage = showPantsPage;
+showPantsPage = function() {
+    history.pushState({}, '', '#pants');
+    originalShowPantsPage();
+};
+
+const originalShowCargosPage = showCargosPage;
+showCargosPage = function() {
+    history.pushState({}, '', '#cargos');
+    originalShowCargosPage();
+};
+
+const originalShowCart = showCart;
+showCart = function() {
+    history.pushState({}, '', '#cart');
+    originalShowCart();
+};
+
+const originalShowProfilePage = showProfilePage;
+showProfilePage = function() {
+    history.pushState({}, '', '#profile');
+    originalShowProfilePage();
+};
+
+const originalBackToProducts = backToProducts;
+backToProducts = function() {
+    history.pushState({}, '', '#home');
+    originalBackToProducts();
+};
   
 </script>
 
