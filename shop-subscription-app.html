@@ -720,57 +720,15 @@
     <div>
    
     
-    <div id="loginSection" class="form-section" >
-        <h1 id="title">Login</h1>
-      <input type="email" id="email" placeholder="Email" />
-      <input type="password" id="password" placeholder="Password" />
-      <button id="emailLoginBtn">Login</button>
-      <a href="#" id="forgotPasswordLink">Forgot Password?</a>
-      <div id="statusMessage" class="status-message"></div>
-      <p class="toggle-link" onclick="toggleForm()">Don't have an account? Sign Up</p>
-     
-                 <div style="margin-top: 30px; padding: 10px; text-align: center; font-size: 14px; color: #555;">
-     <a href="https://iridescent-sawine-8f375c.netlify.app/privacy-policy" 
-   target="_blank" style="color: #007bff; background: none; border: none; padding: 0; margin: 0; box-shadow: none; font-weight: normal;"> Privacy Policy</a> 
-
-              <br> <br>     <a href="https://elegant-peony-a2efdd.netlify.app/" 
-   target="_blank" style="color: #007bff; background: none; border: none; padding: 0; margin: 0; box-shadow: none; font-weight: normal;"> Terms and Conditions</a> 
-  </div>
-
-    </div>
    
-    <div id="signupSection" class="form-section" style="display: none;">
-        <h1 id="title">Sign Up</h1>
-      <input type="text" id="signupName" placeholder="Enter your name" required>
-      <input type="email" id="signupEmail" placeholder="Email" />
-      <input type="password" id="signupPassword" placeholder="Password" />
-      <button id="emailSignupBtn">Sign Up</button>
-      <p class="toggle-link" onclick="toggleForm()">Already have an account? Login</p>
-      
-      <div style="margin-top: 30px; padding: 10px; text-align: center; font-size: 14px; color: #555;">
-    <a href="https://iridescent-sawine-8f375c.netlify.app/privacy-policy" 
-   target="_blank" style="color: #007bff; background: none; border: none; padding: 0; margin: 0; box-shadow: none; font-weight: normal;">Privacy Policy</a>
-
-        <br> <br>     <a href="https://elegant-peony-a2efdd.netlify.app/" 
-   target="_blank" style="color: #007bff; background: none; border: none; padding: 0; margin: 0; box-shadow: none; font-weight: normal;"> Terms and Conditions</a> 
-  </div>
-      
-    </div>
+   
+    
     
    
   
   
 </div> 
-    <div id="subscriptionSection" style="display:none;">
-      <p class="info">Get any 1 Shirt + any 1 Pant at ₹999 <br><h3><center>WHOLESALE PRICE</h3></p>
-      <form class="form-section" id="subscriptionForm">
-        <button type="submit">Subscribe at ₹2/month </button>
-      </form>
-      <div class="confirmation" id="confirmationMessage"></div>
-      <p class="form-section">
-        <button id="logoutBtn">Logout</button>
-      </p>
-    </div>
+   
 </div>
 
    <div id="productsPage" >
@@ -6302,337 +6260,188 @@ function saveOrder(productName, uid) {
 }
 
 
-     const firebaseConfig = {
-      apiKey: "AIzaSyDzW8XuqrxM47W42HcIUXifa_X8tnfrLkY",
-      authDomain: "monster-mens-collection.firebaseapp.com",
-      projectId: "monster-mens-collection",
-      storageBucket: "monster-mens-collection.appspot.com",
-      messagingSenderId: "21161410221",
-      appId: "1:21161410221:web:3f4c777d4b5c8db20a9024",
-      measurementId: "G-5WFHV50M9Z"
-    };
+  const firebaseConfig = {
+  apiKey: "AIzaSyDzW8XuqrxM47W42HcIUXifa_X8tnfrLkY",
+  authDomain: "monster-mens-collection.firebaseapp.com",
+  projectId: "monster-mens-collection",
+  storageBucket: "monster-mens-collection.appspot.com",
+  messagingSenderId: "21161410221",
+  appId: "1:21161410221:web:3f4c777d4b5c8db20a9024",
+  measurementId: "G-5WFHV50M9Z"
+};
 
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
+// Real-time inventory updates for cart
 db.collection("products").onSnapshot(snap => {
   snap.docChanges().forEach(ch => {
-    if (ch.type !== "modified") return;          // only stock edits
+    if (ch.type !== "modified") return;
 
     const docId = ch.doc.id;
-    const sizes = ch.doc.data().sizes || {};     // { M:3, L:0, … }
+    const sizes = ch.doc.data().sizes || {};
 
-    /* ── walk through every size that changed ───────────────── */
     Object.entries(sizes).forEach(([sz, qty]) => {
-
-      /* 1️⃣ Trim the cart if we now hold more units than exist */
       const matches = cart.filter(it => it.docId === docId && it.size === sz);
-      let toRemove   = Math.max(0, matches.length - qty);   // excess units
+      let toRemove = Math.max(0, matches.length - qty);
 
       if (toRemove > 0) {
         cart = cart.filter(it => {
           if (toRemove && it.docId === docId && it.size === sz) {
-            --toRemove;                // drop just enough copies
-            return false;              // ← removes this entry
+            --toRemove;
+            return false;
           }
-          return true;                 // keep the rest
+          return true;
         });
 
         alert(
-          `Heads-up! Another shopper just bought “${docId} – ${sz}”.\n` +
+          `Heads-up! Another shopper just bought "${docId} – ${sz}".\n` +
           `Your quantity was reduced to ${qty}.`
         );
       }
 
-      /* 2️⃣ If stock hit zero, purge any remaining copies      */
       if (qty === 0) {
         cart = cart.filter(it => !(it.docId === docId && it.size === sz));
       }
     });
 
-    /* 3️⃣ Persist & refresh UI (runs once per document change) */
     localStorage.setItem("cart", JSON.stringify(cart));
 
     if (document.getElementById("cartPage").style.display !== "none") {
-      showCart();                       // rebuild list + totals
+      showCart();
     }
-    updateCartAmounts();                // keep bottom bar in-sync
+    updateCartAmounts();
   });
 });
 
-  
-function loadUserProfileAndOrders() {
-    auth.onAuthStateChanged(async (user) => {
-      if (user) {
-        // Set profile name and email
-        document.getElementById('profileEmail').innerText = user.email;
-
-        // Load orders
-        const orderList = document.getElementById("orderList");
-        orderList.innerHTML = "<li>Loading orders...</li>";
-
-        try {
-         const ordersSnapshot = await db.collection("orders")
-             .where("uid", "==", user.uid)
-              .orderBy("timestamp", "desc")
-             .get();
-
-          orderList.innerHTML = "";
-
-          if (ordersSnapshot.empty) {
-            orderList.innerHTML = "<li>No orders found.</li>";
-          } else {
-            orderList.innerHTML = "";
-
-ordersSnapshot.forEach((doc, index) => {
-  const order = doc.data();
-  const orderDiv = document.createElement("div");
-  orderDiv.style.border = "1px solid #ccc";
-  orderDiv.style.borderRadius = "0px";
-  orderDiv.style.padding = "10px";
-  orderDiv.style.marginBottom = "15px";
-  
-  const paymentInfo = order.paymentMode ? order.paymentMode : "Online Paid";
-
-  let itemsHTML = "";
-  (order.cart || []).forEach(item => {
-    itemsHTML += `
-      <div style="margin-left: 10px; margin-top: 5px;">
-      🔹 <strong>${item.title}</strong> - ₹${item.price}
-      <div style="font-size: 12px; color: #555;">Size: ${item.size || "N/A"}</div>
-    </div>
-    `;
-  });
-
-  orderDiv.innerHTML = `
-   <div style="font-size: 12px; color: gray;">Placed on: ${order.timestamp?.toDate().toLocaleString() || "Unknown"}</div>
-    <div><strong>Order No:</strong> ${order.orderNumber || `#${index + 1}`}</div>
-    <div><strong>Payment:</strong>${paymentInfo}</div>
-    <div><strong>Payment ID:</strong> ${order.paymentId}</div>
-    <div style="margin-top: 10px;">${itemsHTML}</div>
-    <br><div><strong>Total:</strong> ₹${order.total}</div>
-  `;
-
-  orderList.appendChild(orderDiv);
-});
-
-          }
-        } catch (error) {
-         console.error("Error loading orders:", error);
-         document.getElementById("orderList").innerHTML = `<li>Error loading orders: ${error.message}</li>`;
-        }
-      }
-    });
-  }
-  
-    const loginSection = document.getElementById("loginSection");
-    const signupSection = document.getElementById("signupSection");
-    const subscriptionSection = document.getElementById("subscriptionSection");
-    const productsPage = document.getElementById("productsPage");
-    const logoutBtn = document.getElementById("logoutBtn");
-    const statusMessage = document.getElementById("statusMessage");
-    const adminControls = document.getElementById("adminControls");
-
-    const adminEmails = ["youremail@example.com"];
-
-    async function checkSubscription(uid) {
-      const doc = await db.collection("subscriptions").doc(uid).get();
-      if (!doc.exists) return false;
-      const data = doc.data();
-      const now = new Date();
-      const expiryDate = data.expiryDate?.toDate?.() || new Date(data.expiryDate);
-      return expiryDate > now;
-    }
-
-    async function updatePageForUser(user) {
-      await user.reload();
-      if (!user.emailVerified) {
-        showCartToast("Please verify your email address before continuing");
-        auth.signOut();
-        return;
-      }
-      const subscribed = await checkSubscription(user.uid);
-      const container = document.getElementById("mainContainer");
-
-if (subscribed) {
-  subscriptionSection.style.display = "none";
-  productsPage.style.display = "block";
-  document.getElementById("title").textContent = "";
-  container.classList.add("no-box");
-  container.classList.remove("with-top-margin");
-} else {
-  subscriptionSection.style.display = "none";
-  productsPage.style.display = "block";
-  document.getElementById("title").textContent = "";
-  container.classList.add("no-box");
-  container.classList.remove("with-top-margin");
-}
-      loginSection.style.display = "none";
-      signupSection.style.display = "none";
-      adminControls.style.display = adminEmails.includes(user.email) ? "block" : "none";
-    }
-
-    async function saveSubscription(uid) {
-      const expiry = new Date();
-      expiry.setMonth(expiry.getMonth() + 1);
-      await db.collection("subscriptions").doc(uid).set({
-        expiryDate: expiry,
-        createdAt: new Date()
-      });
-    }
-    logoutBtn.addEventListener("click", () => {
-      auth.signOut();
-    });
-
-    auth.onAuthStateChanged(async (user) => {
-      if (user) {
-        await updatePageForUser(user);
-      } else {
-        subscriptionSection.style.display = "none";
-        productsPage.style.display = "none";
-        loginSection.style.display = "flex";
-        signupSection.style.display = "none";
-        document.getElementById("title").textContent = "Login";
-        document.getElementById("confirmationMessage").textContent = "";
-        statusMessage.textContent = "";
-        adminControls.style.display = "none";
-      }
-    });
-
-    document.getElementById("emailLoginBtn").addEventListener("click", () => {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      auth.signInWithEmailAndPassword(email, password)
-        .catch((error) => {
-          statusMessage.textContent = "Incorrect email or password. Please try again.";
-        });
-    });
-
-    document.getElementById("emailSignupBtn").addEventListener("click", () => {
-  const name = document.getElementById("signupName").value;
-  const email = document.getElementById("signupEmail").value;
-  const password = document.getElementById("signupPassword").value;
-
-  auth.createUserWithEmailAndPassword(email, password)
-    .then((userCredential) => {
-      const user = userCredential.user;
-
-      // Save name and email to Firestore
-      db.collection("users").doc(user.uid).set({
-        name: name,
-        email: email
-      }).then(() => {
-        console.log("User data saved to Firestore.");
-      }).catch((error) => {
-        console.error("Error saving user data to Firestore: ", error);
-      });
-
-      user.sendEmailVerification()
-        .then(() => {
-          statusMessage.textContent = `A verification email has been sent to ${email}. Please verify before logging in.`;
-          signupSection.style.display = "none";
-          loginSection.style.display = "flex";
-          document.getElementById("title").textContent = "Login";
-        })
-        .catch((error) => {
-          statusMessage.textContent = "Failed to send verification email: " + error.message;
-        });
-
-      auth.signOut(); // Log out after sending email
-    })
-    .catch((error) => {
-      if (error.code === 'auth/email-already-in-use') {
-        statusMessage.textContent = "This email is already in use. Please login instead.";
-        toggleForm();
-      } else {
-        statusMessage.textContent = error.message;
-      }
-    });
-});
-    document.getElementById("forgotPasswordLink").addEventListener("click", () => {
-      const email = document.getElementById("email").value;
-      if (!email) {
-        statusMessage.textContent = "Please enter your email address first.";
-        return;
-      }
-      auth.sendPasswordResetEmail(email)
-        .then(() => {
-          statusMessage.textContent = `A password reset link has been sent to ${email}. Please check your inbox.`;
-        })
-        .catch((error) => {
-          statusMessage.textContent = error.message;
-        });
-    });
-    function updateBottomNavVisibility() {
-  const loginVisible = document.getElementById("loginSection").style.display !== "none";
-  const signupVisible = document.getElementById("signupSection").style.display !== "none";
-  const subscriptionVisible = document.getElementById("subscriptionSection").style.display !== "none";
-
-  const bottomNav = document.getElementById("bottomNav");
-
-  if (loginVisible || signupVisible || subscriptionVisible) {
-    bottomNav.style.display = "none";
-  } else {
-    bottomNav.style.display = "flex"; // or "block" if you're not using flex layout
-  }
-}
-  const subscriptionForm = document.getElementById("subscriptionForm");
-
-  subscriptionForm.addEventListener("submit", async function (e) {
-    e.preventDefault(); // Prevent page reload
-
-    const razorpayOptions = {
-      key: "rzp_live_u6z4G2762EuQ4E", // Replace with your Razorpay test key
-      amount: 200, // ₹2 in paise
-      currency: "INR",
-      name: "Monster Men's Collection",
-      description: "Monthly Subscription",
-      handler: function (response) {
-        // You can store payment success in Firestore or show a message
-        document.getElementById("confirmationMessage").innerText = "Payment successful! Thank you for subscribing.";
-      },
-      prefill: {
-        email: firebase.auth().currentUser?.email || "",
-      },
-      theme: {
-        color: "#007bff",
-      },  
-      webview_intent: true
-    };
-
-    const rzp = new Razorpay(razorpayOptions);
-    rzp.open();
-  });
-    function toggleForm() {
-      const isLoginVisible = loginSection.style.display !== "none";
-      loginSection.style.display = isLoginVisible ? "none" : "flex";
-      signupSection.style.display = isLoginVisible ? "flex" : "none";
-      document.getElementById("title").textContent = isLoginVisible ? "Sign Up" : "Login";
-      statusMessage.textContent = "";
-    }
-
-  window.addEventListener('load', () => {
+// Show products page directly on load
+document.addEventListener("DOMContentLoaded", function() {
+  // Hide loading screen
   const loader = document.getElementById('loadingScreen');
-  /* fade first, then hard-remove to avoid catching tab-focus */
   loader.classList.add('fade-out');
-  setTimeout(() => loader.remove(), 600);  // match CSS transition
-});
+  setTimeout(() => loader.remove(), 600);
   
-  window.onpopstate = function (event) {
-  if (event.state && event.state.page) {
-    const page = event.state.page;
-    // Hide all pages first
-    document.querySelectorAll(".page").forEach(p => p.style.display = "none");
+  // Show products page
+  document.getElementById("productsPage").style.display = "block";
+  document.getElementById("sliderSection").style.display = "block";
+  
+  // Hide login/signup sections
+  document.getElementById("loginSection").style.display = "none";
+  document.getElementById("signupSection").style.display = "none";
+  document.getElementById("subscriptionSection").style.display = "none";
+  
+  // Update container styling
+  document.getElementById("mainContainer").classList.add("no-box");
+  
+  // Initialize cart
+  cart = JSON.parse(localStorage.getItem("cart") || "[]");
+  
+  // Set up other initializations
+  updateAllPrices();
+  positionCartToast();
+  
+  // Initialize filter controls
+  const filterControls = document.querySelectorAll(".filter-controls");
+  filterControls.forEach(control => {
+    const targetPageId = control.getAttribute("data-target");
+    const sortSelect = control.querySelector(".sortPrice");
+    const sizeSelect = control.querySelector(".filterSize");
+    sortSelect.addEventListener("change", () => sortProductsByPrice(targetPageId));
+    sizeSelect.addEventListener("change", () => filterProductsBySize(targetPageId));
+  });
+});
 
-    // Then show the correct one
-    document.getElementById(page).style.display = "block";
-    document.getElementById("descriptionPage").style.display = "none";
-    document.getElementById("detailsPage").style.display = "none";
+// Modified profile page function to handle guest users
+function showProfilePage() {
+  // Hide all pages, show profile
+  document.getElementById("productList").style.display = "none";
+  document.getElementById("sliderSection").style.display = "none";
+  document.getElementById("cartPage").style.display = "none";
+  document.getElementById("profilePage").style.display = "block";
+  document.getElementById("shirtsPage").style.display = "none";
+  document.getElementById("pantsPage").style.display = "none";
+  document.getElementById("descriptionPage").style.display = "none";
+  document.getElementById("tshirtsPage").style.display = "none";
+  document.getElementById("cargosPage").style.display = "none";
+  document.getElementById("detailsPage").style.display = "none";
+  
+  // Show guest message instead of user data
+  document.getElementById("profileEmail").textContent = "Guest User";
+  document.getElementById("profileName").textContent = "Shopping as Guest";
+  
+  // Clear order list for guest users
+  document.getElementById("orderList").innerHTML = "<li>Sign in to view order history</li>";
+}
+
+// Modified checkout function for guest users
+async function checkoutCart() {
+  const name = document.getElementById("checkoutName").value.trim();
+  const address = document.getElementById("checkoutAddress").value.trim();
+  const pincode = document.getElementById("checkoutPincode").value.trim();
+  const mobileNumber = document.getElementById("checkoutMobileNumber").value.trim();
+
+  if (!name || !address || !pincode || !mobileNumber) {
+    showCartToast("Please complete all address fields");
+    return;
   }
-};
 
-/* —— Position the toast exactly above the shipping bar ——— */
+  const subtotalUSD = cart.reduce((s, it) => s + it.price, 0);
+  const subtotalSelected = convert(subtotalUSD);
+  const shippingSelected = subtotalSelected >= convert(0) ? 0 : convert(0);
+  const grandTotalSelected = subtotalSelected + shippingSelected;
+
+  if (grandTotalSelected === 0) {
+    showCartToast("Cart is empty!");
+    return;
+  }
+
+  // Generate guest user ID
+  const guestUID = 'guest_' + Date.now();
+
+  sessionStorage.setItem("pendingOrder", JSON.stringify({
+    cart,
+    addr: { name, address, pincode, mobileNumber },
+    uid: guestUID,
+    totals: {
+      usd: subtotalUSD,
+      sel: grandTotalSelected,
+      curr: currentCurrency
+    }
+  }));
+
+  const amountForGateway = Math.round(grandTotalSelected * 100);
+
+  // Create Razorpay order
+  const { id: orderId } = await fetch("/.netlify/functions/create-order", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      amount: amountForGateway,
+      currency: currentCurrency
+    })
+  }).then(r => r.json());
+
+  const options = {
+    key: "rzp_live_u6z4G2762EuQ4E",
+    amount: amountForGateway,
+    currency: "INR",
+    name: "Monster Men's Collection",
+    description: "Cart Checkout",
+    order_id: orderId,
+    prefill: {
+      name: name,
+      email: "", // No email for guest users
+      contact: mobileNumber,
+    },
+    theme: { color: "#007bff" },
+    webview_intent: true,
+    callback_url: "https://monster-mens-collection.netlify.app/.netlify/functions/verify-signature"
+  };
+  
+  new Razorpay(options).open();
+}
+
+// Toast positioning and other utility functions remain the same
 let cartToastTimer;
 
 function positionCartToast(){
@@ -6640,10 +6449,9 @@ function positionCartToast(){
   if (!toast) return;
   const ship = document.getElementById('shippingBar');
 
-  // If shipping bar is visible, use its real height; else 0
   const shipVisible = ship && getComputedStyle(ship).display !== 'none';
   const shipH = shipVisible ? (ship.offsetHeight || 32) : 0;
-  const gap = 20; // small gap above the shipping bar
+  const gap = 20;
 
   toast.style.bottom = `calc(var(--nav-h) + env(safe-area-inset-bottom) + ${shipH + gap}px)`;
 }
@@ -6655,23 +6463,20 @@ function showCartToast(message = "Item added to cart"){
   toast.textContent = ` ${message}`;
   positionCartToast();
 
-  // restart animation if already visible
   toast.classList.remove('show');
-  // force reflow to allow the animation to replay
   void toast.offsetWidth;
   toast.classList.add('show');
 
   clearTimeout(cartToastTimer);
   cartToastTimer = setTimeout(() => {
     toast.classList.remove('show');
-  }, 1600); // visible for ~1.6s
+  }, 1600);
 }
 
 window.addEventListener('resize', positionCartToast);
 document.addEventListener('DOMContentLoaded', positionCartToast);
 
-
-
+// Scroll behavior remains the same
 let lastScrollTop = 0;
 const bottomNav = document.getElementById("bottomNav");
 const shippingBar = document.getElementById("shippingBar");
@@ -6715,20 +6520,6 @@ window.addEventListener("scroll", function () {
   }
 
   lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
-});
-
-  
-
-
-/* 2️⃣  Fallback – not as reliable, but works on some old WebViews           */
-
-
-  
-    // On initial load (login/signup page), add top margin
-document.getElementById("mainContainer").classList.add("with-top-margin");
-document.getElementById("backToSubscription").addEventListener("click", () => {
-     firebase.auth().signOut();
-  document.getElementById("mainContainer").classList.add("with-top-margin");
 });
 
   
