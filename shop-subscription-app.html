@@ -5059,7 +5059,9 @@
   
 <script>
 
-  // Initialize the page to show products directly
+ let lastCategoryPage = null;
+
+// Initialize the page to show products directly
 document.addEventListener("DOMContentLoaded", function() {
   // Show products page directly without login
   document.getElementById("productsPage").style.display = "block";
@@ -5073,9 +5075,6 @@ document.addEventListener("DOMContentLoaded", function() {
   // Update bottom nav visibility
   updateBottomNavVisibility();
 });
-
-      
-      let lastCategoryPage = null;
 
 function showShirtsPage() {
   if (lastCategoryPage !== 'shirtsPage') {
