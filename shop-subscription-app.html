@@ -6208,6 +6208,7 @@ function saveGuestOrder(orderData) {
 
 // Function to load orders from localStorage for guest users
 // Function to load orders from localStorage for guest users
+// Function to load orders from localStorage for guest users
 function loadGuestOrders() {
   const orderList = document.getElementById("orderList");
   if (!orderList) {
@@ -6215,57 +6216,76 @@ function loadGuestOrders() {
     return;
   }
   
-  orderList.innerHTML = "<li>Loading orders...</li>";
+  // Show loading state
+  orderList.innerHTML = "<div style='text-align: center; padding: 20px; color: #666;'>Loading orders...</div>";
 
-  try {
-    // Get orders from localStorage
-    const guestOrders = JSON.parse(localStorage.getItem("guestOrders") || "[]");
-    
-    orderList.innerHTML = "";
-
-    if (guestOrders.length === 0) {
-      orderList.innerHTML = "<li>No orders found.</li>";
-    } else {
-      // Sort orders by timestamp (newest first)
-      guestOrders.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+  // Small delay to ensure DOM is ready
+  setTimeout(() => {
+    try {
+      // Get orders from localStorage
+      const guestOrders = JSON.parse(localStorage.getItem("guestOrders") || "[]");
       
-      guestOrders.forEach((order, index) => {
-        const orderDiv = document.createElement("div");
-        orderDiv.style.border = "1px solid #ccc";
-        orderDiv.style.borderRadius = "0px";
-        orderDiv.style.padding = "10px";
-        orderDiv.style.marginBottom = "15px";
+      orderList.innerHTML = "";
+
+      if (guestOrders.length === 0) {
+        orderList.innerHTML = "<div style='text-align: center; padding: 20px; color: #666;'>No orders found.</div>";
+      } else {
+        // Sort orders by timestamp (newest first)
+        guestOrders.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
         
-        const paymentInfo = order.paymentMode ? order.paymentMode : "Online Paid";
+        guestOrders.forEach((order, index) => {
+          const orderDiv = document.createElement("div");
+          orderDiv.style.border = "1px solid #e0e0e0";
+          orderDiv.style.borderRadius = "8px";
+          orderDiv.style.padding = "15px";
+          orderDiv.style.marginBottom = "15px";
+          orderDiv.style.backgroundColor = "#f9f9f9";
+          
+          const paymentInfo = order.paymentMode || "Online Paid";
+          const orderDate = order.timestamp ? new Date(order.timestamp).toLocaleString() : "Unknown date";
 
-        let itemsHTML = "";
-        (order.cart || []).forEach(item => {
-          itemsHTML += `
-            <div style="margin-left: 10px; margin-top: 5px;">
-            🔹 <strong>${item.title}</strong> - ₹${item.price}
-            <div style="font-size: 12px; color: #555;">Size: ${item.size || "N/A"}</div>
-          </div>
+          let itemsHTML = "";
+          (order.cart || []).forEach((item, itemIndex) => {
+            itemsHTML += `
+              <div style="margin: 8px 0; padding: 8px; background: white; border-radius: 4px;">
+                <div style="font-weight: bold;">${item.title}</div>
+                <div style="font-size: 14px; color: #555;">
+                  Size: ${item.size || "N/A"} | Price: ₹${item.price}
+                </div>
+              </div>
+            `;
+          });
+
+          orderDiv.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+              <div>
+                <div style="font-size: 12px; color: #666; margin-bottom: 4px;">${orderDate}</div>
+                <div style="font-weight: bold; font-size: 16px;">${order.orderNumber || `Order #${index + 1}`}</div>
+              </div>
+              <div style="text-align: right;">
+                <div style="font-size: 14px; color: #666;">${paymentInfo}</div>
+                <div style="font-size: 18px; font-weight: bold; color: #000;">₹${order.total}</div>
+              </div>
+            </div>
+            <div style="margin-top: 10px;">
+              <div style="font-size: 12px; color: #666; margin-bottom: 5px;">Payment ID: ${order.paymentId}</div>
+              <div style="margin-top: 15px;">
+                <div style="font-size: 14px; font-weight: bold; margin-bottom: 8px;">Items (${(order.cart || []).length}):</div>
+                ${itemsHTML}
+              </div>
+            </div>
           `;
+
+          orderList.appendChild(orderDiv);
         });
-
-        orderDiv.innerHTML = `
-          <div style="font-size: 12px; color: gray;">Placed on: ${new Date(order.timestamp).toLocaleString() || "Unknown"}</div>
-          <div><strong>Order No:</strong> ${order.orderNumber || `#${index + 1}`}</div>
-          <div><strong>Payment:</strong> ${paymentInfo}</div>
-          <div><strong>Payment ID:</strong> ${order.paymentId}</div>
-          <div style="margin-top: 10px;">${itemsHTML}</div>
-          <br><div><strong>Total:</strong> ₹${order.total}</div>
-        `;
-
-        orderList.appendChild(orderDiv);
-      });
+      }
+    } catch (error) {
+      console.error("Error loading guest orders:", error);
+      orderList.innerHTML = `<div style='text-align: center; padding: 20px; color: #ff4444;'>Error loading orders: ${error.message}</div>`;
     }
-  } catch (error) {
-    console.error("Error loading guest orders:", error);
-    orderList.innerHTML = `<li>Error loading orders: ${error.message}</li>`;
-  }
+  }, 100);
 }
-
+  
 function showProfilePage() {
   // Hide all pages, show profile
   document.getElementById("productList").style.display = "none";
@@ -6284,9 +6304,10 @@ function showProfilePage() {
   document.getElementById("profileName").textContent = "Shopping as Guest";
   
   // Load orders from localStorage for guest users
-  loadGuestOrders();
+  setTimeout(() => {
+    loadGuestOrders();
+  }, 200); // Small delay to ensure DOM is fully rendered
 }
-
 function logout() {
   // For guest users, just reload the page
   location.reload();
