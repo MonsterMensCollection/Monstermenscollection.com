@@ -5135,6 +5135,34 @@ function showCargosPage() {
 }
 
 function backToProducts() {
+  // Check if we have a last category page stored
+  if (lastCategoryPage) {
+    // Navigate back to the specific category page
+    switch(lastCategoryPage) {
+      case 'shirtsPage':
+        showShirtsPage();
+        break;
+      case 'tshirtsPage':
+        showTshirtsPage();
+        break;
+      case 'pantsPage':
+        showPantsPage();
+        break;
+      case 'cargosPage':
+        showCargosPage();
+        break;
+      default:
+        // Fallback to main products page
+        goToMainProducts();
+        break;
+    }
+  } else {
+    // Fallback to main products page
+    goToMainProducts();
+  }
+}
+
+function goToMainProducts() {
   history.pushState({ page: "productList" }, "", "#home");
   document.getElementById("descriptionPage").style.display = "none";
   document.getElementById("productList").style.display = "block";
@@ -5145,7 +5173,7 @@ function backToProducts() {
   document.getElementById("profilePage").style.display = "none";
   document.getElementById("tshirtsPage").style.display = "none";
   document.getElementById("cargosPage").style.display = "none";
-    document.getElementById("detailsPage").style.display = "none";
+  document.getElementById("detailsPage").style.display = "none";
 }
 
  function goToDetailsPage() {
@@ -6476,6 +6504,45 @@ function showCartToast(message = "Item added to cart"){
 window.addEventListener('resize', positionCartToast);
 document.addEventListener('DOMContentLoaded', positionCartToast);
 
+// Add this to handle browser back/forward navigation
+window.addEventListener('popstate', function(event) {
+  if (event.state && event.state.page) {
+    switch(event.state.page) {
+      case 'shirtsPage':
+        showShirtsPage();
+        break;
+      case 'tshirtsPage':
+        showTshirtsPage();
+        break;
+      case 'pantsPage':
+        showPantsPage();
+        break;
+      case 'cargosPage':
+        showCargosPage();
+        break;
+      case 'productList':
+        goToMainProducts();
+        break;
+      case 'descriptionPage':
+        // Stay on description page (handled by the function that pushed this state)
+        break;
+      case 'cartPage':
+        showCart();
+        break;
+      case 'detailsPage':
+        goToDetailsPage();
+        break;
+      default:
+        goToMainProducts();
+    }
+  } else {
+    // No state, go to main page
+    goToMainProducts();
+  }
+});
+
+
+  
 // Scroll behavior remains the same
 let lastScrollTop = 0;
 const bottomNav = document.getElementById("bottomNav");
