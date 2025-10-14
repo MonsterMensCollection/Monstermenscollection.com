@@ -5064,245 +5064,278 @@
 <script>
 
       
-    // Add this to your existing JavaScript code
-
-// Track page history
-let pageHistory = [];
-
-// Function to navigate to a page and add to history
-function navigateToPage(pageId, urlHash = '') {
-    // Hide all pages first
-    const allPages = [
-        "productList", "shirtsPage", "pantsPage", "sliderSection", 
-        "cartPage", "profilePage", "descriptionPage", "tshirtsPage", 
-        "cargosPage", "detailsPage", "paymentSuccessPage", "paymentSuccessPageCOD"
-    ];
-    
-    allPages.forEach(id => {
-        if (document.getElementById(id)) {
-            document.getElementById(id).style.display = "none";
-        }
-    });
-
-    // Show the target page
-    if (pageId === "sliderSection" || pageId === "productList") {
-        document.getElementById("productsPage").style.display = "block";
-        document.getElementById("sliderSection").style.display = "block";
-        document.getElementById("productList").style.display = "block";
-    } else if (document.getElementById(pageId)) {
-        document.getElementById(pageId).style.display = "block";
-    }
-
-    // Update URL and history
-    if (urlHash) {
-        history.pushState({ page: pageId }, "", urlHash);
-    }
-    
-    // Add to history (avoid duplicates)
-    if (pageHistory[pageHistory.length - 1] !== pageId) {
-        pageHistory.push(pageId);
-    }
-}
-
-// Handle browser back/forward buttons
-window.addEventListener('popstate', function(event) {
-    if (pageHistory.length > 1) {
-        // Remove current page from history
-        pageHistory.pop();
-        // Go to previous page
-        const previousPage = pageHistory[pageHistory.length - 1];
-        navigateToPage(previousPage, ""); // Don't push to history again
-    } else {
-        // If no history, go to home
-        backToProducts();
-    }
-});
-
-// Initialize with home page
-document.addEventListener("DOMContentLoaded", function() {
-    // Initialize page history
-    pageHistory.push("sliderSection");
-    
-    // Set initial state
-    history.replaceState({ page: "sliderSection" }, "", "#home");
-});
-
-// Your existing JavaScript continues below...
-
-let lastCategoryPage = null;
+      let lastCategoryPage = null;
 
 function showShirtsPage() {
-    navigateToPage("shirtsPage", "#shirts");
+  if (lastCategoryPage !== 'shirtsPage') {
+    lastCategoryPage = 'shirtsPage';
+    history.pushState({ page: 'shirtsPage' }, '', '#shirts');
+  }
+  document.getElementById("productList").style.display = "none";
+  document.getElementById("shirtsPage").style.display = "block";
+  document.getElementById("pantsPage").style.display = "none";
+  document.getElementById("sliderSection").style.display = "none";
+   document.getElementById("cartPage").style.display = "none";
+   document.getElementById("profilePage").style.display = "none";
+   document.getElementById("descriptionPage").style.display = "none";
+     document.getElementById("tshirtsPage").style.display = "none";
+      document.getElementById("cargosPage").style.display = "none";
+    document.getElementById("detailsPage").style.display = "none";
 }
 
 function showTshirtsPage() {
-    navigateToPage("tshirtsPage", "#tshirts");
+    
+     lastCategoryPage = "tshirtsPage";
+    history.pushState({ page: "tshirtsPage" }, "", "#tshirts");
+   
+  document.getElementById("productList").style.display = "none";
+  document.getElementById("tshirtsPage").style.display = "block";
+  document.getElementById("pantsPage").style.display = "none";
+  document.getElementById("sliderSection").style.display = "none";
+   document.getElementById("cartPage").style.display = "none";
+   document.getElementById("profilePage").style.display = "none";
+   document.getElementById("descriptionPage").style.display = "none";
+     document.getElementById("shirtsPage").style.display = "none";
+      document.getElementById("cargosPage").style.display = "none";
+    document.getElementById("detailsPage").style.display = "none";
 }
 
 function showPantsPage() {
-    navigateToPage("pantsPage", "#pants");
+    
+    lastCategoryPage = "pantsPage";
+     history.pushState({ page: "pantsPage" }, "", "#pants");
+
+  document.getElementById("productList").style.display = "none";
+  document.getElementById("pantsPage").style.display = "block";
+  document.getElementById("shirtsPage").style.display = "none";
+  document.getElementById("tshirtsPage").style.display = "none";
+  document.getElementById("sliderSection").style.display = "none";
+   document.getElementById("cartPage").style.display = "none";
+   document.getElementById("profilePage").style.display = "none";
+   document.getElementById("descriptionPage").style.display = "none";
+   document.getElementById("cargosPage").style.display = "none";
+    document.getElementById("detailsPage").style.display = "none";
 }
 
 function showCargosPage() {
-    navigateToPage("cargosPage", "#cargos");
+    
+  lastCategoryPage = "cargosPage"; //  Add this line
+ history.pushState({ page: "cargosPage" }, "", "#cargos");
+
+  document.getElementById("productList").style.display = "none";
+  document.getElementById("cargosPage").style.display = "block";
+  document.getElementById("shirtsPage").style.display = "none";
+  document.getElementById("pantsPage").style.display = "none";
+  document.getElementById("tshirtsPage").style.display = "none";
+  document.getElementById("sliderSection").style.display = "none";
+  document.getElementById("cartPage").style.display = "none";
+  document.getElementById("profilePage").style.display = "none";
+  document.getElementById("descriptionPage").style.display = "none";
+    document.getElementById("detailsPage").style.display = "none";
 }
 
 function backToProducts() {
-    navigateToPage("sliderSection", "#home");
+  history.pushState({ page: "productList" }, "", "#home");
+  document.getElementById("descriptionPage").style.display = "none";
+  document.getElementById("productList").style.display = "block";
+  document.getElementById("shirtsPage").style.display = "none";
+  document.getElementById("pantsPage").style.display = "none";
+  document.getElementById("sliderSection").style.display = "block";
+  document.getElementById("cartPage").style.display = "none";
+  document.getElementById("profilePage").style.display = "none";
+  document.getElementById("tshirtsPage").style.display = "none";
+  document.getElementById("cargosPage").style.display = "none";
+    document.getElementById("detailsPage").style.display = "none";
 }
 
-function showCart() {
-    navigateToPage("cartPage", "#cart");
-    updateCartAmounts();
-}
-
-function showProfilePage() {
-    navigateToPage("profilePage", "#profile");
-}
-
-function goToDetailsPage() {
+ function goToDetailsPage() {
+    // ⛔ Block if cart is empty
     if (!Array.isArray(cart) || cart.length === 0) {
-        showCart();
-        showCartToast("Your cart is empty");
-        return;
+      // keep the user on the cart page and show the empty message/toast
+      showCart(); 
+      showCartToast("Your cart is empty");
+      return;
     }
-    navigateToPage("detailsPage", "#details");
-}
 
-const launchDate = new Date("2025-11-01T00:00:00Z").getTime();
-const countdownEl = document.getElementById("countdown");
+    // (defensive) also block if total is 0
+    const totalUSD = cart.reduce((s, it) => s + Number(it.price || 0), 0);
+    if (totalUSD <= 0) {
+      showCart();
+      showCartToast("Your cart is empty");
+      return;
+    }
 
-function startCountdown() {
+    //  proceed to details page
+    history.pushState({ page: "detailsPage" }, "", "#details");
+
+    document.getElementById("descriptionPage").style.display = "none";
+    document.getElementById("productList").style.display = "none";
+    document.getElementById("shirtsPage").style.display = "none";
+    document.getElementById("pantsPage").style.display = "none";
+    document.getElementById("sliderSection").style.display = "none";
+    document.getElementById("cartPage").style.display = "none";
+    document.getElementById("profilePage").style.display = "none";
+    document.getElementById("tshirtsPage").style.display = "none";
+    document.getElementById("cargosPage").style.display = "none";
+    document.getElementById("detailsPage").style.display = "block";
+  }
+
+
+const launchDate = new Date("2025-11-01T00:00:00Z").getTime(); // Target UTC time
+  const countdownEl = document.getElementById("countdown");
+
+  function startCountdown() {
     const interval = setInterval(() => {
-        const now = Date.now();
-        const distance = launchDate - now;
+      const now = Date.now(); // Local time, automatically adjusted
+      const distance = launchDate - now;
 
-        if (distance <= 0) {
-            countdownEl.innerHTML = "Launched!";
-            clearInterval(interval);
-            return;
-        }
+      if (distance <= 0) {
+        countdownEl.innerHTML = "Launched!";
+        clearInterval(interval);
+        return;
+      }
 
-        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-        countdownEl.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+      countdownEl.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
     }, 1000);
-}
+  }
 
-startCountdown();
+  startCountdown();
 
+
+
+  
 /* ───────────  LIVE-INVENTORY HELPERS  ─────────── */
-const liveStock = {};
+
+/*  Cache that lives only in the current page session  */
+const liveStock = {};          // { "BODAK-106" : { S:10, M:4 … }, … }
 
 async function fetchStockOnce(docId, forceReload = false) {
-    if (!forceReload && liveStock[docId]) {
-        return liveStock[docId];
-    }
-
-    try {
-        const snap = await db.collection("products").doc(docId).get();
-        if (snap.exists) {
-            liveStock[docId] = snap.data().sizes || {};
-        } else {
-            console.warn(`Document ${docId} not found in Firestore`);
-            liveStock[docId] = {};
-        }
-    } catch (error) {
-        console.error("Firestore unreachable for doc", docId, error);
-        liveStock[docId] = {};
-    }
-
+  // Return cached data if available and not forcing reload
+  if (!forceReload && liveStock[docId]) {
     return liveStock[docId];
+  }
+
+  try {
+    const snap = await db.collection("products").doc(docId).get();
+    if (snap.exists) {
+      liveStock[docId] = snap.data().sizes || {};
+    } else {
+      console.warn(`Document ${docId} not found in Firestore`);
+      liveStock[docId] = {};
+    }
+  } catch (error) {
+    console.error("Firestore unreachable for doc", docId, error);
+    // Return empty object if offline or error
+    liveStock[docId] = {};
+  }
+
+  return liveStock[docId];
 }
 
-function reserveOneUnit(docId, size) {
-    const docRef = db.collection("products").doc(docId);
-    return db.runTransaction(tx => tx.get(docRef).then(snap => {
-        const sizes = snap.data().sizes || {};
-        if (!sizes[size] || sizes[size] <= 0) throw "OOS";
-        sizes[size]--;
-        tx.update(docRef, { sizes });
-    }));
+/* Decrement a size atomically in Firestore             */
+function reserveOneUnit(docId,size){
+  const docRef = db.collection("products").doc(docId);
+  return db.runTransaction(tx => tx.get(docRef).then(snap=>{
+     const sizes = snap.data().sizes || {};
+     if (!sizes[size] || sizes[size] <= 0) throw "OOS";
+     sizes[size]--;
+     tx.update(docRef,{ sizes });
+  }));
 }
 
-function restoreOneUnit(docId, size) {
-    const docRef = db.collection("products").doc(docId);
-    return db.runTransaction(tx => tx.get(docRef).then(snap => {
-        const sizes = snap.data().sizes || {};
-        sizes[size] = (sizes[size] || 0) + 1;
-        tx.update(docRef, { sizes });
-    }));
-}
 
+  
+  /* Increment a size atomically in Firestore (opposite of reserve) */
+
+  
 window.restoreAndReport = async () => {
-    try {
-        await restoreWholeCart();
-        console.log("restoreAndReport → OK");
-        return "OK";
-    } catch (e) {
-        console.error(e);
-        return "ERR";
-    }
+  try {
+    await restoreWholeCart();
+    console.log("restoreAndReport → OK");
+    return "OK";
+  } catch (e) {
+    console.error(e);
+    return "ERR";
+  }
 };
-
+  
 async function restoreWholeCart() {
-    const stored = JSON.parse(localStorage.getItem("cart") || "[]");
-    const verified = [];
-    for (const item of stored) {
-        try {
-            const snap = await db.collection("products").doc(item.docId).get();
-            if (snap.exists) verified.push(item);
-        } catch (_) {}
-    }
-    cart = verified;
-}
+  const stored = JSON.parse(localStorage.getItem("cart") || "[]");
 
+  /* filter out docs that no longer exist */
+  const verified = [];
+  for (const item of stored) {
+    try {
+      const snap = await db.collection("products").doc(item.docId).get();
+      if (snap.exists) verified.push(item);
+    } catch (_) {}           // offline? keep the item for now
+  }
+  cart = verified;
+}
+  
+/* After any change push the new numbers on-screen      */
 function updateStockUI(sizes) {
-    const cartBtn = document.querySelector('#descriptionPage button[onclick="addToCart()"]');
+  const cartBtn = document.querySelector('#descriptionPage button[onclick="addToCart()"]');
 
-    document.querySelectorAll("#sizeButtons button").forEach(btn => {
-        const s = btn.dataset.size;
-        const n = sizes[s] ?? 0;
-        btn.innerHTML = `${s}${n ? " · " + n : ""}`;
-        btn.classList.toggle("oos", n === 0);
-        btn.setAttribute("aria-disabled", n === 0 ? "true" : "false");
-    });
+  document.querySelectorAll("#sizeButtons button").forEach(btn => {
+    const s = btn.dataset.size;
+    const n = sizes[s] ?? 0;
 
-    const selected = document.getElementById("selectedSize")?.value;
-    if (selected) {
-        const qty = sizes[selected] ?? 0;
-        if (qty === 0) {
-            cartBtn.textContent = "Out of Stock";
-            cartBtn.disabled = true;
-            cartBtn.style.opacity = 0.5;
-        } else {
-            cartBtn.textContent = "Add to Cart";
-            cartBtn.disabled = false;
-            cartBtn.style.opacity = 1;
-        }
+    // Show live qty like “M · 3”
+    btn.innerHTML = `${s}${n ? " · " + n : ""}`;
+
+    // ❌ Do NOT disable; we want the click to run so we can show “Out of Stock”
+    // btn.disabled = n === 0;
+
+    // Visual + a11y flag instead
+    btn.classList.toggle("oos", n === 0);
+    btn.setAttribute("aria-disabled", n === 0 ? "true" : "false");
+  });
+
+  // If the currently selected size just went OOS, reflect it on the button
+  const selected = document.getElementById("selectedSize")?.value;
+  if (selected) {
+    const qty = sizes[selected] ?? 0;
+    if (qty === 0) {
+      cartBtn.textContent = "Out of Stock";
+      cartBtn.disabled = true;
+      cartBtn.style.opacity = 0.5;
+    } else {
+      cartBtn.textContent = "Add to Cart";
+      cartBtn.disabled = false;
+      cartBtn.style.opacity = 1;
     }
+  }
 }
 
+
+  
+  
 let isMessageVisible = false;
 
-function toggleWhyTime() {
+  function toggleWhyTime() {
     const message = document.getElementById("whyTimeMessage");
 
     if (!isMessageVisible) {
-        message.style.maxHeight = "500px";
-        message.style.paddingTop = "15px";
-        message.style.paddingBottom = "15px";
+      message.style.maxHeight = "500px"; // enough height to expand fully
+      message.style.paddingTop = "15px";
+      message.style.paddingBottom = "15px";
     } else {
-        message.style.maxHeight = "0";
-        message.style.paddingTop = "0";
-        message.style.paddingBottom = "0";
+      message.style.maxHeight = "0";
+      message.style.paddingTop = "0";
+      message.style.paddingBottom = "0";
     }
 
     isMessageVisible = !isMessageVisible;
-}
+  }
+
+
+
 
 let startX = 0;
 let startY = 0;
@@ -5310,72 +5343,72 @@ let startTime = 0;
 let isScrollingVertically = false;
 
 function handleTouchStart(evt) {
-    const touch = evt.touches[0];
-    startX = touch.clientX;
-    startY = touch.clientY;
-    startTime = new Date().getTime();
-    isScrollingVertically = false;
+  const touch = evt.touches[0];
+  startX = touch.clientX;
+  startY = touch.clientY;
+  startTime = new Date().getTime();
+  isScrollingVertically = false;
 }
 
 function handleTouchMove(evt) {
-    const touch = evt.touches[0];
-    const deltaX = Math.abs(touch.clientX - startX);
-    const deltaY = Math.abs(touch.clientY - startY);
+  const touch = evt.touches[0];
+  const deltaX = Math.abs(touch.clientX - startX);
+  const deltaY = Math.abs(touch.clientY - startY);
 
-    if (deltaY > deltaX) {
-        isScrollingVertically = true;
-    }
+  if (deltaY > deltaX) {
+    isScrollingVertically = true;
+  }
 }
 
 function handleTouchEnd(evt, fromPage) {
-    if (isScrollingVertically) return;
+  if (isScrollingVertically) return; // Let native scroll happen
 
-    const touch = evt.changedTouches[0];
-    const endX = touch.clientX;
-    const endTime = new Date().getTime();
+  const touch = evt.changedTouches[0];
+  const endX = touch.clientX;
+  const endTime = new Date().getTime();
 
-    const diffX = startX - endX;
-    const timeDiff = endTime - startTime;
+  const diffX = startX - endX;
+  const timeDiff = endTime - startTime;
 
-    const swipeSpeed = Math.abs(diffX / timeDiff);
-    const fastSwipe = swipeSpeed > 0.3;
-    const farSwipe = Math.abs(diffX) > 60;
+  const swipeSpeed = Math.abs(diffX / timeDiff); // px/ms
+  const fastSwipe = swipeSpeed > 0.3;
+  const farSwipe = Math.abs(diffX) > 60;
 
-    if (!(fastSwipe || farSwipe)) return;
+  if (!(fastSwipe || farSwipe)) return;
 
-    const pagesGroup1 = ["shirtsPage", "tshirtsPage"];
-    const pagesGroup2 = ["pantsPage", "cargosPage"];
+  const pagesGroup1 = ["shirtsPage", "tshirtsPage"];
+  const pagesGroup2 = ["pantsPage", "cargosPage"];
 
-    const navigateTo = (from, to) => {
-        document.getElementById("descriptionPage").style.display = "none";
-        document.getElementById(from).style.display = "none";
-        document.getElementById(to).style.display = "block";
-        lastCategoryPage = to;
-        history.pushState({ page: to }, "", "#" + to.replace("Page", ""));
-    };
+  const navigateTo = (from, to) => {
+    document.getElementById("descriptionPage").style.display = "none";
+    document.getElementById(from).style.display = "none";
+    document.getElementById(to).style.display = "block";
+    lastCategoryPage = to;
+    history.pushState({ page: to }, "", "#" + to.replace("Page", ""));
+  };
 
-    if (pagesGroup1.includes(fromPage)) {
-        const toPage = diffX > 0
-            ? (fromPage === "shirtsPage" ? "tshirtsPage" : "shirtsPage")
-            : (fromPage === "tshirtsPage" ? "shirtsPage" : "tshirtsPage");
-        navigateTo(fromPage, toPage);
-    }
+  if (pagesGroup1.includes(fromPage)) {
+    const toPage = diffX > 0
+      ? (fromPage === "shirtsPage" ? "tshirtsPage" : "shirtsPage")
+      : (fromPage === "tshirtsPage" ? "shirtsPage" : "tshirtsPage");
+    navigateTo(fromPage, toPage);
+  }
 
-    if (pagesGroup2.includes(fromPage)) {
-        const toPage = diffX > 0
-            ? (fromPage === "pantsPage" ? "cargosPage" : "pantsPage")
-            : (fromPage === "cargosPage" ? "pantsPage" : "cargosPage");
-        navigateTo(fromPage, toPage);
-    }
+  if (pagesGroup2.includes(fromPage)) {
+    const toPage = diffX > 0
+      ? (fromPage === "pantsPage" ? "cargosPage" : "pantsPage")
+      : (fromPage === "cargosPage" ? "pantsPage" : "cargosPage");
+    navigateTo(fromPage, toPage);
+  }
 }
 
 ["shirtsPage", "tshirtsPage", "pantsPage", "cargosPage"].forEach(pageId => {
-    const page = document.getElementById(pageId);
-    page.addEventListener("touchstart", handleTouchStart, { passive: true });
-    page.addEventListener("touchmove", handleTouchMove, { passive: true });
-    page.addEventListener("touchend", function(evt) {
-        handleTouchEnd(evt, pageId);
-    }, { passive: true });
+  const page = document.getElementById(pageId);
+  page.addEventListener("touchstart", handleTouchStart, { passive: true });
+  page.addEventListener("touchmove", handleTouchMove, { passive: true }); // new
+  page.addEventListener("touchend", function(evt) {
+    handleTouchEnd(evt, pageId);
+  }, { passive: true });
 });
 
 let img = document.getElementById('descImage');
@@ -5383,860 +5416,1111 @@ let scale = 1;
 let lastDistance = null;
 
 function getDistance(touches) {
-    const dx = touches[0].clientX - touches[1].clientX;
-    const dy = touches[0].clientY - touches[1].clientY;
-    return Math.sqrt(dx * dx + dy * dy);
+  const dx = touches[0].clientX - touches[1].clientX;
+  const dy = touches[0].clientY - touches[1].clientY;
+  return Math.sqrt(dx * dx + dy * dy);
 }
 
 img.addEventListener('touchstart', (e) => {
-    if (e.touches.length === 2) {
-        lastDistance = getDistance(e.touches);
-    }
+  if (e.touches.length === 2) {
+    lastDistance = getDistance(e.touches);
+  }
 }, { passive: false });
 
 img.addEventListener('touchmove', (e) => {
-    if (e.touches.length === 2 && lastDistance) {
-        e.preventDefault();
-        const newDistance = getDistance(e.touches);
-        const delta = newDistance - lastDistance;
-        scale += delta * 0.005;
-        scale = Math.max(1, Math.min(scale, 3));
-        img.style.transform = `scale(${scale})`;
-        lastDistance = newDistance;
-    }
+  if (e.touches.length === 2 && lastDistance) {
+    e.preventDefault();
+    const newDistance = getDistance(e.touches);
+    const delta = newDistance - lastDistance;
+    scale += delta * 0.005;
+    scale = Math.max(1, Math.min(scale, 3));
+    img.style.transform = `scale(${scale})`;
+    lastDistance = newDistance;
+  }
 }, { passive: false });
 
 img.addEventListener('touchend', () => {
-    if (scale <= 1.05) {
-        img.style.transform = 'scale(1)';
-        scale = 1;
-        lastDistance = null;
-    }
+  if (scale <= 1.05) {
+    img.style.transform = 'scale(1)';
+    scale = 1;
+    lastDistance = null;
+  }
 });
-
 const toNumber = v => Number(String(v).replace(/[^0-9.]/g, '')) || 0;
+  
 
 let cart = [];
 
-const handlePageHide = () => {
-    // Handle page hide if needed
-};
 
-['visibilitychange', 'pagehide', 'freeze'].forEach(evt =>
+  const handlePageHide = () => flushRestoreBeacon(cart);
+
+  ['visibilitychange', 'pagehide', 'freeze'].forEach(evt =>
     addEventListener(
-        evt,
-        () => {
-            if (document.visibilityState === 'hidden' || evt === 'freeze') {
-                handlePageHide();
-            }
-        },
-        { capture: true }
+      evt,
+      () => {
+        if (document.visibilityState === 'hidden' || evt === 'freeze') {
+          handlePageHide();
+        }
+      },
+      { capture: true }
     )
-);
+  );
 
+  
 async function showDescription(
-    media,
-    priceUSD,
-    title,
-    sdes,
-    description,
-    sizesAvailable,
-    colorsAvailable,
-    category,
-    docId
-) {
-    const descPriceEl = document.getElementById("descPrice");
-    const mainImage = document.getElementById("descImage");
-    const mainVideo = document.getElementById("descVideo");
-    const previewContainer = document.getElementById("descImagePreview");
+  media,            // [{type:'image'|'video',src:'…'}, …]
+  priceUSD,         // "56"  (pure USD number or "$56")
+  title,            // "BODAK #106"
+  sdes,             // short tag-line
+  description,      // long text
+  sizesAvailable,   // ["S","M","L","XL"]
+  colorsAvailable,  // ["Black","Olive",…]
+  category,         // "shirtsPage" | "pantsPage" | …
+  docId             // Firestore doc-id (e.g. "BODAK-106")
+){
+  /* ——— grab the DOM refs up-front ——— */
+  const descPriceEl     = document.getElementById("descPrice");
+  const mainImage       = document.getElementById("descImage");
+  const mainVideo       = document.getElementById("descVideo");
+  const previewContainer= document.getElementById("descImagePreview");
 
-    let sizes = await fetchStockOnce(docId, true);
+  /* ——— live inventory ——— */
+let sizes = await fetchStockOnce(docId, /* forceReload = */ true);
 
-    const sizeContainer = document.getElementById("sizeButtons");
-    sizeContainer.innerHTML = "";
+/* ——— build the pills straight from Firestore ——— */
+const sizeContainer = document.getElementById("sizeButtons");
+sizeContainer.innerHTML = "";
 
-    sizesAvailable.forEach(sz => {
-        const n = sizes[sz] ?? 0;
-        const btn = document.createElement("button");
+sizesAvailable.forEach(sz => {
+  const n   = sizes[sz] ?? 0;            // live qty for this size
+  const btn = document.createElement("button");
 
-        btn.dataset.size = sz;
-        btn.textContent = n ? `${sz} · ${n}` : sz;
-        btn.style.opacity = n === 0 ? 0.4 : 1;
+  btn.dataset.size  = sz;
+  btn.textContent   = n ? `${sz} · ${n}` : sz;   // “M · 3”   /  “M”
+  btn.style.opacity = n === 0 ? 0.4 : 1;         // faded if 0
 
-        btn.onclick = () => {
-            [...sizeContainer.children].forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
+  /* ⚡ click handler ---------------------------------------------------- */
+btn.onclick = () => {
+  // ❶ highlight the selected pill
+  [...sizeContainer.children].forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
 
-            document.getElementById('selectedSize').value = sz;
+  // ❷ remember which size the user picked
+  document.getElementById('selectedSize').value = sz;
 
-            const cartBtn = document.querySelector(
-                '#descriptionPage button[onclick="addToCart()"]'
-            );
+  // ❸ toggle the main “Add to Cart” button
+  const cartBtn = document.querySelector(
+    '#descriptionPage button[onclick="addToCart()"]'
+  );
 
-            if ((sizes[sz] ?? 0) === 0) {
-                cartBtn.textContent = 'Out of Stock';
-                cartBtn.disabled = true;
-                cartBtn.style.opacity = .5;
-            } else {
-                cartBtn.textContent = 'Add to Cart';
-                cartBtn.disabled = false;
-                cartBtn.style.opacity = 1;
-            }
-        };
-        sizeContainer.appendChild(btn);
-    });
+  if ((sizes[sz] ?? 0) === 0) {            // ← out-of-stock?
+    cartBtn.textContent = 'Out of Stock';
+    cartBtn.disabled    = true;
+    cartBtn.style.opacity = .5;            // (optional) dim it
+  } else {
+    cartBtn.textContent = 'Add to Cart';
+    cartBtn.disabled    = false;
+    cartBtn.style.opacity = 1;
+  }
+};
+  sizeContainer.appendChild(btn);
+});
 
-    updateStockUI(sizes);
+/* paint them (in case you ever call updateStockUI again) */
+updateStockUI(sizes);
 
-    const totalStock = sizesAvailable.reduce(
-        (sum, sz) => sum + (sizes[sz] || 0), 0
-    );
-    const cartBtn = document.querySelector(
-        '#descriptionPage button[onclick="addToCart()"]'
-    );
+  /* ---------- disable/enable cart button depending on inventory ---------- */
+ const totalStock = sizesAvailable.reduce(
+   (sum, sz) => sum + (sizes[sz] || 0), 0
+ );
+ const cartBtn = document.querySelector(
+   '#descriptionPage button[onclick="addToCart()"]'
+ );
 
-    if (totalStock === 0) {
-        cartBtn.textContent = 'Out of Stock';
-        cartBtn.disabled = true;
-        cartBtn.style.opacity = 0.5;
+if (totalStock === 0) {
+   cartBtn.textContent = 'Out of Stock';
+   cartBtn.disabled    = true;
+   cartBtn.style.opacity = 0.5;
+ } else {
+     cartBtn.textContent = 'Select Size';
+  cartBtn.disabled    = true;    // keep it inactive for now
+  cartBtn.style.opacity = 0.6;   // a little dimmed
+}
+  
+  /* ----- guarantee a <input hidden id="selectedSize"> exists ----- */
+let sizeHidden = document.getElementById('selectedSize');
+if (!sizeHidden) {
+  sizeHidden       = document.createElement('input');
+  sizeHidden.type  = 'hidden';
+  sizeHidden.id    = 'selectedSize';
+  document.getElementById('descriptionPage').appendChild(sizeHidden);
+}
+sizeHidden.value = '';        // reset every time a new product opens
+
+
+let colorHidden = document.getElementById('selectedColor');
+if (!colorHidden) {
+  colorHidden       = document.createElement('input');
+  colorHidden.type  = 'hidden';
+  colorHidden.id    = 'selectedColor';
+  document.getElementById('descriptionPage').appendChild(colorHidden);
+}
+colorHidden.value = 'Same';    
+  
+  /* ——— push history so the back-button works ——— */
+  if (category){
+    history.pushState({page: category}, "", "#" + category);
+    lastCategoryPage = category;
+  }
+  history.pushState({page: "descriptionPage"}, "", "#description");
+
+  /* ——— pricing (USD ➜ current currency) ——— */
+  const baseUSD = toNumber(priceUSD);           // helper you already have
+  descPriceEl.dataset.basePrice = baseUSD;
+  descPriceEl.textContent       = format(convert(baseUSD));
+
+  /* ——— product header text ——— */
+  document.getElementById("descName").textContent  = title;
+  document.getElementById("descSText").textContent = sdes;
+  document.getElementById("descText").textContent  = description;
+  if (docId) {
+   document.getElementById("descName").dataset.docid = docId;
+ }
+
+  /* ——— media viewer (swipe + thumbs) ——— */
+  let currentIndex = 0;
+  const showMediaAt = idx => {
+    currentIndex = idx;
+    const item = media[idx];
+    if (item.type === "video"){
+      mainImage.style.display = "none";
+      mainVideo.style.display = "block";
+      mainVideo.src     = item.src;
+      mainVideo.autoplay= true;
+      mainVideo.muted   = true;
+      mainVideo.play();
     } else {
-        cartBtn.textContent = 'Select Size';
-        cartBtn.disabled = true;
-        cartBtn.style.opacity = 0.6;
+      mainVideo.style.display = "none";
+      mainImage.style.display = "block";
+      mainImage.src = item.src;
     }
+  };
+  previewContainer.innerHTML = "";
+  media.forEach((item,i)=>{
+    const thumb = document.createElement(item.type==="video"?"video":"img");
+    thumb.src = item.src;
+    if (item.type==="video"){ thumb.muted=true; thumb.loop=true; thumb.autoplay=true; }
+    Object.assign(thumb.style,{width:"70px",height:"70px",objectFit:"cover",borderRadius:"8px",cursor:"pointer",flexShrink:"0"});
+    thumb.onclick = ()=>showMediaAt(i);
+    previewContainer.appendChild(thumb);
+  });
+  showMediaAt(0);
 
-    let sizeHidden = document.getElementById('selectedSize');
-    if (!sizeHidden) {
-        sizeHidden = document.createElement('input');
-        sizeHidden.type = 'hidden';
-        sizeHidden.id = 'selectedSize';
-        document.getElementById('descriptionPage').appendChild(sizeHidden);
-    }
-    sizeHidden.value = '';
+  /* ——— colour selector ——— */
+          // extract your long colour code to a helper
 
-    let colorHidden = document.getElementById('selectedColor');
-    if (!colorHidden) {
-        colorHidden = document.createElement('input');
-        colorHidden.type = 'hidden';
-        colorHidden.id = 'selectedColor';
-        document.getElementById('descriptionPage').appendChild(colorHidden);
-    }
-    colorHidden.value = 'Same';
+  /* ——— finally: show / hide pages ——— */
+  ["productList","shirtsPage","pantsPage","sliderSection",
+   "profilePage","tshirtsPage","cargosPage","detailsPage"]
+   .forEach(id=>document.getElementById(id).style.display="none");
+  document.getElementById("descriptionPage").style.display="block";
+  window.scrollTo(0,0);
 
-    if (category) {
-        history.pushState({ page: category }, "", "#" + category);
-        lastCategoryPage = category;
-    }
-    history.pushState({ page: "descriptionPage" }, "", "#description");
-
-    const baseUSD = toNumber(priceUSD);
-    descPriceEl.dataset.basePrice = baseUSD;
-    descPriceEl.textContent = format(convert(baseUSD));
-
-    document.getElementById("descName").textContent = title;
-    document.getElementById("descSText").textContent = sdes;
-    document.getElementById("descText").textContent = description;
-    if (docId) {
-        document.getElementById("descName").dataset.docid = docId;
-    }
-
-    let currentIndex = 0;
-    const showMediaAt = idx => {
-        currentIndex = idx;
-        const item = media[idx];
-        if (item.type === "video") {
-            mainImage.style.display = "none";
-            mainVideo.style.display = "block";
-            mainVideo.src = item.src;
-            mainVideo.autoplay = true;
-            mainVideo.muted = true;
-            mainVideo.play();
-        } else {
-            mainVideo.style.display = "none";
-            mainImage.style.display = "block";
-            mainImage.src = item.src;
-        }
-    };
-    previewContainer.innerHTML = "";
-    media.forEach((item, i) => {
-        const thumb = document.createElement(item.type === "video" ? "video" : "img");
-        thumb.src = item.src;
-        if (item.type === "video") { thumb.muted = true; thumb.loop = true; thumb.autoplay = true; }
-        Object.assign(thumb.style, { width: "70px", height: "70px", objectFit: "cover", borderRadius: "8px", cursor: "pointer", flexShrink: "0" });
-        thumb.onclick = () => showMediaAt(i);
-        previewContainer.appendChild(thumb);
-    });
-    showMediaAt(0);
-
-    ["productList", "shirtsPage", "pantsPage", "sliderSection",
-        "profilePage", "tshirtsPage", "cargosPage", "detailsPage"]
-        .forEach(id => document.getElementById(id).style.display = "none");
-    document.getElementById("descriptionPage").style.display = "block";
-    window.scrollTo(0, 0);
-
-    updateAllPrices();
+  updateAllPrices();                            // keep everything in sync
 }
 
-async function addToCart(image = null, priceUSD = null, title = null) {
-    const docId = document.getElementById("descName").dataset.docid;
-    const size = document.getElementById("selectedSize")?.value || "";
+/* overwrite the old function with this one */
+async function addToCart (image = null, priceUSD = null, title = null) {
 
-    if (!size) {
-        alert("Please select a size");
-        return;
-    }
+  /* ── 0 · prelim checks ─────────────────────────────────────────── */
+  const docId = document.getElementById("descName").dataset.docid;
+  const size  = document.getElementById("selectedSize")?.value || "";
 
-    const stock = await fetchStockOnce(docId);
-    const avail = stock[size] ?? 0;
-    const alreadyInCart = cart.filter(it => it.docId === docId && it.size === size).length;
+  if (!size) {                            // no size picked
+    alert("Please select a size");
+    return;
+  }
 
-    if (avail === 0) {
-        alert("Sorry, this size is out of stock.");
-        return;
-    }
-    if (alreadyInCart >= avail) {
-        showCartToast(`Only ${avail} left — you have them all 😉`);
-        return;
-    }
+  /* ── 1 · how many are still available? ─────────────────────────── */
+  const stock  = await fetchStockOnce(docId);      // cached after first hit
+  const avail  = stock[size] ?? 0;                 // 0 if size missing
+  const alreadyInCart = cart.filter(it => it.docId === docId && it.size === size).length;
 
-    if (!image) image = document.getElementById("descImage").src;
-    if (!title) title = document.getElementById("descName").innerText;
-    const color = document.getElementById("selectedColor")?.value || "Same";
+  if (avail === 0) {                               // just in case UI was stale
+    alert("Sorry, this size is out of stock.");
+    return;
+  }
+  if (alreadyInCart >= avail) {                    // no more left to add
+    showCartToast(`Only ${avail} left — you have them all 😉`);
+    return;
+  }
 
-    if (priceUSD === null) {
-        priceUSD = toNumber(document.getElementById("descPrice").dataset.basePrice);
-    } else {
-        priceUSD = toNumber(priceUSD);
-    }
+  /* ── 2 · gather remaining fields (unchanged) ───────────────────── */
+  if (!image) image = document.getElementById("descImage").src;
+  if (!title) title = document.getElementById("descName").innerText;
+  const color = document.getElementById("selectedColor")?.value || "Same";
 
-    cart.push({ image, price: priceUSD, title, size, color, docId });
-    showCartToast("Item added to cart!");
+  if (priceUSD === null) {
+    priceUSD = toNumber(document.getElementById("descPrice").dataset.basePrice);
+  } else {
+    priceUSD = toNumber(priceUSD);        // strips “$”
+  }
 
-    updateCartAmounts?.();
-    updateStockUI(stock);
+  /* ── 3 · push & refresh UI (unchanged except for totals) ───────── */
+  cart.push({ image, price: priceUSD, title, size, color, docId });
+  showCartToast("Item added to cart!");
+
+  updateCartAmounts?.();                 // keep totals in sync
+  updateStockUI(stock);                  // still show live stock numbers
 }
 
+  
 async function finalizeOrderStock(cart) {
-    const batch = db.batch();
+  const batch = db.batch();
 
-    cart.forEach(it => {
-        if (!it.docId || !it.size) return;
-        const ref = db.collection("products").doc(it.docId);
-        batch.update(ref, {
-            [`sizes.${it.size}`]: firebase.firestore.FieldValue.increment(-1)
-        });
+  cart.forEach(it => {
+    if (!it.docId || !it.size) return;          // safety
+    const ref = db.collection("products").doc(it.docId);
+    batch.update(ref, {
+      [`sizes.${it.size}`]: firebase.firestore.FieldValue.increment(-1)
     });
+  });
 
-    await batch.commit();
+  await batch.commit();        // throws if any size < 0 → handle/refund
 }
 
-document.addEventListener("DOMContentLoaded", function() {
-    updateAllPrices();
+  
+document.addEventListener("DOMContentLoaded", function () {
+   updateAllPrices(); // initial
+  // 🔹 Existing Filter Controls
+  const filterControls = document.querySelectorAll(".filter-controls");
 
-    const filterControls = document.querySelectorAll(".filter-controls");
+  filterControls.forEach(control => {
+    const targetPageId = control.getAttribute("data-target");
 
-    filterControls.forEach(control => {
-        const targetPageId = control.getAttribute("data-target");
-        const sortSelect = control.querySelector(".sortPrice");
-        const sizeSelect = control.querySelector(".filterSize");
+    const sortSelect = control.querySelector(".sortPrice");
+    const sizeSelect = control.querySelector(".filterSize");
 
-        sortSelect.addEventListener("change", () => sortProductsByPrice(targetPageId));
-        sizeSelect.addEventListener("change", () => filterProductsBySize(targetPageId));
-    });
+    sortSelect.addEventListener("change", () => sortProductsByPrice(targetPageId));
+    sizeSelect.addEventListener("change", () => filterProductsBySize(targetPageId));
+  });
 
-    const img = document.getElementById('descImage');
-    if (!img) return;
+  // 🔹 New Zoom + Pan Image Code
+  const img = document.getElementById('descImage');
+  if (!img) return;
 
-    let scale = 1;
-    let lastDistance = null;
-    let translateX = 0, translateY = 0;
-    let lastTouchX = 0, lastTouchY = 0;
-    let isDragging = false;
+  let scale = 1;
+  let lastDistance = null;
+  let translateX = 0, translateY = 0;
+  let lastTouchX = 0, lastTouchY = 0;
+  let isDragging = false;
 
-    function getDistance(touches) {
-        const dx = touches[0].clientX - touches[1].clientX;
-        const dy = touches[0].clientY - touches[1].clientY;
-        return Math.sqrt(dx * dx + dy * dy);
+  function getDistance(touches) {
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+  }
+
+  function updateTransform() {
+    img.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+  }
+
+  img.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 2) {
+      lastDistance = getDistance(e.touches);
+      isDragging = false;
+    } else if (e.touches.length === 1 && scale > 1) {
+      isDragging = true;
+      lastTouchX = e.touches[0].clientX;
+      lastTouchY = e.touches[0].clientY;
     }
+  }, { passive: false });
 
-    function updateTransform() {
-        img.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+  img.addEventListener('touchmove', (e) => {
+    if (e.touches.length === 2) {
+      e.preventDefault();
+      const newDistance = getDistance(e.touches);
+      const delta = newDistance - lastDistance;
+      scale += delta * 0.005;
+      scale = Math.max(1, Math.min(scale, 3));
+      updateTransform();
+      lastDistance = newDistance;
+    } else if (e.touches.length === 1 && isDragging) {
+      e.preventDefault();
+      const touch = e.touches[0];
+      const dx = touch.clientX - lastTouchX;
+      const dy = touch.clientY - lastTouchY;
+      translateX += dx;
+      translateY += dy;
+      lastTouchX = touch.clientX;
+      lastTouchY = touch.clientY;
+      updateTransform();
     }
+  }, { passive: false });
 
-    img.addEventListener('touchstart', (e) => {
-        if (e.touches.length === 2) {
-            lastDistance = getDistance(e.touches);
-            isDragging = false;
-        } else if (e.touches.length === 1 && scale > 1) {
-            isDragging = true;
-            lastTouchX = e.touches[0].clientX;
-            lastTouchY = e.touches[0].clientY;
-        }
-    }, { passive: false });
+  img.addEventListener('touchend', () => {
+    if (scale <= 1.05) {
+      scale = 1;
+      translateX = 0;
+      translateY = 0;
+      img.style.transform = 'scale(1)';
+    } else {
+      updateTransform();
+    }
+    lastDistance = null;
+    isDragging = false;
+  });
+    // 🔹 Double Tap to Zoom In/Out
+  let lastTapTime = 0;
+  img.addEventListener("touchend", function (e) {
+    const currentTime = new Date().getTime();
+    const tapLength = currentTime - lastTapTime;
+    lastTapTime = currentTime;
 
-    img.addEventListener('touchmove', (e) => {
-        if (e.touches.length === 2) {
-            e.preventDefault();
-            const newDistance = getDistance(e.touches);
-            const delta = newDistance - lastDistance;
-            scale += delta * 0.005;
-            scale = Math.max(1, Math.min(scale, 3));
-            updateTransform();
-            lastDistance = newDistance;
-        } else if (e.touches.length === 1 && isDragging) {
-            e.preventDefault();
-            const touch = e.touches[0];
-            const dx = touch.clientX - lastTouchX;
-            const dy = touch.clientY - lastTouchY;
-            translateX += dx;
-            translateY += dy;
-            lastTouchX = touch.clientX;
-            lastTouchY = touch.clientY;
-            updateTransform();
-        }
-    }, { passive: false });
-
-    img.addEventListener('touchend', () => {
-        if (scale <= 1.05) {
-            scale = 1;
-            translateX = 0;
-            translateY = 0;
-            img.style.transform = 'scale(1)';
-        } else {
-            updateTransform();
-        }
-        lastDistance = null;
-        isDragging = false;
-    });
-
-    let lastTapTime = 0;
-    img.addEventListener("touchend", function(e) {
-        const currentTime = new Date().getTime();
-        const tapLength = currentTime - lastTapTime;
-        lastTapTime = currentTime;
-
-        if (tapLength < 300 && e.touches.length === 0) {
-            if (scale > 1) {
-                scale = 1;
-                translateX = 0;
-                translateY = 0;
-                updateTransform();
-            } else {
-                scale = 2;
-                const rect = img.getBoundingClientRect();
-                const tapX = e.changedTouches[0].clientX - rect.left;
-                const tapY = e.changedTouches[0].clientY - rect.top;
-                translateX = (img.clientWidth / 2 - tapX) * (scale - 1);
-                translateY = (img.clientHeight / 2 - tapY) * (scale - 1);
-                updateTransform();
-            }
-        }
-    });
+    // Detect double tap (within 300ms)
+    if (tapLength < 300 && e.touches.length === 0) {
+      if (scale > 1) {
+        // Zoom out
+        scale = 1;
+        translateX = 0;
+        translateY = 0;
+        updateTransform();
+      } else {
+        // Zoom in centered at tap
+        scale = 2;
+        const rect = img.getBoundingClientRect();
+        const tapX = e.changedTouches[0].clientX - rect.left;
+        const tapY = e.changedTouches[0].clientY - rect.top;
+        translateX = (img.clientWidth / 2 - tapX) * (scale - 1);
+        translateY = (img.clientHeight / 2 - tapY) * (scale - 1);
+        updateTransform();
+      }
+    }
+  });
 });
 
 function sortProductsByPrice(pageId) {
-    const grid = document.querySelector(`#${pageId} .product-grid`);
-    const products = Array.from(grid.getElementsByClassName("product-card"));
+  const grid = document.querySelector(`#${pageId} .product-grid`);
+  const products = Array.from(grid.getElementsByClassName("product-card"));
 
-    const sortOrder = document.querySelector(`[data-target="${pageId}"] .sortPrice`).value;
+  const sortOrder = document.querySelector(`[data-target="${pageId}"] .sortPrice`).value;
 
-    if (sortOrder === "default") {
-        products.sort((a, b) => 0);
-    } else {
-        products.sort((a, b) => {
-            const priceA = parseInt(a.querySelector(".price").innerText.replace(/[^\d]/g, ""));
-            const priceB = parseInt(b.querySelector(".price").innerText.replace(/[^\d]/g, ""));
-            return sortOrder === "asc" ? priceA - priceB : priceB - priceA;
-        });
-    }
+  if (sortOrder === "default") {
+    products.sort((a, b) => 0);
+  } else {
+    products.sort((a, b) => {
+      const priceA = parseInt(a.querySelector(".price").innerText.replace(/[^\d]/g, ""));
+      const priceB = parseInt(b.querySelector(".price").innerText.replace(/[^\d]/g, ""));
+      return sortOrder === "asc" ? priceA - priceB : priceB - priceA;
+    });
+  }
 
-    grid.innerHTML = "";
-    products.forEach(p => grid.appendChild(p));
+  grid.innerHTML = "";
+  products.forEach(p => grid.appendChild(p));
 }
 
 async function filterProductsBySize(pageId) {
-    const selectedSize = document.querySelector(`[data-target="${pageId}"] .filterSize`).value;
-    const cards = document.querySelectorAll(`#${pageId} .product-card`);
+  const selectedSize = document.querySelector(`[data-target="${pageId}"] .filterSize`).value;
+  const cards = document.querySelectorAll(`#${pageId} .product-card`);
 
-    for (const card of cards) {
-        const onclickAttr = card.querySelector('img').getAttribute('onclick');
-        const docIdMatch = onclickAttr.match(/'([^']+)'\)$/);
-        const docId = docIdMatch ? docIdMatch[1] : null;
+  for (const card of cards) {
+    // Get the product ID from the onclick attribute
+    const onclickAttr = card.querySelector('img').getAttribute('onclick');
+    const docIdMatch = onclickAttr.match(/'([^']+)'\)$/);
+    const docId = docIdMatch ? docIdMatch[1] : null;
 
-        if (!docId) {
-            console.warn('No docId found for card:', card);
-            card.style.display = "none";
-            continue;
-        }
-
-        try {
-            const stock = await fetchStockOnce(docId);
-            const hasSize = selectedSize === "all" ||
-                (stock[selectedSize] && stock[selectedSize] > 0);
-
-            card.style.display = hasSize ? "block" : "none";
-        } catch (error) {
-            console.error('Error fetching stock for', docId, error);
-            card.style.display = selectedSize === "all" ? "block" : "none";
-        }
+    if (!docId) {
+      console.warn('No docId found for card:', card);
+      card.style.display = "none";
+      continue;
     }
+
+    try {
+      const stock = await fetchStockOnce(docId);
+      
+      // Check if the selected size is available
+      const hasSize = selectedSize === "all" || 
+                     (stock[selectedSize] && stock[selectedSize] > 0);
+
+      card.style.display = hasSize ? "block" : "none";
+    } catch (error) {
+      console.error('Error fetching stock for', docId, error);
+      // If there's an error, show the card by default
+      card.style.display = selectedSize === "all" ? "block" : "none";
+    }
+  }
 }
+
 
 const RATES = { USD: 1, INR: 1, EUR: 0.92 };
 let currentCurrency = "INR";
 
 const currencySymbol = c => ({ USD: "₹", INR: "₹", EUR: "€" }[c] || "");
-const convert = usd => usd * RATES[currentCurrency];
-const format = v => currencySymbol(currentCurrency) + v.toFixed(0);
+const convert  = usd => usd * RATES[currentCurrency];
+const format   = v   => currencySymbol(currentCurrency) + v.toFixed(0);
 
-function updateCartAmounts() {
-    const amountEl = document.getElementById("cartAmount");
-    if (!amountEl) return;
+/* ────────────────  🆕  totals + free-shipping helper  ──────────────── */
+function updateCartAmounts () {
+  const amountEl = document.getElementById("cartAmount");
+  if (!amountEl) return;
 
-    const subUSD = cart.reduce((s, it) => s + it.price, 0);
-    const shipUSD = subUSD >= 0 ? 0 : 0;
-    const grandUSD = subUSD + shipUSD;
+  const subUSD     = cart.reduce((s, it) => s + it.price, 0);   // cart prices are USD
+  const shipUSD    = subUSD >= 0 ? 0 : 0;                     // free ≥ $99
+  const grandUSD   = subUSD + shipUSD;
 
-    const shipDisplay = format(convert(shipUSD));
-    const totalDisplay = format(convert(grandUSD));
+  const shipDisplay  = format(convert(shipUSD));
+  const totalDisplay = format(convert(grandUSD));
 
-    amountEl.innerHTML =
-        shipUSD === 0
-            ? `<span style="font-size:12px;color:green;">Free Shipping + </span>${totalDisplay}`
-            : `<span style="font-size:12px;color:#888;">${shipDisplay} shipping + </span>${totalDisplay}`;
+  amountEl.innerHTML =
+    shipUSD === 0
+      ? `<span style="font-size:12px;color:green;">Free Shipping + </span>${totalDisplay}`
+      : `<span style="font-size:12px;color:#888;">${shipDisplay} shipping + </span>${totalDisplay}`;
 }
 
-function updateAllPrices() {
-    document.querySelectorAll('.price').forEach(el => {
-        let usd = parseFloat(el.dataset.basePrice || (el.textContent.replace(/[^0-9.]/g, '')) || 0);
-        if (!usd) return;
-        el.dataset.basePrice = usd;
-        el.textContent = format(convert(usd));
+  
+  // Update every .price text & cart totals
+  function updateAllPrices(){
+    document.querySelectorAll('.price').forEach(el=>{
+      let usd=parseFloat(el.dataset.basePrice||(el.textContent.replace(/[^0-9.]/g,''))||0);
+      if(!usd) return;
+      el.dataset.basePrice=usd; // cache
+      el.textContent=format(convert(usd));
     });
-    if (document.getElementById('cartPage').style.display !== 'none') updateCartAmounts();
-    if (document.getElementById('descPrice')) {
-        const el = document.getElementById('descPrice');
-        let usd = parseFloat(el.dataset.basePrice || (el.textContent.replace(/[^0-9.]/g, '')) || 0);
-        el.dataset.basePrice = usd;
-        el.textContent = format(convert(usd));
+    if(document.getElementById('cartPage').style.display!=='none') updateCartAmounts();
+    if(document.getElementById('descPrice')){
+      const el=document.getElementById('descPrice');
+      let usd=parseFloat(el.dataset.basePrice||(el.textContent.replace(/[^0-9.]/g,''))||0);
+      el.dataset.basePrice=usd;
+      el.textContent=format(convert(usd));
     }
+  }
+
+  // Hook selector
+  document.getElementById('currencySelector').addEventListener('change',e=>{
+    currentCurrency=e.target.value;
+    updateAllPrices();
+  });
+
+
+
+
+
+
+
+  
+  
+function showCart () {
+  lastCategoryPage = "cartPage";
+  history.pushState({ page: "cartPage" }, "", "#cart");
+
+  /* page-visibility boilerplate (unchanged) */
+  ["descriptionPage","productList","shirtsPage","pantsPage",
+   "sliderSection","profilePage","tshirtsPage","cargosPage",
+   "detailsPage"].forEach(id => document.getElementById(id).style.display="none");
+  document.getElementById("cartPage").style.display = "block";
+
+  /* ---------------  Build the cart UI --------------- */
+  const cartItemsDiv     = document.getElementById("cartItems");
+  const emptyCartMessage = document.getElementById("emptyCartMessage");
+  cartItemsDiv.innerHTML = "";
+
+  if (cart.length === 0) {
+    emptyCartMessage.style.display = "block";
+    document.getElementById("cartAmount").textContent = format(convert(0));
+    return;                         // nothing else to do
+  }
+
+  emptyCartMessage.style.display = "none";
+
+  cart.forEach((item, index) => {
+    cartItemsDiv.insertAdjacentHTML(
+      "beforeend",
+      `
+        <div style="display:flex;gap:15px;align-items:center;margin-bottom:15px;padding:12px;">
+          <img src="${item.image}"
+               style="width:80px;border-radius:6px;object-fit:cover;" />
+
+          <div style="flex-grow:1;text-align:left;">
+            <p style="margin:4px 0;"><strong>${item.title}</strong></p>
+            <p style="margin:4px 0;"><strong>Size:</strong> ${item.size || "N/A"}</p>
+            <p style="margin:4px 0;"><strong>Color:</strong> ${item.color || "N/A"}</p>
+
+            <!-- cache USD amount in data-attribute, display converted -->
+            <p  class="price"
+                data-base-price="${item.price}"
+                style="margin:4px 0;">
+              <strong>Price:</strong> ${format(convert(item.price))}
+            </p>
+          </div>
+
+          <button onclick="removeFromCart(${index})"
+                  style="background:transparent;border:none;cursor:pointer;">
+            <img src="https://img.icons8.com/?size=100&id=Qgjnp78cDeJi&format=png&color=000000"
+                 width="16">
+          </button>
+        </div>
+        <hr style="width:80%;margin:10px auto;border:none;border-top:1px solid #ccc;" />
+      `
+    );
+  });
+
+  /* Show the shipping/total row in the selected currency */
+  updateCartAmounts();  // <-- this uses convert() & format() inside
 }
 
-document.getElementById('currencySelector').addEventListener('change', e => {
-    currentCurrency = e.target.value;
-    updateAllPrices();
-});
+
+
+
+
 
 function scrollIntoViewMobile(el) {
-    setTimeout(() => {
-        const rect = el.getBoundingClientRect();
-        const scrollTop = window.scrollY || window.pageYOffset;
-        const elementTop = rect.top + scrollTop - 100;
-        window.scrollTo({ top: elementTop, behavior: "smooth" });
-    }, 300);
+  setTimeout(() => {
+    const rect = el.getBoundingClientRect();
+    const scrollTop = window.scrollY || window.pageYOffset;
+    const elementTop = rect.top + scrollTop - 100; // adjust 100px above the element
+    window.scrollTo({ top: elementTop, behavior: "smooth" });
+  }, 300);
 }
 
 async function removeFromCart(index) {
-    const item = cart[index];
-    cart.splice(index, 1);
+  const item = cart[index];
+  cart.splice(index, 1);                 // remove from local array
 
-    if (item?.docId && item?.size) {
-        try {
-            await restoreOneUnit(item.docId, item.size);
-            const fresh = await fetchStockOnce(item.docId, true);
-            if (document.getElementById("descriptionPage").style.display !== "none") {
-                updateStockUI(fresh);
-            }
-        } catch (err) {
-            console.error("Stock restore failed:", err);
-        }
+  /* ⬅️ put the unit back in Firestore */
+  if (item?.docId && item?.size) {
+    try {
+         await restoreOneUnit(item.docId, item.size);
+    // pull the true count from Firestore and repaint immediately
+    const fresh = await fetchStockOnce(item.docId, /* forceReload= */ true);
+    if (document.getElementById("descriptionPage").style.display !== "none") {
+     updateStockUI(fresh);
     }
+   } catch (err) {
+      console.error("Stock restore failed:", err);   // network-offline etc.
+    }
+  }
 
-    showCart();
-    updateCartAmounts?.();
+  showCart();                         // re-render the cart totals/UI
+  updateCartAmounts?.();              // keep bottom bar in sync
 }
 
 function hideCart() {
-    document.getElementById("cartPage").style.display = "none";
-    document.getElementById("productList").style.display = "block";
-    document.getElementById("sliderSection").style.display = "block";
+  document.getElementById("cartPage").style.display = "none";
+  document.getElementById("productList").style.display = "block";
+  document.getElementById("sliderSection").style.display = "block";
 }
-
 async function checkoutCart() {
-    const name = document.getElementById("checkoutName").value.trim();
-    const address = document.getElementById("checkoutAddress").value.trim();
-    const pincode = document.getElementById("checkoutPincode").value.trim();
-    const mobileNumber = document.getElementById("checkoutMobileNumber").value.trim();
+  /*──────────1. Basic form validation ──────────*/
+  const name         = document.getElementById("checkoutName").value.trim();
+  const address      = document.getElementById("checkoutAddress").value.trim();
+  const pincode      = document.getElementById("checkoutPincode").value.trim();
+  const mobileNumber = document.getElementById("checkoutMobileNumber").value.trim();
 
-    if (!name || !address || !pincode || !mobileNumber) {
-        showCartToast("Please complete all address fields");
-        return;
+  if (!name || !address || !pincode || !mobileNumber) {
+    showCartToast("Please complete all address fields");
+    return;
+  }
+
+  /*──────────2. Totals ──────────*/
+  const subtotalUSD = cart.reduce((s, it) => s + it.price, 0);
+  const subtotalSelected = convert(subtotalUSD);
+  const shippingSelected = subtotalSelected >= convert(0) ? 0 : convert(0);
+  const grandTotalSelected = subtotalSelected + shippingSelected;
+
+  if (grandTotalSelected === 0) {
+    showCartToast("Cart is empty!");
+    return;
+  }
+
+  sessionStorage.setItem("pendingOrder", JSON.stringify({
+    cart,
+    addr: { name, address, pincode, mobileNumber },
+    uid: auth.currentUser.uid,
+    totals: {
+      usd: subtotalUSD,
+      sel: grandTotalSelected,
+      curr: currentCurrency
     }
+  }));
 
-    const subtotalUSD = cart.reduce((s, it) => s + it.price, 0);
-    const subtotalSelected = convert(subtotalUSD);
-    const shippingSelected = subtotalSelected >= convert(0) ? 0 : convert(0);
-    const grandTotalSelected = subtotalSelected + shippingSelected;
+  const amountForGateway = Math.round(grandTotalSelected * 100);
 
-    if (grandTotalSelected === 0) {
-        showCartToast("Cart is empty!");
-        return;
-    }
+  /*──────────3. Create Razorpay order ──────────*/
+  const { id: orderId } = await fetch("/.netlify/functions/create-order", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      amount: amountForGateway,
+      currency: currentCurrency
+    })
+  }).then(r => r.json());
 
-    sessionStorage.setItem("pendingOrder", JSON.stringify({
-        cart,
-        addr: { name, address, pincode, mobileNumber },
-        uid: auth.currentUser.uid,
-        totals: {
-            usd: subtotalUSD,
-            sel: grandTotalSelected,
-            curr: currentCurrency
-        }
-    }));
+  const options = {
+    key: "rzp_live_u6z4G2762EuQ4E",
+    amount: amountForGateway,
+    currency: "INR",
+    name: "Monster Men's Collection",
+    description: "Cart Checkout",
+    order_id: orderId,
+    prefill: {
+      name: name,
+      email: firebase.auth().currentUser?.email || "",
+      contact: mobileNumber,
+    },
+    theme: { color: "#007bff" },
+    webview_intent: true,
+    callback_url   : "https://monster-mens-collection.netlify.app/.netlify/functions/verify-signature"
+       };
+  new Razorpay(options).open();        // snapshot is already in sessionStorage
 
-    const amountForGateway = Math.round(grandTotalSelected * 100);
+  /* ────────── 5. Success callback stays unchanged ────────── */
+  async function handleSuccessfulPayment (response) {
+    const user = auth.currentUser;
+    if (!user) return;
 
-    const { id: orderId } = await fetch("/.netlify/functions/create-order", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            amount: amountForGateway,
-            currency: currentCurrency
-        })
-    }).then(r => r.json());
-
-    const options = {
-        key: "rzp_live_u6z4G2762EuQ4E",
-        amount: amountForGateway,
-        currency: "INR",
-        name: "Monster Men's Collection",
-        description: "Cart Checkout",
-        order_id: orderId,
-        prefill: {
-            name: name,
-            email: firebase.auth().currentUser?.email || "",
-            contact: mobileNumber,
-        },
-        theme: { color: "#007bff" },
-        webview_intent: true,
-        callback_url: "https://monster-mens-collection.netlify.app/.netlify/functions/verify-signature"
+    const orderData = {
+      uid         : user.uid,
+      name, address, pincode, mobilenumber: mobileNumber,
+      cart        : [...cart],
+      totalUSD    : subtotalUSD,
+      total       : grandTotalSelected,
+      currency    : currentCurrency,
+      paymentId   : response.razorpay_payment_id,
+      paymentMode : "Razorpay",
+      timestamp   : firebase.firestore.FieldValue.serverTimestamp(),
+      orderNumber : `ORD-${Date.now()}`
     };
-    new Razorpay(options).open();
 
-    async function handleSuccessfulPayment(response) {
-        const user = auth.currentUser;
-        if (!user) return;
+    try {
+      await finalizeOrderStock(cart);                 // lock inventory
+      await db.collection("orders").add(orderData);   // record order
+      sessionStorage.removeItem("pendingOrder");      // 🔑 clear snapshot
 
-        const orderData = {
-            uid: user.uid,
-            name, address, pincode, mobilenumber: mobileNumber,
-            cart: [...cart],
-            totalUSD: subtotalUSD,
-            total: grandTotalSelected,
-            currency: currentCurrency,
-            paymentId: response.razorpay_payment_id,
-            paymentMode: "Razorpay",
-            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-            orderNumber: `ORD-${Date.now()}`
-        };
+      /* success UI (unchanged) */
+      [
+        "descriptionPage","productList","shirtsPage","pantsPage",
+        "sliderSection","cartPage","profilePage","tshirtsPage",
+        "cargosPage","detailsPage"
+      ].forEach(id => (document.getElementById(id).style.display = "none"));
 
-        try {
-            await finalizeOrderStock(cart);
-            await db.collection("orders").add(orderData);
-            sessionStorage.removeItem("pendingOrder");
+      document.getElementById("paymentSuccessPage").style.display = "block";
+      document.getElementById("successPaymentId").textContent =
+        response.razorpay_payment_id;
 
-            [
-                "descriptionPage", "productList", "shirtsPage", "pantsPage",
-                "sliderSection", "cartPage", "profilePage", "tshirtsPage",
-                "cargosPage", "detailsPage"
-            ].forEach(id => (document.getElementById(id).style.display = "none"));
+      cart = [];   // clear local cart
 
-            document.getElementById("paymentSuccessPage").style.display = "block";
-            document.getElementById("successPaymentId").textContent =
-                response.razorpay_payment_id;
+      setTimeout(() => {
+        document.getElementById("paymentSuccessPage").style.display = "none";
+        document.getElementById("productList").style.display        = "block";
+        document.getElementById("sliderSection").style.display      = "block";
+      }, 5000);
 
-            cart = [];
-
-            setTimeout(() => {
-                document.getElementById("paymentSuccessPage").style.display = "none";
-                document.getElementById("productList").style.display = "block";
-                document.getElementById("sliderSection").style.display = "block";
-            }, 5000);
-
-        } catch (err) {
-            console.error("Checkout finalisation failed:", err);
-            alert(
-                "Payment received but an item just sold out. " +
-                "A full refund will be issued automatically."
-            );
-        }
+    } catch (err) {
+      console.error("Checkout finalisation failed:", err);
+      alert(
+        "Payment received but an item just sold out. " +
+        "A full refund will be issued automatically."
+      );
     }
+  }
 }
 
 function checkoutCOD() {
-    const name = document.getElementById("checkoutName").value.trim();
-    const address = document.getElementById("checkoutAddress").value.trim();
-    const pincode = document.getElementById("checkoutPincode").value.trim();
-    const mobilenumber = document.getElementById("checkoutMobileNumber").value.trim();
+  const name = document.getElementById("checkoutName").value.trim();
+  const address = document.getElementById("checkoutAddress").value.trim();
+   const pincode = document.getElementById("checkoutPincode").value.trim();
+  const mobilenumber  = document.getElementById("checkoutMobileNumber").value.trim();
 
-    if (!name || !address) {
-        showCartToast("Please enter name and address to continue");
-        return;
-    }
+  if (!name || !address) {
+    showCartToast("Please enter name and address to continue");
+    return;
+  }
 
-    const totalAmount = cart.reduce((sum, item) => sum + item.price, 0);
+  const totalAmount = cart.reduce((sum, item) => sum + item.price, 0);
 
-    if (totalAmount === 0) {
-        showCartToast("Cart is empty!");
-        return;
-    }
+  if (totalAmount === 0) {
+    showCartToast("Cart is empty!");
+    return;
+  }
 
-    const user = auth.currentUser;
-    if (!user) {
-        showCartToast("You must be logged in to place an order");
-        return;
-    }
+  const user = auth.currentUser;
+  if (!user) {
+    showCartToast("You must be logged in to place an order");
+    return;
+  }
 
-    const orderData = {
-        uid: user.uid,
-        name: name,
-        address: address,
-        pincode: pincode,
-        mobilenumber: mobilenumber,
-        cart: cart,
-        total: totalAmount,
-        paymentId: "COD",
-        paymentMode: "Cash on Delivery",
-        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-        orderNumber: `ORD-${Date.now()}`
-    };
+  const orderData = {
+    uid: user.uid,
+    name: name,
+    address: address,
+    pincode: pincode,
+    mobilenumber: mobilenumber,
+    cart: cart,
+    total: totalAmount,
+    paymentId: "COD",
+    paymentMode: "Cash on Delivery",
+    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+    orderNumber: `ORD-${Date.now()}`
+  };
 
-    db.collection("orders").add(orderData).then(() => {
-        document.getElementById("descriptionPage").style.display = "none";
-        document.getElementById("productList").style.display = "none";
-        document.getElementById("shirtsPage").style.display = "none";
-        document.getElementById("pantsPage").style.display = "none";
-        document.getElementById("sliderSection").style.display = "none";
-        document.getElementById("cartPage").style.display = "none";
-        document.getElementById("profilePage").style.display = "none";
-        document.getElementById("tshirtsPage").style.display = "none";
-        document.getElementById("cargosPage").style.display = "none";
+  db.collection("orders").add(orderData).then(() => {
 
-        document.getElementById("paymentSuccessPageCOD").style.display = "block";
+      //  UI changes after successful order
+          document.getElementById("descriptionPage").style.display = "none";
+          document.getElementById("productList").style.display = "none";
+          document.getElementById("shirtsPage").style.display = "none";
+          document.getElementById("pantsPage").style.display = "none";
+          document.getElementById("sliderSection").style.display = "none";
+          document.getElementById("cartPage").style.display = "none";
+          document.getElementById("profilePage").style.display = "none";
+            document.getElementById("tshirtsPage").style.display = "none";
+             document.getElementById("cargosPage").style.display = "none";
 
-        setTimeout(() => {
+          // Show success page
+          document.getElementById("paymentSuccessPageCOD").style.display = "block";
+
+          // Hide after 5 seconds and go back to products
+          setTimeout(() => {
             document.getElementById("paymentSuccessPageCOD").style.display = "none";
             document.getElementById("productList").style.display = "block";
             document.getElementById("sliderSection").style.display = "block";
-        }, 5000);
-        cart = [];
-    }).catch(error => {
-        console.error("Error placing COD order:", error);
-        alert("Error placing order. Please try again.");
-    });
+          }, 5000);
+    cart = []; // Return to main page
+  }).catch(error => {
+    console.error("Error placing COD order:", error);
+    alert("Error placing order. Please try again.");
+  });
 }
 
 function confirmCOD() {
-    document.getElementById("codConfirmationModal").style.display = "block";
+  document.getElementById("codConfirmationModal").style.display = "block";
 }
 
 function closeCODModal() {
-    document.getElementById("codConfirmationModal").style.display = "none";
+  document.getElementById("codConfirmationModal").style.display = "none";
 }
 
 function proceedWithCOD() {
-    closeCODModal();
-    checkoutCOD();
+  closeCODModal();
+  checkoutCOD(); // existing function
 }
 
+
+function showProfilePage() {
+ const user = auth.currentUser;
+ console.log(auth.currentUser?.email);
+  console.log("Current user:", user?.email, user?.uid);
+  if (user) {
+    document.getElementById("profileEmail").textContent = user.email;
+
+db.collection("users").doc(user.uid).get().then(doc => {
+  let name = "Not available";
+
+  if (doc.exists && doc.data().name) {
+    name = doc.data().name;
+  } else if (user.displayName) {
+    name = user.displayName;
+  }
+
+  document.getElementById("profileName").textContent = name;
+  loadUserProfileAndOrders();
+});
+
+
+    // Hide all pages, show profile
+    document.getElementById("productList").style.display = "none";
+    document.getElementById("sliderSection").style.display = "none";
+    document.getElementById("cartPage").style.display = "none";
+    document.getElementById("profilePage").style.display = "block";
+    document.getElementById("shirtsPage").style.display = "none";
+    document.getElementById("pantsPage").style.display = "none";
+    document.getElementById("descriptionPage").style.display = "none";
+      document.getElementById("tshirtsPage").style.display = "none";
+       document.getElementById("cargosPage").style.display = "none";
+     document.getElementById("detailsPage").style.display = "none";
+  }
+}
 function logout() {
-    auth.signOut().then(() => {
-        location.reload();
-    });
+  auth.signOut().then(() => {
+    location.reload(); // Reload to return to login screen
+  });
 }
 
 function saveOrder(productName, uid) {
-    db.collection("orders").add({
-        uid,
-        productName,
-        status: "Pending",
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    }).then(docRef => {
-        console.log("Simple order saved:", docRef.id);
-    }).catch(error => {
-        console.error("Error saving simple order:", error);
-    });
+  db.collection("orders").add({
+    uid, //  match field used in query
+    productName,
+    status: "Pending",
+    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+  }).then(docRef => {
+    console.log("Simple order saved:", docRef.id);
+  }).catch(error => {
+    console.error("Error saving simple order:", error);
+  });
 }
 
-const firebaseConfig = {
-    apiKey: "AIzaSyDzW8XuqrxM47W42HcIUXifa_X8tnfrLkY",
-    authDomain: "monster-mens-collection.firebaseapp.com",
-    projectId: "monster-mens-collection",
-    storageBucket: "monster-mens-collection.appspot.com",
-    messagingSenderId: "21161410221",
-    appId: "1:21161410221:web:3f4c777d4b5c8db20a9024",
-    measurementId: "G-5WFHV50M9Z"
+
+  const firebaseConfig = {
+  apiKey: "AIzaSyDzW8XuqrxM47W42HcIUXifa_X8tnfrLkY",
+  authDomain: "monster-mens-collection.firebaseapp.com",
+  projectId: "monster-mens-collection",
+  storageBucket: "monster-mens-collection.appspot.com",
+  messagingSenderId: "21161410221",
+  appId: "1:21161410221:web:3f4c777d4b5c8db20a9024",
+  measurementId: "G-5WFHV50M9Z"
 };
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
+// Real-time inventory updates for cart
 db.collection("products").onSnapshot(snap => {
-    snap.docChanges().forEach(ch => {
-        if (ch.type !== "modified") return;
+  snap.docChanges().forEach(ch => {
+    if (ch.type !== "modified") return;
 
-        const docId = ch.doc.id;
-        const sizes = ch.doc.data().sizes || {};
+    const docId = ch.doc.id;
+    const sizes = ch.doc.data().sizes || {};
 
-        Object.entries(sizes).forEach(([sz, qty]) => {
-            const matches = cart.filter(it => it.docId === docId && it.size === sz);
-            let toRemove = Math.max(0, matches.length - qty);
+    Object.entries(sizes).forEach(([sz, qty]) => {
+      const matches = cart.filter(it => it.docId === docId && it.size === sz);
+      let toRemove = Math.max(0, matches.length - qty);
 
-            if (toRemove > 0) {
-                cart = cart.filter(it => {
-                    if (toRemove && it.docId === docId && it.size === sz) {
-                        --toRemove;
-                        return false;
-                    }
-                    return true;
-                });
-
-                alert(
-                    `Heads-up! Another shopper just bought "${docId} – ${sz}".\n` +
-                    `Your quantity was reduced to ${qty}.`
-                );
-            }
-
-            if (qty === 0) {
-                cart = cart.filter(it => !(it.docId === docId && it.size === sz));
-            }
+      if (toRemove > 0) {
+        cart = cart.filter(it => {
+          if (toRemove && it.docId === docId && it.size === sz) {
+            --toRemove;
+            return false;
+          }
+          return true;
         });
 
-        localStorage.setItem("cart", JSON.stringify(cart));
+        alert(
+          `Heads-up! Another shopper just bought "${docId} – ${sz}".\n` +
+          `Your quantity was reduced to ${qty}.`
+        );
+      }
 
-        if (document.getElementById("cartPage").style.display !== "none") {
-            showCart();
-        }
-        updateCartAmounts();
+      if (qty === 0) {
+        cart = cart.filter(it => !(it.docId === docId && it.size === sz));
+      }
     });
+
+    localStorage.setItem("cart", JSON.stringify(cart));
+
+    if (document.getElementById("cartPage").style.display !== "none") {
+      showCart();
+    }
+    updateCartAmounts();
+  });
 });
 
+// Show products page directly on load
 document.addEventListener("DOMContentLoaded", function() {
-    const loader = document.getElementById('loadingScreen');
-    loader.classList.add('fade-out');
-    setTimeout(() => loader.remove(), 600);
-
-    document.getElementById("productsPage").style.display = "block";
-    document.getElementById("sliderSection").style.display = "block";
-
-    document.getElementById("loginSection").style.display = "none";
-    document.getElementById("signupSection").style.display = "none";
-    document.getElementById("subscriptionSection").style.display = "none";
-
-    document.getElementById("mainContainer").classList.add("no-box");
-
-    cart = JSON.parse(localStorage.getItem("cart") || "[]");
-
-    updateAllPrices();
-    positionCartToast();
-
-    const filterControls = document.querySelectorAll(".filter-controls");
-    filterControls.forEach(control => {
-        const targetPageId = control.getAttribute("data-target");
-        const sortSelect = control.querySelector(".sortPrice");
-        const sizeSelect = control.querySelector(".filterSize");
-        sortSelect.addEventListener("change", () => sortProductsByPrice(targetPageId));
-        sizeSelect.addEventListener("change", () => filterProductsBySize(targetPageId));
-    });
+  // Hide loading screen
+  const loader = document.getElementById('loadingScreen');
+  loader.classList.add('fade-out');
+  setTimeout(() => loader.remove(), 600);
+  
+  // Show products page
+  document.getElementById("productsPage").style.display = "block";
+  document.getElementById("sliderSection").style.display = "block";
+  
+  // Hide login/signup sections
+  document.getElementById("loginSection").style.display = "none";
+  document.getElementById("signupSection").style.display = "none";
+  document.getElementById("subscriptionSection").style.display = "none";
+  
+  // Update container styling
+  document.getElementById("mainContainer").classList.add("no-box");
+  
+  // Initialize cart
+  cart = JSON.parse(localStorage.getItem("cart") || "[]");
+  
+  // Set up other initializations
+  updateAllPrices();
+  positionCartToast();
+  
+  // Initialize filter controls
+  const filterControls = document.querySelectorAll(".filter-controls");
+  filterControls.forEach(control => {
+    const targetPageId = control.getAttribute("data-target");
+    const sortSelect = control.querySelector(".sortPrice");
+    const sizeSelect = control.querySelector(".filterSize");
+    sortSelect.addEventListener("change", () => sortProductsByPrice(targetPageId));
+    sizeSelect.addEventListener("change", () => filterProductsBySize(targetPageId));
+  });
 });
 
+// Modified profile page function to handle guest users
 function showProfilePage() {
-    navigateToPage("profilePage", "#profile");
-    
-    document.getElementById("profileEmail").textContent = "Guest User";
-    document.getElementById("profileName").textContent = "Shopping as Guest";
-    document.getElementById("orderList").innerHTML = "<li>Sign in to view order history</li>";
+  // Hide all pages, show profile
+  document.getElementById("productList").style.display = "none";
+  document.getElementById("sliderSection").style.display = "none";
+  document.getElementById("cartPage").style.display = "none";
+  document.getElementById("profilePage").style.display = "block";
+  document.getElementById("shirtsPage").style.display = "none";
+  document.getElementById("pantsPage").style.display = "none";
+  document.getElementById("descriptionPage").style.display = "none";
+  document.getElementById("tshirtsPage").style.display = "none";
+  document.getElementById("cargosPage").style.display = "none";
+  document.getElementById("detailsPage").style.display = "none";
+  
+  // Show guest message instead of user data
+  document.getElementById("profileEmail").textContent = "Guest User";
+  document.getElementById("profileName").textContent = "Shopping as Guest";
+  
+  // Clear order list for guest users
+  document.getElementById("orderList").innerHTML = "<li>Sign in to view order history</li>";
 }
 
+// Modified checkout function for guest users
+async function checkoutCart() {
+  const name = document.getElementById("checkoutName").value.trim();
+  const address = document.getElementById("checkoutAddress").value.trim();
+  const pincode = document.getElementById("checkoutPincode").value.trim();
+  const mobileNumber = document.getElementById("checkoutMobileNumber").value.trim();
+
+  if (!name || !address || !pincode || !mobileNumber) {
+    showCartToast("Please complete all address fields");
+    return;
+  }
+
+  const subtotalUSD = cart.reduce((s, it) => s + it.price, 0);
+  const subtotalSelected = convert(subtotalUSD);
+  const shippingSelected = subtotalSelected >= convert(0) ? 0 : convert(0);
+  const grandTotalSelected = subtotalSelected + shippingSelected;
+
+  if (grandTotalSelected === 0) {
+    showCartToast("Cart is empty!");
+    return;
+  }
+
+  // Generate guest user ID
+  const guestUID = 'guest_' + Date.now();
+
+  sessionStorage.setItem("pendingOrder", JSON.stringify({
+    cart,
+    addr: { name, address, pincode, mobileNumber },
+    uid: guestUID,
+    totals: {
+      usd: subtotalUSD,
+      sel: grandTotalSelected,
+      curr: currentCurrency
+    }
+  }));
+
+  const amountForGateway = Math.round(grandTotalSelected * 100);
+
+  // Create Razorpay order
+  const { id: orderId } = await fetch("/.netlify/functions/create-order", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      amount: amountForGateway,
+      currency: currentCurrency
+    })
+  }).then(r => r.json());
+
+  const options = {
+    key: "rzp_live_u6z4G2762EuQ4E",
+    amount: amountForGateway,
+    currency: "INR",
+    name: "Monster Men's Collection",
+    description: "Cart Checkout",
+    order_id: orderId,
+    prefill: {
+      name: name,
+      email: "", // No email for guest users
+      contact: mobileNumber,
+    },
+    theme: { color: "#007bff" },
+    webview_intent: true,
+    callback_url: "https://monster-mens-collection.netlify.app/.netlify/functions/verify-signature"
+  };
+  
+  new Razorpay(options).open();
+}
+
+// Toast positioning and other utility functions remain the same
 let cartToastTimer;
 
-function positionCartToast() {
-    const toast = document.getElementById('cartToast');
-    if (!toast) return;
-    const ship = document.getElementById('shippingBar');
+function positionCartToast(){
+  const toast = document.getElementById('cartToast');
+  if (!toast) return;
+  const ship = document.getElementById('shippingBar');
 
-    const shipVisible = ship && getComputedStyle(ship).display !== 'none';
-    const shipH = shipVisible ? (ship.offsetHeight || 32) : 0;
-    const gap = 20;
+  const shipVisible = ship && getComputedStyle(ship).display !== 'none';
+  const shipH = shipVisible ? (ship.offsetHeight || 32) : 0;
+  const gap = 20;
 
-    toast.style.bottom = `calc(var(--nav-h) + env(safe-area-inset-bottom) + ${shipH + gap}px)`;
+  toast.style.bottom = `calc(var(--nav-h) + env(safe-area-inset-bottom) + ${shipH + gap}px)`;
 }
 
-function showCartToast(message = "Item added to cart") {
-    const toast = document.getElementById('cartToast');
-    if (!toast) return;
+function showCartToast(message = "Item added to cart"){
+  const toast = document.getElementById('cartToast');
+  if (!toast) return;
 
-    toast.textContent = ` ${message}`;
-    positionCartToast();
+  toast.textContent = ` ${message}`;
+  positionCartToast();
 
+  toast.classList.remove('show');
+  void toast.offsetWidth;
+  toast.classList.add('show');
+
+  clearTimeout(cartToastTimer);
+  cartToastTimer = setTimeout(() => {
     toast.classList.remove('show');
-    void toast.offsetWidth;
-    toast.classList.add('show');
-
-    clearTimeout(cartToastTimer);
-    cartToastTimer = setTimeout(() => {
-        toast.classList.remove('show');
-    }, 1600);
+  }, 1600);
 }
 
 window.addEventListener('resize', positionCartToast);
 document.addEventListener('DOMContentLoaded', positionCartToast);
 
+// Scroll behavior remains the same
 let lastScrollTop = 0;
 const bottomNav = document.getElementById("bottomNav");
 const shippingBar = document.getElementById("shippingBar");
 
-window.addEventListener("scroll", function() {
-    const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+window.addEventListener("scroll", function () {
+  const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
 
-    const isShirtPage = document.getElementById("shirtsPage").style.display !== "none";
-    const isTshirtPage = document.getElementById("tshirtsPage")?.style.display !== "none";
-    const isPantsPage = document.getElementById("pantsPage").style.display !== "none";
-    const isCargosPage = document.getElementById("cargosPage")?.style.display !== "none";
+  const isShirtPage = document.getElementById("shirtsPage").style.display !== "none";
+  const isTshirtPage = document.getElementById("tshirtsPage")?.style.display !== "none";
+  const isPantsPage = document.getElementById("pantsPage").style.display !== "none";
+  const isCargosPage = document.getElementById("cargosPage")?.style.display !== "none";
 
-    let filterControls = null;
+  let filterControls = null;
 
-    if (isShirtPage) {
-        filterControls = document.getElementById("filterControlsShirts");
-    } else if (isTshirtPage) {
-        filterControls = document.getElementById("filterControlsTshirts");
-    } else if (isPantsPage) {
-        filterControls = document.getElementById("filterControlsPants");
-    } else if (isCargosPage) {
-        filterControls = document.getElementById("filterControlsCargos");
-    }
+  if (isShirtPage) {
+    filterControls = document.getElementById("filterControlsShirts");
+  } else if (isTshirtPage) {
+    filterControls = document.getElementById("filterControlsTshirts");
+  } else if (isPantsPage) {
+    filterControls = document.getElementById("filterControlsPants");
+  } else if (isCargosPage) {
+    filterControls = document.getElementById("filterControlsCargos");
+  }
 
-    const shouldHide = isShirtPage || isTshirtPage || isPantsPage || isCargosPage;
+  const shouldHide = isShirtPage || isTshirtPage || isPantsPage || isCargosPage;
 
-    if (shouldHide) {
-        if (currentScroll > lastScrollTop) {
-            bottomNav.classList.add("hide-bottom-nav");
-            shippingBar.classList.add("hide-shippingBar-nav");
-            filterControls?.classList.add("hide-filter-bar");
-        } else {
-            bottomNav.classList.remove("hide-bottom-nav");
-            shippingBar.classList.remove("hide-shippingBar-nav");
-            filterControls?.classList.remove("hide-filter-bar");
-        }
+  if (shouldHide) {
+    if (currentScroll > lastScrollTop) {
+      bottomNav.classList.add("hide-bottom-nav");
+      shippingBar.classList.add("hide-shippingBar-nav");
+      filterControls?.classList.add("hide-filter-bar");
     } else {
-        bottomNav.classList.remove("hide-bottom-nav");
-        shippingBar.classList.remove("hide-shippingBar-nav");
-        filterControls?.classList.remove("hide-filter-bar");
+      bottomNav.classList.remove("hide-bottom-nav");
+      shippingBar.classList.remove("hide-shippingBar-nav");
+      filterControls?.classList.remove("hide-filter-bar");
     }
+  } else {
+    bottomNav.classList.remove("hide-bottom-nav");
+    shippingBar.classList.remove("hide-shippingBar-nav");
+    filterControls?.classList.remove("hide-filter-bar");
+  }
 
-    lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
+  lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
 });
-
 
   
 </script>
