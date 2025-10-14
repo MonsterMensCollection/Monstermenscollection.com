@@ -5146,7 +5146,7 @@ function goToMainProducts() {
   document.getElementById("cartPage").style.display = "none";
   document.getElementById("profilePage").style.display = "none";
   document.getElementById("tshirtsPage").style.display = "none";
-  document.getElementById("cargosPage").style.display = "none";
+  document.getElementById("cargosPage").style.display = "none"; // Add this line
   document.getElementById("detailsPage").style.display = "none";
 }
 
@@ -6479,7 +6479,7 @@ window.addEventListener('resize', positionCartToast);
 document.addEventListener('DOMContentLoaded', positionCartToast);
 
   
-// Add this to handle browser back/forward navigation
+// Update the popstate event handler - replace the existing one
 window.addEventListener('popstate', function(event) {
   if (event.state && event.state.page) {
     switch(event.state.page) {
@@ -6492,7 +6492,7 @@ window.addEventListener('popstate', function(event) {
       case 'pantsPage':
         showPantsPage();
         break;
-      case 'cargosPage':
+      case 'cargosPage':  // Add this case
         showCargosPage();
         break;
       case 'productList':
@@ -6515,7 +6515,6 @@ window.addEventListener('popstate', function(event) {
     goToMainProducts();
   }
 });
-
 
 
   
