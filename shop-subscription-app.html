@@ -5100,9 +5100,12 @@ function showTshirtsPage() {
 }
 
 function showPantsPage() {
+  
+   if (lastCategoryPage !== 'pantsPage') {
   lastCategoryPage = "pantsPage";
   history.pushState({ page: "pantsPage" }, "", "#pants");
-
+   }
+  
   document.getElementById("productList").style.display = "none";
   document.getElementById("pantsPage").style.display = "block";
   document.getElementById("shirtsPage").style.display = "none";
