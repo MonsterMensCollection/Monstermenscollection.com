@@ -5100,26 +5100,24 @@ function showTshirtsPage() {
 }
 
 function showPantsPage() {
-    
-    lastCategoryPage = "pantsPage";
-     history.pushState({ page: "pantsPage" }, "", "#pants");
+  lastCategoryPage = "pantsPage";
+  history.pushState({ page: "pantsPage" }, "", "#pants");
 
   document.getElementById("productList").style.display = "none";
   document.getElementById("pantsPage").style.display = "block";
   document.getElementById("shirtsPage").style.display = "none";
   document.getElementById("tshirtsPage").style.display = "none";
   document.getElementById("sliderSection").style.display = "none";
-   document.getElementById("cartPage").style.display = "none";
-   document.getElementById("profilePage").style.display = "none";
-   document.getElementById("descriptionPage").style.display = "none";
-   document.getElementById("cargosPage").style.display = "none";
-    document.getElementById("detailsPage").style.display = "none";
+  document.getElementById("cartPage").style.display = "none";
+  document.getElementById("profilePage").style.display = "none";
+  document.getElementById("descriptionPage").style.display = "none";
+  document.getElementById("cargosPage").style.display = "none";
+  document.getElementById("detailsPage").style.display = "none";
 }
 
 function showCargosPage() {
-    
-  lastCategoryPage = "cargosPage"; //  Add this line
- history.pushState({ page: "cargosPage" }, "", "#cargos");
+  lastCategoryPage = "cargosPage";
+  history.pushState({ page: "cargosPage" }, "", "#cargos");
 
   document.getElementById("productList").style.display = "none";
   document.getElementById("cargosPage").style.display = "block";
@@ -5130,7 +5128,7 @@ function showCargosPage() {
   document.getElementById("cartPage").style.display = "none";
   document.getElementById("profilePage").style.display = "none";
   document.getElementById("descriptionPage").style.display = "none";
-    document.getElementById("detailsPage").style.display = "none";
+  document.getElementById("detailsPage").style.display = "none";
 }
 
 function backToProducts() {
@@ -6480,6 +6478,7 @@ function showCartToast(message = "Item added to cart"){
 window.addEventListener('resize', positionCartToast);
 document.addEventListener('DOMContentLoaded', positionCartToast);
 
+  
 // Add this to handle browser back/forward navigation
 window.addEventListener('popstate', function(event) {
   if (event.state && event.state.page) {
@@ -6500,7 +6499,7 @@ window.addEventListener('popstate', function(event) {
         goToMainProducts();
         break;
       case 'descriptionPage':
-        // Stay on description page (handled by the function that pushed this state)
+        // Handle description page navigation if needed
         break;
       case 'cartPage':
         showCart();
@@ -6516,6 +6515,7 @@ window.addEventListener('popstate', function(event) {
     goToMainProducts();
   }
 });
+
 
 
   
