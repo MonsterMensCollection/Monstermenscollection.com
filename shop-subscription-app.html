@@ -5064,64 +5064,75 @@
 <script>
 
       
-      let lastCategoryPage = null;
+      
+
+let lastCategoryPage = null;
 
 function showShirtsPage() {
   if (lastCategoryPage !== 'shirtsPage') {
     lastCategoryPage = 'shirtsPage';
     history.pushState({ page: 'shirtsPage' }, '', '#shirts');
   }
+  // ADD THIS LINE:
+  document.getElementById("productsPage").style.display = "block";
+  
   document.getElementById("productList").style.display = "none";
   document.getElementById("shirtsPage").style.display = "block";
   document.getElementById("pantsPage").style.display = "none";
   document.getElementById("sliderSection").style.display = "none";
-   document.getElementById("cartPage").style.display = "none";
-   document.getElementById("profilePage").style.display = "none";
-   document.getElementById("descriptionPage").style.display = "none";
-     document.getElementById("tshirtsPage").style.display = "none";
-      document.getElementById("cargosPage").style.display = "none";
-    document.getElementById("detailsPage").style.display = "none";
+  document.getElementById("cartPage").style.display = "none";
+  document.getElementById("profilePage").style.display = "none";
+  document.getElementById("descriptionPage").style.display = "none";
+  document.getElementById("tshirtsPage").style.display = "none";
+  document.getElementById("cargosPage").style.display = "none";
+  document.getElementById("detailsPage").style.display = "none";
 }
 
 function showTshirtsPage() {
-    
-     lastCategoryPage = "tshirtsPage";
-    history.pushState({ page: "tshirtsPage" }, "", "#tshirts");
-   
+  lastCategoryPage = "tshirtsPage";
+  history.pushState({ page: "tshirtsPage" }, "", "#tshirts");
+  
+  // ADD THIS LINE:
+  document.getElementById("productsPage").style.display = "block";
+  
   document.getElementById("productList").style.display = "none";
   document.getElementById("tshirtsPage").style.display = "block";
   document.getElementById("pantsPage").style.display = "none";
   document.getElementById("sliderSection").style.display = "none";
-   document.getElementById("cartPage").style.display = "none";
-   document.getElementById("profilePage").style.display = "none";
-   document.getElementById("descriptionPage").style.display = "none";
-     document.getElementById("shirtsPage").style.display = "none";
-      document.getElementById("cargosPage").style.display = "none";
-    document.getElementById("detailsPage").style.display = "none";
+  document.getElementById("cartPage").style.display = "none";
+  document.getElementById("profilePage").style.display = "none";
+  document.getElementById("descriptionPage").style.display = "none";
+  document.getElementById("shirtsPage").style.display = "none";
+  document.getElementById("cargosPage").style.display = "none";
+  document.getElementById("detailsPage").style.display = "none";
 }
 
 function showPantsPage() {
-    
-    lastCategoryPage = "pantsPage";
-     history.pushState({ page: "pantsPage" }, "", "#pants");
+  lastCategoryPage = "pantsPage";
+  history.pushState({ page: "pantsPage" }, "", "#pants");
 
+  // ADD THIS LINE:
+  document.getElementById("productsPage").style.display = "block";
+  
   document.getElementById("productList").style.display = "none";
   document.getElementById("pantsPage").style.display = "block";
   document.getElementById("shirtsPage").style.display = "none";
   document.getElementById("tshirtsPage").style.display = "none";
   document.getElementById("sliderSection").style.display = "none";
-   document.getElementById("cartPage").style.display = "none";
-   document.getElementById("profilePage").style.display = "none";
-   document.getElementById("descriptionPage").style.display = "none";
-   document.getElementById("cargosPage").style.display = "none";
-    document.getElementById("detailsPage").style.display = "none";
+  document.getElementById("cartPage").style.display = "none";
+  document.getElementById("profilePage").style.display = "none";
+  document.getElementById("descriptionPage").style.display = "none";
+  document.getElementById("cargosPage").style.display = "none";
+  document.getElementById("detailsPage").style.display = "none";
 }
 
 function showCargosPage() {
-    
-  lastCategoryPage = "cargosPage"; //  Add this line
- history.pushState({ page: "cargosPage" }, "", "#cargos");
+  lastCategoryPage = "cargosPage";
+  history.pushState({ page: "cargosPage" }, "", "#cargos");
 
+  // ADD THIS LINE:
+  document.getElementById("productsPage").style.display = "block";
+  
   document.getElementById("productList").style.display = "none";
   document.getElementById("cargosPage").style.display = "block";
   document.getElementById("shirtsPage").style.display = "none";
@@ -5131,9 +5142,29 @@ function showCargosPage() {
   document.getElementById("cartPage").style.display = "none";
   document.getElementById("profilePage").style.display = "none";
   document.getElementById("descriptionPage").style.display = "none";
-    document.getElementById("detailsPage").style.display = "none";
+  document.getElementById("detailsPage").style.display = "none";
 }
 
+// Update showCart and showProfilePage functions:
+function showCart() {
+  document.getElementById("productsPage").style.display = "none";
+  document.getElementById("cartPage").style.display = "block";
+  document.getElementById("profilePage").style.display = "none";
+  document.getElementById("sliderSection").style.display = "none";
+  document.getElementById("descriptionPage").style.display = "none";
+  document.getElementById("detailsPage").style.display = "none";
+}
+
+function showProfilePage() {
+  document.getElementById("productsPage").style.display = "none";
+  document.getElementById("cartPage").style.display = "none";
+  document.getElementById("profilePage").style.display = "block";
+  document.getElementById("sliderSection").style.display = "none";
+  document.getElementById("descriptionPage").style.display = "none";
+  document.getElementById("detailsPage").style.display = "none";
+}
+
+// Keep your existing backToProducts and goToMainProducts functions as they are
 function backToProducts() {
   // Check if we have a last category page stored
   if (lastCategoryPage) {
@@ -5174,6 +5205,9 @@ function goToMainProducts() {
   document.getElementById("tshirtsPage").style.display = "none";
   document.getElementById("cargosPage").style.display = "none";
   document.getElementById("detailsPage").style.display = "none";
+  
+  // ADD THIS LINE:
+  document.getElementById("productsPage").style.display = "block";
 }
 
  function goToDetailsPage() {
