@@ -5134,31 +5134,8 @@ function showCargosPage() {
 }
 
 function backToProducts() {
-  // Check if we have a last category page stored
-  if (lastCategoryPage) {
-    // Navigate back to the specific category page
-    switch(lastCategoryPage) {
-      case 'shirtsPage':
-        showShirtsPage();
-        break;
-      case 'tshirtsPage':
-        showTshirtsPage();
-        break;
-      case 'pantsPage':
-        showPantsPage();
-        break;
-      case 'cargosPage':
-        showCargosPage();
-        break;
-      default:
-        // Fallback to main products page
-        goToMainProducts();
-        break;
-    }
-  } else {
-    // Fallback to main products page
-    goToMainProducts();
-  }
+  // Always go to main home page when home icon is clicked
+  goToMainProducts();
 }
 
 function goToMainProducts() {
