@@ -5213,38 +5213,44 @@ function goToMainProducts() {
   document.getElementById("detailsPage").style.display = "none";
 }
 
- function goToDetailsPage() {
-    // ⛔ Block if cart is empty
-    if (!Array.isArray(cart) || cart.length === 0) {
-      // keep the user on the cart page and show the empty message/toast
-      showCart(); 
-      showCartToast("Your cart is empty");
-      return;
-    }
-
-    // (defensive) also block if total is 0
-    const totalUSD = cart.reduce((s, it) => s + Number(it.price || 0), 0);
-    if (totalUSD <= 0) {
-      showCart();
-      showCartToast("Your cart is empty");
-      return;
-    }
-
-    //  proceed to details page
-    history.pushState({ page: "detailsPage" }, "", "#details");
-
-    document.getElementById("descriptionPage").style.display = "none";
-    document.getElementById("productList").style.display = "none";
-    document.getElementById("shirtsPage").style.display = "none";
-    document.getElementById("pantsPage").style.display = "none";
-    document.getElementById("sliderSection").style.display = "none";
-    document.getElementById("cartPage").style.display = "none";
-    document.getElementById("profilePage").style.display = "none";
-    document.getElementById("tshirtsPage").style.display = "none";
-    document.getElementById("cargosPage").style.display = "none";
-   document.getElementById("signupPage").style.display = "none";
-    document.getElementById("detailsPage").style.display = "block";
+function goToDetailsPage() {
+  // ⛔ Block if cart is empty
+  if (!Array.isArray(cart) || cart.length === 0) {
+    showCart(); 
+    showCartToast("Your cart is empty");
+    return;
   }
+
+  const totalUSD = cart.reduce((s, it) => s + Number(it.price || 0), 0);
+  if (totalUSD <= 0) {
+    showCart();
+    showCartToast("Your cart is empty");
+    return;
+  }
+
+  // Proceed to details page
+  history.pushState({ page: "detailsPage" }, "", "#details");
+
+  // Hide all other pages
+  const pagesToHide = [
+    "descriptionPage", "productList", "shirtsPage", "pantsPage",
+    "sliderSection", "cartPage", "profilePage", "tshirtsPage",
+    "cargosPage", "signupPage", "loginPage"
+  ];
+  
+  pagesToHide.forEach(id => {
+    const element = document.getElementById(id);
+    if (element) element.style.display = "none";
+  });
+
+  // Show details page
+  const detailsPage = document.getElementById("detailsPage");
+  if (detailsPage) {
+    detailsPage.style.display = "block";
+  }
+  
+  window.scrollTo(0, 0);
+}
 
 
 const launchDate = new Date("2025-11-01T00:00:00Z").getTime(); // Target UTC time
@@ -6000,10 +6006,12 @@ function createAccountAndCheckout() {
     return;
   }
   
+  // Store checkout intent in sessionStorage
+  sessionStorage.setItem('checkoutIntent', 'true');
+  
   // Create user with email and password
   auth.createUserWithEmailAndPassword(email, password)
     .then((userCredential) => {
-      // User created successfully
       const user = userCredential.user;
       
       // Update profile with name
@@ -6021,11 +6029,15 @@ function createAccountAndCheckout() {
     .then(() => {
       // Account created successfully, proceed to checkout
       showCartToast("Account created successfully!");
+      
+      // Clear the checkout intent and redirect to checkout
+      sessionStorage.removeItem('checkoutIntent');
       goToDetailsPage();
     })
     .catch((error) => {
       console.error("Error creating account:", error);
       showCartToast("Error creating account: " + error.message);
+      sessionStorage.removeItem('checkoutIntent');
     });
 }
 
@@ -6093,18 +6105,22 @@ function loginAndCheckout() {
     return;
   }
   
+  // Store checkout intent
+  sessionStorage.setItem('checkoutIntent', 'true');
+  
   auth.signInWithEmailAndPassword(email, password)
     .then(() => {
       // Login successful, proceed to checkout
       showCartToast("Signed in successfully!");
+      sessionStorage.removeItem('checkoutIntent');
       goToDetailsPage();
     })
     .catch((error) => {
       console.error("Error signing in:", error);
       showCartToast("Error signing in: " + error.message);
+      sessionStorage.removeItem('checkoutIntent');
     });
 }
-
   
 const RATES = { USD: 1, INR: 1, EUR: 0.92 };
 let currentCurrency = "INR";
@@ -6533,18 +6549,26 @@ const db = firebase.firestore();
 const auth = firebase.auth();
 
 // Listen for auth state changes
+// Listen for auth state changes
 auth.onAuthStateChanged((user) => {
   if (user) {
     // User is signed in
     console.log("User is signed in:", user.email);
-    // You can update UI elements here if needed
+    
+    // Check if user was trying to checkout
+    const checkoutIntent = sessionStorage.getItem('checkoutIntent');
+    if (checkoutIntent === 'true') {
+      // Automatically redirect to checkout
+      setTimeout(() => {
+        goToDetailsPage();
+        sessionStorage.removeItem('checkoutIntent');
+      }, 1000);
+    }
   } else {
     // User is signed out
     console.log("User is signed out");
-    // You can show login prompts here if needed
   }
 });
-
 // Fix the missing restoreOneUnit function
 async function restoreOneUnit(docId, size) {
   try {
@@ -6626,6 +6650,9 @@ function handleCheckout() {
   } else {
     // User is not signed in, show signup page
     console.log("Showing signup page");
+    
+    // Store checkout intent so we can redirect after auth
+    sessionStorage.setItem('checkoutIntent', 'true');
     showSignupPage();
   }
 }
@@ -6711,6 +6738,17 @@ document.addEventListener("DOMContentLoaded", function() {
     sortSelect.addEventListener("change", () => sortProductsByPrice(targetPageId));
     sizeSelect.addEventListener("change", () => filterProductsBySize(targetPageId));
   });
+   // Check if user was in checkout flow
+  const checkoutIntent = sessionStorage.getItem('checkoutIntent');
+  const user = auth.currentUser;
+  
+  if (checkoutIntent === 'true' && user) {
+    // User just signed in and was trying to checkout
+    setTimeout(() => {
+      goToDetailsPage();
+      sessionStorage.removeItem('checkoutIntent');
+    }, 500);
+  }
 });
 
 // Modified profile page function to handle guest users
