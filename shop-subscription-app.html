@@ -6341,18 +6341,22 @@ async function checkoutCart() {
     if (!user) return;
 
     const orderData = {
-      uid         : user.uid,
-      name, address, pincode, mobilenumber: mobileNumber,
-      cart        : [...cart],
-      totalUSD    : subtotalUSD,
-      total       : grandTotalSelected,
-      currency    : currentCurrency,
-      paymentId   : response.razorpay_payment_id,
-      paymentMode : "Razorpay",
-      timestamp   : firebase.firestore.FieldValue.serverTimestamp(),
-      orderNumber : `ORD-${Date.now()}`,
-      status: "Processing"
-    };
+  uid: user.uid, // Make sure this is consistent
+  name: name,
+  address: address,
+  pincode: pincode,
+  mobilenumber: mobileNumber,
+  cart: [...cart],
+  totalUSD: subtotalUSD,
+  total: grandTotalSelected,
+  currency: currentCurrency,
+  paymentId: response.razorpay_payment_id,
+  paymentMode: "Razorpay",
+  timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+  orderNumber: `ORD-${Date.now()}`,
+  status: "Processing",
+  userEmail: user.email // Add email for verification
+};
 
     try {
       await finalizeOrderStock(cart);                 // lock inventory
@@ -6900,73 +6904,7 @@ document.addEventListener("DOMContentLoaded", function() {
 // Modified profile page function to handle guest users
 
 
-// Modified checkout function for guest users
-async function checkoutCart() {
-  const name = document.getElementById("checkoutName").value.trim();
-  const address = document.getElementById("checkoutAddress").value.trim();
-  const pincode = document.getElementById("checkoutPincode").value.trim();
-  const mobileNumber = document.getElementById("checkoutMobileNumber").value.trim();
 
-  if (!name || !address || !pincode || !mobileNumber) {
-    showCartToast("Please complete all address fields");
-    return;
-  }
-
-  const subtotalUSD = cart.reduce((s, it) => s + it.price, 0);
-  const subtotalSelected = convert(subtotalUSD);
-  const shippingSelected = subtotalSelected >= convert(0) ? 0 : convert(0);
-  const grandTotalSelected = subtotalSelected + shippingSelected;
-
-  if (grandTotalSelected === 0) {
-    showCartToast("Cart is empty!");
-    return;
-  }
-
-  // Generate guest user ID
-  const guestUID = 'guest_' + Date.now();
-
-  sessionStorage.setItem("pendingOrder", JSON.stringify({
-    cart,
-    addr: { name, address, pincode, mobileNumber },
-    uid: guestUID,
-    totals: {
-      usd: subtotalUSD,
-      sel: grandTotalSelected,
-      curr: currentCurrency
-    }
-  }));
-
-  const amountForGateway = Math.round(grandTotalSelected * 100);
-
-  // Create Razorpay order
-  const { id: orderId } = await fetch("/.netlify/functions/create-order", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      amount: amountForGateway,
-      currency: currentCurrency
-    })
-  }).then(r => r.json());
-
-  const options = {
-    key: "rzp_live_u6z4G2762EuQ4E",
-    amount: amountForGateway,
-    currency: "INR",
-    name: "Monster Men's Collection",
-    description: "Cart Checkout",
-    order_id: orderId,
-    prefill: {
-      name: name,
-      email: "", // No email for guest users
-      contact: mobileNumber,
-    },
-    theme: { color: "#007bff" },
-    webview_intent: true,
-    callback_url: "https://monster-mens-collection.netlify.app/.netlify/functions/verify-signature"
-  };
-  
-  new Razorpay(options).open();
-}
 
 // Toast positioning and other utility functions remain the same
 let cartToastTimer;
