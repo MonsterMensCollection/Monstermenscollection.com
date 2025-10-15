@@ -6525,7 +6525,11 @@ function loadUserProfileAndOrders() {
 
 function loadUserOrders() {
   const user = auth.currentUser;
-  if (!user) return;
+  if (!user) {
+    const orderList = document.getElementById("orderList");
+    orderList.innerHTML = "<div style='text-align: center; padding: 20px; color: #777;'>Sign in to view order history</div>";
+    return;
+  }
   
   const orderList = document.getElementById("orderList");
   orderList.innerHTML = "<div style='text-align: center; padding: 20px; color: #777;'>Loading your orders...</div>";
@@ -6551,41 +6555,72 @@ function loadUserOrders() {
         orderItem.style.backgroundColor = "#f9f9f9";
         orderItem.style.borderRadius = "8px";
         
-        // Format order items
-        const itemsList = order.cart ? order.cart.map(item => 
-          `${item.title} - ${item.size || 'N/A'} (${format(convert(item.price || 0))})`
-        ).join(', ') : 'No items';
+        // Format order items safely
+        let itemsList = "No items";
+        if (order.cart && Array.isArray(order.cart)) {
+          itemsList = order.cart.map(item => {
+            const itemName = item.title || "Unknown Item";
+            const itemSize = item.size || 'N/A';
+            const itemPrice = item.price ? format(convert(item.price)) : '₹0';
+            return `${itemName} - ${itemSize} (${itemPrice})`;
+          }).join(', ');
+        }
         
-        // Format date
-        const orderDate = order.timestamp ? 
-          order.timestamp.toDate().toLocaleDateString('en-IN', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-          }) : 'Recent';
+        // Format date safely
+        let orderDate = "Recent";
+        if (order.timestamp && order.timestamp.toDate) {
+          try {
+            orderDate = order.timestamp.toDate().toLocaleDateString('en-IN', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            });
+          } catch (e) {
+            console.error("Error formatting date:", e);
+          }
+        }
+        
+        // Format order number
+        const orderNumber = order.orderNumber || `ORD-${doc.id.slice(-8)}`;
+        
+        // Format total amount
+        const totalAmount = order.total ? format(convert(order.total)) : '₹0';
+        
+        // Format status with color
+        const status = order.status || 'Processing';
+        let statusColor = 'orange'; // default for Processing
+        if (status === 'Delivered') statusColor = 'green';
+        if (status === 'Cancelled') statusColor = 'red';
+        if (status === 'Shipped') statusColor = 'blue';
+        
+        // Format payment info
+        const paymentMode = order.paymentMode || 'N/A';
+        let paymentIdDisplay = '';
+        if (order.paymentId && order.paymentId !== 'COD') {
+          paymentIdDisplay = ` (ID: ${order.paymentId.slice(-8)})`;
+        }
         
         orderItem.innerHTML = `
           <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-            <strong style="font-size: 16px;">Order #${order.orderNumber || doc.id.slice(-8)}</strong>
+            <strong style="font-size: 16px;">Order #${orderNumber}</strong>
             <span style="font-size: 14px; color: #666;">${orderDate}</span>
           </div>
           <div style="margin-bottom: 8px;">
             <strong>Items:</strong> ${itemsList}
           </div>
           <div style="margin-bottom: 8px;">
-            <strong>Total:</strong> ${format(convert(order.total || 0))}
+            <strong>Total:</strong> ${totalAmount}
           </div>
           <div style="margin-bottom: 8px;">
             <strong>Status:</strong> 
-            <span style="color: ${order.status === 'Delivered' ? 'green' : order.status === 'Cancelled' ? 'red' : 'orange'};">
-              ${order.status || 'Processing'}
+            <span style="color: ${statusColor}; font-weight: bold;">
+              ${status}
             </span>
           </div>
           <div>
-            <strong>Payment:</strong> ${order.paymentMode || 'N/A'}
-            ${order.paymentId && order.paymentId !== 'COD' ? ` (ID: ${order.paymentId.slice(-8)})` : ''}
+            <strong>Payment:</strong> ${paymentMode}${paymentIdDisplay}
           </div>
         `;
         
