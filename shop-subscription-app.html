@@ -6350,7 +6350,8 @@ async function checkoutCart() {
       paymentId   : response.razorpay_payment_id,
       paymentMode : "Razorpay",
       timestamp   : firebase.firestore.FieldValue.serverTimestamp(),
-      orderNumber : `ORD-${Date.now()}`
+      orderNumber : `ORD-${Date.now()}`,
+      status: "Processing"
     };
 
     try {
@@ -6422,7 +6423,8 @@ function checkoutCOD() {
     paymentId: "COD",
     paymentMode: "Cash on Delivery",
     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-    orderNumber: `ORD-${Date.now()}`
+    orderNumber: `ORD-${Date.now()}`,
+      status: "Processing"
   };
 
   db.collection("orders").add(orderData).then(() => {
@@ -6702,39 +6704,27 @@ function flushRestoreBeacon(cart) {
 function loadUserProfileAndOrders() {
   const user = auth.currentUser;
   if (!user) return;
+
+  // Update profile information immediately
+  document.getElementById("profileEmail").textContent = user.email || "Not available";
+  document.getElementById("profileName").textContent = user.displayName || "Loading...";
   
+  // Try to get user name from Firestore first, then fall back to displayName
+  db.collection("users").doc(user.uid).get().then((doc) => {
+    if (doc.exists && doc.data().name) {
+      document.getElementById("profileName").textContent = doc.data().name;
+    } else if (user.displayName) {
+      document.getElementById("profileName").textContent = user.displayName;
+    } else {
+      document.getElementById("profileName").textContent = "Not available";
+    }
+  }).catch((error) => {
+    console.error("Error loading user profile:", error);
+    document.getElementById("profileName").textContent = user.displayName || "Not available";
+  });
+
   // Load user orders
-  db.collection("orders")
-    .where("uid", "==", user.uid)
-    .orderBy("timestamp", "desc")
-    .get()
-    .then((querySnapshot) => {
-      const orderList = document.getElementById("orderList");
-      orderList.innerHTML = "";
-      
-      if (querySnapshot.empty) {
-        orderList.innerHTML = "<li>No orders yet</li>";
-        return;
-      }
-      
-      querySnapshot.forEach((doc) => {
-        const order = doc.data();
-        const li = document.createElement("li");
-        li.style.padding = "10px";
-        li.style.borderBottom = "1px solid #eee";
-        li.innerHTML = `
-          <strong>Order #${order.orderNumber || doc.id}</strong><br>
-          Total: ${format(convert(order.total || 0))}<br>
-          Status: ${order.status || "Processing"}<br>
-          Date: ${order.timestamp?.toDate?.().toLocaleDateString() || "Recent"}
-        `;
-        orderList.appendChild(li);
-      });
-    })
-    .catch((error) => {
-      console.error("Error loading orders:", error);
-      document.getElementById("orderList").innerHTML = "<li>Error loading orders</li>";
-    });
+  loadUserOrders();
 }
 
 // Update the handleCheckout function
