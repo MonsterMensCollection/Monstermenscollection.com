@@ -4952,76 +4952,60 @@
 </div>
 
 
-<!-- Login Page -->
-  <div id="loginPage" class="form-section">
-    <img src="https://see.fontimg.com/api/rf5/woG33/N2Y3Y2RhYTdiOGMwNGVjOGE5MWE1MTFiNGJjM2E4Y2Iub3Rm/U0lHTiBJTg/redtrap-expanded-puo.png?r=fs&h=30&w=1000&fg=000000&bg=FFFFFF&tb=1&s=30" 
-         style="display: block; margin-left: auto; margin-right: auto;">
-    <br><br>
-    
-    <input type="email" id="loginEmail" placeholder="Email Address" />
-    <input type="password" id="loginPassword" placeholder="Password" />
-    
-    <button onclick="loginUser()">SIGN IN</button>
-    
-    <div class="toggle-link">
-      Don't have an account? <a onclick="showSignupPage()">Sign up</a>
+<div id="profilePage" class="form-section" style="display: none; margin-top: 22%; padding: 20px; max-width: 90%; margin-left: auto; margin-right: auto; background-color: #fff; border-radius: 0px;">
+  <!-- Logo -->
+  <img src="https://see.fontimg.com/api/rf5/woG33/N2Y3Y2RhYTdiOGMwNGVjOGE5MWE1MTFiNGJjM2E4Y2Iub3Rm/UFJPRklMRQ/redtrap-expanded-puo.png?r=fs&h=30&w=1000&fg=000000&bg=FFFFFF&tb=1&s=30" style="display: block; margin-left: auto; margin-right: auto;"><br><br>
+
+  <!-- Profile Info -->
+  <div style="width: 100%; background-color: #f9f9f9; padding: 15px 20px; border-radius: 0px; box-sizing: border-box;">
+    <div style="margin-bottom: 15px;">
+      <label style="font-size: 14px; color: #777;">Name</label>
+      <div id="profileName" style="font-size: 18px; font-weight: bold; color: #333;">Loading...</div>
+    </div>
+    <div>
+      <label style="font-size: 14px; color: #777;">Email</label>
+      <div id="profileEmail" style="font-size: 18px; font-weight: bold; color: #333;">Loading...</div>
+    </div>
+  </div>
+  
+  <div style="display: none;">
+    <label for="currencySelector" style="font-size: 14px; color: #777; white-space: nowrap;">
+      Currency
+    </label>
+    <select id="currencySelector" style="flex: 1 1 auto; padding: 10px 12px; border: 0px solid #ccc; border-radius: 0; background: #fafafa; font-size: 16px; font-weight: 600; color: #333;">
+      <option value="INR">₹ INR</option>
+    </select>
+  </div>
+
+  <!-- About Us Button -->
+  <button onclick="toggleWhyTime()" style="margin-top: 30px; padding: 12px 20px; background-color: #eee; color: #000; border: none; border-radius: 0px; cursor: pointer; font-weight: bold; width: 100%;">
+    About Us
+  </button>
+
+  <!-- Hidden Explanation Text -->
+  <div id="whyTimeMessage" style="max-height: 0; overflow: hidden; transition: max-height 0.5s ease-out, padding 0.5s ease-out; background-color: #f0f0f0; border-left: 4px solid #000; font-size: 14px; line-height: 1.6; color: #333; padding: 0 15px;">
+    <div style="padding-top: 15px; padding-bottom: 15px;">
+      I'm a dropout with a crazy love for streetwear and formal fits. Out of that passion, I started Enly—a space where style meets attitude. We mix street energy with sharp classics, built for guys who want to stand out and keep it real.
     </div>
   </div>
 
-  <!-- Profile Page (updated) -->
-  <div id="profilePage" class="form-section" style="display: none; margin-top: 22%; padding: 20px; max-width: 90%; margin-left: auto; margin-right: auto; background-color: #fff; border-radius: 0px;">
-    <!-- Logo -->
-    <img src="https://see.fontimg.com/api/rf5/woG33/N2Y3Y2RhYTdiOGMwNGVjOGE5MWE1MTFiNGJjM2E4Y2Iub3Rm/UFJPRklMRQ/redtrap-expanded-puo.png?r=fs&h=30&w=1000&fg=000000&bg=FFFFFF&tb=1&s=30" style="display: block; margin-left: auto; margin-right: auto;"><br><br>
+  <!-- Logout Button -->
+  <button onclick="logout()" style="margin-top: 20px; padding: 12px 20px; background-color: #000; color: white; border: none; border-radius: 0px; cursor: pointer; font-weight: bold; width: 100%;">
+    Logout
+  </button>
 
-    <!-- Profile Info (only shown when logged in) -->
-    <div id="profileInfo" style="width: 100%; background-color: #f9f9f9; padding: 15px 20px; border-radius: 0px; box-sizing: border-box; display: none;">
-      <div style="margin-bottom: 15px;">
-        <label style="font-size: 14px; color: #777;">Name</label>
-        <div id="profileName" style="font-size: 18px; font-weight: bold; color: #333;">Loading...</div>
-      </div>
-      <div>
-        <label style="font-size: 14px; color: #777;">Email</label>
-        <div id="profileEmail" style="font-size: 18px; font-weight: bold; color: #333;">Loading...</div>
+  <!-- Orders Section -->
+  <div style="margin-top: 30px;">
+    <h3 style="font-size: 20px; color: #000;">Your Orders</h3>
+    <div id="orderList" style="margin-top: 10px; background: #FFFFFF; padding: 10px; border-radius: 0px; color: #333;">
+      <div style="text-align: center; padding: 20px; color: #777;">
+        Loading your orders...
       </div>
     </div>
-
-    <!-- Login/Logout Buttons -->
-    <div id="authButtons">
-      <!-- Login button shown when user is logged out -->
-      <button id="loginBtn" class="profile-button login-button" onclick="showLoginPage()" style="display: none;">
-        LOGIN
-      </button>
-      
-      <!-- Logout button shown when user is logged in -->
-      <button id="logoutBtn" class="profile-button logout-button" onclick="logout()" style="display: none;">
-        LOGOUT
-      </button>
-    </div>
-
-    <!-- About Us Button (only shown when logged in) -->
-    <button id="aboutUsBtn" onclick="toggleWhyTime()" style="margin-top: 20px; padding: 12px 20px; background-color: #eee; color: #000; border: none; border-radius: 0px; cursor: pointer; font-weight: bold; width: 100%; display: none;">
-      About Us
-    </button>
-
-    <!-- Hidden Explanation Text -->
-    <div id="whyTimeMessage" style="max-height: 0; overflow: hidden; transition: max-height 0.5s ease-out, padding 0.5s ease-out; background-color: #f0f0f0; border-left: 4px solid #000; font-size: 14px; line-height: 1.6; color: #333; padding: 0 15px;">
-      <div style="padding-top: 15px; padding-bottom: 15px;">
-        I'm a dropout with a crazy love for streetwear and formal fits. Out of that passion, I started Enly—a space where style meets attitude. We mix street energy with sharp classics, built for guys who want to stand out and keep it real.
-      </div>
-    </div>
-
-    <!-- Orders Section (only shown when logged in) -->
-    <div id="ordersSection" style="margin-top: 30px; display: none;">
-      <h3 style="font-size: 20px; color: #000;">Your Orders</h3>
-      <div id="orderList" style="margin-top: 10px; background: #FFFFFF; padding: 10px; border-radius: 0px; color: #333;">
-        <div style="text-align: center; padding: 20px; color: #777;">
-          Loading your orders...
-        </div>
-      </div>
-    </div>
-
-    <br><br><br><br><br>
   </div>
+
+  <br><br><br><br><br>
+</div>
 
 
      
@@ -6491,43 +6475,30 @@ function proceedWithCOD() {
 
 
 function showProfilePage() {
-    const user = auth.currentUser;
-    
-    // Hide all pages, show profile
-    document.getElementById("productList").style.display = "none";
-    document.getElementById("sliderSection").style.display = "none";
-    document.getElementById("cartPage").style.display = "none";
-    document.getElementById("profilePage").style.display = "block";
-    document.getElementById("shirtsPage").style.display = "none";
-    document.getElementById("pantsPage").style.display = "none";
-    document.getElementById("descriptionPage").style.display = "none";
-    document.getElementById("tshirtsPage").style.display = "none";
-    document.getElementById("cargosPage").style.display = "none";
-    document.getElementById("detailsPage").style.display = "none";
-    document.getElementById("loginPage").style.display = "none";
-    document.getElementById("signupPage").style.display = "none";
+  const user = auth.currentUser;
+  
+  // Hide all pages, show profile
+  document.getElementById("productList").style.display = "none";
+  document.getElementById("sliderSection").style.display = "none";
+  document.getElementById("cartPage").style.display = "none";
+  document.getElementById("profilePage").style.display = "block";
+  document.getElementById("shirtsPage").style.display = "none";
+  document.getElementById("pantsPage").style.display = "none";
+  document.getElementById("descriptionPage").style.display = "none";
+  document.getElementById("tshirtsPage").style.display = "none";
+  document.getElementById("cargosPage").style.display = "none";
+  document.getElementById("detailsPage").style.display = "none";
 
-    if (user) {
-      // User is signed in - show profile info and logout button
-      document.getElementById("profileInfo").style.display = "block";
-      document.getElementById("aboutUsBtn").style.display = "block";
-      document.getElementById("ordersSection").style.display = "block";
-      document.getElementById("loginBtn").style.display = "none";
-      document.getElementById("logoutBtn").style.display = "block";
-      
-      // Load user profile and orders
-      loadUserProfileAndOrders();
-    } else {
-      // User is not signed in - show guest view with login button
-      document.getElementById("profileInfo").style.display = "none";
-      document.getElementById("aboutUsBtn").style.display = "none";
-      document.getElementById("ordersSection").style.display = "none";
-      document.getElementById("loginBtn").style.display = "block";
-      document.getElementById("logoutBtn").style.display = "none";
-      
-      document.getElementById("orderList").innerHTML = "<div style='text-align: center; padding: 20px; color: #777;'>Sign in to view order history</div>";
-    }
+  if (user) {
+    // User is signed in - load profile data
+    loadUserProfileAndOrders();
+  } else {
+    // User is not signed in - show guest message
+    document.getElementById("profileEmail").textContent = "Guest User";
+    document.getElementById("profileName").textContent = "Shopping as Guest";
+    document.getElementById("orderList").innerHTML = "<div style='text-align: center; padding: 20px; color: #777;'>Sign in to view order history</div>";
   }
+}
 
 function loadUserProfileAndOrders() {
   const user = auth.currentUser;
@@ -6678,23 +6649,24 @@ function loadUserOrders() {
 }
 
 // Update the logout function
-// Updated logout function
-  function logout() {
-    auth.signOut().then(() => {
-      // Clear local data
-      cart = [];
-      localStorage.removeItem("cart");
-      
-      // Show success message
-      showCartToast("Logged out successfully");
-      
-      // Update profile page to show login button
-      showProfilePage();
-    }).catch((error) => {
-      console.error("Error signing out:", error);
-      showCartToast("Error logging out");
-    });
-  }
+function logout() {
+  auth.signOut().then(() => {
+    // Clear local data
+    cart = [];
+    localStorage.removeItem("cart");
+    
+    // Show success message
+    showCartToast("Logged out successfully");
+    
+    // Return to main page
+    setTimeout(() => {
+      goToMainProducts();
+    }, 1000);
+  }).catch((error) => {
+    console.error("Error signing out:", error);
+    showCartToast("Error logging out");
+  });
+}
 
 function saveOrder(productName, uid) {
   db.collection("orders").add({
@@ -6728,73 +6700,33 @@ const db = firebase.firestore();
 // Firebase auth state listener
 const auth = firebase.auth();
 
- // Show Login Page
-  function showLoginPage() {
-    history.pushState({ page: "loginPage" }, "", "#login");
-    
-    // Hide all other pages
-    document.getElementById("descriptionPage").style.display = "none";
-    document.getElementById("productList").style.display = "none";
-    document.getElementById("shirtsPage").style.display = "none";
-    document.getElementById("pantsPage").style.display = "none";
-    document.getElementById("sliderSection").style.display = "none";
-    document.getElementById("cartPage").style.display = "none";
-    document.getElementById("profilePage").style.display = "none";
-    document.getElementById("tshirtsPage").style.display = "none";
-    document.getElementById("cargosPage").style.display = "none";
-    document.getElementById("detailsPage").style.display = "none";
-    document.getElementById("signupPage").style.display = "none";
-    
-    // Show login page
-    document.getElementById("loginPage").style.display = "block";
-  }
-
-  // Login User
-  function loginUser() {
-    const email = document.getElementById("loginEmail").value.trim();
-    const password = document.getElementById("loginPassword").value.trim();
-    
-    if (!email || !password) {
-      showCartToast("Please fill in all fields");
-      return;
-    }
-    
-    auth.signInWithEmailAndPassword(email, password)
-      .then((userCredential) => {
-        // Login successful
-        showCartToast("Signed in successfully!");
-        
-        // Return to profile page
-        setTimeout(() => {
-          showProfilePage();
-        }, 1000);
-      })
-      .catch((error) => {
-        console.error("Error signing in:", error);
-        showCartToast("Error signing in: " + error.message);
-      });
-  }
-
-
-  
 // Listen for auth state changes
 // Listen for auth state changes
 auth.onAuthStateChanged((user) => {
-    if (user) {
-      console.log("User is signed in:", user.email);
-      
-      // If profile page is currently visible, refresh the data
-      if (document.getElementById("profilePage").style.display === "block") {
-        showProfilePage();
-      }
-    } else {
-      console.log("User is signed out");
-      // If profile page is visible and user logs out, update to guest view
-      if (document.getElementById("profilePage").style.display === "block") {
-        showProfilePage();
-      }
+  if (user) {
+    console.log("User is signed in:", user.email);
+    
+    // If profile page is currently visible, refresh the data
+    if (document.getElementById("profilePage").style.display === "block") {
+      loadUserProfileAndOrders();
     }
-  });
+    
+    // Check if user was trying to checkout
+    const checkoutIntent = sessionStorage.getItem('checkoutIntent');
+    if (checkoutIntent === 'true') {
+      setTimeout(() => {
+        goToDetailsPage();
+        sessionStorage.removeItem('checkoutIntent');
+      }, 1000);
+    }
+  } else {
+    console.log("User is signed out");
+    // If profile page is visible and user logs out, update to guest view
+    if (document.getElementById("profilePage").style.display === "block") {
+      showProfilePage(); // This will now show guest view
+    }
+  }
+});
 // Fix the missing restoreOneUnit function
 async function restoreOneUnit(docId, size) {
   try {
@@ -7009,12 +6941,6 @@ document.addEventListener('DOMContentLoaded', positionCartToast);
 window.addEventListener('popstate', function(event) {
   if (event.state && event.state.page) {
     switch(event.state.page) {
-        case 'loginPage':
-          showLoginPage();
-          break;
-        case 'profilePage':
-          showProfilePage();
-          break;
       case 'shirtsPage':
         showShirtsPage();
         break;
