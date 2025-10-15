@@ -6555,6 +6555,9 @@ function loadUserOrders() {
         orderItem.style.backgroundColor = "#f9f9f9";
         orderItem.style.borderRadius = "8px";
         
+        // Debug logging
+        console.log("Order data:", order);
+        
         // Format order items safely
         let itemsList = "No items";
         if (order.cart && Array.isArray(order.cart)) {
@@ -6562,21 +6565,32 @@ function loadUserOrders() {
             const itemName = item.title || "Unknown Item";
             const itemSize = item.size || 'N/A';
             const itemPrice = item.price ? format(convert(item.price)) : '₹0';
-            return `${itemName} - ${itemSize} (${itemPrice})`;
+            return `${itemName} (${itemSize})`;
           }).join(', ');
         }
         
         // Format date safely
         let orderDate = "Recent";
-        if (order.timestamp && order.timestamp.toDate) {
+        if (order.timestamp) {
           try {
-            orderDate = order.timestamp.toDate().toLocaleDateString('en-IN', {
-              year: 'numeric',
-              month: 'short',
-              day: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit'
-            });
+            // Handle both Firestore timestamp and regular date
+            if (order.timestamp.toDate) {
+              orderDate = order.timestamp.toDate().toLocaleDateString('en-IN', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+              });
+            } else if (order.timestamp instanceof Date) {
+              orderDate = order.timestamp.toLocaleDateString('en-IN', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+              });
+            }
           } catch (e) {
             console.error("Error formatting date:", e);
           }
@@ -6586,7 +6600,8 @@ function loadUserOrders() {
         const orderNumber = order.orderNumber || `ORD-${doc.id.slice(-8)}`;
         
         // Format total amount
-        const totalAmount = order.total ? format(convert(order.total)) : '₹0';
+        const totalAmount = order.total ? format(convert(order.total)) : 
+                           order.totalUSD ? format(convert(order.totalUSD)) : '₹0';
         
         // Format status with color
         const status = order.status || 'Processing';
