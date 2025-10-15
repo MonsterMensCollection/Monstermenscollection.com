@@ -6475,32 +6475,28 @@ function proceedWithCOD() {
 
 
 function showProfilePage() {
-  history.pushState({ page: "profilePage" }, "", "#profile");
+  const user = auth.currentUser;
   
-  // Hide all pages first
+  // Hide all pages, show profile
   document.getElementById("productList").style.display = "none";
   document.getElementById("sliderSection").style.display = "none";
   document.getElementById("cartPage").style.display = "none";
+  document.getElementById("profilePage").style.display = "block";
   document.getElementById("shirtsPage").style.display = "none";
   document.getElementById("pantsPage").style.display = "none";
   document.getElementById("descriptionPage").style.display = "none";
   document.getElementById("tshirtsPage").style.display = "none";
   document.getElementById("cargosPage").style.display = "none";
   document.getElementById("detailsPage").style.display = "none";
-  document.getElementById("signupPage").style.display = "none";
-  document.getElementById("loginPage").style.display = "none";
-  
-  // Show profile page
-  document.getElementById("profilePage").style.display = "block";
 
-  const user = auth.currentUser;
-  
   if (user) {
     // User is signed in - load profile data
     loadUserProfileAndOrders();
   } else {
-    // User is not signed in - show login/signup options
-    showLoginPage(); // Or showSignupPage() depending on your preference
+    // User is not signed in - show guest message
+    document.getElementById("profileEmail").textContent = "Guest User";
+    document.getElementById("profileName").textContent = "Shopping as Guest";
+    document.getElementById("orderList").innerHTML = "<div style='text-align: center; padding: 20px; color: #777;'>Sign in to view order history</div>";
   }
 }
 
