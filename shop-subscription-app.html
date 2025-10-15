@@ -7046,6 +7046,29 @@ window.addEventListener('popstate', function(event) {
   }
 });
 
+  // Debug function - call this from browser console to check orders
+function debugOrders() {
+  const user = auth.currentUser;
+  if (!user) {
+    console.log("No user logged in");
+    return;
+  }
+  
+  console.log("User UID:", user.uid);
+  
+  db.collection("orders")
+    .where("uid", "==", user.uid)
+    .get()
+    .then((querySnapshot) => {
+      console.log("Total orders found:", querySnapshot.size);
+      querySnapshot.forEach((doc) => {
+        console.log("Order:", doc.id, doc.data());
+      });
+    })
+    .catch((error) => {
+      console.error("Debug error:", error);
+    });
+}
 
   
 // Scroll behavior remains the same
