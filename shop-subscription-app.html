@@ -6523,9 +6523,113 @@ function saveOrder(productName, uid) {
   measurementId: "G-5WFHV50M9Z"
 };
 
+
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
+// ============ ADD THE AUTH CODE RIGHT HERE ============
+// Firebase auth state listener
+const auth = firebase.auth();
+
+// Listen for auth state changes
+auth.onAuthStateChanged((user) => {
+  if (user) {
+    // User is signed in
+    console.log("User is signed in:", user.email);
+    // You can update UI elements here if needed
+  } else {
+    // User is signed out
+    console.log("User is signed out");
+    // You can show login prompts here if needed
+  }
+});
+
+// Fix the missing restoreOneUnit function
+async function restoreOneUnit(docId, size) {
+  try {
+    const docRef = db.collection("products").doc(docId);
+    await db.runTransaction(async (tx) => {
+      const snap = await tx.get(docRef);
+      const sizes = snap.data().sizes || {};
+      sizes[size] = (sizes[size] || 0) + 1; // Increment stock
+      tx.update(docRef, { sizes });
+    });
+    console.log(`Restored 1 unit of ${docId} size ${size}`);
+  } catch (error) {
+    console.error("Error restoring stock:", error);
+  }
+}
+
+// Fix the missing flushRestoreBeacon function
+function flushRestoreBeacon(cart) {
+  // This would typically send analytics or backup data
+  // For now, we'll just ensure cart is saved to localStorage
+  localStorage.setItem("cart", JSON.stringify(cart));
+}
+
+// Fix the missing loadUserProfileAndOrders function
+function loadUserProfileAndOrders() {
+  const user = auth.currentUser;
+  if (!user) return;
+  
+  // Load user orders
+  db.collection("orders")
+    .where("uid", "==", user.uid)
+    .orderBy("timestamp", "desc")
+    .get()
+    .then((querySnapshot) => {
+      const orderList = document.getElementById("orderList");
+      orderList.innerHTML = "";
+      
+      if (querySnapshot.empty) {
+        orderList.innerHTML = "<li>No orders yet</li>";
+        return;
+      }
+      
+      querySnapshot.forEach((doc) => {
+        const order = doc.data();
+        const li = document.createElement("li");
+        li.style.padding = "10px";
+        li.style.borderBottom = "1px solid #eee";
+        li.innerHTML = `
+          <strong>Order #${order.orderNumber || doc.id}</strong><br>
+          Total: ${format(convert(order.total || 0))}<br>
+          Status: ${order.status || "Processing"}<br>
+          Date: ${order.timestamp?.toDate?.().toLocaleDateString() || "Recent"}
+        `;
+        orderList.appendChild(li);
+      });
+    })
+    .catch((error) => {
+      console.error("Error loading orders:", error);
+      document.getElementById("orderList").innerHTML = "<li>Error loading orders</li>";
+    });
+}
+
+// Update the handleCheckout function
+function handleCheckout() {
+  const user = auth.currentUser;
+  
+  // Check if cart is empty
+  if (!cart || cart.length === 0) {
+    showCartToast("Your cart is empty");
+    return;
+  }
+  
+  console.log("Checkout clicked, user:", user ? "logged in" : "not logged in");
+  
+  if (user) {
+    // User is signed in, proceed to checkout
+    console.log("Proceeding to details page");
+    goToDetailsPage();
+  } else {
+    // User is not signed in, show signup page
+    console.log("Showing signup page");
+    showSignupPage();
+  }
+}
+// ============ END OF AUTH CODE ============
+  
 // Real-time inventory updates for cart
 db.collection("products").onSnapshot(snap => {
   snap.docChanges().forEach(ch => {
@@ -6569,6 +6673,9 @@ db.collection("products").onSnapshot(snap => {
 
 // Show products page directly on load
 document.addEventListener("DOMContentLoaded", function() {
+  // Initialize auth
+  const auth = firebase.auth();
+  
   // Hide loading screen
   const loader = document.getElementById('loadingScreen');
   loader.classList.add('fade-out');
@@ -6586,8 +6693,9 @@ document.addEventListener("DOMContentLoaded", function() {
   // Update container styling
   document.getElementById("mainContainer").classList.add("no-box");
   
-  // Initialize cart
+  // Initialize cart from localStorage
   cart = JSON.parse(localStorage.getItem("cart") || "[]");
+  console.log("Cart loaded:", cart.length, "items");
   
   // Set up other initializations
   updateAllPrices();
