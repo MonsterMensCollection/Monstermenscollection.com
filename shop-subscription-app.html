@@ -5038,7 +5038,7 @@
     <img src="https://img.icons8.com/?size=100&id=5hmLU5efq3jw&format=png&color=000000" width="24" alt="Cart"onclick="window.scrollTo({top: 0, behavior: 'instant'}); showCart();"/>
    
    
-    <img src="https://img.icons8.com/?size=100&id=Or3Eb98tGbJL&format=png&color=000000" width="24" alt="Profile"onclick="window.scrollTo({top: 0, behavior: 'instant'}); handleSignIn();"/>
+    <img src="https://img.icons8.com/?size=100&id=Or3Eb98tGbJL&format=png&color=000000" width="24" alt="Profile"onclick="window.scrollTo({top: 0, behavior: 'instant'}); showProfilePage();"/>
   
 </div>
 
@@ -5244,19 +5244,7 @@ function goToDetailsPage() {
   window.scrollTo(0, 0);
 }
 
-// Function to handle sign in
-function handleSignIn() {
-  const user = auth.currentUser;
-  
-  if (user) {
-    // User is already signed in, show profile page
-    showProfilePage();
-  } else {
-    // User is not signed in, show login page
-    showLoginPage();
-  }
-}
-  
+
 const launchDate = new Date("2025-11-01T00:00:00Z").getTime(); // Target UTC time
   const countdownEl = document.getElementById("countdown");
 
@@ -6050,21 +6038,21 @@ function showLoginPage() {
   history.pushState({ page: "loginPage" }, "", "#login");
   
   // Hide all other pages
-  const pagesToHide = [
-    "descriptionPage", "productList", "shirtsPage", "pantsPage",
-    "sliderSection", "cartPage", "profilePage", "tshirtsPage",
-    "cargosPage", "detailsPage", "signupPage"
-  ];
+  document.getElementById("descriptionPage").style.display = "none";
+  document.getElementById("productList").style.display = "none";
+  document.getElementById("shirtsPage").style.display = "none";
+  document.getElementById("pantsPage").style.display = "none";
+  document.getElementById("sliderSection").style.display = "none";
+  document.getElementById("cartPage").style.display = "none";
+  document.getElementById("profilePage").style.display = "none";
+  document.getElementById("tshirtsPage").style.display = "none";
+  document.getElementById("cargosPage").style.display = "none";
+  document.getElementById("detailsPage").style.display = "none";
+  document.getElementById("signupPage").style.display = "none";
   
-  pagesToHide.forEach(id => {
-    const element = document.getElementById(id);
-    if (element) element.style.display = "none";
-  });
-  
-  // Show login page
+  // Create or show login page
   let loginPage = document.getElementById("loginPage");
   if (!loginPage) {
-    // Create login page if it doesn't exist
     loginPage = document.createElement("div");
     loginPage.id = "loginPage";
     loginPage.className = "form-section";
@@ -6084,9 +6072,9 @@ function showLoginPage() {
              style="padding: 12px; width: 100%; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 0px; box-sizing: border-box;" />
       <input type="password" id="loginPassword" placeholder="Password" 
              style="padding: 12px; width: 100%; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 0px; box-sizing: border-box;" />
-      <button onclick="loginUser()" 
+      <button onclick="loginAndCheckout()" 
               style="width: 100%; padding: 14px; background-color: #000; color: white; border: none; border-radius: 0px; font-size: 16px; font-weight: bold; cursor: pointer; box-sizing: border-box;">
-        SIGN IN
+        SIGN IN & CHECKOUT
       </button>
       <p style="text-align: center; margin-top: 15px; font-size: 14px; color: #666;">
         Don't have an account? <a href="#" onclick="showSignupPage()" style="color: #000; text-decoration: underline;">Sign up</a>
@@ -6097,31 +6085,6 @@ function showLoginPage() {
   }
   
   loginPage.style.display = "block";
-  window.scrollTo(0, 0);
-}
-
-// Simple login function for profile access
-function loginUser() {
-  const email = document.getElementById("loginEmail").value.trim();
-  const password = document.getElementById("loginPassword").value.trim();
-  
-  if (!email || !password) {
-    showCartToast("Please fill in all fields");
-    return;
-  }
-  
-  auth.signInWithEmailAndPassword(email, password)
-    .then(() => {
-      showCartToast("Signed in successfully!");
-      // After login, show the profile page
-      setTimeout(() => {
-        showProfilePage();
-      }, 1000);
-    })
-    .catch((error) => {
-      console.error("Error signing in:", error);
-      showCartToast("Error signing in: " + error.message);
-    });
 }
 
 // Function to login and proceed to checkout
@@ -6514,29 +6477,26 @@ function proceedWithCOD() {
 function showProfilePage() {
   const user = auth.currentUser;
   
-  if (user) {
-    // User is signed in - show profile page
-    history.pushState({ page: "profilePage" }, "", "#profile");
-    
-    // Hide all other pages
-    document.getElementById("productList").style.display = "none";
-    document.getElementById("sliderSection").style.display = "none";
-    document.getElementById("cartPage").style.display = "none";
-    document.getElementById("profilePage").style.display = "block";
-    document.getElementById("shirtsPage").style.display = "none";
-    document.getElementById("pantsPage").style.display = "none";
-    document.getElementById("descriptionPage").style.display = "none";
-    document.getElementById("tshirtsPage").style.display = "none";
-    document.getElementById("cargosPage").style.display = "none";
-    document.getElementById("detailsPage").style.display = "none";
-    document.getElementById("signupPage").style.display = "none";
-    document.getElementById("loginPage").style.display = "none";
+  // Hide all pages, show profile
+  document.getElementById("productList").style.display = "none";
+  document.getElementById("sliderSection").style.display = "none";
+  document.getElementById("cartPage").style.display = "none";
+  document.getElementById("profilePage").style.display = "block";
+  document.getElementById("shirtsPage").style.display = "none";
+  document.getElementById("pantsPage").style.display = "none";
+  document.getElementById("descriptionPage").style.display = "none";
+  document.getElementById("tshirtsPage").style.display = "none";
+  document.getElementById("cargosPage").style.display = "none";
+  document.getElementById("detailsPage").style.display = "none";
 
-    // Load user profile data
+  if (user) {
+    // User is signed in - load profile data
     loadUserProfileAndOrders();
   } else {
-    // User is not signed in - show login page instead
-    showLoginPage();
+    // User is not signed in - show guest message
+    document.getElementById("profileEmail").textContent = "Guest User";
+    document.getElementById("profileName").textContent = "Shopping as Guest";
+    document.getElementById("orderList").innerHTML = "<div style='text-align: center; padding: 20px; color: #777;'>Sign in to view order history</div>";
   }
 }
 
@@ -6981,9 +6941,6 @@ document.addEventListener('DOMContentLoaded', positionCartToast);
 window.addEventListener('popstate', function(event) {
   if (event.state && event.state.page) {
     switch(event.state.page) {
-        case 'profilePage':
-  showProfilePage();
-  break;
       case 'shirtsPage':
         showShirtsPage();
         break;
