@@ -4958,15 +4958,15 @@
 
   <!-- Profile Info -->
   <div style="width: 100%; background-color: #f9f9f9; padding: 15px 20px; border-radius: 0px; box-sizing: border-box;">
-    <div style="margin-bottom: 15px;">
-      <label style="font-size: 14px; color: #777;">Name</label>
-      <div id="profileName" style="font-size: 18px; font-weight: bold; color: #333;">Loading...</div>
-    </div>
-    <div>
-      <label style="font-size: 14px; color: #777;">Email</label>
-      <div id="profileEmail" style="font-size: 18px; font-weight: bold; color: #333;">Loading...</div>
-    </div>
+  <div style="margin-bottom: 15px;">
+    <label style="font-size: 14px; color: #777;">Name</label>
+    <div id="profileName" style="font-size: 18px; font-weight: bold; color: #333;">Loading...</div>
   </div>
+  <div>
+    <label style="font-size: 14px; color: #777;">Mobile Number</label>
+    <div id="profileMobile" style="font-size: 18px; font-weight: bold; color: #333;">Loading...</div>
+  </div>
+</div>
   
   <div style="display: none;">
     <label for="currencySelector" style="font-size: 14px; color: #777; white-space: nowrap;">
@@ -5965,11 +5965,11 @@ function showLoginPage() {
       <img src="https://see.fontimg.com/api/rf5/woG33/N2Y3Y2RhYTdiOGMwNGVjOGE5MWE1MTFiNGJjM2E4Y2Iub3Rm/U0lHTiBJTg/redtrap-expanded-puo.png?r=fs&h=30&w=1000&fg=000000&bg=FFFFFF&tb=1&s=30" 
            style="display: block; margin-left: auto; margin-right: auto;">
       <br><br>
-      <input type="email" id="loginEmail" placeholder="Email Address" 
+      <input type="tel" id="loginMobile" placeholder="Mobile Number" 
              style="padding: 12px; width: 100%; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 0px; box-sizing: border-box;" />
       <input type="password" id="loginPassword" placeholder="Password" 
              style="padding: 12px; width: 100%; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 0px; box-sizing: border-box;" />
-      <button onclick="event.preventDefault(); loginUser()" 
+      <button id="loginButton" onclick="event.preventDefault(); loginUser()" 
               style="width: 100%; padding: 14px; background-color: #000; color: white; border: none; border-radius: 0px; font-size: 16px; font-weight: bold; cursor: pointer; box-sizing: border-box;">
         SIGN IN
       </button>
@@ -5983,7 +5983,7 @@ function showLoginPage() {
   
   loginPage.style.display = "block";
 }
-
+  
 function showSignupPage() {
   history.pushState({ page: "signupPage" }, "", "#signup");
   
@@ -6019,11 +6019,11 @@ function showSignupPage() {
       <br><br>
       <input type="text" id="signupName" placeholder="Full Name" 
              style="padding: 12px; width: 100%; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 0px; box-sizing: border-box;" />
-      <input type="email" id="signupEmail" placeholder="Email Address" 
+      <input type="tel" id="signupMobile" placeholder="Mobile Number" 
              style="padding: 12px; width: 100%; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 0px; box-sizing: border-box;" />
       <input type="password" id="signupPassword" placeholder="Password" 
              style="padding: 12px; width: 100%; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 0px; box-sizing: border-box;" />
-      <button onclick="event.preventDefault(); createAccount()" 
+      <button id="signupButton" onclick="event.preventDefault(); createAccount()" 
               style="width: 100%; padding: 14px; background-color: #000; color: white; border: none; border-radius: 0px; font-size: 16px; font-weight: bold; cursor: pointer; box-sizing: border-box;">
         CREATE ACCOUNT
       </button>
@@ -6038,14 +6038,14 @@ function showSignupPage() {
   signupPage.style.display = "block";
 }
 
-
 // Authentication functions
+// Replace the createAccount function
 function createAccount() {
   const name = document.getElementById("signupName").value.trim();
-  const email = document.getElementById("signupEmail").value.trim();
+  const mobileNumber = document.getElementById("signupMobile").value.trim();
   const password = document.getElementById("signupPassword").value.trim();
   
-  if (!name || !email || !password) {
+  if (!name || !mobileNumber || !password) {
     showCartToast("Please fill in all fields");
     return;
   }
@@ -6054,11 +6054,26 @@ function createAccount() {
     showCartToast("Password should be at least 6 characters");
     return;
   }
+
+  // For mobile authentication, we'll use a different approach
+  // Since Firebase doesn't directly support mobile+password, we'll use custom authentication
+  // or phone authentication with verification
   
-  // Create user with email and password
-  auth.createUserWithEmailAndPassword(email, password)
-    .then((userCredential) => {
-      const user = userCredential.user;
+  // Using Firebase Phone Authentication
+  const appVerifier = new firebase.auth.RecaptchaVerifier('signupButton', {
+    'size': 'invisible'
+  });
+  
+  const phoneNumber = '+91' + mobileNumber; // Adjust country code as needed
+  
+  auth.signInWithPhoneNumber(phoneNumber, appVerifier)
+    .then((confirmationResult) => {
+      // SMS sent. Prompt user to type the code from the message.
+      const verificationCode = prompt('Please enter the verification code sent to your mobile:');
+      return confirmationResult.confirm(verificationCode);
+    })
+    .then((result) => {
+      const user = result.user;
       
       // Update profile with name
       return user.updateProfile({
@@ -6067,15 +6082,14 @@ function createAccount() {
         // Save additional user data to Firestore
         return db.collection("users").doc(user.uid).set({
           name: name,
-          email: email,
+          mobileNumber: mobileNumber,
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
       });
     })
     .then(() => {
-      // Account created successfully
       showCartToast("Account created successfully!");
-      
+      showProfilePage();
     })
     .catch((error) => {
       console.error("Error creating account:", error);
@@ -6083,21 +6097,31 @@ function createAccount() {
     });
 }
 
+// Replace the loginUser function
 function loginUser() {
-  const email = document.getElementById("loginEmail").value.trim();
+  const mobileNumber = document.getElementById("loginMobile").value.trim();
   const password = document.getElementById("loginPassword").value.trim();
   
-  if (!email || !password) {
+  if (!mobileNumber || !password) {
     showCartToast("Please fill in all fields");
     return;
   }
-  
-  auth.signInWithEmailAndPassword(email, password)
-    .then(() => {
-      // Login successful
-      showCartToast("Signed in successfully!");
-      
 
+  // For mobile login, we'll use phone authentication
+  const appVerifier = new firebase.auth.RecaptchaVerifier('loginButton', {
+    'size': 'invisible'
+  });
+  
+  const phoneNumber = '+91' + mobileNumber; // Adjust country code as needed
+  
+  auth.signInWithPhoneNumber(phoneNumber, appVerifier)
+    .then((confirmationResult) => {
+      const verificationCode = prompt('Please enter the verification code sent to your mobile:');
+      return confirmationResult.confirm(verificationCode);
+    })
+    .then(() => {
+      showCartToast("Signed in successfully!");
+      showProfilePage();
     })
     .catch((error) => {
       console.error("Error signing in:", error);
@@ -6595,23 +6619,23 @@ function loadUserProfileAndOrders() {
   const user = auth.currentUser;
   if (!user) return;
 
-  // Update profile information
-  document.getElementById("profileEmail").textContent = user.email || "Not available";
-  
-  // Try to get user name from Firestore first, then fall back to displayName
+  // Try to get user data from Firestore
   db.collection("users").doc(user.uid).get().then((doc) => {
     let name = "Not available";
+    let mobileNumber = "Not available";
     
-    if (doc.exists && doc.data().name) {
-      name = doc.data().name;
-    } else if (user.displayName) {
-      name = user.displayName;
+    if (doc.exists) {
+      const userData = doc.data();
+      name = userData.name || "Not available";
+      mobileNumber = userData.mobileNumber || "Not available";
     }
     
     document.getElementById("profileName").textContent = name;
+    document.getElementById("profileMobile").textContent = mobileNumber;
   }).catch((error) => {
     console.error("Error loading user profile:", error);
     document.getElementById("profileName").textContent = user.displayName || "Not available";
+    document.getElementById("profileMobile").textContent = "Not available";
   });
 
   // Load user orders
