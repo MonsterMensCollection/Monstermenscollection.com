@@ -5201,16 +5201,24 @@ function backToProducts() {
 
 function goToMainProducts() {
   history.pushState({ page: "productList" }, "", "#home");
-  document.getElementById("descriptionPage").style.display = "none";
+  
+  // Hide ALL pages including login/signup
+  const allPages = [
+    "descriptionPage", "productList", "shirtsPage", "pantsPage",
+    "sliderSection", "cartPage", "profilePage", "tshirtsPage",
+    "cargosPage", "detailsPage", "loginPage", "signupPage"
+  ];
+  
+  allPages.forEach(id => {
+    const element = document.getElementById(id);
+    if (element) element.style.display = "none";
+  });
+  
+  // Show only the main products/slider section
   document.getElementById("productList").style.display = "block";
-  document.getElementById("shirtsPage").style.display = "none";
-  document.getElementById("pantsPage").style.display = "none";
   document.getElementById("sliderSection").style.display = "block";
-  document.getElementById("cartPage").style.display = "none";
-  document.getElementById("profilePage").style.display = "none";
-  document.getElementById("tshirtsPage").style.display = "none";
-  document.getElementById("cargosPage").style.display = "none"; // Add this line
-  document.getElementById("detailsPage").style.display = "none";
+  
+  window.scrollTo(0, 0);
 }
 
 function goToDetailsPage() {
@@ -6567,32 +6575,27 @@ function proceedWithCOD() {
 function showProfilePage() {
   const user = auth.currentUser;
 
+  // Hide ALL pages first
+  const allPages = [
+    "descriptionPage", "productList", "shirtsPage", "pantsPage",
+    "sliderSection", "cartPage", "profilePage", "tshirtsPage",
+    "cargosPage", "detailsPage", "loginPage", "signupPage"
+  ];
+  
+  allPages.forEach(id => {
+    const element = document.getElementById(id);
+    if (element) element.style.display = "none";
+  });
+
   if (!user) {
     // User is not signed in, show login page
     showLoginPage();
     return;
   }
-  // Hide all pages, show profile
-  document.getElementById("productList").style.display = "none";
-  document.getElementById("sliderSection").style.display = "none";
-  document.getElementById("cartPage").style.display = "none";
+  
+  // User is signed in, show profile page
   document.getElementById("profilePage").style.display = "block";
-  document.getElementById("shirtsPage").style.display = "none";
-  document.getElementById("pantsPage").style.display = "none";
-  document.getElementById("descriptionPage").style.display = "none";
-  document.getElementById("tshirtsPage").style.display = "none";
-  document.getElementById("cargosPage").style.display = "none";
-  document.getElementById("detailsPage").style.display = "none";
-
-  if (user) {
-    // User is signed in - load profile data
-    loadUserProfileAndOrders();
-  } else {
-    // User is not signed in - show guest message
-    document.getElementById("profileEmail").textContent = "Guest User";
-    document.getElementById("profileName").textContent = "Shopping as Guest";
-    document.getElementById("orderList").innerHTML = "<div style='text-align: center; padding: 20px; color: #777;'>Sign in to view order history</div>";
-  }
+  loadUserProfileAndOrders();
 }
 
 function loadUserProfileAndOrders() {
