@@ -5969,7 +5969,7 @@ function showLoginPage() {
              style="padding: 12px; width: 100%; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 0px; box-sizing: border-box;" />
       <input type="password" id="loginPassword" placeholder="Password" 
              style="padding: 12px; width: 100%; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 0px; box-sizing: border-box;" />
-      <button onclick="loginUser()" 
+      <button onclick="event.preventDefault(); loginUser()" 
               style="width: 100%; padding: 14px; background-color: #000; color: white; border: none; border-radius: 0px; font-size: 16px; font-weight: bold; cursor: pointer; box-sizing: border-box;">
         SIGN IN
       </button>
@@ -6023,7 +6023,7 @@ function showSignupPage() {
              style="padding: 12px; width: 100%; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 0px; box-sizing: border-box;" />
       <input type="password" id="signupPassword" placeholder="Password" 
              style="padding: 12px; width: 100%; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 0px; box-sizing: border-box;" />
-      <button onclick="createAccount()" 
+      <button onclick="event.preventDefault(); createAccount()" 
               style="width: 100%; padding: 14px; background-color: #000; color: white; border: none; border-radius: 0px; font-size: 16px; font-weight: bold; cursor: pointer; box-sizing: border-box;">
         CREATE ACCOUNT
       </button>
