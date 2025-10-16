@@ -712,7 +712,7 @@
   opacity: 1;
 }
 
-    #signupPage, #loginPage {
+     #signupPage, #loginPage {
   display: none;
   margin-top: 22%;
   padding: 20px;
@@ -721,8 +721,6 @@
   margin-right: auto;
   background-color: #fff;
   border-radius: 0px;
-  position: relative;
-  z-index: 100; /* Ensure it appears above other content */
 }
 
 #signupPage a, #loginPage a {
@@ -5134,6 +5132,8 @@ function showShirtsPage() {
      document.getElementById("tshirtsPage").style.display = "none";
       document.getElementById("cargosPage").style.display = "none";
     document.getElementById("detailsPage").style.display = "none";
+   document.getElementById("loginPage").style.display = "none";
+  document.getElementById("signupPage").style.display = "none";
 }
 
 function showTshirtsPage() {
@@ -5151,6 +5151,8 @@ function showTshirtsPage() {
      document.getElementById("shirtsPage").style.display = "none";
       document.getElementById("cargosPage").style.display = "none";
     document.getElementById("detailsPage").style.display = "none";
+  document.getElementById("loginPage").style.display = "none";
+  document.getElementById("signupPage").style.display = "none";
 }
 
 function showPantsPage() {
@@ -5170,6 +5172,8 @@ function showPantsPage() {
   document.getElementById("descriptionPage").style.display = "none";
   document.getElementById("cargosPage").style.display = "none";
   document.getElementById("detailsPage").style.display = "none";
+  document.getElementById("loginPage").style.display = "none";
+  document.getElementById("signupPage").style.display = "none";
 }
 
 function showCargosPage() {
@@ -5186,6 +5190,8 @@ function showCargosPage() {
   document.getElementById("profilePage").style.display = "none";
   document.getElementById("descriptionPage").style.display = "none";
   document.getElementById("detailsPage").style.display = "none";
+  document.getElementById("loginPage").style.display = "none";
+  document.getElementById("signupPage").style.display = "none";
 }
 
 function backToProducts() {
@@ -5205,6 +5211,8 @@ function goToMainProducts() {
   document.getElementById("tshirtsPage").style.display = "none";
   document.getElementById("cargosPage").style.display = "none"; // Add this line
   document.getElementById("detailsPage").style.display = "none";
+  document.getElementById("loginPage").style.display = "none";
+    document.getElementById("signupPage").style.display = "none";
 }
 
 function goToDetailsPage() {
@@ -5944,6 +5952,7 @@ function showSignupPage() {
   document.getElementById("tshirtsPage").style.display = "none";
   document.getElementById("cargosPage").style.display = "none";
   document.getElementById("detailsPage").style.display = "none";
+  document.getElementById("loginPage").style.display = "none";
   
   // Create or show signup page
   let signupPage = document.getElementById("signupPage");
@@ -6036,59 +6045,57 @@ function createAccountAndCheckout() {
 }
 
 // Optional: Add login page for existing users
-function showSignupPage() {
-  history.pushState({ page: "signupPage" }, "", "#signup");
+function showLoginPage() {
+  history.pushState({ page: "loginPage" }, "", "#login");
   
   // Hide all other pages
-  const pagesToHide = [
-    "descriptionPage", "productList", "shirtsPage", "pantsPage",
-    "sliderSection", "cartPage", "profilePage", "tshirtsPage",
-    "cargosPage", "detailsPage", "loginPage"
-  ];
+  document.getElementById("descriptionPage").style.display = "none";
+  document.getElementById("productList").style.display = "none";
+  document.getElementById("shirtsPage").style.display = "none";
+  document.getElementById("pantsPage").style.display = "none";
+  document.getElementById("sliderSection").style.display = "none";
+  document.getElementById("cartPage").style.display = "none";
+  document.getElementById("profilePage").style.display = "none";
+  document.getElementById("tshirtsPage").style.display = "none";
+  document.getElementById("cargosPage").style.display = "none";
+  document.getElementById("detailsPage").style.display = "none";
+  document.getElementById("signupPage").style.display = "none";
   
-  pagesToHide.forEach(id => {
-    const element = document.getElementById(id);
-    if (element) element.style.display = "none";
-  });
-  
-  // Create or show signup page
-  let signupPage = document.getElementById("signupPage");
-  if (!signupPage) {
-    signupPage = document.createElement("div");
-    signupPage.id = "signupPage";
-    signupPage.className = "form-section";
-    signupPage.style.marginTop = "22%";
-    signupPage.style.padding = "20px";
-    signupPage.style.maxWidth = "90%";
-    signupPage.style.marginLeft = "auto";
-    signupPage.style.marginRight = "auto";
-    signupPage.style.backgroundColor = "#fff";
-    signupPage.style.borderRadius = "0px";
+  // Create or show login page
+  let loginPage = document.getElementById("loginPage");
+  if (!loginPage) {
+    loginPage = document.createElement("div");
+    loginPage.id = "loginPage";
+    loginPage.className = "form-section";
+    loginPage.style.marginTop = "22%";
+    loginPage.style.padding = "20px";
+    loginPage.style.maxWidth = "90%";
+    loginPage.style.marginLeft = "auto";
+    loginPage.style.marginRight = "auto";
+    loginPage.style.backgroundColor = "#fff";
+    loginPage.style.borderRadius = "0px";
     
-    signupPage.innerHTML = `
-      <img src="https://see.fontimg.com/api/rf5/woG33/N2Y3Y2RhYTdiOGMwNGVjOGE5MWE1MTFiNGJjM2E4Y2Iub3Rm/U0lHTiBVUA/redtrap-expanded-puo.png?r=fs&h=30&w=1000&fg=000000&bg=FFFFFF&tb=1&s=30" 
+    loginPage.innerHTML = `
+      <img src="https://see.fontimg.com/api/rf5/woG33/N2Y3Y2RhYTdiOGMwNGVjOGE5MWE1MTFiNGJjM2E4Y2Iub3Rm/U0lHTiBJTg/redtrap-expanded-puo.png?r=fs&h=30&w=1000&fg=000000&bg=FFFFFF&tb=1&s=30" 
            style="display: block; margin-left: auto; margin-right: auto;">
       <br><br>
-      <input type="text" id="signupName" placeholder="Full Name" 
+      <input type="email" id="loginEmail" placeholder="Email Address" 
              style="padding: 12px; width: 100%; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 0px; box-sizing: border-box;" />
-      <input type="email" id="signupEmail" placeholder="Email Address" 
+      <input type="password" id="loginPassword" placeholder="Password" 
              style="padding: 12px; width: 100%; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 0px; box-sizing: border-box;" />
-      <input type="password" id="signupPassword" placeholder="Password" 
-             style="padding: 12px; width: 100%; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 0px; box-sizing: border-box;" />
-      <button onclick="createAccountAndCheckout()" 
+      <button onclick="loginAndCheckout()" 
               style="width: 100%; padding: 14px; background-color: #000; color: white; border: none; border-radius: 0px; font-size: 16px; font-weight: bold; cursor: pointer; box-sizing: border-box;">
-        CREATE ACCOUNT & CHECKOUT
+        SIGN IN & CHECKOUT
       </button>
       <p style="text-align: center; margin-top: 15px; font-size: 14px; color: #666;">
-        Already have an account? <a href="#" onclick="showLoginPage()" style="color: #000; text-decoration: underline;">Sign in</a>
+        Don't have an account? <a href="#" onclick="showSignupPage()" style="color: #000; text-decoration: underline;">Sign up</a>
       </p>
     `;
     
-    document.body.appendChild(signupPage);
+    document.body.appendChild(loginPage);
   }
   
-  signupPage.style.display = "block";
-  window.scrollTo(0, 0);
+  loginPage.style.display = "block";
 }
 
 // Function to login and proceed to checkout
@@ -6182,7 +6189,7 @@ function showCart () {
   /* page-visibility boilerplate (unchanged) */
   ["descriptionPage","productList","shirtsPage","pantsPage",
    "sliderSection","profilePage","tshirtsPage","cargosPage",
-   "detailsPage"].forEach(id => document.getElementById(id).style.display="none");
+   "detailsPage","signupPage","loginPage"].forEach(id => document.getElementById(id).style.display="none");
   document.getElementById("cartPage").style.display = "block";
 
   /* ---------------  Build the cart UI --------------- */
@@ -6492,6 +6499,8 @@ function showProfilePage() {
   document.getElementById("tshirtsPage").style.display = "none";
   document.getElementById("cargosPage").style.display = "none";
   document.getElementById("detailsPage").style.display = "none";
+   document.getElementById("signupPage").style.display = "none";
+   document.getElementById("loginPage").style.display = "none";
 
   if (user) {
     // User is signed in - load profile data
