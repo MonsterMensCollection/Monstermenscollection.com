@@ -6189,7 +6189,7 @@ function showCart () {
   /* page-visibility boilerplate (unchanged) */
   ["descriptionPage","productList","shirtsPage","pantsPage",
    "sliderSection","profilePage","tshirtsPage","cargosPage",
-   "detailsPage","signupPage","loginPage"].forEach(id => document.getElementById(id).style.display="none");
+   "detailsPage"].forEach(id => document.getElementById(id).style.display="none");
   document.getElementById("cartPage").style.display = "block";
 
   /* ---------------  Build the cart UI --------------- */
@@ -6499,8 +6499,6 @@ function showProfilePage() {
   document.getElementById("tshirtsPage").style.display = "none";
   document.getElementById("cargosPage").style.display = "none";
   document.getElementById("detailsPage").style.display = "none";
-   document.getElementById("signupPage").style.display = "none";
-   document.getElementById("loginPage").style.display = "none";
 
   if (user) {
     // User is signed in - load profile data
