@@ -20,6 +20,8 @@
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
    <style>
   @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400&display=swap');
@@ -6023,9 +6025,24 @@ function showSignupPage() {
              style="padding: 12px; width: 100%; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 0px; box-sizing: border-box;" />
       <input type="password" id="signupPassword" placeholder="Password" 
              style="padding: 12px; width: 100%; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 0px; box-sizing: border-box;" />
-      <button id="signupButton" onclick="event.preventDefault(); createAccount()" 
+      
+      <!-- OTP Verification Section (Initially Hidden) -->
+      <div id="otpSection" style="display: none;">
+        <input type="text" id="otpInput" placeholder="Enter OTP" 
+               style="padding: 12px; width: 100%; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 0px; box-sizing: border-box;" />
+        <button id="verifyOtpButton" onclick="event.preventDefault(); verifyOTP()" 
+                style="width: 100%; padding: 14px; background-color: #000; color: white; border: none; border-radius: 0px; font-size: 16px; font-weight: bold; cursor: pointer; box-sizing: border-box; margin-bottom: 15px;">
+          VERIFY OTP
+        </button>
+        <button id="resendOtpButton" onclick="event.preventDefault(); resendOTP()" 
+                style="width: 100%; padding: 14px; background-color: #666; color: white; border: none; border-radius: 0px; font-size: 14px; cursor: pointer; box-sizing: border-box;">
+          RESEND OTP
+        </button>
+      </div>
+      
+      <button id="signupButton" onclick="event.preventDefault(); sendOTP()" 
               style="width: 100%; padding: 14px; background-color: #000; color: white; border: none; border-radius: 0px; font-size: 16px; font-weight: bold; cursor: pointer; box-sizing: border-box;">
-        CREATE ACCOUNT
+        SEND OTP
       </button>
       <p style="text-align: center; margin-top: 15px; font-size: 14px; color: #666;">
         Already have an account? <a href="#" onclick="event.preventDefault(); showLoginPage()" style="color: #000; text-decoration: underline;">Sign in</a>
@@ -6038,6 +6055,131 @@ function showSignupPage() {
   signupPage.style.display = "block";
 }
 
+  let confirmationResult = null;
+let phoneNumber = '';
+
+async function sendOTP() {
+  const name = document.getElementById('signupName').value;
+  const mobile = document.getElementById('signupMobile').value;
+  const password = document.getElementById('signupPassword').value;
+
+  // Basic validation
+  if (!name || !mobile || !password) {
+    alert('Please fill in all fields');
+    return;
+  }
+
+  if (password.length < 6) {
+    alert('Password must be at least 6 characters long');
+    return;
+  }
+
+  // Format phone number for Firebase (assuming Indian numbers)
+  phoneNumber = mobile.startsWith('+') ? mobile : `+91${mobile}`;
+
+  try {
+    // Initialize Firebase Auth if not already done
+    if (!window.recaptchaVerifier) {
+      window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('signupButton', {
+        'size': 'invisible',
+        'callback': function(response) {
+          // reCAPTCHA solved, allow signInWithPhoneNumber.
+          console.log('reCAPTCHA solved');
+        }
+      });
+    }
+
+    // Send OTP
+    confirmationResult = await firebase.auth().signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier);
+    
+    // Show OTP section and hide signup button
+    document.getElementById('otpSection').style.display = 'block';
+    document.getElementById('signupButton').style.display = 'none';
+    
+    alert('OTP sent successfully to ' + mobile);
+    
+  } catch (error) {
+    console.error('Error sending OTP:', error);
+    alert('Error sending OTP: ' + error.message);
+    
+    // Reset reCAPTCHA verifier on error
+    if (window.recaptchaVerifier) {
+      window.recaptchaVerifier.clear();
+      window.recaptchaVerifier = null;
+    }
+  }
+}
+
+ async function verifyOTP() {
+  const otp = document.getElementById('otpInput').value;
+  const name = document.getElementById('signupName').value;
+  const password = document.getElementById('signupPassword').value;
+
+  if (!otp) {
+    alert('Please enter OTP');
+    return;
+  }
+
+  try {
+    // Verify OTP
+    const result = await confirmationResult.confirm(otp);
+    const user = result.user;
+
+    // If OTP verification successful, create account in your backend
+    await createAccountBackend(name, phoneNumber, password, user.uid);
+    
+    alert('Account created successfully!');
+    
+    // Redirect to login page or home page
+    showLoginPage();
+    
+  } catch (error) {
+    console.error('Error verifying OTP:', error);
+    alert('Invalid OTP. Please try again.');
+  }
+}
+
+  async function resendOTP() {
+  // Reset and resend OTP
+  if (window.recaptchaVerifier) {
+    window.recaptchaVerifier.clear();
+    window.recaptchaVerifier = null;
+  }
+  
+  document.getElementById('otpInput').value = '';
+  document.getElementById('verifyOtpButton').disabled = true;
+  
+  await sendOTP();
+}
+
+
+  async function createAccountBackend(name, phone, password, firebaseUid) {
+  // Replace this with your actual backend API call
+  try {
+    const response = await fetch('/api/signup', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        name: name,
+        phone: phone,
+        password: password,
+        firebaseUid: firebaseUid
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to create account');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error creating account:', error);
+    throw error;
+  }
+}
+  
 // Authentication functions
 // Replace the createAccount function
 function createAccount() {
