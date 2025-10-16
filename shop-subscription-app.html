@@ -5974,7 +5974,7 @@ function showLoginPage() {
         SIGN IN
       </button>
       <p style="text-align: center; margin-top: 15px; font-size: 14px; color: #666;">
-        Don't have an account? <a href="#" onclick="showSignupPage()" style="color: #000; text-decoration: underline;">Sign up</a>
+        Don't have an account? <a href="#" onclick="event.preventDefault(); showSignupPage()" style="color: #000; text-decoration: underline;">Sign up</a>
       </p>
     `;
     
@@ -6028,7 +6028,7 @@ function showSignupPage() {
         CREATE ACCOUNT
       </button>
       <p style="text-align: center; margin-top: 15px; font-size: 14px; color: #666;">
-        Already have an account? <a href="#" onclick="showLoginPage()" style="color: #000; text-decoration: underline;">Sign in</a>
+        Already have an account? <a href="#" onclick="event.preventDefault(); showLoginPage()" style="color: #000; text-decoration: underline;">Sign in</a>
       </p>
     `;
     
