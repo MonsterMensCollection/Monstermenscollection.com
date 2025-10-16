@@ -5925,23 +5925,73 @@ async function filterProductsBySize(pageId) {
   }
 }
 
+// Add these functions to show login/signup pages properly
+function showLoginPage() {
+  history.pushState({ page: "loginPage" }, "", "#login");
+  
+  // Hide all other pages
+  const pagesToHide = [
+    "descriptionPage", "productList", "shirtsPage", "pantsPage",
+    "sliderSection", "cartPage", "profilePage", "tshirtsPage",
+    "cargosPage", "detailsPage", "signupPage"
+  ];
+  
+  pagesToHide.forEach(id => {
+    const element = document.getElementById(id);
+    if (element) element.style.display = "none";
+  });
+  
+  // Create or show login page
+  let loginPage = document.getElementById("loginPage");
+  if (!loginPage) {
+    loginPage = document.createElement("div");
+    loginPage.id = "loginPage";
+    loginPage.className = "form-section";
+    loginPage.style.marginTop = "22%";
+    loginPage.style.padding = "20px";
+    loginPage.style.maxWidth = "90%";
+    loginPage.style.marginLeft = "auto";
+    loginPage.style.marginRight = "auto";
+    loginPage.style.backgroundColor = "#fff";
+    loginPage.style.borderRadius = "0px";
+    
+    loginPage.innerHTML = `
+      <img src="https://see.fontimg.com/api/rf5/woG33/N2Y3Y2RhYTdiOGMwNGVjOGE5MWE1MTFiNGJjM2E4Y2Iub3Rm/U0lHTiBJTg/redtrap-expanded-puo.png?r=fs&h=30&w=1000&fg=000000&bg=FFFFFF&tb=1&s=30" 
+           style="display: block; margin-left: auto; margin-right: auto;">
+      <br><br>
+      <input type="email" id="loginEmail" placeholder="Email Address" 
+             style="padding: 12px; width: 100%; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 0px; box-sizing: border-box;" />
+      <input type="password" id="loginPassword" placeholder="Password" 
+             style="padding: 12px; width: 100%; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 0px; box-sizing: border-box;" />
+      <button onclick="loginUser()" 
+              style="width: 100%; padding: 14px; background-color: #000; color: white; border: none; border-radius: 0px; font-size: 16px; font-weight: bold; cursor: pointer; box-sizing: border-box;">
+        SIGN IN
+      </button>
+      <p style="text-align: center; margin-top: 15px; font-size: 14px; color: #666;">
+        Don't have an account? <a href="#" onclick="showSignupPage()" style="color: #000; text-decoration: underline;">Sign up</a>
+      </p>
+    `;
+    
+    document.body.appendChild(loginPage);
+  }
+  
+  loginPage.style.display = "block";
+}
 
-
-// Add this function to show the signup page
 function showSignupPage() {
   history.pushState({ page: "signupPage" }, "", "#signup");
   
   // Hide all other pages
-  document.getElementById("descriptionPage").style.display = "none";
-  document.getElementById("productList").style.display = "none";
-  document.getElementById("shirtsPage").style.display = "none";
-  document.getElementById("pantsPage").style.display = "none";
-  document.getElementById("sliderSection").style.display = "none";
-  document.getElementById("cartPage").style.display = "none";
-  document.getElementById("profilePage").style.display = "none";
-  document.getElementById("tshirtsPage").style.display = "none";
-  document.getElementById("cargosPage").style.display = "none";
-  document.getElementById("detailsPage").style.display = "none";
+  const pagesToHide = [
+    "descriptionPage", "productList", "shirtsPage", "pantsPage",
+    "sliderSection", "cartPage", "profilePage", "tshirtsPage",
+    "cargosPage", "detailsPage", "loginPage"
+  ];
+  
+  pagesToHide.forEach(id => {
+    const element = document.getElementById(id);
+    if (element) element.style.display = "none";
+  });
   
   // Create or show signup page
   let signupPage = document.getElementById("signupPage");
@@ -5967,9 +6017,9 @@ function showSignupPage() {
              style="padding: 12px; width: 100%; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 0px; box-sizing: border-box;" />
       <input type="password" id="signupPassword" placeholder="Password" 
              style="padding: 12px; width: 100%; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 0px; box-sizing: border-box;" />
-      <button onclick="createAccountAndCheckout()" 
+      <button onclick="createAccount()" 
               style="width: 100%; padding: 14px; background-color: #000; color: white; border: none; border-radius: 0px; font-size: 16px; font-weight: bold; cursor: pointer; box-sizing: border-box;">
-        CREATE ACCOUNT & CHECKOUT
+        CREATE ACCOUNT
       </button>
       <p style="text-align: center; margin-top: 15px; font-size: 14px; color: #666;">
         Already have an account? <a href="#" onclick="showLoginPage()" style="color: #000; text-decoration: underline;">Sign in</a>
@@ -5982,6 +6032,89 @@ function showSignupPage() {
   signupPage.style.display = "block";
 }
 
+
+// Authentication functions
+function createAccount() {
+  const name = document.getElementById("signupName").value.trim();
+  const email = document.getElementById("signupEmail").value.trim();
+  const password = document.getElementById("signupPassword").value.trim();
+  
+  if (!name || !email || !password) {
+    showCartToast("Please fill in all fields");
+    return;
+  }
+  
+  if (password.length < 6) {
+    showCartToast("Password should be at least 6 characters");
+    return;
+  }
+  
+  // Create user with email and password
+  auth.createUserWithEmailAndPassword(email, password)
+    .then((userCredential) => {
+      const user = userCredential.user;
+      
+      // Update profile with name
+      return user.updateProfile({
+        displayName: name
+      }).then(() => {
+        // Save additional user data to Firestore
+        return db.collection("users").doc(user.uid).set({
+          name: name,
+          email: email,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      });
+    })
+    .then(() => {
+      // Account created successfully
+      showCartToast("Account created successfully!");
+      
+      // Redirect to products page after successful signup
+      setTimeout(() => {
+        goToMainProducts();
+      }, 1500);
+    })
+    .catch((error) => {
+      console.error("Error creating account:", error);
+      showCartToast("Error creating account: " + error.message);
+    });
+}
+
+function loginUser() {
+  const email = document.getElementById("loginEmail").value.trim();
+  const password = document.getElementById("loginPassword").value.trim();
+  
+  if (!email || !password) {
+    showCartToast("Please fill in all fields");
+    return;
+  }
+  
+  auth.signInWithEmailAndPassword(email, password)
+    .then(() => {
+      // Login successful
+      showCartToast("Signed in successfully!");
+      
+      // Redirect to products page after successful login
+      setTimeout(() => {
+        goToMainProducts();
+      }, 1500);
+    })
+    .catch((error) => {
+      console.error("Error signing in:", error);
+      showCartToast("Error signing in: " + error.message);
+    });
+}
+
+
+// Add this to your bottom nav or create a login button
+function showAuthPage() {
+  // Show login page by default, user can switch to signup
+  showLoginPage();
+}
+
+  
+  
 // Add this function to create account and proceed to checkout
 function createAccountAndCheckout() {
   const name = document.getElementById("signupName").value.trim();
@@ -6038,58 +6171,6 @@ function createAccountAndCheckout() {
     });
 }
 
-// Optional: Add login page for existing users
-function showLoginPage() {
-  history.pushState({ page: "loginPage" }, "", "#login");
-  
-  // Hide all other pages
-  document.getElementById("descriptionPage").style.display = "none";
-  document.getElementById("productList").style.display = "none";
-  document.getElementById("shirtsPage").style.display = "none";
-  document.getElementById("pantsPage").style.display = "none";
-  document.getElementById("sliderSection").style.display = "none";
-  document.getElementById("cartPage").style.display = "none";
-  document.getElementById("profilePage").style.display = "none";
-  document.getElementById("tshirtsPage").style.display = "none";
-  document.getElementById("cargosPage").style.display = "none";
-  document.getElementById("detailsPage").style.display = "none";
-  
-  // Create or show login page
-  let loginPage = document.getElementById("loginPage");
-  if (!loginPage) {
-    loginPage = document.createElement("div");
-    loginPage.id = "loginPage";
-    loginPage.className = "form-section";
-    loginPage.style.marginTop = "22%";
-    loginPage.style.padding = "20px";
-    loginPage.style.maxWidth = "90%";
-    loginPage.style.marginLeft = "auto";
-    loginPage.style.marginRight = "auto";
-    loginPage.style.backgroundColor = "#fff";
-    loginPage.style.borderRadius = "0px";
-    
-    loginPage.innerHTML = `
-      <img src="https://see.fontimg.com/api/rf5/woG33/N2Y3Y2RhYTdiOGMwNGVjOGE5MWE1MTFiNGJjM2E4Y2Iub3Rm/U0lHTiBJTg/redtrap-expanded-puo.png?r=fs&h=30&w=1000&fg=000000&bg=FFFFFF&tb=1&s=30" 
-           style="display: block; margin-left: auto; margin-right: auto;">
-      <br><br>
-      <input type="email" id="loginEmail" placeholder="Email Address" 
-             style="padding: 12px; width: 100%; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 0px; box-sizing: border-box;" />
-      <input type="password" id="loginPassword" placeholder="Password" 
-             style="padding: 12px; width: 100%; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 0px; box-sizing: border-box;" />
-      <button onclick="loginAndCheckout()" 
-              style="width: 100%; padding: 14px; background-color: #000; color: white; border: none; border-radius: 0px; font-size: 16px; font-weight: bold; cursor: pointer; box-sizing: border-box;">
-        SIGN IN & CHECKOUT
-      </button>
-      <p style="text-align: center; margin-top: 15px; font-size: 14px; color: #666;">
-        Don't have an account? <a href="#" onclick="showSignupPage()" style="color: #000; text-decoration: underline;">Sign up</a>
-      </p>
-    `;
-    
-    document.body.appendChild(loginPage);
-  }
-  
-  loginPage.style.display = "block";
-}
 
 // Function to login and proceed to checkout
 function loginAndCheckout() {
@@ -6487,7 +6568,12 @@ function proceedWithCOD() {
 
 function showProfilePage() {
   const user = auth.currentUser;
-  
+
+  if (!user) {
+    // User is not signed in, show login page
+    showLoginPage();
+    return;
+  }
   // Hide all pages, show profile
   document.getElementById("productList").style.display = "none";
   document.getElementById("sliderSection").style.display = "none";
