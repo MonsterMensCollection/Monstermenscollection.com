@@ -5925,17 +5925,7 @@ async function filterProductsBySize(pageId) {
   }
 }
 
-// Add this function to handle the checkout button click
-function handleCheckout() {
-  const user = auth.currentUser;
-  if (user) {
-    // User is signed in, proceed to checkout
-    goToDetailsPage();
-  } else {
-    // User is not signed in, show signup page
-    showSignupPage();
-  }
-}
+
 
 // Add this function to show the signup page
 function showSignupPage() {
