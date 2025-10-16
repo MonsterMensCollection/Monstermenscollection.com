@@ -5984,9 +5984,10 @@ function showLoginPage() {
   loginPage.style.display = "block";
 }
   
+// Show Signup Page
 function showSignupPage() {
   history.pushState({ page: "signupPage" }, "", "#signup");
-  
+
   // Hide all other pages
   const pagesToHide = [
     "descriptionPage", "productList", "shirtsPage", "pantsPage",
@@ -5998,7 +5999,7 @@ function showSignupPage() {
     const element = document.getElementById(id);
     if (element) element.style.display = "none";
   });
-  
+
   // Create or show signup page
   let signupPage = document.getElementById("signupPage");
   if (!signupPage) {
@@ -6012,31 +6013,123 @@ function showSignupPage() {
     signupPage.style.marginRight = "auto";
     signupPage.style.backgroundColor = "#fff";
     signupPage.style.borderRadius = "0px";
-    
+
     signupPage.innerHTML = `
       <img src="https://see.fontimg.com/api/rf5/woG33/N2Y3Y2RhYTdiOGMwNGVjOGE5MWE1MTFiNGJjM2E4Y2Iub3Rm/U0lHTiBVUA/redtrap-expanded-puo.png?r=fs&h=30&w=1000&fg=000000&bg=FFFFFF&tb=1&s=30" 
            style="display: block; margin-left: auto; margin-right: auto;">
       <br><br>
-      <input type="text" id="signupName" placeholder="Full Name" 
-             style="padding: 12px; width: 100%; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 0px; box-sizing: border-box;" />
-      <input type="tel" id="signupMobile" placeholder="Mobile Number" 
-             style="padding: 12px; width: 100%; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 0px; box-sizing: border-box;" />
-      <input type="password" id="signupPassword" placeholder="Password" 
-             style="padding: 12px; width: 100%; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 0px; box-sizing: border-box;" />
-      <button id="signupButton" onclick="event.preventDefault(); createAccount()" 
-              style="width: 100%; padding: 14px; background-color: #000; color: white; border: none; border-radius: 0px; font-size: 16px; font-weight: bold; cursor: pointer; box-sizing: border-box;">
-        CREATE ACCOUNT
+      <input type="text" id="signupName" placeholder="Full Name"
+             style="padding: 12px; width: 100%; margin-bottom: 15px; border: 1px solid #ccc;" />
+      <input type="tel" id="signupMobile" placeholder="Mobile Number"
+             style="padding: 12px; width: 100%; margin-bottom: 15px; border: 1px solid #ccc;" />
+      <input type="password" id="signupPassword" placeholder="Password"
+             style="padding: 12px; width: 100%; margin-bottom: 15px; border: 1px solid #ccc;" />
+
+      <div id="recaptcha-container"></div>
+
+      <button id="sendOtpBtn" onclick="sendOTP()"
+              style="width: 100%; padding: 14px; background-color: #000; color: white; border: none; font-size: 16px; font-weight: bold;">
+        SEND OTP
       </button>
+
+      <div id="otpSection" style="display:none; margin-top:15px;">
+        <input type="text" id="otpCode" placeholder="Enter OTP"
+               style="padding: 12px; width: 100%; margin-bottom: 15px; border: 1px solid #ccc;" />
+        <button id="verifyOtpBtn" onclick="verifyOTP()"
+                style="width: 100%; padding: 14px; background-color: #28a745; color: white; border: none; font-size: 16px; font-weight: bold;">
+          VERIFY OTP
+        </button>
+      </div>
+
       <p style="text-align: center; margin-top: 15px; font-size: 14px; color: #666;">
-        Already have an account? <a href="#" onclick="event.preventDefault(); showLoginPage()" style="color: #000; text-decoration: underline;">Sign in</a>
+        Already have an account? 
+        <a href="#" onclick="event.preventDefault(); showLoginPage()" style="color: #000; text-decoration: underline;">Sign in</a>
       </p>
     `;
-    
+
     document.body.appendChild(signupPage);
   }
-  
+
   signupPage.style.display = "block";
 }
+
+// Firebase OTP Send
+let confirmationResultGlobal = null;
+
+function sendOTP() {
+  const name = document.getElementById("signupName").value.trim();
+  const mobile = document.getElementById("signupMobile").value.trim();
+  const password = document.getElementById("signupPassword").value.trim();
+
+  if (!name || !mobile || !password) {
+    showCartToast("Please fill in all fields");
+    return;
+  }
+
+  if (mobile.length !== 10) {
+    showCartToast("Enter a valid 10-digit mobile number");
+    return;
+  }
+
+  if (password.length < 6) {
+    showCartToast("Password should be at least 6 characters");
+    return;
+  }
+
+  // Setup invisible recaptcha
+  window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+    size: 'invisible'
+  });
+
+  const phoneNumber = "+91" + mobile;
+
+  firebase.auth().signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier)
+    .then((confirmationResult) => {
+      confirmationResultGlobal = confirmationResult;
+      showCartToast("OTP sent successfully!");
+      document.getElementById("otpSection").style.display = "block";
+      document.getElementById("sendOtpBtn").style.display = "none";
+    })
+    .catch((error) => {
+      console.error(error);
+      showCartToast("Error sending OTP: " + error.message);
+    });
+}
+
+// Firebase OTP Verify
+function verifyOTP() {
+  const otpCode = document.getElementById("otpCode").value.trim();
+  const name = document.getElementById("signupName").value.trim();
+  const mobile = document.getElementById("signupMobile").value.trim();
+
+  if (!otpCode) {
+    showCartToast("Please enter the OTP");
+    return;
+  }
+
+  confirmationResultGlobal.confirm(otpCode)
+    .then((result) => {
+      const user = result.user;
+
+      // Update display name
+      return user.updateProfile({ displayName: name }).then(() => {
+        return db.collection("users").doc(user.uid).set({
+          name: name,
+          mobileNumber: mobile,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+      });
+    })
+    .then(() => {
+      showCartToast("Account created successfully!");
+      showProfilePage();
+    })
+    .catch((error) => {
+      console.error(error);
+      showCartToast("Invalid OTP or error: " + error.message);
+    });
+}
+
 
 // Authentication functions
 // Replace the createAccount function
