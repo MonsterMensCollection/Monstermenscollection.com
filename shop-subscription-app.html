@@ -6009,7 +6009,7 @@ function createAccountAndCheckout() {
   }
   
   // Store checkout intent in sessionStorage
-  sessionStorage.setItem('checkoutIntent', 'true');
+  const checkoutIntent = sessionStorage.getItem('checkoutIntent');
   
   // Create user with email and password
   auth.createUserWithEmailAndPassword(email, password)
@@ -6029,12 +6029,17 @@ function createAccountAndCheckout() {
       });
     })
     .then(() => {
-      // Account created successfully, proceed to checkout
+      // Account created successfully
       showCartToast("Account created successfully!");
       
-      // Clear the checkout intent and redirect to checkout
-      sessionStorage.removeItem('checkoutIntent');
-      goToDetailsPage();
+      if (checkoutIntent === 'true') {
+        // User was trying to checkout, redirect to checkout
+        sessionStorage.removeItem('checkoutIntent');
+        goToDetailsPage();
+      } else {
+        // User was just signing up, redirect to profile page
+        showProfilePage();
+      }
     })
     .catch((error) => {
       console.error("Error creating account:", error);
@@ -6108,14 +6113,21 @@ function loginAndCheckout() {
   }
   
   // Store checkout intent
-  sessionStorage.setItem('checkoutIntent', 'true');
+  const checkoutIntent = sessionStorage.getItem('checkoutIntent');
   
   auth.signInWithEmailAndPassword(email, password)
     .then(() => {
-      // Login successful, proceed to checkout
+      // Login successful
       showCartToast("Signed in successfully!");
-      sessionStorage.removeItem('checkoutIntent');
-      goToDetailsPage();
+      
+      if (checkoutIntent === 'true') {
+        // User was trying to checkout, redirect to checkout
+        sessionStorage.removeItem('checkoutIntent');
+        goToDetailsPage();
+      } else {
+        // User was just logging in, redirect to profile page or stay on login page
+        showProfilePage();
+      }
     })
     .catch((error) => {
       console.error("Error signing in:", error);
