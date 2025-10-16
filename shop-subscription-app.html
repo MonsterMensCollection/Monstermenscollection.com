@@ -6076,10 +6076,6 @@ function createAccount() {
       // Account created successfully
       showCartToast("Account created successfully!");
       
-      // Redirect to products page after successful signup
-      setTimeout(() => {
-        goToMainProducts();
-      }, 1500);
     })
     .catch((error) => {
       console.error("Error creating account:", error);
@@ -6101,10 +6097,7 @@ function loginUser() {
       // Login successful
       showCartToast("Signed in successfully!");
       
-      // Redirect to products page after successful login
-      setTimeout(() => {
-        goToMainProducts();
-      }, 1500);
+
     })
     .catch((error) => {
       console.error("Error signing in:", error);
