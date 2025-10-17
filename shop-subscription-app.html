@@ -4958,27 +4958,48 @@
 
   <!-- Profile Info -->
   <div style="width: 100%; background-color: #f9f9f9; padding: 15px 20px; border-radius: 0px; box-sizing: border-box;">
-  <div style="margin-bottom: 15px;">
-    <label style="font-size: 14px; color: #777;">Name</label>
-    <div id="profileName" style="font-size: 18px; font-weight: bold; color: #333;">Loading...</div>
+    <div style="margin-bottom: 15px;">
+      <label style="font-size: 14px; color: #777;">Name</label>
+      <div id="profileName" style="font-size: 18px; font-weight: bold; color: #333;">Loading...</div>
+    </div>
+    <div>
+      <label style="font-size: 14px; color: #777;">Mobile Number</label>
+      <div id="profileMobile" style="font-size: 18px; font-weight: bold; color: #333;">Loading...</div>
+    </div>
   </div>
-  <div>
-    <label style="font-size: 14px; color: #777;">Mobile Number</label>
-    <div id="profileMobile" style="font-size: 18px; font-weight: bold; color: #333;">Loading...</div>
-  </div>
-</div>
-  
-  <div style="display: none;">
-    <label for="currencySelector" style="font-size: 14px; color: #777; white-space: nowrap;">
-      Currency
-    </label>
-    <select id="currencySelector" style="flex: 1 1 auto; padding: 10px 12px; border: 0px solid #ccc; border-radius: 0; background: #fafafa; font-size: 16px; font-weight: 600; color: #333;">
-      <option value="INR">₹ INR</option>
-    </select>
+
+  <!-- Update Profile Button -->
+  <button onclick="showUpdateProfileForm()" style="margin-top: 20px; padding: 12px 20px; background-color: #000; color: white; border: none; border-radius: 0px; cursor: pointer; font-weight: bold; width: 100%;">
+    Update Profile
+  </button>
+
+  <!-- Update Profile Form (Initially Hidden) -->
+  <div id="updateProfileForm" style="display: none; margin-top: 20px; padding: 20px; background-color: #f9f9f9; border-radius: 0px;">
+    <h3 style="margin-bottom: 15px;">Update Profile</h3>
+    
+    <input type="text" id="updateName" placeholder="Full Name" 
+           style="padding: 12px; width: 100%; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 0px; box-sizing: border-box;" />
+    
+    <input type="tel" id="updateMobile" placeholder="Mobile Number" 
+           style="padding: 12px; width: 100%; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 0px; box-sizing: border-box;" />
+    
+    <input type="email" id="updateEmail" placeholder="Email (optional)" 
+           style="padding: 12px; width: 100%; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 0px; box-sizing: border-box;" />
+    
+    <div style="display: flex; gap: 10px;">
+      <button onclick="updateProfile()" 
+              style="flex: 1; padding: 12px; background-color: #28a745; color: white; border: none; border-radius: 0px; cursor: pointer; font-weight: bold;">
+        Save Changes
+      </button>
+      <button onclick="hideUpdateProfileForm()" 
+              style="flex: 1; padding: 12px; background-color: #6c757d; color: white; border: none; border-radius: 0px; cursor: pointer; font-weight: bold;">
+        Cancel
+      </button>
+    </div>
   </div>
 
   <!-- About Us Button -->
-  <button onclick="toggleWhyTime()" style="margin-top: 30px; padding: 12px 20px; background-color: #eee; color: #000; border: none; border-radius: 0px; cursor: pointer; font-weight: bold; width: 100%;">
+  <button onclick="toggleWhyTime()" style="margin-top: 20px; padding: 12px 20px; background-color: #eee; color: #000; border: none; border-radius: 0px; cursor: pointer; font-weight: bold; width: 100%;">
     About Us
   </button>
 
@@ -6096,7 +6117,7 @@ function sendOTP() {
     });
 }
 
-// Firebase OTP Verify
+// Enhanced verifyOTP function
 function verifyOTP() {
   const otpCode = document.getElementById("otpCode").value.trim();
   const name = document.getElementById("signupName").value.trim();
@@ -6111,12 +6132,15 @@ function verifyOTP() {
     .then((result) => {
       const user = result.user;
 
-      // Update display name
+      // Update display name in Firebase Auth
       return user.updateProfile({ displayName: name }).then(() => {
+        // Save complete user data to Firestore
         return db.collection("users").doc(user.uid).set({
           name: name,
           mobileNumber: mobile,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          email: user.email || "",
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          lastLogin: firebase.firestore.FieldValue.serverTimestamp()
         });
       });
     })
@@ -6372,9 +6396,111 @@ function updateCartAmounts () {
   });
 
 
+ 
 
+// Show update profile form
+function showUpdateProfileForm() {
+  const user = auth.currentUser;
+  if (!user) {
+    showCartToast("Please sign in to update profile");
+    return;
+  }
 
+  // Populate form with current data
+  document.getElementById("updateName").value = document.getElementById("profileName").textContent;
+  document.getElementById("updateMobile").value = document.getElementById("profileMobile").textContent;
+  
+  // Get email from Firebase user
+  if (user.email) {
+    document.getElementById("updateEmail").value = user.email;
+  }
 
+  // Show the form
+  document.getElementById("updateProfileForm").style.display = "block";
+  
+  // Scroll to form
+  document.getElementById("updateProfileForm").scrollIntoView({ behavior: 'smooth' });
+}
+
+// Hide update profile form
+function hideUpdateProfileForm() {
+  document.getElementById("updateProfileForm").style.display = "none";
+} 
+
+// Update profile function
+async function updateProfile() {
+  const user = auth.currentUser;
+  if (!user) {
+    showCartToast("Please sign in to update profile");
+    return;
+  }
+
+  const name = document.getElementById("updateName").value.trim();
+  const mobile = document.getElementById("updateMobile").value.trim();
+  const email = document.getElementById("updateEmail").value.trim();
+
+  // Validation
+  if (!name) {
+    showCartToast("Please enter your name");
+    return;
+  }
+
+  if (!mobile) {
+    showCartToast("Please enter your mobile number");
+    return;
+  }
+
+  if (mobile.length !== 10) {
+    showCartToast("Please enter a valid 10-digit mobile number");
+    return;
+  }
+
+  try {
+    // Update user profile in Firebase Auth (email if provided)
+    const updatePromises = [];
+    
+    if (email && email !== user.email) {
+      updatePromises.push(user.updateEmail(email));
+    }
+    
+    updatePromises.push(user.updateProfile({
+      displayName: name
+    }));
+
+    // Wait for all auth updates to complete
+    await Promise.all(updatePromises);
+
+    // Update user data in Firestore
+    await db.collection("users").doc(user.uid).set({
+      name: name,
+      mobileNumber: mobile,
+      email: email || user.email,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true }); // merge: true ensures we don't overwrite other fields
+
+    // Update the displayed profile information
+    document.getElementById("profileName").textContent = name;
+    document.getElementById("profileMobile").textContent = mobile;
+
+    // Hide the form
+    hideUpdateProfileForm();
+
+    showCartToast("Profile updated successfully!");
+    
+  } catch (error) {
+    console.error("Error updating profile:", error);
+    
+    // Handle specific errors
+    if (error.code === 'auth/requires-recent-login') {
+      showCartToast("Please sign in again to update your email");
+      // You could trigger a re-authentication flow here
+    } else {
+      showCartToast("Error updating profile: " + error.message);
+    }
+  }
+}
+  
+  
 
 
   
@@ -6712,19 +6838,30 @@ function loadUserProfileAndOrders() {
   const user = auth.currentUser;
   if (!user) return;
 
-  // Try to get user data from Firestore
+  // Update profile information immediately with Firebase data
+  document.getElementById("profileName").textContent = user.displayName || "Loading...";
+  document.getElementById("profileMobile").textContent = "Loading...";
+
+  // Get detailed user data from Firestore
   db.collection("users").doc(user.uid).get().then((doc) => {
-    let name = "Not available";
-    let mobileNumber = "Not available";
-    
     if (doc.exists) {
       const userData = doc.data();
-      name = userData.name || "Not available";
-      mobileNumber = userData.mobileNumber || "Not available";
+      
+      // Update with Firestore data (preferred) or fallback to Firebase auth data
+      document.getElementById("profileName").textContent = userData.name || user.displayName || "Not available";
+      document.getElementById("profileMobile").textContent = userData.mobileNumber || "Not available";
+    } else {
+      // If no Firestore doc exists, create one with current auth data
+      db.collection("users").doc(user.uid).set({
+        name: user.displayName || "",
+        mobileNumber: "",
+        email: user.email || "",
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
+      
+      document.getElementById("profileName").textContent = user.displayName || "Not available";
+      document.getElementById("profileMobile").textContent = "Not available";
     }
-    
-    document.getElementById("profileName").textContent = name;
-    document.getElementById("profileMobile").textContent = mobileNumber;
   }).catch((error) => {
     console.error("Error loading user profile:", error);
     document.getElementById("profileName").textContent = user.displayName || "Not available";
@@ -6958,32 +7095,7 @@ function flushRestoreBeacon(cart) {
   localStorage.setItem("cart", JSON.stringify(cart));
 }
 
-// Fix the missing loadUserProfileAndOrders function
-function loadUserProfileAndOrders() {
-  const user = auth.currentUser;
-  if (!user) return;
 
-  // Update profile information immediately
-  document.getElementById("profileEmail").textContent = user.email || "Not available";
-  document.getElementById("profileName").textContent = user.displayName || "Loading...";
-  
-  // Try to get user name from Firestore first, then fall back to displayName
-  db.collection("users").doc(user.uid).get().then((doc) => {
-    if (doc.exists && doc.data().name) {
-      document.getElementById("profileName").textContent = doc.data().name;
-    } else if (user.displayName) {
-      document.getElementById("profileName").textContent = user.displayName;
-    } else {
-      document.getElementById("profileName").textContent = "Not available";
-    }
-  }).catch((error) => {
-    console.error("Error loading user profile:", error);
-    document.getElementById("profileName").textContent = user.displayName || "Not available";
-  });
-
-  // Load user orders
-  loadUserOrders();
-}
 
 // Update the handleCheckout function
 function handleCheckout() {
