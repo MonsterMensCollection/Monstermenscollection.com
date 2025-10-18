@@ -6032,6 +6032,10 @@ function showSignupPage() {
         SEND OTP
       </button>
 
+      <div id="otpSuccessMessage" style="display: none; text-align: center; margin-top: 10px;">
+  <p style="color: green; font-size: 14px; margin: 0;">OTP sent successfully!</p>
+</div>
+
       <div id="otpSection" style="display:none; margin-top:15px;">
         <input type="text" id="otpCode" placeholder="Enter OTP"
                style="padding: 12px; width: 100%; margin-bottom: 15px; border: 1px solid #ccc;" />
@@ -6086,6 +6090,16 @@ function sendOTP() {
   firebase.auth().signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier)
     .then((confirmationResult) => {
       confirmationResultGlobal = confirmationResult;
+      
+      // Show the success message
+      const otpSuccessMessage = document.getElementById("otpSuccessMessage");
+      otpSuccessMessage.style.display = "block";
+      
+      // Hide the message after 3 seconds
+      setTimeout(() => {
+        otpSuccessMessage.style.display = "none";
+      }, 3000);
+      
       showCartToast("OTP sent successfully!");
       document.getElementById("otpSection").style.display = "block";
       document.getElementById("sendOtpBtn").style.display = "none";
@@ -6095,7 +6109,6 @@ function sendOTP() {
       showCartToast("Error sending OTP: " + error.message);
     });
 }
-
 // Firebase OTP Verify
 function verifyOTP() {
   const otpCode = document.getElementById("otpCode").value.trim();
