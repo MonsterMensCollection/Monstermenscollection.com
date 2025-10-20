@@ -6033,8 +6033,16 @@ function showSignupPage() {
       </button>
 
       <div id="otpSuccessMessage" style="display: none; text-align: center; margin-top: 10px;">
-  <p style="color: green; font-size: 14px; margin: 0;">OTP sent successfully!</p>
-</div>
+        <p style="color: green; font-size: 14px; margin: 0;">OTP sent successfully!</p>
+      </div>
+
+      <div id="resendOtpSection" style="display:none; text-align: center; margin-top: 10px;">
+        <p id="resendTimer" style="font-size: 14px; color: #666; margin: 5px 0;"></p>
+        <button id="resendOtpBtn" onclick="resendOTP()" disabled
+                style="background: none; border: none; color: #666; text-decoration: underline; font-size: 14px; cursor: pointer;">
+          Send OTP Again
+        </button>
+      </div>
 
       <div id="otpSection" style="display:none; margin-top:15px;">
         <input type="text" id="otpCode" placeholder="Enter OTP"
@@ -6057,10 +6065,63 @@ function showSignupPage() {
   signupPage.style.display = "block";
 }
 
+let otpResendTimer = null;
+
+function startResendTimer() {
+  const resendBtn = document.getElementById('resendOtpBtn');
+  const timerDisplay = document.getElementById('resendTimer');
+  let timeLeft = 30;
+
+  // Show the resend section
+  document.getElementById('resendOtpSection').style.display = 'block';
+  
+  // Disable the resend button initially
+  resendBtn.disabled = true;
+  resendBtn.style.color = '#666';
+  resendBtn.style.cursor = 'not-allowed';
+
+  // Clear any existing timer
+  if (otpResendTimer) {
+    clearInterval(otpResendTimer);
+  }
+
+  // Update timer every second
+  otpResendTimer = setInterval(() => {
+    timerDisplay.textContent = `You can resend OTP in ${timeLeft} seconds`;
+    timeLeft--;
+
+    if (timeLeft < 0) {
+      clearInterval(otpResendTimer);
+      timerDisplay.textContent = '';
+      resendBtn.disabled = false;
+      resendBtn.style.color = '#000';
+      resendBtn.style.cursor = 'pointer';
+      resendBtn.textContent = 'Send OTP Again';
+    }
+  }, 1000);
+}
+
+  function resendOTP() {
+  // Reset the timer
+  startResendTimer();
+  
+  // Call your existing sendOTP function
+  sendOTP();
+  
+  // Show success message
+  const successMsg = document.getElementById('otpSuccessMessage');
+  successMsg.style.display = 'block';
+  
+  // Hide success message after 3 seconds
+  setTimeout(() => {
+    successMsg.style.display = 'none';
+  }, 3000);
+}
+  
 // Firebase OTP Send
 let confirmationResultGlobal = null;
 
-function sendOTP() {
+  function sendOTP() {
   const name = document.getElementById("signupName").value.trim();
   const mobile = document.getElementById("signupMobile").value.trim();
   const password = document.getElementById("signupPassword").value.trim();
@@ -6104,6 +6165,9 @@ function sendOTP() {
     .then((confirmationResult) => {
       confirmationResultGlobal = confirmationResult;
       showCartToast("OTP sent successfully!");
+      
+      // After successfully sending OTP, start the resend timer
+      startResendTimer();
     })
     .catch((error) => {
       console.error(error);
@@ -6112,8 +6176,15 @@ function sendOTP() {
       // If OTP fails, show the send button again
       document.getElementById("sendOtpBtn").style.display = "block";
       document.getElementById("otpSection").style.display = "none";
+      document.getElementById("resendOtpSection").style.display = "none";
+      
+      // Clear any existing timer
+      if (otpResendTimer) {
+        clearInterval(otpResendTimer);
+      }
     });
 }
+
 // Firebase OTP Verify
 function verifyOTP() {
   const otpCode = document.getElementById("otpCode").value.trim();
