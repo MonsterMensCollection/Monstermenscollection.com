@@ -4952,61 +4952,79 @@
 </div>
 
 
+
 <div id="profilePage" class="form-section" style="display: none; margin-top: 22%; padding: 20px; max-width: 90%; margin-left: auto; margin-right: auto; background-color: #fff; border-radius: 0px;">
   <!-- Logo -->
   <img src="https://see.fontimg.com/api/rf5/woG33/N2Y3Y2RhYTdiOGMwNGVjOGE5MWE1MTFiNGJjM2E4Y2Iub3Rm/UFJPRklMRQ/redtrap-expanded-puo.png?r=fs&h=30&w=1000&fg=000000&bg=FFFFFF&tb=1&s=30" style="display: block; margin-left: auto; margin-right: auto;"><br><br>
 
-  <!-- Profile Info -->
-  <div style="width: 100%; background-color: #f9f9f9; padding: 15px 20px; border-radius: 0px; box-sizing: border-box;">
-  <div style="margin-bottom: 15px;">
-    <label style="font-size: 14px; color: #777;">Name</label>
-    <div id="profileName" style="font-size: 18px; font-weight: bold; color: #333;">Loading...</div>
-  </div>
-  <div>
-    <label style="font-size: 14px; color: #777;">Mobile Number</label>
-    <div id="profileMobile" style="font-size: 18px; font-weight: bold; color: #333;">Loading...</div>
-  </div>
-</div>
-  
-  <div style="display: none;">
-    <label for="currencySelector" style="font-size: 14px; color: #777; white-space: nowrap;">
-      Currency
-    </label>
-    <select id="currencySelector" style="flex: 1 1 auto; padding: 10px 12px; border: 0px solid #ccc; border-radius: 0; background: #fafafa; font-size: 16px; font-weight: 600; color: #333;">
-      <option value="INR">₹ INR</option>
-    </select>
-  </div>
-
-  <!-- About Us Button -->
-  <button onclick="toggleWhyTime()" style="margin-top: 30px; padding: 12px 20px; background-color: #eee; color: #000; border: none; border-radius: 0px; cursor: pointer; font-weight: bold; width: 100%;">
-    About Us
-  </button>
-
-  <!-- Hidden Explanation Text -->
-  <div id="whyTimeMessage" style="max-height: 0; overflow: hidden; transition: max-height 0.5s ease-out, padding 0.5s ease-out; background-color: #f0f0f0; border-left: 4px solid #000; font-size: 14px; line-height: 1.6; color: #333; padding: 0 15px;">
-    <div style="padding-top: 15px; padding-bottom: 15px;">
-      I'm a dropout with a crazy love for streetwear and formal fits. Out of that passion, I started Enly—a space where style meets attitude. We mix street energy with sharp classics, built for guys who want to stand out and keep it real.
+  <!-- Guest View (shown when not logged in) -->
+  <div id="guestProfileView" style="display: none;">
+    <div style="text-align: center; padding: 20px;">
+      <p style="font-size: 16px; color: #666; margin-bottom: 30px;">Sign in to access your profile, orders, and preferences</p>
+      
+      <button onclick="showSignupPage()" style="width: 100%; padding: 14px; background-color: #000; color: white; border: none; border-radius: 0px; font-size: 16px; font-weight: bold; cursor: pointer; margin-bottom: 15px;">
+        SIGN UP
+      </button>
+      
+      <button onclick="showLoginPage()" style="width: 100%; padding: 14px; background-color: #f8f9fa; color: #000; border: 1px solid #ddd; border-radius: 0px; font-size: 16px; font-weight: bold; cursor: pointer;">
+        SIGN IN
+      </button>
     </div>
   </div>
 
-  <!-- Logout Button -->
-  <button onclick="logout()" style="margin-top: 20px; padding: 12px 20px; background-color: #000; color: white; border: none; border-radius: 0px; cursor: pointer; font-weight: bold; width: 100%;">
-    Logout
-  </button>
+  <!-- User View (shown when logged in) -->
+  <div id="userProfileView" style="display: none;">
+    <!-- Profile Info -->
+    <div style="width: 100%; background-color: #f9f9f9; padding: 15px 20px; border-radius: 0px; box-sizing: border-box;">
+      <div style="margin-bottom: 15px;">
+        <label style="font-size: 14px; color: #777;">Name</label>
+        <div id="profileName" style="font-size: 18px; font-weight: bold; color: #333;">Loading...</div>
+      </div>
+      <div>
+        <label style="font-size: 14px; color: #777;">Mobile Number</label>
+        <div id="profileMobile" style="font-size: 18px; font-weight: bold; color: #333;">Loading...</div>
+      </div>
+    </div>
+    
+    <div style="display: none;">
+      <label for="currencySelector" style="font-size: 14px; color: #777; white-space: nowrap;">
+        Currency
+      </label>
+      <select id="currencySelector" style="flex: 1 1 auto; padding: 10px 12px; border: 0px solid #ccc; border-radius: 0; background: #fafafa; font-size: 16px; font-weight: 600; color: #333;">
+        <option value="INR">₹ INR</option>
+      </select>
+    </div>
 
-  <!-- Orders Section -->
-  <div style="margin-top: 30px;">
-    <h3 style="font-size: 20px; color: #000;">Your Orders</h3>
-    <div id="orderList" style="margin-top: 10px; background: #FFFFFF; padding: 10px; border-radius: 0px; color: #333;">
-      <div style="text-align: center; padding: 20px; color: #777;">
-        Loading your orders...
+    <!-- About Us Button -->
+    <button onclick="toggleWhyTime()" style="margin-top: 30px; padding: 12px 20px; background-color: #eee; color: #000; border: none; border-radius: 0px; cursor: pointer; font-weight: bold; width: 100%;">
+      About Us
+    </button>
+
+    <!-- Hidden Explanation Text -->
+    <div id="whyTimeMessage" style="max-height: 0; overflow: hidden; transition: max-height 0.5s ease-out, padding 0.5s ease-out; background-color: #f0f0f0; border-left: 4px solid #000; font-size: 14px; line-height: 1.6; color: #333; padding: 0 15px;">
+      <div style="padding-top: 15px; padding-bottom: 15px;">
+        I'm a dropout with a crazy love for streetwear and formal fits. Out of that passion, I started Enly—a space where style meets attitude. We mix street energy with sharp classics, built for guys who want to stand out and keep it real.
+      </div>
+    </div>
+
+    <!-- Logout Button -->
+    <button onclick="logout()" style="margin-top: 20px; padding: 12px 20px; background-color: #000; color: white; border: none; border-radius: 0px; cursor: pointer; font-weight: bold; width: 100%;">
+      Logout
+    </button>
+
+    <!-- Orders Section -->
+    <div style="margin-top: 30px;">
+      <h3 style="font-size: 20px; color: #000;">Your Orders</h3>
+      <div id="orderList" style="margin-top: 10px; background: #FFFFFF; padding: 10px; border-radius: 0px; color: #333;">
+        <div style="text-align: center; padding: 20px; color: #777;">
+          Loading your orders...
+        </div>
       </div>
     </div>
   </div>
 
   <br><br><br><br><br>
 </div>
-
 
      
 
@@ -6847,20 +6865,20 @@ function showProfilePage() {
   
   profilePage.style.display = "block";
   
-  if (!user) {
-    // User is not signed in, show guest view
-    document.getElementById("profileName").textContent = "Guest User";
-    document.getElementById("profileMobile").textContent = "Sign in to view details";
-    
-    const orderList = document.getElementById("orderList");
-    if (orderList) {
-      orderList.innerHTML = "<div style='text-align: center; padding: 20px; color: #777;'>Sign in to view order history</div>";
-    }
-    return;
-  }
+  // Show appropriate view based on authentication status
+  const guestView = document.getElementById("guestProfileView");
+  const userView = document.getElementById("userProfileView");
   
-  // User is signed in, load their data
-  loadUserProfileAndOrders();
+  if (!user) {
+    // User is not signed in, show guest view with signin/signup buttons
+    if (guestView) guestView.style.display = "block";
+    if (userView) userView.style.display = "none";
+  } else {
+    // User is signed in, show user profile view
+    if (guestView) guestView.style.display = "none";
+    if (userView) userView.style.display = "block";
+    loadUserProfileAndOrders();
+  }
 }
 
 // Debug function - call this from browser console to check user data
@@ -7082,12 +7100,18 @@ const auth = firebase.auth();
 
 // Listen for auth state changes
 // Listen for auth state changes
+// ============ FIXED AUTH STATE HANDLER ============
 auth.onAuthStateChanged((user) => {
   if (user) {
-    console.log("User is signed in:", user.email);
+    console.log("User is signed in:", user.uid);
     
-    // If profile page is currently visible, refresh the data
-    if (document.getElementById("profilePage").style.display === "block") {
+    // If profile page is currently visible, update the view
+    if (document.getElementById("profilePage") && document.getElementById("profilePage").style.display === "block") {
+      const guestView = document.getElementById("guestProfileView");
+      const userView = document.getElementById("userProfileView");
+      
+      if (guestView) guestView.style.display = "none";
+      if (userView) userView.style.display = "block";
       loadUserProfileAndOrders();
     }
     
@@ -7102,11 +7126,17 @@ auth.onAuthStateChanged((user) => {
   } else {
     console.log("User is signed out");
     // If profile page is visible and user logs out, update to guest view
-    if (document.getElementById("profilePage").style.display === "block") {
-      showProfilePage(); // This will now show guest view
+    if (document.getElementById("profilePage") && document.getElementById("profilePage").style.display === "block") {
+      const guestView = document.getElementById("guestProfileView");
+      const userView = document.getElementById("userProfileView");
+      
+      if (guestView) guestView.style.display = "block";
+      if (userView) userView.style.display = "none";
     }
   }
 });
+
+  
 // Fix the missing restoreOneUnit function
 async function restoreOneUnit(docId, size) {
   try {
