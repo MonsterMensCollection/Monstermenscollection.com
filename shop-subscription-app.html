@@ -6372,6 +6372,7 @@ async function sendOTP() {
     });
 }
 
+
 function verifyOTP() {
   const otpCode = document.getElementById("otpCode").value.trim();
   const name = document.getElementById("signupName").value.trim();
@@ -6386,18 +6387,27 @@ function verifyOTP() {
     .then((result) => {
       const user = result.user;
 
-      // Update display name
-      return user.updateProfile({ displayName: name }).then(() => {
+      // Update display name in Firebase Auth
+      return user.updateProfile({ 
+        displayName: name 
+      }).then(() => {
+        // Create user document in Firestore
         return db.collection("users").doc(user.uid).set({
           name: name,
           mobileNumber: mobile,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
+          email: user.email || "",
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true }); // Use merge to avoid overwriting existing data
       });
     })
     .then(() => {
       showCartToast("Account created successfully!");
       
+      // Force refresh auth state
+      return auth.currentUser.reload();
+    })
+    .then(() => {
       // Check if user was trying to checkout
       const checkoutIntent = sessionStorage.getItem('checkoutIntent');
       if (checkoutIntent === 'true') {
@@ -6424,11 +6434,10 @@ function verifyOTP() {
       }
     })
     .catch((error) => {
-      console.error(error);
+      console.error("Error during signup:", error);
       showCartToast("Invalid OTP or error: " + error.message);
     });
 }
-
 
 // Authentication functions
 // Replace the createAccount function
@@ -6819,8 +6828,8 @@ function showProfilePage() {
   // Hide ALL pages first
   const allPages = [
     "descriptionPage", "productList", "shirtsPage", "pantsPage",
-    "sliderSection", "cartPage", "profilePage", "tshirtsPage",
-    "cargosPage", "detailsPage", "loginPage", "signupPage"
+    "sliderSection", "cartPage", "tshirtsPage", "cargosPage", 
+    "detailsPage", "loginPage", "signupPage"
   ];
   
   allPages.forEach(id => {
@@ -6828,38 +6837,93 @@ function showProfilePage() {
     if (element) element.style.display = "none";
   });
 
-  if (!user) {
-    // User is not signed in, show login page
-    showLoginPage();
+  // Ensure profile page exists and is visible
+  const profilePage = document.getElementById("profilePage");
+  if (!profilePage) {
+    console.error("Profile page element not found!");
+    goToMainProducts();
     return;
   }
   
-  // User is signed in, show profile page
-  document.getElementById("profilePage").style.display = "block";
+  profilePage.style.display = "block";
+  
+  if (!user) {
+    // User is not signed in, show guest view
+    document.getElementById("profileName").textContent = "Guest User";
+    document.getElementById("profileMobile").textContent = "Sign in to view details";
+    
+    const orderList = document.getElementById("orderList");
+    if (orderList) {
+      orderList.innerHTML = "<div style='text-align: center; padding: 20px; color: #777;'>Sign in to view order history</div>";
+    }
+    return;
+  }
+  
+  // User is signed in, load their data
   loadUserProfileAndOrders();
 }
 
+// Debug function - call this from browser console to check user data
+function debugUser() {
+  const user = auth.currentUser;
+  if (!user) {
+    console.log("No user logged in");
+    return;
+  }
+  
+  console.log("Firebase Auth User:", user);
+  console.log("User UID:", user.uid);
+  console.log("Display Name:", user.displayName);
+  console.log("Email:", user.email);
+  console.log("Phone:", user.phoneNumber);
+  
+  // Check Firestore user document
+  db.collection("users").doc(user.uid).get().then((doc) => {
+    if (doc.exists) {
+      console.log("Firestore User Data:", doc.data());
+    } else {
+      console.log("No Firestore user document found");
+    }
+  }).catch(error => {
+    console.error("Error fetching user document:", error);
+  });
+}
+
+  
 function loadUserProfileAndOrders() {
   const user = auth.currentUser;
-  if (!user) return;
+  if (!user) {
+    // User is not logged in, show guest view
+    document.getElementById("profileName").textContent = "Guest User";
+    document.getElementById("profileMobile").textContent = "Sign in to view";
+    
+    const orderList = document.getElementById("orderList");
+    orderList.innerHTML = "<div style='text-align: center; padding: 20px; color: #777;'>Sign in to view order history</div>";
+    return;
+  }
 
   // Try to get user data from Firestore
   db.collection("users").doc(user.uid).get().then((doc) => {
-    let name = "Not available";
-    let mobileNumber = "Not available";
+    let name = "Loading...";
+    let mobileNumber = "Loading...";
     
     if (doc.exists) {
       const userData = doc.data();
-      name = userData.name || "Not available";
+      name = userData.name || user.displayName || "Not set";
       mobileNumber = userData.mobileNumber || "Not available";
+    } else {
+      // If no user document exists, use auth data
+      name = user.displayName || "Not set";
+      mobileNumber = user.phoneNumber || "Not available";
     }
     
     document.getElementById("profileName").textContent = name;
     document.getElementById("profileMobile").textContent = mobileNumber;
   }).catch((error) => {
     console.error("Error loading user profile:", error);
-    document.getElementById("profileName").textContent = user.displayName || "Not available";
-    document.getElementById("profileMobile").textContent = "Not available";
+    // Fallback to auth user data
+    document.getElementById("profileName").textContent = user.displayName || "Error loading";
+    document.getElementById("profileMobile").textContent = user.phoneNumber || "Error loading";
   });
 
   // Load user orders
@@ -6898,16 +6962,12 @@ function loadUserOrders() {
         orderItem.style.backgroundColor = "#f9f9f9";
         orderItem.style.borderRadius = "8px";
         
-        // Debug logging
-        console.log("Order data:", order);
-        
         // Format order items safely
         let itemsList = "No items";
         if (order.cart && Array.isArray(order.cart)) {
           itemsList = order.cart.map(item => {
             const itemName = item.title || "Unknown Item";
             const itemSize = item.size || 'N/A';
-            const itemPrice = item.price ? format(convert(item.price)) : '₹0';
             return `${itemName} (${itemSize})`;
           }).join(', ');
         }
@@ -6916,23 +6976,13 @@ function loadUserOrders() {
         let orderDate = "Recent";
         if (order.timestamp) {
           try {
-            // Handle both Firestore timestamp and regular date
+            // Handle Firestore timestamp
             if (order.timestamp.toDate) {
-              orderDate = order.timestamp.toDate().toLocaleDateString('en-IN', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-              });
+              orderDate = order.timestamp.toDate().toLocaleDateString('en-IN');
             } else if (order.timestamp instanceof Date) {
-              orderDate = order.timestamp.toLocaleDateString('en-IN', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-              });
+              orderDate = order.timestamp.toLocaleDateString('en-IN');
+            } else if (typeof order.timestamp === 'string') {
+              orderDate = new Date(order.timestamp).toLocaleDateString('en-IN');
             }
           } catch (e) {
             console.error("Error formatting date:", e);
@@ -6943,22 +6993,11 @@ function loadUserOrders() {
         const orderNumber = order.orderNumber || `ORD-${doc.id.slice(-8)}`;
         
         // Format total amount
-        const totalAmount = order.total ? format(convert(order.total)) : 
-                           order.totalUSD ? format(convert(order.totalUSD)) : '₹0';
-        
-        // Format status with color
-        const status = order.status || 'Processing';
-        let statusColor = 'orange'; // default for Processing
-        if (status === 'Delivered') statusColor = 'green';
-        if (status === 'Cancelled') statusColor = 'red';
-        if (status === 'Shipped') statusColor = 'blue';
+        const totalAmount = order.total ? `₹${order.total}` : 
+                           order.totalUSD ? `₹${order.totalUSD}` : '₹0';
         
         // Format payment info
         const paymentMode = order.paymentMode || 'N/A';
-        let paymentIdDisplay = '';
-        if (order.paymentId && order.paymentId !== 'COD') {
-          paymentIdDisplay = ` (ID: ${order.paymentId.slice(-8)})`;
-        }
         
         orderItem.innerHTML = `
           <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
@@ -6971,10 +7010,11 @@ function loadUserOrders() {
           <div style="margin-bottom: 8px;">
             <strong>Total:</strong> ${totalAmount}
           </div>
-          <div style="margin-bottom: 8px;">
-          </div>
           <div>
             <strong>Payment:</strong> ${paymentMode}
+          </div>
+          <div style="margin-top: 8px;">
+            <strong>Status:</strong> <span style="color: ${order.status === 'Delivered' ? 'green' : 'orange'}">${order.status || 'Processing'}</span>
           </div>
         `;
         
@@ -6986,6 +7026,7 @@ function loadUserOrders() {
       orderList.innerHTML = "<div style='text-align: center; padding: 20px; color: #777;'>Error loading orders. Please try again.</div>";
     });
 }
+
 
 // Update the logout function
 function logout() {
@@ -7090,31 +7131,7 @@ function flushRestoreBeacon(cart) {
 }
 
 // Fix the missing loadUserProfileAndOrders function
-function loadUserProfileAndOrders() {
-  const user = auth.currentUser;
-  if (!user) return;
 
-  // Update profile information immediately
-  document.getElementById("profileEmail").textContent = user.email || "Not available";
-  document.getElementById("profileName").textContent = user.displayName || "Loading...";
-  
-  // Try to get user name from Firestore first, then fall back to displayName
-  db.collection("users").doc(user.uid).get().then((doc) => {
-    if (doc.exists && doc.data().name) {
-      document.getElementById("profileName").textContent = doc.data().name;
-    } else if (user.displayName) {
-      document.getElementById("profileName").textContent = user.displayName;
-    } else {
-      document.getElementById("profileName").textContent = "Not available";
-    }
-  }).catch((error) => {
-    console.error("Error loading user profile:", error);
-    document.getElementById("profileName").textContent = user.displayName || "Not available";
-  });
-
-  // Load user orders
-  loadUserOrders();
-}
 
 // Update the handleCheckout function
 function handleCheckout() {
