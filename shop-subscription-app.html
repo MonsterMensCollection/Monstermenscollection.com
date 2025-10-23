@@ -6173,7 +6173,19 @@ function loginVerifyOTP() {
     })
     .then(() => {
       showCartToast("Signed in successfully!");
-      showProfilePage();
+      
+      // Check if user was trying to checkout
+      const checkoutIntent = sessionStorage.getItem('checkoutIntent');
+      if (checkoutIntent === 'true') {
+        // Redirect back to checkout/details page
+        setTimeout(() => {
+          goToDetailsPage();
+          sessionStorage.removeItem('checkoutIntent');
+        }, 1000);
+      } else {
+        // Default behavior - go to profile
+        showProfilePage();
+      }
     })
     .catch((error) => {
       console.error(error);
@@ -6374,7 +6386,19 @@ function verifyOTP() {
     })
     .then(() => {
       showCartToast("Account created successfully!");
-      showProfilePage();
+      
+      // Check if user was trying to checkout
+      const checkoutIntent = sessionStorage.getItem('checkoutIntent');
+      if (checkoutIntent === 'true') {
+        // Redirect back to checkout/details page
+        setTimeout(() => {
+          goToDetailsPage();
+          sessionStorage.removeItem('checkoutIntent');
+        }, 1000);
+      } else {
+        // Default behavior - go to profile
+        showProfilePage();
+      }
     })
     .catch((error) => {
       console.error(error);
