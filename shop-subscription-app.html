@@ -7193,17 +7193,14 @@ document.addEventListener("DOMContentLoaded", function() {
   
   // Hide loading screen
   const loader = document.getElementById('loadingScreen');
-  loader.classList.add('fade-out');
-  setTimeout(() => loader.remove(), 600);
+  if (loader) {
+    loader.classList.add('fade-out');
+    setTimeout(() => loader.remove(), 600);
+  }
   
   // Show products page
   document.getElementById("productsPage").style.display = "block";
   document.getElementById("sliderSection").style.display = "block";
-  
-  // Hide login/signup sections
-  document.getElementById("loginSection").style.display = "none";
-  document.getElementById("signupSection").style.display = "none";
-  document.getElementById("subscriptionSection").style.display = "none";
   
   // Update container styling
   document.getElementById("mainContainer").classList.add("no-box");
@@ -7222,10 +7219,15 @@ document.addEventListener("DOMContentLoaded", function() {
     const targetPageId = control.getAttribute("data-target");
     const sortSelect = control.querySelector(".sortPrice");
     const sizeSelect = control.querySelector(".filterSize");
-    sortSelect.addEventListener("change", () => sortProductsByPrice(targetPageId));
-    sizeSelect.addEventListener("change", () => filterProductsBySize(targetPageId));
+    if (sortSelect) {
+      sortSelect.addEventListener("change", () => sortProductsByPrice(targetPageId));
+    }
+    if (sizeSelect) {
+      sizeSelect.addEventListener("change", () => filterProductsBySize(targetPageId));
+    }
   });
-   // Check if user was in checkout flow
+  
+  // Check if user was in checkout flow - FIXED: Only declare once
   const checkoutIntent = sessionStorage.getItem('checkoutIntent');
   const user = auth.currentUser;
   
@@ -7236,14 +7238,68 @@ document.addEventListener("DOMContentLoaded", function() {
       sessionStorage.removeItem('checkoutIntent');
     }, 500);
   }
+  
   // Clean up any stale session storage on page load
-  const checkoutIntent = sessionStorage.getItem('checkoutIntent');
-  if (checkoutIntent && !auth.currentUser) {
+  if (checkoutIntent && !user) {
     // User refreshed page during checkout flow but is not logged in
     sessionStorage.removeItem('checkoutIntent');
     sessionStorage.removeItem('pendingCheckoutCart');
   }
 });
+
+// ============ ADD MISSING ELEMENTS TO HTML ============
+// Add this right before closing </body> tag if these elements don't exist
+function addMissingElements() {
+  // Add selectedSize hidden input if it doesn't exist
+  if (!document.getElementById('selectedSize')) {
+    const sizeInput = document.createElement('input');
+    sizeInput.type = 'hidden';
+    sizeInput.id = 'selectedSize';
+    document.body.appendChild(sizeInput);
+  }
+  
+  // Add selectedColor hidden input if it doesn't exist
+  if (!document.getElementById('selectedColor')) {
+    const colorInput = document.createElement('input');
+    colorInput.type = 'hidden';
+    colorInput.id = 'selectedColor';
+    document.body.appendChild(colorInput);
+  }
+}
+
+// Call this function after DOM loads
+setTimeout(addMissingElements, 100);
+
+// ============ FIXED AUTH STATE HANDLER ============
+auth.onAuthStateChanged((user) => {
+  if (user) {
+    console.log("User is signed in:", user.uid);
+    
+    // If profile page is currently visible, refresh the data
+    if (document.getElementById("profilePage") && document.getElementById("profilePage").style.display === "block") {
+      loadUserProfileAndOrders();
+    }
+    
+    // Check if user was trying to checkout
+    const checkoutIntent = sessionStorage.getItem('checkoutIntent');
+    if (checkoutIntent === 'true') {
+      setTimeout(() => {
+        goToDetailsPage();
+        sessionStorage.removeItem('checkoutIntent');
+      }, 1000);
+    }
+  } else {
+    console.log("User is signed out");
+    // If profile page is visible and user logs out, update to guest view
+    if (document.getElementById("profilePage") && document.getElementById("profilePage").style.display === "block") {
+      showProfilePage();
+    }
+  }
+});
+
+// ============ EMERGENCY LOADING SCREEN FIX ============
+// If loading screen is still stuck after 8 seconds, force remove it
+
 
 // Modified profile page function to handle guest users
 
