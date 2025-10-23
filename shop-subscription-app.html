@@ -6475,10 +6475,6 @@ async function sendOTP() {
     .then(() => {
       showCartToast("Account created successfully!");
       
-      // Force refresh auth state
-      return auth.currentUser.reload();
-    })
-    .then(() => {
       // Check if user was trying to checkout
       const checkoutIntent = sessionStorage.getItem('checkoutIntent');
       if (checkoutIntent === 'true') {
