@@ -730,15 +730,23 @@
 }
 
 
-     .action-buttons-container {
-  position: sticky;
-  bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + var(--banner-gap) + 10px);
+.action-buttons-container {
+  position: fixed;
+  bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + var(--banner-gap) + 50px);
   background: white;
   padding: 15px 15px;
-  z-index: 10001;
+  z-index: 10002;
   border-top: 1px solid #f0f0f0;
+  width: 100%;
+  left: 0;
+  right: 0;
+  box-sizing: border-box;
 }
-
+     
+.scrolling-banner {
+  z-index: 9999;
+}
+     
  </style>
 </head>
 <body>
