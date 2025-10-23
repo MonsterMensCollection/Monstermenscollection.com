@@ -732,7 +732,7 @@
 
 .action-buttons-container {
   position: fixed;
-  bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + var(--banner-gap) + 20px );
+  bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + var(--banner-gap) + 25px );
   background: white;
   padding: 15px 15px;
   z-index: 10002;
@@ -746,6 +746,32 @@
 .scrolling-banner {
   z-index: 9999;
 }
+
+
+     /* Similar Products Styles */
+#similarProductsGrid .product-card {
+  background-color: #fff;
+  border-radius: 0px;
+  padding: 0px;
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+#similarProductsGrid .product-card img {
+  width: 130%;
+  height: auto;
+  border-radius: 0px;
+  cursor: pointer;
+}
+
+#similarProductsGrid .product-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  width: 100%;
+  row-gap: 12px;
+  column-gap: 0;
+}
+
      
  </style>
 </head>
@@ -4874,7 +4900,14 @@
     </button>
   </div>
 </div>
-  
+
+
+  <!-- Similar Products Section -->
+<div id="similarProductsSection" style="margin-top: 30px; display: none;">
+  <h3 style="text-align: left; margin-bottom: 15px; font-size: 18px; color: #333;">Similar Products</h3>
+  <div id="similarProductsGrid" class="product-grid" style="margin-top: 10px;"></div>
+</div>
+  <br>
   <br>
   <br>
   <br>
@@ -5766,7 +5799,10 @@ colorHidden.value = 'Same';
   document.getElementById("descriptionPage").style.display="block";
   window.scrollTo(0,0);
 
-  updateAllPrices();                            // keep everything in sync
+  updateAllPrices();     
+  
+  // NEW: Load similar products
+  await loadSimilarProducts(docId, category); // keep everything in sync
 }
 
 
@@ -5814,6 +5850,139 @@ function buyNow() {
   }, 800);
 }
 
+  async function loadSimilarProducts(currentDocId, currentCategory) {
+  const similarSection = document.getElementById("similarProductsSection");
+  const similarGrid = document.getElementById("similarProductsGrid");
+  
+  // Clear previous similar products
+  similarGrid.innerHTML = "";
+  similarSection.style.display = "none";
+  
+  try {
+    // Get current product brand/type for similarity matching
+    const currentTitle = document.getElementById("descName").textContent;
+    const currentBrand = currentTitle.split(' ')[0]; // Extract brand name
+    
+    // Get all products from the same category
+    const productsSnapshot = await db.collection("products")
+      .where("category", "==", currentCategory.replace("Page", ""))
+      .get();
+    
+    const similarProducts = [];
+    
+    productsSnapshot.forEach(doc => {
+      const productData = doc.data();
+      
+      // Skip the current product
+      if (doc.id === currentDocId) return;
+      
+      // Calculate similarity score
+      let similarityScore = 0;
+      
+      // Same brand = higher score
+      if (productData.title && productData.title.includes(currentBrand)) {
+        similarityScore += 3;
+      }
+      
+      // Similar price range = medium score
+      const currentPrice = parseFloat(document.getElementById("descPrice").dataset.basePrice);
+      const productPrice = productData.price || 0;
+      const priceDiff = Math.abs(currentPrice - productPrice);
+      if (priceDiff <= 100) {
+        similarityScore += 2;
+      }
+      
+      // Same sizes available = small score
+      if (productData.sizes && sizesAvailable) {
+        const commonSizes = sizesAvailable.filter(size => 
+          productData.sizes[size] > 0
+        );
+        if (commonSizes.length > 0) {
+          similarityScore += 1;
+        }
+      }
+      
+      if (similarityScore > 0) {
+        similarProducts.push({
+          id: doc.id,
+          data: productData,
+          score: similarityScore
+        });
+      }
+    });
+    
+    // Sort by similarity score and take top 4
+    similarProducts.sort((a, b) => b.score - a.score);
+    const topSimilar = similarProducts.slice(0, 4);
+    
+    if (topSimilar.length > 0) {
+      // Display similar products
+      topSimilar.forEach(product => {
+        const productCard = createSimilarProductCard(product);
+        similarGrid.appendChild(productCard);
+      });
+      
+      similarSection.style.display = "block";
+    }
+    
+  } catch (error) {
+    console.error("Error loading similar products:", error);
+  }
+}
+
+function createSimilarProductCard(product) {
+  const productData = product.data;
+  const card = document.createElement("div");
+  card.className = "product-card";
+  card.setAttribute("data-docid", product.id);
+  
+  card.innerHTML = `
+    <div class="image-wrapper">
+      <img src="${productData.images?.[0] || productData.image || 'https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/placeholder.jpg'}" 
+           alt="${productData.title}" 
+           onclick="showSimilarProductDescription('${product.id}')">
+    </div>
+    <div class="cardName">
+      <h3>${productData.brand || productData.title.split(' ')[0]}</h3>
+      <p>${productData.shortDescription || productData.title}</p>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:0 10px;">
+      <p class="price">₹${productData.price || 0}</p>
+    </div>
+  `;
+  
+  return card;
+}
+
+async function showSimilarProductDescription(docId) {
+  try {
+    const doc = await db.collection("products").doc(docId).get();
+    if (doc.exists) {
+      const productData = doc.data();
+      
+      // Convert product data to showDescription format
+      const media = (productData.images || [productData.image]).map(src => ({
+        type: 'image',
+        src: src
+      }));
+      
+      showDescription(
+        media,
+        productData.price || 0,
+        productData.title || "Product",
+        productData.shortDescription || "",
+        productData.description || "No description available",
+        Object.keys(productData.sizes || {}),
+        productData.colors || ["Same"],
+        productData.category ? productData.category + "Page" : "shirtsPage",
+        docId
+      );
+    }
+  } catch (error) {
+    console.error("Error loading similar product:", error);
+    showCartToast("Error loading product details");
+  }
+}
   
 /* overwrite the old function with this one */
 async function addToCart (image = null, priceUSD = null, title = null) {
