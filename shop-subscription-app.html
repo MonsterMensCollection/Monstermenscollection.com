@@ -6058,6 +6058,16 @@ function showSignupPage() {
         </button>
       </div>
 
+<!-- Add this after the OTP section in your signup page -->
+<div id="switchToLoginMessage" style="display:none; text-align: center; margin-top: 15px; padding: 10px; background-color: #f8f9fa; border-radius: 5px;">
+  <p style="margin: 0; color: #666; font-size: 14px;">
+    Mobile number already registered. 
+    <a href="#" onclick="event.preventDefault(); completeSwitchToLogin()" style="color: #007bff; text-decoration: underline; font-weight: bold;">
+      Click here to sign in
+    </a>
+  </p>
+</div>
+
       <div id="resendOtpSection" style="display:none; text-align: center; margin-top: 10px;">
         <p id="resendTimer" style="font-size: 14px; color: #666; margin: 5px 0;"></p>
         <button id="resendOtpBtn" onclick="resendOTP()" disabled
@@ -6078,6 +6088,13 @@ function showSignupPage() {
   signupPage.style.display = "block";
 }
 
+
+function completeSwitchToLogin() {
+  const mobile = document.getElementById("signupMobile").value.trim();
+  document.getElementById("loginMobile").value = mobile;
+  showLoginPage();
+}
+  
 let loginConfirmationResultGlobal = null;
 let loginOtpResendTimer = null;
 
@@ -6262,7 +6279,7 @@ function startResendTimer() {
 // Firebase OTP Send
 let confirmationResultGlobal = null;
 
-function sendOTP() {
+async function sendOTP() {
   const name = document.getElementById("signupName").value.trim();
   const mobile = document.getElementById("signupMobile").value.trim();
 
@@ -6276,14 +6293,39 @@ function sendOTP() {
     return;
   }
 
-  // Show OTP section immediately
+  // First check if user exists in Firestore
+  try {
+    const usersSnapshot = await db.collection("users")
+      .where("mobileNumber", "==", mobile)
+      .get();
+
+    if (!usersSnapshot.empty) {
+      // Mobile number exists, automatically switch to login with OTP
+      showCartToast("Mobile number exists. Signing you in...");
+      
+      // Pre-fill login form
+      document.getElementById("loginMobile").value = mobile;
+      
+      // Automatically trigger login OTP sending
+      showLoginPage();
+      
+      // Small delay to ensure login page is loaded, then trigger OTP
+      setTimeout(() => {
+        loginSendOTP();
+      }, 500);
+      
+      return;
+    }
+  } catch (error) {
+    console.error("Error checking user existence:", error);
+    // Continue with signup if there's an error checking
+  }
+
+  // Rest of the original signup OTP code remains the same...
   document.getElementById("otpSection").style.display = "block";
   document.getElementById("sendOtpBtn").style.display = "none";
-
-  // Start the resend timer immediately
   startResendTimer();
 
-  // Setup invisible recaptcha
   window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
     size: 'invisible'
   });
@@ -6298,13 +6340,9 @@ function sendOTP() {
     .catch((error) => {
       console.error(error);
       showCartToast("Error sending OTP: " + error.message);
-      
-      // If OTP fails, show the send button again
       document.getElementById("sendOtpBtn").style.display = "block";
       document.getElementById("otpSection").style.display = "none";
       document.getElementById("resendOtpSection").style.display = "none";
-      
-      // Clear any existing timer
       if (otpResendTimer) {
         clearInterval(otpResendTimer);
       }
