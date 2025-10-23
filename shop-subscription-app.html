@@ -6032,17 +6032,7 @@ function showSignupPage() {
         SEND OTP
       </button>
 
-      <div id="otpSuccessMessage" style="display: none; text-align: center; margin-top: 10px;">
-        <p style="color: green; font-size: 14px; margin: 0;">OTP sent successfully!</p>
-      </div>
-
-      <div id="resendOtpSection" style="display:none; text-align: center; margin-top: 10px;">
-        <p id="resendTimer" style="font-size: 14px; color: #666; margin: 5px 0;"></p>
-        <button id="resendOtpBtn" onclick="resendOTP()" disabled
-                style="background: none; border: none; color: #666; text-decoration: underline; font-size: 14px; cursor: pointer;">
-          Send OTP Again
-        </button>
-      </div>
+      
 
       <div id="otpSection" style="display:none; margin-top:15px;">
         <input type="text" id="otpCode" placeholder="Enter OTP"
@@ -6053,6 +6043,21 @@ function showSignupPage() {
         </button>
       </div>
 
+      
+<div id="otpSuccessMessage" style="display: none; text-align: center; margin-top: 10px;">
+        <p style="color: green; font-size: 14px; margin: 0;">OTP sent successfully!</p>
+        startResendTimer();
+      </div>
+
+      <div id="resendOtpSection" style="display:none; text-align: center; margin-top: 10px;">
+        <p id="resendTimer" style="font-size: 14px; color: #666; margin: 5px 0;"></p>
+        <button id="resendOtpBtn" onclick="resendOTP()" disabled
+                style="background: none; border: none; color: #666; text-decoration: underline; font-size: 14px; cursor: pointer;">
+          Send OTP Again
+        </button>
+      </div>
+
+      
       <p style="text-align: center; margin-top: 15px; font-size: 14px; color: #666;">
         Already have an account? 
         <a href="#" onclick="event.preventDefault(); showLoginPage()" style="color: #000; text-decoration: underline;">Sign in</a>
@@ -6164,10 +6169,9 @@ let confirmationResultGlobal = null;
   firebase.auth().signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier)
     .then((confirmationResult) => {
       confirmationResultGlobal = confirmationResult;
-      showCartToast("OTP sent successfully!");
       
       // After successfully sending OTP, start the resend timer
-      startResendTimer();
+      
     })
     .catch((error) => {
       console.error(error);
