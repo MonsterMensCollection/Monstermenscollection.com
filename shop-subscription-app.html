@@ -728,7 +728,19 @@
   text-decoration: underline;
   cursor: pointer;
 }
-  
+
+
+     .action-buttons-container {
+  position: sticky;
+  bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + var(--banner-gap) + 10px);
+  background: white;
+  padding: 15px 0;
+  margin-top: 20px;
+  z-index: 10001;
+  border-top: 1px solid #f0f0f0;
+}
+
+     
  </style>
 </head>
 <body>
@@ -4835,13 +4847,16 @@
 </div>
 
 <!-- Button Container with both Add to Cart and Buy Now -->
-<div style="display: flex; gap: 10px; margin-top: 15px;">
-  <button onclick="addToCart()" style="flex: 1; padding: 12px; background-color: #000; color: white; border: none; border-radius: 0px; cursor: pointer; font-size: 14px;">
-    Add to Cart
-  </button>
-  <button onclick="buyNow()" style="flex: 1; padding: 12px; background-color: #ff4444; color: white; border: none; border-radius: 0px; cursor: pointer; font-size: 14px; font-weight: bold;">
-    Buy Now
-  </button>
+<!-- Replace the current button container in description page with this -->
+<div class="action-buttons-container">
+  <div style="display: flex; gap: 10px; margin-top: 15px;">
+    <button onclick="addToCart()" style="flex: 1; padding: 12px; background-color: #000; color: white; border: none; border-radius: 0px; cursor: pointer; font-size: 14px;">
+      Add to Cart
+    </button>
+    <button onclick="buyNow()" style="flex: 1; padding: 12px; background-color: #ff4444; color: white; border: none; border-radius: 0px; cursor: pointer; font-size: 14px; font-weight: bold;">
+      Buy Now
+    </button>
+  </div>
 </div>
 
   <h3>Select Size:</h3>
