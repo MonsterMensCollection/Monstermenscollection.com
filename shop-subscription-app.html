@@ -5260,7 +5260,6 @@ function goToDetailsPage() {
   window.scrollTo(0, 0);
 }
 
-
 const launchDate = new Date("2025-11-01T00:00:00Z").getTime(); // Target UTC time
   const countdownEl = document.getElementById("countdown");
 
@@ -6177,6 +6176,18 @@ function loginVerifyOTP() {
       // Check if user was trying to checkout
       const checkoutIntent = sessionStorage.getItem('checkoutIntent');
       if (checkoutIntent === 'true') {
+        // Restore cart from session storage if needed
+        const pendingCart = sessionStorage.getItem('pendingCheckoutCart');
+        if (pendingCart) {
+          try {
+            cart = JSON.parse(pendingCart);
+            localStorage.setItem("cart", JSON.stringify(cart));
+          } catch (e) {
+            console.error("Error restoring cart:", e);
+          }
+          sessionStorage.removeItem('pendingCheckoutCart');
+        }
+        
         // Redirect back to checkout/details page
         setTimeout(() => {
           goToDetailsPage();
@@ -6390,7 +6401,19 @@ function verifyOTP() {
       // Check if user was trying to checkout
       const checkoutIntent = sessionStorage.getItem('checkoutIntent');
       if (checkoutIntent === 'true') {
-        // Redirect back to checkout/details page
+        // Restore cart from session storage if needed
+        const pendingCart = sessionStorage.getItem('pendingCheckoutCart');
+        if (pendingCart) {
+          try {
+            cart = JSON.parse(pendingCart);
+            localStorage.setItem("cart", JSON.stringify(cart));
+          } catch (e) {
+            console.error("Error restoring cart:", e);
+          }
+          sessionStorage.removeItem('pendingCheckoutCart');
+        }
+        
+        // Redirect to checkout/details page
         setTimeout(() => {
           goToDetailsPage();
           sessionStorage.removeItem('checkoutIntent');
@@ -7113,8 +7136,10 @@ function handleCheckout() {
     // User is not signed in, show signup page
     console.log("Showing signup page");
     
-    // Store checkout intent so we can redirect after auth
+    // Store checkout intent and current cart state
     sessionStorage.setItem('checkoutIntent', 'true');
+    sessionStorage.setItem('pendingCheckoutCart', JSON.stringify(cart));
+    
     showSignupPage();
   }
 }
@@ -7210,6 +7235,13 @@ document.addEventListener("DOMContentLoaded", function() {
       goToDetailsPage();
       sessionStorage.removeItem('checkoutIntent');
     }, 500);
+  }
+  // Clean up any stale session storage on page load
+  const checkoutIntent = sessionStorage.getItem('checkoutIntent');
+  if (checkoutIntent && !auth.currentUser) {
+    // User refreshed page during checkout flow but is not logged in
+    sessionStorage.removeItem('checkoutIntent');
+    sessionStorage.removeItem('pendingCheckoutCart');
   }
 });
 
