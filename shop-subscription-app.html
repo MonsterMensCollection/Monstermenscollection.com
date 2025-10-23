@@ -6043,11 +6043,6 @@ function showSignupPage() {
         </button>
       </div>
 
-      
-<div id="otpSuccessMessage" style="display: none; text-align: center; margin-top: 10px;">
-        <p style="color: green; font-size: 14px; margin: 0;">OTP sent successfully!</p>
-        startResendTimer();
-      </div>
 
       <div id="resendOtpSection" style="display:none; text-align: center; margin-top: 10px;">
         <p id="resendTimer" style="font-size: 14px; color: #666; margin: 5px 0;"></p>
@@ -6126,7 +6121,7 @@ function startResendTimer() {
 // Firebase OTP Send
 let confirmationResultGlobal = null;
 
-  function sendOTP() {
+function sendOTP() {
   const name = document.getElementById("signupName").value.trim();
   const mobile = document.getElementById("signupMobile").value.trim();
   const password = document.getElementById("signupPassword").value.trim();
@@ -6146,18 +6141,12 @@ let confirmationResultGlobal = null;
     return;
   }
 
-  // Show success message IMMEDIATELY after clicking send OTP
-  const otpSuccessMessage = document.getElementById("otpSuccessMessage");
-  otpSuccessMessage.style.display = "block";
-  
   // Show OTP section immediately
   document.getElementById("otpSection").style.display = "block";
   document.getElementById("sendOtpBtn").style.display = "none";
 
-  // Hide the success message after 3 seconds
-  setTimeout(() => {
-    otpSuccessMessage.style.display = "none";
-  }, 3000);
+  // Start the resend timer immediately
+  startResendTimer();
 
   // Setup invisible recaptcha
   window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
@@ -6169,9 +6158,6 @@ let confirmationResultGlobal = null;
   firebase.auth().signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier)
     .then((confirmationResult) => {
       confirmationResultGlobal = confirmationResult;
-      
-      // After successfully sending OTP, start the resend timer
-      
     })
     .catch((error) => {
       console.error(error);
