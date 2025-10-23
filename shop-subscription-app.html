@@ -4833,15 +4833,20 @@
     <p class="price" id="descPrice" style="font-size: 18px; color: #555; margin-right: 10px; text-align: right;">₹0</p>
   </div>
 </div>
- <div style="margin-top: 0px; text-align: right; margin-right:0%">
-    <button onclick="addToCart()">Add to Cart</button>
-  </div>
+
+<!-- Button Container with both Add to Cart and Buy Now -->
+<div style="display: flex; gap: 10px; margin-top: 15px;">
+  <button onclick="addToCart()" style="flex: 1; padding: 12px; background-color: #000; color: white; border: none; border-radius: 0px; cursor: pointer; font-size: 14px;">
+    Add to Cart
+  </button>
+  <button onclick="buyNow()" style="flex: 1; padding: 12px; background-color: #ff4444; color: white; border: none; border-radius: 0px; cursor: pointer; font-size: 14px; font-weight: bold;">
+    Buy Now
+  </button>
+</div>
+
   <h3>Select Size:</h3>
 <div id="sizeButtons" style="display: flex; border-radius: 0px; gap: 10px; margin: 10px 0;">
-  <option value="">-- Choose Size --</option>
-  <option value="M">M</option>
-  <option value="L">L</option>
-  <option value="XL">XL</option>
+  <!-- Size buttons will be dynamically added here -->
 </div>
 <br>
     <p id="descText" style="margin-top: 10px; font-size: 16px; color: #333; text-align: left;"></p> <!-- Product Description -->
@@ -5605,19 +5610,24 @@ btn.onclick = () => {
   // ❷ remember which size the user picked
   document.getElementById('selectedSize').value = sz;
 
-  // ❸ toggle the main “Add to Cart” button
-  const cartBtn = document.querySelector(
-    '#descriptionPage button[onclick="addToCart()"]'
-  );
+  // ❸ toggle both the "Add to Cart" and "Buy Now" buttons
+  const cartBtn = document.querySelector('#descriptionPage button[onclick="addToCart()"]');
+  const buyNowBtn = document.querySelector('#descriptionPage button[onclick="buyNow()"]');
 
-  if ((sizes[sz] ?? 0) === 0) {            // ← out-of-stock?
+  if ((sizes[sz] ?? 0) === 0) {
     cartBtn.textContent = 'Out of Stock';
-    cartBtn.disabled    = true;
-    cartBtn.style.opacity = .5;            // (optional) dim it
+    cartBtn.disabled = true;
+    cartBtn.style.opacity = 0.5;
+    buyNowBtn.textContent = 'Out of Stock';
+    buyNowBtn.disabled = true;
+    buyNowBtn.style.opacity = 0.5;
   } else {
     cartBtn.textContent = 'Add to Cart';
-    cartBtn.disabled    = false;
+    cartBtn.disabled = false;
     cartBtn.style.opacity = 1;
+    buyNowBtn.textContent = 'Buy Now';
+    buyNowBtn.disabled = false;
+    buyNowBtn.style.opacity = 1;
   }
 };
   sizeContainer.appendChild(btn);
@@ -5627,21 +5637,30 @@ btn.onclick = () => {
 updateStockUI(sizes);
 
   /* ---------- disable/enable cart button depending on inventory ---------- */
- const totalStock = sizesAvailable.reduce(
-   (sum, sz) => sum + (sizes[sz] || 0), 0
- );
- const cartBtn = document.querySelector(
-   '#descriptionPage button[onclick="addToCart()"]'
- );
+const totalStock = sizesAvailable.reduce(
+  (sum, sz) => sum + (sizes[sz] || 0), 0
+);
+const cartBtn = document.querySelector(
+  '#descriptionPage button[onclick="addToCart()"]'
+);
+const buyNowBtn = document.querySelector(
+  '#descriptionPage button[onclick="buyNow()"]'
+);
 
 if (totalStock === 0) {
-   cartBtn.textContent = 'Out of Stock';
-   cartBtn.disabled    = true;
-   cartBtn.style.opacity = 0.5;
- } else {
-     cartBtn.textContent = 'Select Size';
-  cartBtn.disabled    = true;    // keep it inactive for now
-  cartBtn.style.opacity = 0.6;   // a little dimmed
+  cartBtn.textContent = 'Out of Stock';
+  cartBtn.disabled = true;
+  cartBtn.style.opacity = 0.5;
+  buyNowBtn.textContent = 'Out of Stock';
+  buyNowBtn.disabled = true;
+  buyNowBtn.style.opacity = 0.5;
+} else {
+  cartBtn.textContent = 'Add to Cart';
+  cartBtn.disabled = true;    // keep it inactive until size is selected
+  cartBtn.style.opacity = 0.6;
+  buyNowBtn.textContent = 'Buy Now';
+  buyNowBtn.disabled = true;  // keep it inactive until size is selected
+  buyNowBtn.style.opacity = 0.6;
 }
   
   /* ----- guarantee a <input hidden id="selectedSize"> exists ----- */
@@ -5726,6 +5745,52 @@ colorHidden.value = 'Same';
   updateAllPrices();                            // keep everything in sync
 }
 
+
+function buyNow() {
+  /* ── 0 · prelim checks ─────────────────────────────────────────── */
+  const docId = document.getElementById("descName").dataset.docid;
+  const size = document.getElementById("selectedSize")?.value || "";
+
+  if (!size) {
+    alert("Please select a size");
+    return;
+  }
+
+  /* ── 1 · check stock availability ──────────────────────────────── */
+  const stock = liveStock[docId] || {};
+  const avail = stock[size] ?? 0;
+
+  if (avail === 0) {
+    alert("Sorry, this size is out of stock.");
+    return;
+  }
+
+  /* ── 2 · gather product details ────────────────────────────────── */
+  const image = document.getElementById("descImage").src;
+  const title = document.getElementById("descName").innerText;
+  const color = document.getElementById("selectedColor")?.value || "Same";
+  const priceUSD = toNumber(document.getElementById("descPrice").dataset.basePrice);
+
+  /* ── 3 · clear cart and add only this item ─────────────────────── */
+  cart = [{
+    image,
+    price: priceUSD,
+    title,
+    size,
+    color,
+    docId
+  }];
+
+  /* ── 4 · proceed directly to checkout ──────────────────────────── */
+  showCartToast("Proceeding to checkout...");
+  
+  // Small delay to show the toast message
+  setTimeout(() => {
+    handleCheckout();
+  }, 800);
+}
+
+  
 /* overwrite the old function with this one */
 async function addToCart (image = null, priceUSD = null, title = null) {
 
