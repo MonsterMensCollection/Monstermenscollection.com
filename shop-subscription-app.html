@@ -6262,13 +6262,13 @@ function loginVerifyOTP() {
           sessionStorage.removeItem('pendingCheckoutCart');
         }
         
-        // ✅ FIX: Redirect back to checkout/details page instead of profile
+        // Redirect back to checkout/details page
         setTimeout(() => {
-          goToDetailsPage(); // This goes to checkout page
+          goToDetailsPage();
           sessionStorage.removeItem('checkoutIntent');
         }, 1000);
       } else {
-        // Default behavior - go to profile (only for regular logins)
+        // Default behavior - go to profile
         showProfilePage();
       }
     })
@@ -6469,7 +6469,7 @@ function verifyOTP() {
           email: user.email || "",
           createdAt: firebase.firestore.FieldValue.serverTimestamp(),
           lastLogin: firebase.firestore.FieldValue.serverTimestamp()
-        }, { merge: true });
+        }, { merge: true }); // Use merge to avoid overwriting existing data
       });
     })
     .then(() => {
@@ -6494,13 +6494,13 @@ function verifyOTP() {
           sessionStorage.removeItem('pendingCheckoutCart');
         }
         
-        // ✅ FIX: Redirect back to checkout/details page instead of profile
+        // Redirect to checkout/details page
         setTimeout(() => {
-          goToDetailsPage(); // This goes to checkout page
+          goToDetailsPage();
           sessionStorage.removeItem('checkoutIntent');
         }, 1000);
       } else {
-        // Default behavior - go to profile (only for regular signups)
+        // Default behavior - go to profile
         showProfilePage();
       }
     })
@@ -6509,6 +6509,7 @@ function verifyOTP() {
       showCartToast("Invalid OTP or error: " + error.message);
     });
 }
+
 // Authentication functions
 // Replace the createAccount function
 
