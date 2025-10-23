@@ -6135,13 +6135,14 @@ function loginSendOTP() {
   // Start the resend timer immediately
   loginStartResendTimer();
 
-  // Setup invisible recaptcha
-  window.loginRecaptchaVerifier = new firebase.auth.RecaptchaVerifier('loginRecaptchaContainer', {
-    size: 'invisible'
-  });
-
   const phoneNumber = "+91" + mobile;
 
+  // Create invisible reCAPTCHA
+  window.loginRecaptchaVerifier = new firebase.auth.RecaptchaVerifier('loginRecaptchaContainer', {
+    'size': 'invisible'
+  });
+
+  // Send OTP directly
   firebase.auth().signInWithPhoneNumber(phoneNumber, window.loginRecaptchaVerifier)
     .then((confirmationResult) => {
       loginConfirmationResultGlobal = confirmationResult;
@@ -6149,16 +6150,71 @@ function loginSendOTP() {
     })
     .catch((error) => {
       console.error(error);
-      showCartToast("Error sending OTP: " + error.message);
       
-      // If OTP fails, show the send button again
-      document.getElementById("loginSendOtpBtn").style.display = "block";
-      document.getElementById("loginOtpSection").style.display = "none";
-      document.getElementById("loginResendOtpSection").style.display = "none";
+      // If there's a reCAPTCHA challenge, you might need to handle it
+      if (error.code === 'auth/recaptcha-not-enabled') {
+        // Try alternative approach
+        sendOTPDirectly(phoneNumber, 'login');
+      } else {
+        showCartToast("Error sending OTP: " + error.message);
+        
+        document.getElementById("loginSendOtpBtn").style.display = "block";
+        document.getElementById("loginOtpSection").style.display = "none";
+        document.getElementById("loginResendOtpSection").style.display = "none";
+        
+        if (loginOtpResendTimer) {
+          clearInterval(loginOtpResendTimer);
+        }
+      }
+    });
+}
+
+// Fallback function for direct OTP sending
+function sendOTPDirectly(phoneNumber, type) {
+  // This would require backend implementation
+  // You'd need to create a Cloud Function to send OTP without client-side reCAPTCHA
+  showCartToast("Please contact support for OTP verification");
+}
+
+// Helper function to send OTP after reCAPTCHA
+function sendOTPAfterRecaptcha(phoneNumber, type) {
+  const appVerifier = type === 'login' ? window.loginRecaptchaVerifier : window.recaptchaVerifier;
+  
+  firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
+    .then((confirmationResult) => {
+      if (type === 'login') {
+        loginConfirmationResultGlobal = confirmationResult;
+      } else {
+        confirmationResultGlobal = confirmationResult;
+      }
+      showCartToast("OTP sent successfully!");
+    })
+    .catch((error) => {
+      console.error("OTP sending error:", error);
+      
+      // Handle specific error cases
+      if (error.code === 'auth/too-many-requests') {
+        showCartToast("Too many attempts. Please try again later.");
+      } else {
+        showCartToast("Error sending OTP: " + error.message);
+      }
+      
+      // Show the send button again
+      if (type === 'login') {
+        document.getElementById("loginSendOtpBtn").style.display = "block";
+        document.getElementById("loginOtpSection").style.display = "none";
+        document.getElementById("loginResendOtpSection").style.display = "none";
+      } else {
+        document.getElementById("sendOtpBtn").style.display = "block";
+        document.getElementById("otpSection").style.display = "none";
+        document.getElementById("resendOtpSection").style.display = "none";
+      }
       
       // Clear any existing timer
-      if (loginOtpResendTimer) {
+      if (type === 'login' && loginOtpResendTimer) {
         clearInterval(loginOtpResendTimer);
+      } else if (otpResendTimer) {
+        clearInterval(otpResendTimer);
       }
     });
 }
@@ -6362,32 +6418,29 @@ async function sendOTP() {
     // Continue with signup if there's an error checking
   }
 
-  // Rest of the original signup OTP code remains the same...
+  // Rest of the signup flow
   document.getElementById("otpSection").style.display = "block";
   document.getElementById("sendOtpBtn").style.display = "none";
   startResendTimer();
 
-  window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-    size: 'invisible'
-  });
-
   const phoneNumber = "+91" + mobile;
 
-  firebase.auth().signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier)
-    .then((confirmationResult) => {
-      confirmationResultGlobal = confirmationResult;
-      showCartToast("OTP sent successfully!");
-    })
-    .catch((error) => {
-      console.error(error);
-      showCartToast("Error sending OTP: " + error.message);
-      document.getElementById("sendOtpBtn").style.display = "block";
-      document.getElementById("otpSection").style.display = "none";
-      document.getElementById("resendOtpSection").style.display = "none";
-      if (otpResendTimer) {
-        clearInterval(otpResendTimer);
-      }
-    });
+  // Use invisible reCAPTCHA for signup as well
+  window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+    'size': 'invisible',
+    'callback': function(response) {
+      sendOTPAfterRecaptcha(phoneNumber, 'signup');
+    }
+  });
+
+  // Execute the reCAPTCHA automatically
+  window.recaptchaVerifier.verify().then(() => {
+    // This will trigger the callback above
+  }).catch((error) => {
+    console.error("reCAPTCHA error:", error);
+    // Fallback: try to send OTP directly
+    sendOTPAfterRecaptcha(phoneNumber, 'signup');
+  });
 }
 
 
