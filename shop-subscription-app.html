@@ -5850,7 +5850,7 @@ function buyNow() {
   }, 800);
 }
 
-  async function loadSimilarProducts(currentDocId, currentCategory) {
+async function loadSimilarProducts(currentDocId, currentCategory) {
   const similarSection = document.getElementById("similarProductsSection");
   const similarGrid = document.getElementById("similarProductsGrid");
   
@@ -5859,13 +5859,23 @@ function buyNow() {
   similarSection.style.display = "none";
   
   try {
-    // Get current product brand/type for similarity matching
+    // Convert page ID to category name
+    let categoryName = "";
+    switch(currentCategory) {
+      case "shirtsPage": categoryName = "shirts"; break;
+      case "tshirtsPage": categoryName = "tshirts"; break;
+      case "pantsPage": categoryName = "pants"; break;
+      case "cargosPage": categoryName = "cargos"; break;
+      default: categoryName = "shirts";
+    }
+    
+    // Get current product title for brand extraction
     const currentTitle = document.getElementById("descName").textContent;
     const currentBrand = currentTitle.split(' ')[0]; // Extract brand name
     
     // Get all products from the same category
     const productsSnapshot = await db.collection("products")
-      .where("category", "==", currentCategory.replace("Page", ""))
+      .where("category", "==", categoryName)
       .get();
     
     const similarProducts = [];
@@ -5892,12 +5902,10 @@ function buyNow() {
         similarityScore += 2;
       }
       
-      // Same sizes available = small score
-      if (productData.sizes && sizesAvailable) {
-        const commonSizes = sizesAvailable.filter(size => 
-          productData.sizes[size] > 0
-        );
-        if (commonSizes.length > 0) {
+      // Any available stock = small score
+      if (productData.sizes) {
+        const hasStock = Object.values(productData.sizes).some(qty => qty > 0);
+        if (hasStock) {
           similarityScore += 1;
         }
       }
@@ -5910,6 +5918,20 @@ function buyNow() {
         });
       }
     });
+    
+    // If no similar products found by score, get random products from same category
+    if (similarProducts.length === 0) {
+      productsSnapshot.forEach(doc => {
+        const productData = doc.data();
+        if (doc.id !== currentDocId) {
+          similarProducts.push({
+            id: doc.id,
+            data: productData,
+            score: 0 // Random products get score 0
+          });
+        }
+      });
+    }
     
     // Sort by similarity score and take top 4
     similarProducts.sort((a, b) => b.score - a.score);
@@ -5927,6 +5949,8 @@ function buyNow() {
     
   } catch (error) {
     console.error("Error loading similar products:", error);
+    // Fallback: show a message or hide the section
+    similarSection.style.display = "none";
   }
 }
 
@@ -5936,15 +5960,25 @@ function createSimilarProductCard(product) {
   card.className = "product-card";
   card.setAttribute("data-docid", product.id);
   
+  // Use the first image or a placeholder
+  const imageUrl = productData.images && productData.images.length > 0 
+    ? productData.images[0] 
+    : productData.image 
+    ? productData.image 
+    : 'https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/placeholder.jpg';
+  
+  // Create a simple media array for the showDescription function
+  const mediaArray = [{ type: 'image', src: imageUrl }];
+  
   card.innerHTML = `
     <div class="image-wrapper">
-      <img src="${productData.images?.[0] || productData.image || 'https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/placeholder.jpg'}" 
-           alt="${productData.title}" 
+      <img src="${imageUrl}" 
+           alt="${productData.title || 'Product'}" 
            onclick="showSimilarProductDescription('${product.id}')">
     </div>
     <div class="cardName">
-      <h3>${productData.brand || productData.title.split(' ')[0]}</h3>
-      <p>${productData.shortDescription || productData.title}</p>
+      <h3>${productData.brand || (productData.title ? productData.title.split(' ')[0] : 'Product')}</h3>
+      <p>${productData.shortDescription || productData.title || 'Product Description'}</p>
     </div>
     <div style="display:flex;justify-content:space-between;align-items:center;padding:0 10px;">
       <p class="price">₹${productData.price || 0}</p>
@@ -5961,10 +5995,23 @@ async function showSimilarProductDescription(docId) {
       const productData = doc.data();
       
       // Convert product data to showDescription format
-      const media = (productData.images || [productData.image]).map(src => ({
-        type: 'image',
-        src: src
-      }));
+      const media = [];
+      if (productData.images && productData.images.length > 0) {
+        productData.images.forEach(src => {
+          media.push({ type: 'image', src: src });
+        });
+      } else if (productData.image) {
+        media.push({ type: 'image', src: productData.image });
+      } else {
+        // Fallback placeholder
+        media.push({ type: 'image', src: 'https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/placeholder.jpg' });
+      }
+      
+      // Determine category page
+      let categoryPage = "shirtsPage";
+      if (productData.category) {
+        categoryPage = productData.category + "Page";
+      }
       
       showDescription(
         media,
@@ -5974,9 +6021,11 @@ async function showSimilarProductDescription(docId) {
         productData.description || "No description available",
         Object.keys(productData.sizes || {}),
         productData.colors || ["Same"],
-        productData.category ? productData.category + "Page" : "shirtsPage",
+        categoryPage,
         docId
       );
+    } else {
+      showCartToast("Product not found");
     }
   } catch (error) {
     console.error("Error loading similar product:", error);
