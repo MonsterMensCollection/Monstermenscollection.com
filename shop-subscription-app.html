@@ -4956,79 +4956,53 @@
   <!-- Logo -->
   <img src="https://see.fontimg.com/api/rf5/woG33/N2Y3Y2RhYTdiOGMwNGVjOGE5MWE1MTFiNGJjM2E4Y2Iub3Rm/UFJPRklMRQ/redtrap-expanded-puo.png?r=fs&h=30&w=1000&fg=000000&bg=FFFFFF&tb=1&s=30" style="display: block; margin-left: auto; margin-right: auto;"><br><br>
 
-  <!-- Profile Info Section -->
-  <div style="width: 100%; background-color: #f9f9f9; padding: 20px; border-radius: 0px; box-sizing: border-box; margin-bottom: 20px;">
-    <h3 style="margin-top: 0; margin-bottom: 15px; font-size: 18px; color: #333; border-bottom: 1px solid #ddd; padding-bottom: 10px;">Profile Information</h3>
-    
-    <div style="display: flex; flex-direction: column; gap: 15px;">
-      <div>
-        <label style="font-size: 14px; color: #777; display: block; margin-bottom: 5px;">Full Name</label>
-        <div id="profileName" style="font-size: 16px; font-weight: bold; color: #333; padding: 8px 0; border-bottom: 1px solid #eee;">Loading...</div>
-      </div>
-      
-      <div>
-        <label style="font-size: 14px; color: #777; display: block; margin-bottom: 5px;">Mobile Number</label>
-        <div id="profileMobile" style="font-size: 16px; font-weight: bold; color: #333; padding: 8px 0; border-bottom: 1px solid #eee;">Loading...</div>
-      </div>
-      
-      <div>
-        <label style="font-size: 14px; color: #777; display: block; margin-bottom: 5px;">Email Address</label>
-        <div id="profileEmail" style="font-size: 16px; color: #333; padding: 8px 0; border-bottom: 1px solid #eee;">Loading...</div>
-      </div>
-      
-      <div>
-        <label style="font-size: 14px; color: #777; display: block; margin-bottom: 5px;">Member Since</label>
-        <div id="profileJoinDate" style="font-size: 14px; color: #666; padding: 8px 0;">Loading...</div>
-      </div>
-    </div>
+  <!-- Profile Info -->
+  <div style="width: 100%; background-color: #f9f9f9; padding: 15px 20px; border-radius: 0px; box-sizing: border-box;">
+  <div style="margin-bottom: 15px;">
+    <label style="font-size: 14px; color: #777;">Name</label>
+    <div id="profileName" style="font-size: 18px; font-weight: bold; color: #333;">Loading...</div>
+  </div>
+  <div>
+    <label style="font-size: 14px; color: #777;">Mobile Number</label>
+    <div id="profileMobile" style="font-size: 18px; font-weight: bold; color: #333;">Loading...</div>
+  </div>
+</div>
+  
+  <div style="display: none;">
+    <label for="currencySelector" style="font-size: 14px; color: #777; white-space: nowrap;">
+      Currency
+    </label>
+    <select id="currencySelector" style="flex: 1 1 auto; padding: 10px 12px; border: 0px solid #ccc; border-radius: 0; background: #fafafa; font-size: 16px; font-weight: 600; color: #333;">
+      <option value="INR">₹ INR</option>
+    </select>
   </div>
 
-  <!-- Edit Profile Button -->
-  <button onclick="editProfile()" style="margin-bottom: 20px; padding: 12px 20px; background-color: #000; color: white; border: none; border-radius: 0px; cursor: pointer; font-weight: bold; width: 100%;">
-    Edit Profile
-  </button>
-
   <!-- About Us Button -->
-  <button onclick="toggleWhyTime()" style="margin-bottom: 20px; padding: 12px 20px; background-color: #eee; color: #000; border: none; border-radius: 0px; cursor: pointer; font-weight: bold; width: 100%;">
+  <button onclick="toggleWhyTime()" style="margin-top: 30px; padding: 12px 20px; background-color: #eee; color: #000; border: none; border-radius: 0px; cursor: pointer; font-weight: bold; width: 100%;">
     About Us
   </button>
 
   <!-- Hidden Explanation Text -->
-  <div id="whyTimeMessage" style="max-height: 0; overflow: hidden; transition: max-height 0.5s ease-out, padding 0.5s ease-out; background-color: #f0f0f0; border-left: 4px solid #000; font-size: 14px; line-height: 1.6; color: #333; padding: 0 15px; margin-bottom: 20px;">
+  <div id="whyTimeMessage" style="max-height: 0; overflow: hidden; transition: max-height 0.5s ease-out, padding 0.5s ease-out; background-color: #f0f0f0; border-left: 4px solid #000; font-size: 14px; line-height: 1.6; color: #333; padding: 0 15px;">
     <div style="padding-top: 15px; padding-bottom: 15px;">
       I'm a dropout with a crazy love for streetwear and formal fits. Out of that passion, I started Enly—a space where style meets attitude. We mix street energy with sharp classics, built for guys who want to stand out and keep it real.
     </div>
   </div>
 
-  <!-- Orders Section -->
-  <div style="margin-top: 20px;">
-    <h3 style="font-size: 20px; color: #000; margin-bottom: 15px; border-bottom: 1px solid #ddd; padding-bottom: 10px;">Your Orders</h3>
-    <div id="orderList" style="margin-top: 10px; background: #FFFFFF; border-radius: 0px; color: #333; max-height: 400px; overflow-y: auto;">
-      <div style="text-align: center; padding: 30px; color: #777;">
-        <img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/shopping-bag.png" width="60" alt="No Orders" style="opacity: 0.5; margin-bottom: 10px;" />
-        <p>No orders yet</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Order Statistics -->
-  <div id="orderStats" style="display: none; margin-top: 15px; background: #f8f9fa; padding: 15px; border-radius: 0px; text-align: center;">
-    <div style="display: flex; justify-content: space-around;">
-      <div>
-        <div style="font-size: 24px; font-weight: bold; color: #000;" id="totalOrders">0</div>
-        <div style="font-size: 12px; color: #666;">Total Orders</div>
-      </div>
-      <div>
-        <div style="font-size: 24px; font-weight: bold; color: #28a745;" id="totalSpent">₹0</div>
-        <div style="font-size: 12px; color: #666;">Total Spent</div>
-      </div>
-    </div>
-  </div>
-
   <!-- Logout Button -->
-  <button onclick="logout()" style="margin-top: 30px; padding: 12px 20px; background-color: #000; color: white; border: none; border-radius: 0px; cursor: pointer; font-weight: bold; width: 100%;">
+  <button onclick="logout()" style="margin-top: 20px; padding: 12px 20px; background-color: #000; color: white; border: none; border-radius: 0px; cursor: pointer; font-weight: bold; width: 100%;">
     Logout
   </button>
+
+  <!-- Orders Section -->
+  <div style="margin-top: 30px;">
+    <h3 style="font-size: 20px; color: #000;">Your Orders</h3>
+    <div id="orderList" style="margin-top: 10px; background: #FFFFFF; padding: 10px; border-radius: 0px; color: #333;">
+      <div style="text-align: center; padding: 20px; color: #777;">
+        Loading your orders...
+      </div>
+    </div>
+  </div>
 
   <br><br><br><br><br>
 </div>
@@ -6842,59 +6816,30 @@ function showProfilePage() {
   loadUserProfileAndOrders();
 }
 
-// Enhanced profile loading function
 function loadUserProfileAndOrders() {
   const user = auth.currentUser;
-  if (!user) {
-    // Show guest view
-    document.getElementById("profileName").textContent = "Guest User";
-    document.getElementById("profileMobile").textContent = "Not signed in";
-    document.getElementById("profileEmail").textContent = "Not signed in";
-    document.getElementById("profileJoinDate").textContent = "Not available";
-    document.getElementById("orderStats").style.display = "none";
-    return;
-  }
+  if (!user) return;
 
-  // Update basic user info
-  document.getElementById("profileEmail").textContent = user.email || "Not available";
-  
-  // Try to get detailed user data from Firestore
+  // Try to get user data from Firestore
   db.collection("users").doc(user.uid).get().then((doc) => {
+    let name = "Not available";
+    let mobileNumber = "Not available";
+    
     if (doc.exists) {
       const userData = doc.data();
-      
-      // Name with fallbacks
-      const name = userData.name || user.displayName || "Not set";
-      document.getElementById("profileName").textContent = name;
-      
-      // Mobile number
-      const mobile = userData.mobileNumber || "Not set";
-      document.getElementById("profileMobile").textContent = mobile;
-      
-      // Join date
-      if (userData.createdAt) {
-        const joinDate = userData.createdAt.toDate ? 
-          userData.createdAt.toDate().toLocaleDateString('en-IN') : 
-          new Date(userData.createdAt).toLocaleDateString('en-IN');
-        document.getElementById("profileJoinDate").textContent = joinDate;
-      } else {
-        document.getElementById("profileJoinDate").textContent = "Recent";
-      }
-    } else {
-      // Fallback to auth user data
-      document.getElementById("profileName").textContent = user.displayName || "Not set";
-      document.getElementById("profileMobile").textContent = "Not set";
-      document.getElementById("profileJoinDate").textContent = "Recent";
+      name = userData.name || "Not available";
+      mobileNumber = userData.mobileNumber || "Not available";
     }
+    
+    document.getElementById("profileName").textContent = name;
+    document.getElementById("profileMobile").textContent = mobileNumber;
   }).catch((error) => {
     console.error("Error loading user profile:", error);
-    // Fallback values
     document.getElementById("profileName").textContent = user.displayName || "Not available";
     document.getElementById("profileMobile").textContent = "Not available";
-    document.getElementById("profileJoinDate").textContent = "Recent";
   });
 
-  // Load user orders and statistics
+  // Load user orders
   loadUserOrders();
 }
 
@@ -6902,21 +6847,12 @@ function loadUserOrders() {
   const user = auth.currentUser;
   if (!user) {
     const orderList = document.getElementById("orderList");
-    orderList.innerHTML = `
-      <div style="text-align: center; padding: 40px; color: #777;">
-        <img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/shopping-bag.png" width="60" alt="Sign In" style="opacity: 0.5; margin-bottom: 10px;" />
-        <p>Sign in to view order history</p>
-      </div>
-    `;
-    document.getElementById("orderStats").style.display = "none";
+    orderList.innerHTML = "<div style='text-align: center; padding: 20px; color: #777;'>Sign in to view order history</div>";
     return;
   }
   
   const orderList = document.getElementById("orderList");
-  orderList.innerHTML = "<div style='text-align: center; padding: 30px; color: #777;'>Loading your orders...</div>";
-  
-  let totalOrders = 0;
-  let totalSpent = 0;
+  orderList.innerHTML = "<div style='text-align: center; padding: 20px; color: #777;'>Loading your orders...</div>";
   
   db.collection("orders")
     .where("uid", "==", user.uid)
@@ -6924,151 +6860,110 @@ function loadUserOrders() {
     .get()
     .then((querySnapshot) => {
       orderList.innerHTML = "";
-      totalOrders = querySnapshot.size;
       
       if (querySnapshot.empty) {
-        orderList.innerHTML = `
-          <div style="text-align: center; padding: 40px; color: #777;">
-            <img src="https://raw.githubusercontent.com/MonsterMensCollection/Ads/refs/heads/main/shopping-bag.png" width="60" alt="No Orders" style="opacity: 0.5; margin-bottom: 10px;" />
-            <p>No orders yet</p>
-            <p style="font-size: 12px; margin-top: 10px;">Start shopping to see your orders here</p>
-          </div>
-        `;
-        document.getElementById("orderStats").style.display = "none";
+        orderList.innerHTML = "<div style='text-align: center; padding: 20px; color: #777;'>No orders yet</div>";
         return;
       }
       
       querySnapshot.forEach((doc) => {
         const order = doc.data();
-        totalSpent += (order.total || order.totalUSD || 0);
+        const orderItem = document.createElement("div");
+        orderItem.style.padding = "15px";
+        orderItem.style.borderBottom = "1px solid #eee";
+        orderItem.style.marginBottom = "10px";
+        orderItem.style.backgroundColor = "#f9f9f9";
+        orderItem.style.borderRadius = "8px";
         
-        const orderItem = createOrderItem(order, doc.id);
+        // Debug logging
+        console.log("Order data:", order);
+        
+        // Format order items safely
+        let itemsList = "No items";
+        if (order.cart && Array.isArray(order.cart)) {
+          itemsList = order.cart.map(item => {
+            const itemName = item.title || "Unknown Item";
+            const itemSize = item.size || 'N/A';
+            const itemPrice = item.price ? format(convert(item.price)) : '₹0';
+            return `${itemName} (${itemSize})`;
+          }).join(', ');
+        }
+        
+        // Format date safely
+        let orderDate = "Recent";
+        if (order.timestamp) {
+          try {
+            // Handle both Firestore timestamp and regular date
+            if (order.timestamp.toDate) {
+              orderDate = order.timestamp.toDate().toLocaleDateString('en-IN', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+              });
+            } else if (order.timestamp instanceof Date) {
+              orderDate = order.timestamp.toLocaleDateString('en-IN', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+              });
+            }
+          } catch (e) {
+            console.error("Error formatting date:", e);
+          }
+        }
+        
+        // Format order number
+        const orderNumber = order.orderNumber || `ORD-${doc.id.slice(-8)}`;
+        
+        // Format total amount
+        const totalAmount = order.total ? format(convert(order.total)) : 
+                           order.totalUSD ? format(convert(order.totalUSD)) : '₹0';
+        
+        // Format status with color
+        const status = order.status || 'Processing';
+        let statusColor = 'orange'; // default for Processing
+        if (status === 'Delivered') statusColor = 'green';
+        if (status === 'Cancelled') statusColor = 'red';
+        if (status === 'Shipped') statusColor = 'blue';
+        
+        // Format payment info
+        const paymentMode = order.paymentMode || 'N/A';
+        let paymentIdDisplay = '';
+        if (order.paymentId && order.paymentId !== 'COD') {
+          paymentIdDisplay = ` (ID: ${order.paymentId.slice(-8)})`;
+        }
+        
+        orderItem.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+            <strong style="font-size: 16px;">Order #${orderNumber}</strong>
+            <span style="font-size: 14px; color: #666;">${orderDate}</span>
+          </div>
+          <div style="margin-bottom: 8px;">
+            <strong>Items:</strong> ${itemsList}
+          </div>
+          <div style="margin-bottom: 8px;">
+            <strong>Total:</strong> ${totalAmount}
+          </div>
+          <div style="margin-bottom: 8px;">
+          </div>
+          <div>
+            <strong>Payment:</strong> ${paymentMode}
+          </div>
+        `;
+        
         orderList.appendChild(orderItem);
       });
-      
-      // Update statistics
-      updateOrderStats(totalOrders, totalSpent);
-      
     })
     .catch((error) => {
       console.error("Error loading orders:", error);
-      orderList.innerHTML = `
-        <div style="text-align: center; padding: 30px; color: #777;">
-          <p>Error loading orders</p>
-          <p style="font-size: 12px; margin-top: 5px;">Please try again later</p>
-        </div>
-      `;
-      document.getElementById("orderStats").style.display = "none";
+      orderList.innerHTML = "<div style='text-align: center; padding: 20px; color: #777;'>Error loading orders. Please try again.</div>";
     });
 }
 
-// Helper function to create order item
-function createOrderItem(order, docId) {
-  const orderItem = document.createElement("div");
-  orderItem.style.padding = "15px";
-  orderItem.style.borderBottom = "1px solid #eee";
-  orderItem.style.marginBottom = "10px";
-  orderItem.style.backgroundColor = "#f9f9f9";
-  orderItem.style.borderRadius = "8px";
-  
-  // Format order items
-  let itemsList = "No items";
-  let itemsCount = 0;
-  if (order.cart && Array.isArray(order.cart)) {
-    itemsCount = order.cart.length;
-    itemsList = order.cart.map(item => {
-      const itemName = item.title || "Unknown Item";
-      const itemSize = item.size || 'N/A';
-      return `${itemName} (${itemSize})`;
-    }).join(', ');
-  }
-  
-  // Format date
-  let orderDate = "Recent";
-  if (order.timestamp) {
-    try {
-      if (order.timestamp.toDate) {
-        orderDate = order.timestamp.toDate().toLocaleDateString('en-IN', {
-          year: 'numeric',
-          month: 'short',
-          day: 'numeric'
-        });
-      } else if (order.timestamp instanceof Date) {
-        orderDate = order.timestamp.toLocaleDateString('en-IN', {
-          year: 'numeric',
-          month: 'short',
-          day: 'numeric'
-        });
-      }
-    } catch (e) {
-      console.error("Error formatting date:", e);
-    }
-  }
-  
-  // Format order number
-  const orderNumber = order.orderNumber || `ORD-${docId.slice(-8)}`;
-  
-  // Format total amount
-  const totalAmount = order.total ? format(convert(order.total)) : 
-                     order.totalUSD ? format(convert(order.totalUSD)) : '₹0';
-  
-  // Status with color
-  const status = order.status || 'Processing';
-  let statusColor = '#ff9800'; // orange for Processing
-  if (status === 'Delivered') statusColor = '#4caf50';
-  if (status === 'Cancelled') statusColor = '#f44336';
-  if (status === 'Shipped') statusColor = '#2196f3';
-  
-  // Payment info
-  const paymentMode = order.paymentMode || 'N/A';
-  
-  orderItem.innerHTML = `
-    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-      <div>
-        <strong style="font-size: 16px;">Order #${orderNumber}</strong>
-        <div style="font-size: 12px; color: #666; margin-top: 2px;">${itemsCount} item${itemsCount !== 1 ? 's' : ''}</div>
-      </div>
-      <span style="font-size: 14px; color: #666;">${orderDate}</span>
-    </div>
-    
-    <div style="margin-bottom: 8px;">
-      <strong>Items:</strong> ${itemsList}
-    </div>
-    
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-      <div>
-        <strong>Total:</strong> ${totalAmount}
-      </div>
-      <span style="background-color: ${statusColor}; color: white; padding: 4px 8px; border-radius: 12px; font-size: 12px;">
-        ${status}
-      </span>
-    </div>
-    
-    <div style="font-size: 14px; color: #666;">
-      <strong>Payment:</strong> ${paymentMode}
-    </div>
-  `;
-  
-  return orderItem;
-}
-
-  // Update order statistics
-function updateOrderStats(totalOrders, totalSpent) {
-  const statsDiv = document.getElementById("orderStats");
-  if (totalOrders > 0) {
-    document.getElementById("totalOrders").textContent = totalOrders;
-    document.getElementById("totalSpent").textContent = format(convert(totalSpent));
-    statsDiv.style.display = "block";
-  } else {
-    statsDiv.style.display = "none";
-  }
-}
-
-function editProfile() {
-  showCartToast("Profile editing feature coming soon!");
-  // Future implementation: Allow users to edit name and other details
-}
-  
 // Update the logout function
 function logout() {
   auth.signOut().then(() => {
