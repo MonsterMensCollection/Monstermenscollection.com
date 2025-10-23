@@ -5967,12 +5967,31 @@ function showLoginPage() {
       <br><br>
       <input type="tel" id="loginMobile" placeholder="Mobile Number" 
              style="padding: 12px; width: 100%; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 0px; box-sizing: border-box;" />
-      <input type="password" id="loginPassword" placeholder="Password" 
-             style="padding: 12px; width: 100%; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 0px; box-sizing: border-box;" />
-      <button id="loginButton" onclick="event.preventDefault(); loginUser()" 
+      
+      <div id="loginRecaptchaContainer"></div>
+
+      <button id="loginSendOtpBtn" onclick="loginSendOTP()"
               style="width: 100%; padding: 14px; background-color: #000; color: white; border: none; border-radius: 0px; font-size: 16px; font-weight: bold; cursor: pointer; box-sizing: border-box;">
-        SIGN IN
+        SEND OTP
       </button>
+
+      <div id="loginOtpSection" style="display:none; margin-top:15px;">
+        <input type="text" id="loginOtpCode" placeholder="Enter OTP"
+               style="padding: 12px; width: 100%; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 0px; box-sizing: border-box;" />
+        <button id="loginVerifyOtpBtn" onclick="loginVerifyOTP()"
+                style="width: 100%; padding: 14px; background-color: #28a745; color: white; border: none; border-radius: 0px; font-size: 16px; font-weight: bold; cursor: pointer; box-sizing: border-box;">
+          VERIFY OTP & SIGN IN
+        </button>
+      </div>
+
+      <div id="loginResendOtpSection" style="display:none; text-align: center; margin-top: 10px;">
+        <p id="loginResendTimer" style="font-size: 14px; color: #666; margin: 5px 0;"></p>
+        <button id="loginResendOtpBtn" onclick="loginResendOTP()" disabled
+                style="background: none; border: none; color: #666; text-decoration: underline; font-size: 14px; cursor: pointer;">
+          Send OTP Again
+        </button>
+      </div>
+      
       <p style="text-align: center; margin-top: 15px; font-size: 14px; color: #666;">
         Don't have an account? <a href="#" onclick="event.preventDefault(); showSignupPage()" style="color: #000; text-decoration: underline;">Sign up</a>
       </p>
@@ -6022,8 +6041,6 @@ function showSignupPage() {
              style="padding: 12px; width: 100%; margin-bottom: 15px;  border: 1px solid #ccc; border-radius: 0px; box-sizing: border-box;" />
       <input type="tel" id="signupMobile" placeholder="Mobile Number"
              style="padding: 12px; width: 100%; margin-bottom: 15px;  border: 1px solid #ccc; border-radius: 0px; box-sizing: border-box;" />
-      <input type="password" id="signupPassword" placeholder="Password"
-             style="padding: 12px; width: 100%; margin-bottom: 15px;  border: 1px solid #ccc; border-radius: 0px; box-sizing: border-box;" />
 
       <div id="recaptcha-container"></div>
 
@@ -6031,8 +6048,6 @@ function showSignupPage() {
               style="width: 100%; padding: 14px; background-color: #000; color: white; border: none; font-size: 16px; font-weight: bold;">
         SEND OTP
       </button>
-
-      
 
       <div id="otpSection" style="display:none; margin-top:0px;">
         <input type="text" id="otpCode" placeholder="Enter OTP"
@@ -6043,7 +6058,6 @@ function showSignupPage() {
         </button>
       </div>
 
-
       <div id="resendOtpSection" style="display:none; text-align: center; margin-top: 10px;">
         <p id="resendTimer" style="font-size: 14px; color: #666; margin: 5px 0;"></p>
         <button id="resendOtpBtn" onclick="resendOTP()" disabled
@@ -6051,7 +6065,6 @@ function showSignupPage() {
           Send OTP Again
         </button>
       </div>
-
       
       <p style="text-align: center; margin-top: 15px; font-size: 14px; color: #666;">
         Already have an account? 
@@ -6065,6 +6078,134 @@ function showSignupPage() {
   signupPage.style.display = "block";
 }
 
+let loginConfirmationResultGlobal = null;
+let loginOtpResendTimer = null;
+
+function loginSendOTP() {
+  const mobile = document.getElementById("loginMobile").value.trim();
+
+  if (!mobile) {
+    showCartToast("Please enter your mobile number");
+    return;
+  }
+
+  if (mobile.length !== 10) {
+    showCartToast("Enter a valid 10-digit mobile number");
+    return;
+  }
+
+  // Show OTP section immediately
+  document.getElementById("loginOtpSection").style.display = "block";
+  document.getElementById("loginSendOtpBtn").style.display = "none";
+
+  // Start the resend timer immediately
+  loginStartResendTimer();
+
+  // Setup invisible recaptcha
+  window.loginRecaptchaVerifier = new firebase.auth.RecaptchaVerifier('loginRecaptchaContainer', {
+    size: 'invisible'
+  });
+
+  const phoneNumber = "+91" + mobile;
+
+  firebase.auth().signInWithPhoneNumber(phoneNumber, window.loginRecaptchaVerifier)
+    .then((confirmationResult) => {
+      loginConfirmationResultGlobal = confirmationResult;
+      showCartToast("OTP sent successfully!");
+    })
+    .catch((error) => {
+      console.error(error);
+      showCartToast("Error sending OTP: " + error.message);
+      
+      // If OTP fails, show the send button again
+      document.getElementById("loginSendOtpBtn").style.display = "block";
+      document.getElementById("loginOtpSection").style.display = "none";
+      document.getElementById("loginResendOtpSection").style.display = "none";
+      
+      // Clear any existing timer
+      if (loginOtpResendTimer) {
+        clearInterval(loginOtpResendTimer);
+      }
+    });
+}
+
+function loginVerifyOTP() {
+  const otpCode = document.getElementById("loginOtpCode").value.trim();
+
+  if (!otpCode) {
+    showCartToast("Please enter the OTP");
+    return;
+  }
+
+  loginConfirmationResultGlobal.confirm(otpCode)
+    .then((result) => {
+      const user = result.user;
+      
+      // Check if user exists in Firestore, if not create profile
+      return db.collection("users").doc(user.uid).get().then((doc) => {
+        if (!doc.exists) {
+          // User doesn't exist, create basic profile
+          const mobile = document.getElementById("loginMobile").value.trim();
+          return db.collection("users").doc(user.uid).set({
+            mobileNumber: mobile,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        }
+        return Promise.resolve();
+      });
+    })
+    .then(() => {
+      showCartToast("Signed in successfully!");
+      showProfilePage();
+    })
+    .catch((error) => {
+      console.error(error);
+      showCartToast("Invalid OTP or error: " + error.message);
+    });
+}
+
+function loginResendOTP() {
+  // Reset the timer
+  loginStartResendTimer();
+  
+  // Call send OTP function
+  loginSendOTP();
+}
+
+function loginStartResendTimer() {
+  const resendBtn = document.getElementById('loginResendOtpBtn');
+  const timerDisplay = document.getElementById('loginResendTimer');
+  let timeLeft = 30;
+
+  // Show the resend section
+  document.getElementById('loginResendOtpSection').style.display = 'block';
+  
+  // Disable the resend button initially
+  resendBtn.disabled = true;
+  resendBtn.style.color = '#666';
+  resendBtn.style.cursor = 'not-allowed';
+
+  // Clear any existing timer
+  if (loginOtpResendTimer) {
+    clearInterval(loginOtpResendTimer);
+  }
+
+  // Update timer every second
+  loginOtpResendTimer = setInterval(() => {
+    timerDisplay.textContent = `You can resend OTP in ${timeLeft} seconds`;
+    timeLeft--;
+
+    if (timeLeft < 0) {
+      clearInterval(loginOtpResendTimer);
+      timerDisplay.textContent = '';
+      resendBtn.disabled = false;
+      resendBtn.style.color = '#000';
+      resendBtn.style.cursor = 'pointer';
+      resendBtn.textContent = 'Send OTP Again';
+    }
+  }, 1000);
+}
+  
 let otpResendTimer = null;
 
 function startResendTimer() {
@@ -6124,20 +6265,14 @@ let confirmationResultGlobal = null;
 function sendOTP() {
   const name = document.getElementById("signupName").value.trim();
   const mobile = document.getElementById("signupMobile").value.trim();
-  const password = document.getElementById("signupPassword").value.trim();
 
-  if (!name || !mobile || !password) {
+  if (!name || !mobile) {
     showCartToast("Please fill in all fields");
     return;
   }
 
   if (mobile.length !== 10) {
     showCartToast("Enter a valid 10-digit mobile number");
-    return;
-  }
-
-  if (password.length < 6) {
-    showCartToast("Password should be at least 6 characters");
     return;
   }
 
@@ -6158,6 +6293,7 @@ function sendOTP() {
   firebase.auth().signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier)
     .then((confirmationResult) => {
       confirmationResultGlobal = confirmationResult;
+      showCartToast("OTP sent successfully!");
     })
     .catch((error) => {
       console.error(error);
@@ -6175,7 +6311,6 @@ function sendOTP() {
     });
 }
 
-// Firebase OTP Verify
 function verifyOTP() {
   const otpCode = document.getElementById("otpCode").value.trim();
   const name = document.getElementById("signupName").value.trim();
@@ -6212,94 +6347,10 @@ function verifyOTP() {
 
 // Authentication functions
 // Replace the createAccount function
-function createAccount() {
-  const name = document.getElementById("signupName").value.trim();
-  const mobileNumber = document.getElementById("signupMobile").value.trim();
-  const password = document.getElementById("signupPassword").value.trim();
-  
-  if (!name || !mobileNumber || !password) {
-    showCartToast("Please fill in all fields");
-    return;
-  }
-  
-  if (password.length < 6) {
-    showCartToast("Password should be at least 6 characters");
-    return;
-  }
 
-  // For mobile authentication, we'll use a different approach
-  // Since Firebase doesn't directly support mobile+password, we'll use custom authentication
-  // or phone authentication with verification
-  
-  // Using Firebase Phone Authentication
-  const appVerifier = new firebase.auth.RecaptchaVerifier('signupButton', {
-    'size': 'invisible'
-  });
-  
-  const phoneNumber = '+91' + mobileNumber; // Adjust country code as needed
-  
-  auth.signInWithPhoneNumber(phoneNumber, appVerifier)
-    .then((confirmationResult) => {
-      // SMS sent. Prompt user to type the code from the message.
-      const verificationCode = prompt('Please enter the verification code sent to your mobile:');
-      return confirmationResult.confirm(verificationCode);
-    })
-    .then((result) => {
-      const user = result.user;
-      
-      // Update profile with name
-      return user.updateProfile({
-        displayName: name
-      }).then(() => {
-        // Save additional user data to Firestore
-        return db.collection("users").doc(user.uid).set({
-          name: name,
-          mobileNumber: mobileNumber,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-      });
-    })
-    .then(() => {
-      showCartToast("Account created successfully!");
-      showProfilePage();
-    })
-    .catch((error) => {
-      console.error("Error creating account:", error);
-      showCartToast("Error creating account: " + error.message);
-    });
-}
 
 // Replace the loginUser function
-function loginUser() {
-  const mobileNumber = document.getElementById("loginMobile").value.trim();
-  const password = document.getElementById("loginPassword").value.trim();
-  
-  if (!mobileNumber || !password) {
-    showCartToast("Please fill in all fields");
-    return;
-  }
 
-  // For mobile login, we'll use phone authentication
-  const appVerifier = new firebase.auth.RecaptchaVerifier('loginButton', {
-    'size': 'invisible'
-  });
-  
-  const phoneNumber = '+91' + mobileNumber; // Adjust country code as needed
-  
-  auth.signInWithPhoneNumber(phoneNumber, appVerifier)
-    .then((confirmationResult) => {
-      const verificationCode = prompt('Please enter the verification code sent to your mobile:');
-      return confirmationResult.confirm(verificationCode);
-    })
-    .then(() => {
-      showCartToast("Signed in successfully!");
-      showProfilePage();
-    })
-    .catch((error) => {
-      console.error("Error signing in:", error);
-      showCartToast("Error signing in: " + error.message);
-    });
-}
 
 
 // Add this to your bottom nav or create a login button
@@ -6311,95 +6362,11 @@ function showAuthPage() {
   
   
 // Add this function to create account and proceed to checkout
-function createAccountAndCheckout() {
-  const name = document.getElementById("signupName").value.trim();
-  const email = document.getElementById("signupEmail").value.trim();
-  const password = document.getElementById("signupPassword").value.trim();
-  
-  if (!name || !email || !password) {
-    showCartToast("Please fill in all fields");
-    return;
-  }
-  
-  if (password.length < 6) {
-    showCartToast("Password should be at least 6 characters");
-    return;
-  }
-  
-  // Store checkout intent in sessionStorage
-  const checkoutIntent = sessionStorage.getItem('checkoutIntent');
-  
-  // Create user with email and password
-  auth.createUserWithEmailAndPassword(email, password)
-    .then((userCredential) => {
-      const user = userCredential.user;
-      
-      // Update profile with name
-      return user.updateProfile({
-        displayName: name
-      }).then(() => {
-        // Save additional user data to Firestore
-        return db.collection("users").doc(user.uid).set({
-          name: name,
-          email: email,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-      });
-    })
-    .then(() => {
-      // Account created successfully
-      showCartToast("Account created successfully!");
-      
-      if (checkoutIntent === 'true') {
-        // User was trying to checkout, redirect to checkout
-        sessionStorage.removeItem('checkoutIntent');
-        goToDetailsPage();
-      } else {
-        // User was just signing up, redirect to profile page
-        showProfilePage();
-      }
-    })
-    .catch((error) => {
-      console.error("Error creating account:", error);
-      showCartToast("Error creating account: " + error.message);
-      sessionStorage.removeItem('checkoutIntent');
-    });
-}
+
 
 
 // Function to login and proceed to checkout
-function loginAndCheckout() {
-  const email = document.getElementById("loginEmail").value.trim();
-  const password = document.getElementById("loginPassword").value.trim();
-  
-  if (!email || !password) {
-    showCartToast("Please fill in all fields");
-    return;
-  }
-  
-  // Store checkout intent
-  const checkoutIntent = sessionStorage.getItem('checkoutIntent');
-  
-  auth.signInWithEmailAndPassword(email, password)
-    .then(() => {
-      // Login successful
-      showCartToast("Signed in successfully!");
-      
-      if (checkoutIntent === 'true') {
-        // User was trying to checkout, redirect to checkout
-        sessionStorage.removeItem('checkoutIntent');
-        goToDetailsPage();
-      } else {
-        // User was just logging in, redirect to profile page or stay on login page
-        showProfilePage();
-      }
-    })
-    .catch((error) => {
-      console.error("Error signing in:", error);
-      showCartToast("Error signing in: " + error.message);
-      sessionStorage.removeItem('checkoutIntent');
-    });
-}
+
   
 const RATES = { USD: 1, INR: 1, EUR: 0.92 };
 let currentCurrency = "INR";
