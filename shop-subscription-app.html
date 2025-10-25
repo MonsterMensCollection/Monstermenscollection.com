@@ -6507,7 +6507,7 @@ function showSignupPage() {
       <img src="https://see.fontimg.com/api/rf5/woG33/N2Y3Y2RhYTdiOGMwNGVjOGE5MWE1MTFiNGJjM2E4Y2Iub3Rm/U0lHTiBVUA/redtrap-expanded-puo.png?r=fs&h=30&w=1000&fg=000000&bg=FFFFFF&tb=1&s=30" 
            style="display: block; margin-left: auto; margin-right: auto;">
       <br><br>
-    
+      
       <input type="tel" id="signupMobile" placeholder="Mobile Number"
              style="padding: 12px; width: 100%; margin-bottom: 15px;  border: 1px solid #ccc; border-radius: 0px; box-sizing: border-box;" />
 
@@ -6545,7 +6545,10 @@ function showSignupPage() {
         </button>
       </div>
       
-  
+      <p style="text-align: center; margin-top: 15px; font-size: 14px; color: #666;">
+        Already have an account? 
+        <a href="#" onclick="event.preventDefault(); showLoginPage()" style="color: #000; text-decoration: underline;">Sign in</a>
+      </p>
     `;
 
     document.body.appendChild(signupPage);
@@ -6718,7 +6721,7 @@ function loginVerifyOTP() {
         }, 1000);
       } else {
         // Default behavior - go to profile (only when NOT checking out)
-      
+        showProfilePage();
       }
     })
     .catch((error) => {
@@ -6826,6 +6829,7 @@ function startResendTimer() {
 let confirmationResultGlobal = null;
 
 async function sendOTP() {
+
   const mobile = document.getElementById("signupMobile").value.trim();
 
   if (!mobile) {
@@ -6894,7 +6898,6 @@ async function sendOTP() {
 
   function verifyOTP() {
   const otpCode = document.getElementById("otpCode").value.trim();
-  const name = document.getElementById("signupName").value.trim();
   const mobile = document.getElementById("signupMobile").value.trim();
 
   if (!otpCode) {
@@ -6908,11 +6911,10 @@ async function sendOTP() {
 
       // Update display name in Firebase Auth
       return user.updateProfile({ 
-        displayName: name 
+        displayName: mobile 
       }).then(() => {
         // Create user document in Firestore
         return db.collection("users").doc(user.uid).set({
-          name: name,
           mobileNumber: mobile,
           email: user.email || "",
           createdAt: firebase.firestore.FieldValue.serverTimestamp(),
@@ -6945,7 +6947,7 @@ async function sendOTP() {
         }, 1000);
       } else {
         // Default behavior - go to profile (only when NOT checking out)
-        
+        showProfilePage();
       }
     })
     .catch((error) => {
