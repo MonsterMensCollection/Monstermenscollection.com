@@ -6412,12 +6412,16 @@ async function sendOTP() {
     return;
   }
 
-  if (mobile.length !== 10) {
+  if (mobile.length !== 10 || !/^\d+$/.test(mobile)) {
     showCartToast("Enter a valid 10-digit mobile number");
     return;
   }
 
   try {
+    // Show loading state
+    document.getElementById("sendOtpBtn").disabled = true;
+    document.getElementById("sendOtpBtn").textContent = "Checking...";
+
     // First check if user exists in Firestore by mobile number
     const usersSnapshot = await db.collection("users")
       .where("mobileNumber", "==", mobile)
@@ -6430,6 +6434,10 @@ async function sendOTP() {
       
       // Store the entered name for potential use in login
       sessionStorage.setItem('pendingSignupName', name);
+      
+      // Reset button
+      document.getElementById("sendOtpBtn").disabled = false;
+      document.getElementById("sendOtpBtn").textContent = "SEND OTP";
       return;
     }
 
@@ -6440,25 +6448,50 @@ async function sendOTP() {
 
     const phoneNumber = "+91" + mobile;
 
+    // Reset any existing reCAPTCHA
+    if (window.recaptchaVerifier) {
+      window.recaptchaVerifier.clear();
+    }
+
     // Use invisible reCAPTCHA
     window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
       'size': 'invisible',
       'callback': function(response) {
+        // This will be called when reCAPTCHA is solved
         sendOTPAfterRecaptcha(phoneNumber, 'signup');
+      },
+      'expired-callback': function() {
+        showCartToast("reCAPTCHA expired. Please try again.");
+        document.getElementById("sendOtpBtn").style.display = "block";
+        document.getElementById("otpSection").style.display = "none";
       }
     });
 
-    // Execute the reCAPTCHA automatically
-    window.recaptchaVerifier.verify().then(() => {
-      // This will trigger the callback above
-    }).catch((error) => {
-      console.error("reCAPTCHA error:", error);
+    // Execute the reCAPTCHA
+    try {
+      await window.recaptchaVerifier.verify();
+    } catch (error) {
+      console.error("reCAPTCHA verification error:", error);
+      // If reCAPTCHA fails, try direct OTP sending as fallback
       sendOTPAfterRecaptcha(phoneNumber, 'signup');
-    });
+    }
 
   } catch (error) {
-    console.error("Error checking user existence:", error);
-    showCartToast("Error checking user. Please try again.");
+    console.error("Error in sendOTP:", error);
+    
+    // Reset UI on error
+    document.getElementById("sendOtpBtn").disabled = false;
+    document.getElementById("sendOtpBtn").textContent = "SEND OTP";
+    document.getElementById("sendOtpBtn").style.display = "block";
+    document.getElementById("otpSection").style.display = "none";
+    
+    if (error.code === 'failed-precondition') {
+      showCartToast("Please complete the security check");
+    } else if (error.code === 'unavailable') {
+      showCartToast("Network error. Please check your connection.");
+    } else {
+      showCartToast("Error checking user: " + error.message);
+    }
   }
 }
 
