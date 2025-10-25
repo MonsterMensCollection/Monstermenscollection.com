@@ -6472,6 +6472,15 @@ function showLoginPage() {
   
   loginPage.style.display = "block";
 }
+
+  // Add this function to pre-fill name when returning to signup
+function prefillSignupName() {
+  const pendingName = sessionStorage.getItem('pendingSignupName');
+  if (pendingName && document.getElementById('signupName')) {
+    document.getElementById('signupName').value = pendingName;
+    sessionStorage.removeItem('pendingSignupName');
+  }
+}
   
 // Show Signup Page
 function showSignupPage() {
@@ -6556,13 +6565,24 @@ function showSignupPage() {
   }
 
   signupPage.style.display = "block";
+  setTimeout(prefillSignupName, 100);
 }
 
 
 function completeSwitchToLogin() {
   const mobile = document.getElementById("signupMobile").value.trim();
+  const name = document.getElementById("signupName").value.trim();
+  
+  // Store the name in session storage to pre-fill if they go back to signup
+  if (name) {
+    sessionStorage.setItem('pendingSignupName', name);
+  }
+  
   document.getElementById("loginMobile").value = mobile;
   showLoginPage();
+  
+  // Hide the switch message
+  document.getElementById("switchToLoginMessage").style.display = "none";
 }
   
 let loginConfirmationResultGlobal = null;
@@ -6850,20 +6870,9 @@ async function sendOTP() {
       .get();
 
     if (!usersSnapshot.empty) {
-      // Mobile number exists, automatically switch to login with OTP
-      showCartToast("Mobile number exists. Signing you in...");
-      
-      // Pre-fill login form
-      document.getElementById("loginMobile").value = mobile;
-      
-      // Automatically trigger login OTP sending
-      showLoginPage();
-      
-      // Small delay to ensure login page is loaded, then trigger OTP
-      setTimeout(() => {
-        loginSendOTP();
-      }, 500);
-      
+      // Mobile number exists, show message to login instead
+      document.getElementById("switchToLoginMessage").style.display = "block";
+      showCartToast("Mobile number already registered. Please sign in.");
       return;
     }
   } catch (error) {
@@ -6871,7 +6880,7 @@ async function sendOTP() {
     // Continue with signup if there's an error checking
   }
 
-  // Rest of the signup flow
+  // Rest of the signup flow for new users
   document.getElementById("otpSection").style.display = "block";
   document.getElementById("sendOtpBtn").style.display = "none";
   startResendTimer();
