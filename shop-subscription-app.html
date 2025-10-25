@@ -6019,8 +6019,8 @@ function buyNow() {
   const color = document.getElementById("selectedColor")?.value || "Same";
   const priceUSD = toNumber(document.getElementById("descPrice").dataset.basePrice);
 
-  /* ── 3 · clear cart and add only this item ─────────────────────── */
-  cart = [{
+  /* ── 3 · create single item cart for buy now ───────────────────── */
+  const buyNowCart = [{
     image,
     price: priceUSD,
     title,
@@ -6029,15 +6029,42 @@ function buyNow() {
     docId
   }];
 
-  /* ── 4 · proceed directly to checkout ──────────────────────────── */
+  const user = auth.currentUser;
+  
+  if (user) {
+    // User is already logged in, proceed directly to checkout
+    console.log("User logged in, proceeding to checkout");
+    proceedToCheckout(buyNowCart);
+  } else {
+    // User not logged in, show login page first
+    console.log("User not logged in, showing login page");
+    
+    // Store buy now intent and cart data
+    sessionStorage.setItem('buyNowIntent', 'true');
+    sessionStorage.setItem('buyNowCart', JSON.stringify(buyNowCart));
+    
+    showLoginPage();
+  }
+}
+
+// New function to handle the checkout process after login
+function proceedToCheckout(cartItems) {
+  // Set the cart to the buy now items
+  cart = cartItems;
+  
+  // Save to localStorage
+  localStorage.setItem("cart", JSON.stringify(cart));
+  
+  // Show success message
   showCartToast("Proceeding to checkout...");
   
   // Small delay to show the toast message
   setTimeout(() => {
-    handleCheckout();
+    goToDetailsPage();
   }, 800);
 }
 
+  
 
 
   function createSimilarProductCard(product) {
@@ -6700,10 +6727,29 @@ function loginVerifyOTP() {
     .then(() => {
       showCartToast("Signed in successfully!");
       
-      // Check if user was trying to checkout
+      // Check different intents
+      const buyNowIntent = sessionStorage.getItem('buyNowIntent');
       const checkoutIntent = sessionStorage.getItem('checkoutIntent');
-      if (checkoutIntent === 'true') {
-        // Restore cart from session storage if needed
+      
+      if (buyNowIntent === 'true') {
+        // Handle buy now flow
+        const buyNowCart = sessionStorage.getItem('buyNowCart');
+        if (buyNowCart) {
+          try {
+            // Use the buy now cart instead of regular cart
+            const cartItems = JSON.parse(buyNowCart);
+            proceedToCheckout(cartItems);
+          } catch (e) {
+            console.error("Error restoring buy now cart:", e);
+            // Fallback to regular flow
+            showProfilePage();
+          }
+          sessionStorage.removeItem('buyNowCart');
+        }
+        sessionStorage.removeItem('buyNowIntent');
+        
+      } else if (checkoutIntent === 'true') {
+        // Handle regular checkout flow (from cart page)
         const pendingCart = sessionStorage.getItem('pendingCheckoutCart');
         if (pendingCart) {
           try {
@@ -6715,13 +6761,12 @@ function loginVerifyOTP() {
           sessionStorage.removeItem('pendingCheckoutCart');
         }
         
-        // ✅ FIX: Redirect to checkout/details page
         setTimeout(() => {
-          goToDetailsPage(); // This goes to the checkout page
+          goToDetailsPage();
           sessionStorage.removeItem('checkoutIntent');
         }, 1000);
       } else {
-        // Default behavior - go to profile (only when NOT checking out)
+        // Default behavior - go to profile
         showProfilePage();
       }
     })
@@ -6896,8 +6941,7 @@ async function sendOTP() {
   });
 }
 
-
-  function verifyOTP() {
+function verifyOTP() {
   const otpCode = document.getElementById("otpCode").value.trim();
   const name = document.getElementById("signupName").value.trim();
   const mobile = document.getElementById("signupMobile").value.trim();
@@ -6928,10 +6972,27 @@ async function sendOTP() {
     .then(() => {
       showCartToast("Account created successfully!");
       
-      // Check if user was trying to checkout
+      // Check different intents
+      const buyNowIntent = sessionStorage.getItem('buyNowIntent');
       const checkoutIntent = sessionStorage.getItem('checkoutIntent');
-      if (checkoutIntent === 'true') {
-        // Restore cart from session storage if needed
+      
+      if (buyNowIntent === 'true') {
+        // Handle buy now flow
+        const buyNowCart = sessionStorage.getItem('buyNowCart');
+        if (buyNowCart) {
+          try {
+            const cartItems = JSON.parse(buyNowCart);
+            proceedToCheckout(cartItems);
+          } catch (e) {
+            console.error("Error restoring buy now cart:", e);
+            showProfilePage();
+          }
+          sessionStorage.removeItem('buyNowCart');
+        }
+        sessionStorage.removeItem('buyNowIntent');
+        
+      } else if (checkoutIntent === 'true') {
+        // Handle regular checkout flow
         const pendingCart = sessionStorage.getItem('pendingCheckoutCart');
         if (pendingCart) {
           try {
@@ -6943,13 +7004,12 @@ async function sendOTP() {
           sessionStorage.removeItem('pendingCheckoutCart');
         }
         
-        // ✅ FIX: Redirect to checkout/details page instead of profile
         setTimeout(() => {
-          goToDetailsPage(); // This goes to the checkout page
+          goToDetailsPage();
           sessionStorage.removeItem('checkoutIntent');
         }, 1000);
       } else {
-        // Default behavior - go to profile (only when NOT checking out)
+        // Default behavior - go to profile
         showProfilePage();
       }
     })
@@ -6958,6 +7018,7 @@ async function sendOTP() {
       showCartToast("Invalid OTP or error: " + error.message);
     });
 }
+
 
 // Authentication functions
 // Replace the createAccount function
@@ -6977,7 +7038,14 @@ function showAuthPage() {
   
 // Add this function to create account and proceed to checkout
 
-
+function cleanupSessionStorage() {
+  const staleIntents = ['buyNowIntent', 'checkoutIntent', 'buyNowCart', 'pendingCheckoutCart'];
+  staleIntents.forEach(key => {
+    if (sessionStorage.getItem(key)) {
+      sessionStorage.removeItem(key);
+    }
+  });
+}
 
 // Function to login and proceed to checkout
 
@@ -7737,6 +7805,7 @@ db.collection("products").onSnapshot(snap => {
 
 // Show products page directly on load
 document.addEventListener("DOMContentLoaded", function() {
+    cleanupSessionStorage();
   // Initialize auth
   const auth = firebase.auth();
   
