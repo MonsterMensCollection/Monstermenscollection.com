@@ -6030,14 +6030,18 @@ function buyNow() {
   }];
 
   /* ── 4 · proceed directly to checkout ──────────────────────────── */
-  showCartToast("Proceeding to checkout...");
+ /* ── 4 · Save cart and redirect to signup page ─────────────────── */
+  localStorage.setItem("cart", JSON.stringify(cart));
   
-  // Small delay to show the toast message
-  setTimeout(() => {
-    handleCheckout();
-  }, 800);
+  // Set checkout intent for after signup
+  sessionStorage.setItem('checkoutIntent', 'true');
+  sessionStorage.setItem('pendingCheckoutCart', JSON.stringify(cart));
+  
+  // Show signup page
+  showSignupPage();
+  
+  showCartToast("Please sign up to complete your purchase");
 }
-
 
 
   function createSimilarProductCard(product) {
