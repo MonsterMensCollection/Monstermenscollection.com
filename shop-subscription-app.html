@@ -4902,11 +4902,12 @@
 </div>
 
 
-  <!-- Similar Products Section -->
+ <!-- Similar Products Section -->
 <div id="similarProductsSection" style="margin-top: 30px; display: none;">
-  <h3 style="text-align: left; margin-bottom: 15px; font-size: 18px; color: #333;">Similar Products</h3>
+  <h3 style="text-align: left; margin-bottom: 15px; font-size: 18px; color: #333; font-weight: bold;">You Might Also Like</h3>
   <div id="similarProductsGrid" class="product-grid" style="margin-top: 10px;"></div>
 </div>
+  
   <br>
   <br>
   <br>
@@ -5629,6 +5630,90 @@ let cart = [];
     )
   );
 
+  function findSimilarProducts(currentProduct, allProducts, maxResults = 4) {
+    const similarProducts = [];
+    
+    allProducts.forEach(product => {
+        // Skip the current product
+        if (product.docId === currentProduct.docId) return;
+        
+        let similarityScore = 0;
+        
+        // 1. Same category/brand (highest weight)
+        const currentBrand = currentProduct.title.split(' ')[0];
+        const productBrand = product.title.split(' ')[0];
+        if (currentBrand === productBrand) {
+            similarityScore += 3;
+        }
+        
+        // 2. Similar price range (medium weight)
+        const currentPrice = currentProduct.price;
+        const productPrice = product.price;
+        const priceDiff = Math.abs(currentPrice - productPrice);
+        if (priceDiff <= 100) { // Within ₹100
+            similarityScore += 2;
+        }
+        
+        // 3. Same type/keywords (medium weight)
+        const currentKeywords = currentProduct.title.toLowerCase().split(' ');
+        const productKeywords = product.title.toLowerCase().split(' ');
+        const commonKeywords = currentKeywords.filter(keyword => 
+            productKeywords.includes(keyword) && keyword.length > 2
+        );
+        similarityScore += commonKeywords.length;
+        
+        if (similarityScore > 0) {
+            similarProducts.push({
+                ...product,
+                similarityScore
+            });
+        }
+    });
+    
+    // Sort by similarity score and return top results
+    return similarProducts
+        .sort((a, b) => b.similarityScore - a.similarityScore)
+        .slice(0, maxResults);
+}
+
+ // Add this function to get all products from a page
+function getAllProductsFromPage(pageId) {
+    const products = [];
+    const productCards = document.querySelectorAll(`#${pageId} .product-card`);
+    
+    productCards.forEach(card => {
+        const title = card.querySelector('h3').textContent + ' ' + card.querySelector('p').textContent;
+        const priceText = card.querySelector('.price').textContent;
+        const price = parseInt(priceText.replace(/[^\d]/g, '')) || 0;
+        const image = card.querySelector('img').src;
+        const docId = card.getAttribute('data-docid');
+        const onclick = card.querySelector('img').getAttribute('onclick');
+        
+        // Extract the showDescription parameters from onclick
+        const onclickMatch = onclick.match(/showDescription\(\[(.*?)\],\s*'([^']*)',\s*'([^']*)',\s*'([^']*)',\s*'([^']*)',\s*\[(.*?)\],\s*\[(.*?)\],\s*'([^']*)',\s*'([^']*)'\)/);
+        
+        if (onclickMatch) {
+            products.push({
+                docId,
+                title,
+                price,
+                image,
+                media: [{ type: 'image', src: image }],
+                priceUSD: price,
+                sdes: onclickMatch[4],
+                description: onclickMatch[5],
+                sizesAvailable: onclickMatch[6].split(',').map(s => s.trim().replace(/['"]/g, '')),
+                colorsAvailable: onclickMatch[7].split(',').map(s => s.trim().replace(/['"]/g, '')),
+                category: onclickMatch[8],
+                fullOnclick: onclick
+            });
+        }
+    });
+    
+    return products;
+}
+
+  
   
 async function showDescription(
   media,            // [{type:'image'|'video',src:'…'}, …]
@@ -5804,12 +5889,71 @@ colorHidden.value = 'Same';
   window.scrollTo(0,0);
 
   updateAllPrices();     
-  
+
+  await loadSimilarProducts(docId, category, title, priceUSD);
   // NEW: Load similar products
-  await loadSimilarProducts(docId, category); // keep everything in sync
+  // keep everything in sync
 }
 
-
+async function loadSimilarProducts(currentDocId, currentCategory, currentTitle, currentPrice) {
+    const similarSection = document.getElementById("similarProductsSection");
+    const similarGrid = document.getElementById("similarProductsGrid");
+    
+    // Clear previous similar products
+    similarGrid.innerHTML = "";
+    similarSection.style.display = "none";
+    
+    try {
+        // Get all products from the current category page
+        let allProducts = [];
+        
+        // Define which pages to search based on current category
+        const searchPages = [currentCategory]; // Start with current category
+        
+        // You can expand this to search other related categories
+        if (currentCategory === 'shirtsPage') {
+            searchPages.push('tshirtsPage');
+        } else if (currentCategory === 'tshirtsPage') {
+            searchPages.push('shirtsPage');
+        } else if (currentCategory === 'pantsPage') {
+            searchPages.push('cargosPage');
+        } else if (currentCategory === 'cargosPage') {
+            searchPages.push('pantsPage');
+        }
+        
+        // Collect products from all search pages
+        searchPages.forEach(pageId => {
+            const pageProducts = getAllProductsFromPage(pageId);
+            allProducts = allProducts.concat(pageProducts);
+        });
+        
+        // Create current product object for comparison
+        const currentProduct = {
+            docId: currentDocId,
+            title: currentTitle,
+            price: currentPrice,
+            category: currentCategory
+        };
+        
+        // Find similar products
+        const similarProducts = findSimilarProducts(currentProduct, allProducts, 4);
+        
+        if (similarProducts.length > 0) {
+            // Display similar products
+            similarProducts.forEach(product => {
+                const productCard = createSimilarProductCard(product);
+                similarGrid.appendChild(productCard);
+            });
+            
+            similarSection.style.display = "block";
+        }
+        
+    } catch (error) {
+        console.error("Error loading similar products:", error);
+        similarSection.style.display = "none";
+    }
+}
+  
 function buyNow() {
   /* ── 0 · prelim checks ─────────────────────────────────────────── */
   const docId = document.getElementById("descName").dataset.docid;
@@ -5854,143 +5998,102 @@ function buyNow() {
   }, 800);
 }
 
-async function loadSimilarProducts(currentDocId, currentCategory) {
-  const similarSection = document.getElementById("similarProductsSection");
-  const similarGrid = document.getElementById("similarProductsGrid");
-  
-  // Clear previous similar products
-  similarGrid.innerHTML = "";
-  similarSection.style.display = "none";
-  
-  try {
-    // Convert page ID to category name
-    let categoryName = "";
-    switch(currentCategory) {
-      case "shirtsPage": categoryName = "shirts"; break;
-      case "tshirtsPage": categoryName = "tshirts"; break;
-      case "pantsPage": categoryName = "pants"; break;
-      case "cargosPage": categoryName = "cargos"; break;
-      default: categoryName = "shirts";
-    }
+
+
+  function createSimilarProductCard(product) {
+    const card = document.createElement("div");
+    card.className = "product-card";
+    card.setAttribute("data-docid", product.docId);
     
-    // Get current product title for brand extraction
-    const currentTitle = document.getElementById("descName").textContent;
-    const currentBrand = currentTitle.split(' ')[0]; // Extract brand name
+    card.innerHTML = `
+        <div class="image-wrapper">
+            <img src="${product.image}" 
+                 alt="${product.title}" 
+                 onclick="${product.fullOnclick}">
+        </div>
+        <div class="cardName">
+            <h3>${product.title.split(' ')[0]}</h3>
+            <p>${product.sdes || product.title.split(' ').slice(1).join(' ')}</p>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:0 10px;">
+            <p class="price">₹${product.price}</p>
+        </div>
+    `;
     
-    // Get all products from the same category
-    const productsSnapshot = await db.collection("products")
-      .where("category", "==", categoryName)
-      .get();
-    
-    const similarProducts = [];
-    
-    productsSnapshot.forEach(doc => {
-      const productData = doc.data();
-      
-      // Skip the current product
-      if (doc.id === currentDocId) return;
-      
-      // Calculate similarity score
-      let similarityScore = 0;
-      
-      // Same brand = higher score
-      if (productData.title && productData.title.includes(currentBrand)) {
-        similarityScore += 3;
-      }
-      
-      // Similar price range = medium score
-      const currentPrice = parseFloat(document.getElementById("descPrice").dataset.basePrice);
-      const productPrice = productData.price || 0;
-      const priceDiff = Math.abs(currentPrice - productPrice);
-      if (priceDiff <= 100) {
-        similarityScore += 2;
-      }
-      
-      // Any available stock = small score
-      if (productData.sizes) {
-        const hasStock = Object.values(productData.sizes).some(qty => qty > 0);
-        if (hasStock) {
-          similarityScore += 1;
-        }
-      }
-      
-      if (similarityScore > 0) {
-        similarProducts.push({
-          id: doc.id,
-          data: productData,
-          score: similarityScore
-        });
-      }
-    });
-    
-    // If no similar products found by score, get random products from same category
-    if (similarProducts.length === 0) {
-      productsSnapshot.forEach(doc => {
-        const productData = doc.data();
-        if (doc.id !== currentDocId) {
-          similarProducts.push({
-            id: doc.id,
-            data: productData,
-            score: 0 // Random products get score 0
-          });
-        }
-      });
-    }
-    
-    // Sort by similarity score and take top 4
-    similarProducts.sort((a, b) => b.score - a.score);
-    const topSimilar = similarProducts.slice(0, 4);
-    
-    if (topSimilar.length > 0) {
-      // Display similar products
-      topSimilar.forEach(product => {
-        const productCard = createSimilarProductCard(product);
-        similarGrid.appendChild(productCard);
-      });
-      
-      similarSection.style.display = "block";
-    }
-    
-  } catch (error) {
-    console.error("Error loading similar products:", error);
-    // Fallback: show a message or hide the section
-    similarSection.style.display = "none";
-  }
+    return card;
 }
 
-function createSimilarProductCard(product) {
-  const productData = product.data;
-  const card = document.createElement("div");
-  card.className = "product-card";
-  card.setAttribute("data-docid", product.id);
-  
-  // Use the first image or a placeholder
-  const imageUrl = productData.images && productData.images.length > 0 
-    ? productData.images[0] 
-    : productData.image 
-    ? productData.image 
-    : 'https://raw.githubusercontent.com/MonsterMensCollection/product-img/refs/heads/main/placeholder.jpg';
-  
-  // Create a simple media array for the showDescription function
-  const mediaArray = [{ type: 'image', src: imageUrl }];
-  
-  card.innerHTML = `
-    <div class="image-wrapper">
-      <img src="${imageUrl}" 
-           alt="${productData.title || 'Product'}" 
-           onclick="showSimilarProductDescription('${product.id}')">
-    </div>
-    <div class="cardName">
-      <h3>${productData.brand || (productData.title ? productData.title.split(' ')[0] : 'Product')}</h3>
-      <p>${productData.shortDescription || productData.title || 'Product Description'}</p>
-    </div>
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:0 10px;">
-      <p class="price">₹${productData.price || 0}</p>
-    </div>
-  `;
-  
-  return card;
+const similarProductsCSS = `
+#similarProductsSection {
+    margin-top: 30px;
+    padding: 20px 0;
+    border-top: 1px solid #eee;
 }
+
+#similarProductsSection h3 {
+    text-align: left;
+    margin-bottom: 15px;
+    font-size: 18px;
+    color: #333;
+    font-weight: bold;
+}
+
+#similarProductsGrid .product-card {
+    background: white;
+    border-radius: 0px;
+    overflow: hidden;
+    transition: transform 0.2s ease;
+}
+
+#similarProductsGrid .product-card:hover {
+    transform: translateY(-2px);
+}
+
+#similarProductsGrid .image-wrapper {
+    position: relative;
+    width: 100%;
+    padding-bottom: 125%;
+    overflow: hidden;
+    background-color: #f8f8f8;
+}
+
+#similarProductsGrid .image-wrapper img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    cursor: pointer;
+}
+
+#similarProductsGrid .cardName {
+    padding: 10px 8px;
+    text-align: left;
+}
+
+#similarProductsGrid .cardName h3 {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #000;
+    font-weight: bold;
+}
+
+#similarProductsGrid .cardName p {
+    margin: 4px 0 0 0;
+    font-size: 0.8rem;
+    color: #666;
+    line-height: 1.3;
+}
+
+#similarProductsGrid .price {
+    text-align: left;
+    margin: 4px 0 0 8px;
+    font-size: 0.9rem;
+    color: #000;
+    font-weight: bold;
+}
+`;
 
 async function showSimilarProductDescription(docId) {
   try {
@@ -7862,6 +7965,9 @@ window.addEventListener("scroll", function () {
   lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
 });
 
+  const style = document.createElement('style');
+style.textContent = similarProductsCSS;
+document.head.appendChild(style);
   
 </script>
 
