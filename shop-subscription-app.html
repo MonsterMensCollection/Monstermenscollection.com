@@ -6467,10 +6467,10 @@ function showLoginPage() {
       
       <div id="loginRecaptchaContainer"></div>
 
-      <button id="loginSendOtpBtn" onclick="loginSendOTP()"
-              style="width: 100%; padding: 14px; background-color: #000; color: white; border: none; border-radius: 0px; font-size: 16px; font-weight: bold; cursor: pointer; box-sizing: border-box;">
-        SEND OTP
-      </button>
+     <button id="loginSendOtpBtn" onclick="loginSendOTP()"
+        style="width: 100%; padding: 14px; background-color: #000; color: white; border: none; border-radius: 0px; font-size: 16px; font-weight: bold; cursor: pointer; box-sizing: border-box;">
+  SEND OTP
+</button>
 
       <div id="loginOtpSection" style="display:none; margin-top:15px;">
         <input type="text" id="loginOtpCode" placeholder="Enter OTP"
@@ -6538,10 +6538,10 @@ function showSignupPage() {
 
       <div id="recaptcha-container"></div>
 
-      <button id="sendOtpBtn" onclick="sendOTP()"
-              style="width: 100%; padding: 14px; background-color: #000; color: white; border: none; font-size: 16px; font-weight: bold;">
-        SEND OTP
-      </button>
+     <button id="sendOtpBtn" onclick="sendOTP()"
+        style="width: 100%; padding: 14px; background-color: #000; color: white; border: none; font-size: 16px; font-weight: bold;">
+  SEND OTP
+</button>
 
       <div id="otpSection" style="display:none; margin-top:0px;">
         <input type="text" id="otpCode" placeholder="Enter OTP"
@@ -6592,59 +6592,100 @@ function completeSwitchToLogin() {
 let loginConfirmationResultGlobal = null;
 let loginOtpResendTimer = null;
 
-function loginSendOTP() {
-  const mobile = document.getElementById("loginMobile").value.trim();
+  async function loginSendOTP() {
+    const mobile = document.getElementById("loginMobile").value.trim();
 
-  if (!mobile) {
-    showCartToast("Please enter your mobile number");
-    return;
-  }
+    if (!mobile) {
+        showCartToast("Please enter your mobile number");
+        return;
+    }
 
-  if (mobile.length !== 10) {
-    showCartToast("Enter a valid 10-digit mobile number");
-    return;
-  }
+    if (mobile.length !== 10) {
+        showCartToast("Enter a valid 10-digit mobile number");
+        return;
+    }
 
-  // Show OTP section immediately
-  document.getElementById("loginOtpSection").style.display = "block";
-  document.getElementById("loginSendOtpBtn").style.display = "none";
+    // Show OTP section immediately for better UX
+    document.getElementById("loginOtpSection").style.display = "block";
+    document.getElementById("loginSendOtpBtn").style.display = "none";
+    document.getElementById("loginSendOtpBtn").disabled = true;
+    document.getElementById("loginSendOtpBtn").textContent = "Sending...";
 
-  // Start the resend timer immediately
-  loginStartResendTimer();
+    // Start the resend timer immediately
+    loginStartResendTimer();
 
-  const phoneNumber = "+91" + mobile;
+    const phoneNumber = "+91" + mobile;
 
-  // Create invisible reCAPTCHA
-  window.loginRecaptchaVerifier = new firebase.auth.RecaptchaVerifier('loginRecaptchaContainer', {
-    'size': 'invisible'
-  });
+    try {
+        // Use pre-loaded verifier or create new one
+        if (!window.loginRecaptchaVerifier) {
+            window.loginRecaptchaVerifier = new firebase.auth.RecaptchaVerifier('loginRecaptchaContainer', {
+                'size': 'invisible'
+            });
+        }
 
-  // Send OTP directly
-  firebase.auth().signInWithPhoneNumber(phoneNumber, window.loginRecaptchaVerifier)
-    .then((confirmationResult) => {
-      loginConfirmationResultGlobal = confirmationResult;
-      showCartToast("OTP sent successfully!");
-    })
-    .catch((error) => {
-      console.error(error);
-      
-      // If there's a reCAPTCHA challenge, you might need to handle it
-      if (error.code === 'auth/recaptcha-not-enabled') {
-        // Try alternative approach
-        sendOTPDirectly(phoneNumber, 'login');
-      } else {
-        showCartToast("Error sending OTP: " + error.message);
+        // Clear any existing reCAPTCHA
+        try {
+            window.loginRecaptchaVerifier.clear();
+        } catch (e) {
+            console.log("No existing reCAPTCHA to clear");
+        }
+
+        // Send OTP
+        const confirmationResult = await firebase.auth().signInWithPhoneNumber(phoneNumber, window.loginRecaptchaVerifier);
+        loginConfirmationResultGlobal = confirmationResult;
         
+        showCartToast("OTP sent successfully!");
+        document.getElementById("loginSendOtpBtn").textContent = "SEND OTP";
+        
+    } catch (error) {
+        console.error("OTP sending error:", error);
+        
+        // Reset UI on error
         document.getElementById("loginSendOtpBtn").style.display = "block";
+        document.getElementById("loginSendOtpBtn").disabled = false;
+        document.getElementById("loginSendOtpBtn").textContent = "SEND OTP";
         document.getElementById("loginOtpSection").style.display = "none";
         document.getElementById("loginResendOtpSection").style.display = "none";
         
         if (loginOtpResendTimer) {
-          clearInterval(loginOtpResendTimer);
+            clearInterval(loginOtpResendTimer);
         }
-      }
-    });
+
+        // User-friendly error messages
+        if (error.code === 'auth/too-many-requests') {
+            showCartToast("Too many attempts. Please try again later.");
+        } else if (error.code === 'auth/invalid-phone-number') {
+            showCartToast("Invalid phone number format");
+        } else {
+            showCartToast("Failed to send OTP. Please try again.");
+        }
+    }
 }
+
+
+  function handleRecaptchaError(error, type) {
+    console.error(`reCAPTCHA ${type} error:`, error);
+    
+    // Fallback: Try to render visible reCAPTCHA as backup
+    try {
+        if (type === 'login') {
+            window.loginRecaptchaVerifier = new firebase.auth.RecaptchaVerifier('loginRecaptchaContainer', {
+                'size': 'normal'
+            });
+            window.loginRecaptchaVerifier.render();
+        } else {
+            window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+                'size': 'normal'
+            });
+            window.recaptchaVerifier.render();
+        }
+        showCartToast("Please complete the verification to send OTP");
+    } catch (renderError) {
+        showCartToast("Verification failed. Please refresh and try again.");
+    }
+}
+
 
 // Fallback function for direct OTP sending
 function sendOTPDirectly(phoneNumber, type) {
@@ -6872,70 +6913,86 @@ function startResendTimer() {
 let confirmationResultGlobal = null;
 
 async function sendOTP() {
-  const name = document.getElementById("signupName").value.trim();
-  const mobile = document.getElementById("signupMobile").value.trim();
+    const name = document.getElementById("signupName").value.trim();
+    const mobile = document.getElementById("signupMobile").value.trim();
 
-  if (!name || !mobile) {
-    showCartToast("Please fill in all fields");
-    return;
-  }
-
-  if (mobile.length !== 10) {
-    showCartToast("Enter a valid 10-digit mobile number");
-    return;
-  }
-
-  // First check if user exists in Firestore
-  try {
-    const usersSnapshot = await db.collection("users")
-      .where("mobileNumber", "==", mobile)
-      .get();
-
-    if (!usersSnapshot.empty) {
-      // Mobile number exists, automatically switch to login with OTP
-      showCartToast("Mobile number exists. Signing you in...");
-      
-      // Pre-fill login form
-      document.getElementById("loginMobile").value = mobile;
-      
-      // Automatically trigger login OTP sending
-      showLoginPage();
-      
-      // Small delay to ensure login page is loaded, then trigger OTP
-      setTimeout(() => {
-        loginSendOTP();
-      }, 500);
-      
-      return;
+    if (!name || !mobile) {
+        showCartToast("Please fill in all fields");
+        return;
     }
-  } catch (error) {
-    console.error("Error checking user existence:", error);
-    // Continue with signup if there's an error checking
-  }
 
-  // Rest of the signup flow
-  document.getElementById("otpSection").style.display = "block";
-  document.getElementById("sendOtpBtn").style.display = "none";
-  startResendTimer();
-
-  const phoneNumber = "+91" + mobile;
-
-  // Use invisible reCAPTCHA for signup as well
-  window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-    'size': 'invisible',
-    'callback': function(response) {
-      sendOTPAfterRecaptcha(phoneNumber, 'signup');
+    if (mobile.length !== 10) {
+        showCartToast("Enter a valid 10-digit mobile number");
+        return;
     }
-  });
 
-  // Execute the reCAPTCHA automatically
-  window.recaptchaVerifier.verify().then(() => {
-    // This will trigger the callback above
-  }).catch((error) => {
-    console.error("reCAPTCHA error:", error);
-    // Fallback: try to send OTP directly
-    sendOTPAfterRecaptcha(phoneNumber, 'signup');
-  });
+    // UI updates first for immediate feedback
+    document.getElementById("otpSection").style.display = "block";
+    document.getElementById("sendOtpBtn").style.display = "none";
+    document.getElementById("sendOtpBtn").disabled = true;
+    document.getElementById("sendOtpBtn").textContent = "Sending...";
+    startResendTimer();
+
+    const phoneNumber = "+91" + mobile;
+
+    try {
+        // Check if user exists (existing logic)
+        const usersSnapshot = await db.collection("users")
+            .where("mobileNumber", "==", mobile)
+            .get();
+
+        if (!usersSnapshot.empty) {
+            showCartToast("Mobile number exists. Signing you in...");
+            document.getElementById("loginMobile").value = mobile;
+            showLoginPage();
+            setTimeout(() => { loginSendOTP(); }, 500);
+            return;
+        }
+
+        // Use pre-loaded verifier or create new one
+        if (!window.recaptchaVerifier) {
+            window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+                'size': 'invisible'
+            });
+        }
+
+        // Clear any existing reCAPTCHA
+        try {
+            window.recaptchaVerifier.clear();
+        } catch (e) {
+            console.log("No existing reCAPTCHA to clear");
+        }
+
+        // Send OTP
+        const confirmationResult = await firebase.auth().signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier);
+        confirmationResultGlobal = confirmationResult;
+        
+        showCartToast("OTP sent successfully!");
+        document.getElementById("sendOtpBtn").textContent = "SEND OTP";
+        
+    } catch (error) {
+        console.error("OTP sending error:", error);
+        
+        // Reset UI on error
+        document.getElementById("sendOtpBtn").style.display = "block";
+        document.getElementById("sendOtpBtn").disabled = false;
+        document.getElementById("sendOtpBtn").textContent = "SEND OTP";
+        document.getElementById("otpSection").style.display = "none";
+        document.getElementById("resendOtpSection").style.display = "none";
+        
+        if (otpResendTimer) {
+            clearInterval(otpResendTimer);
+        }
+
+        // User-friendly error messages
+        if (error.code === 'auth/too-many-requests') {
+            showCartToast("Too many attempts. Please try again later.");
+        } else if (error.code === 'auth/invalid-phone-number') {
+            showCartToast("Invalid phone number format");
+        } else {
+            showCartToast("Failed to send OTP. Please try again.");
+        }
+    }
 }
 
 function verifyOTP() {
@@ -7841,6 +7898,8 @@ document.addEventListener("DOMContentLoaded", function() {
   console.log("Cart loaded:", cart.length, "items");
   
   // Set up other initializations
+  // Pre-initialize reCAPTCHA verifiers
+  initializeRecaptchaVerifiers();
   updateAllPrices();
   positionCartToast();
   
@@ -7857,6 +7916,31 @@ document.addEventListener("DOMContentLoaded", function() {
       sizeSelect.addEventListener("change", () => filterProductsBySize(targetPageId));
     }
   });
+
+
+  function initializeRecaptchaVerifiers() {
+    try {
+        // Pre-create invisible reCAPTCHA verifiers
+        if (typeof firebase !== 'undefined' && firebase.auth) {
+            window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+                'size': 'invisible',
+                'callback': function(response) {
+                    console.log("reCAPTCHA solved automatically");
+                }
+            });
+            
+            window.loginRecaptchaVerifier = new firebase.auth.RecaptchaVerifier('loginRecaptchaContainer', {
+                'size': 'invisible',
+                'callback': function(response) {
+                    console.log("Login reCAPTCHA solved automatically");
+                }
+            });
+        }
+    } catch (error) {
+        console.log("reCAPTCHA pre-loading failed, will initialize on demand:", error);
+    }
+}
+
   
   // Check if user was in checkout flow - FIXED: Only declare once
   const checkoutIntent = sessionStorage.getItem('checkoutIntent');
