@@ -5633,10 +5633,18 @@ let cart = [];
   function findSimilarProducts(currentProduct, allProducts, maxResults = 4) {
     const similarProducts = [];
     
-    allProducts.forEach(product => {
-        // Skip the current product
-        if (product.docId === currentProduct.docId) return;
-        
+    // Filter out the current product first
+    const otherProducts = allProducts.filter(product => 
+        product.docId !== currentProduct.docId
+    );
+    
+    // If we don't have enough products, just return what we have
+    if (otherProducts.length <= maxResults) {
+        return otherProducts;
+    }
+    
+    // Calculate similarity scores for all products
+    otherProducts.forEach(product => {
         let similarityScore = 0;
         
         // 1. Same category/brand (highest weight)
@@ -5670,10 +5678,36 @@ let cart = [];
         }
     });
     
-    // Sort by similarity score and return top results
-    return similarProducts
-        .sort((a, b) => b.similarityScore - a.similarityScore)
-        .slice(0, maxResults);
+    // Sort by similarity score (highest first)
+    similarProducts.sort((a, b) => b.similarityScore - a.similarityScore);
+    
+    // If we have enough highly similar products, take top ones
+    if (similarProducts.length >= maxResults) {
+        // Take top 8 similar products
+        const topSimilar = similarProducts.slice(0, 8);
+        // Randomly select 4 from the top similar ones
+        return shuffleArray(topSimilar).slice(0, maxResults);
+    }
+    
+    // If not enough similar products, supplement with random products
+    const remainingProducts = otherProducts.filter(product => 
+        !similarProducts.some(sim => sim.docId === product.docId)
+    );
+    
+    const shuffledRemaining = shuffleArray(remainingProducts);
+    const combined = [...similarProducts, ...shuffledRemaining.slice(0, maxResults - similarProducts.length)];
+    
+    return shuffleArray(combined).slice(0, maxResults);
+}
+
+// Helper function to shuffle an array (Fisher-Yates algorithm)
+function shuffleArray(array) {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
 }
 
  // Add this function to get all products from a page
@@ -5895,6 +5929,7 @@ colorHidden.value = 'Same';
   // keep everything in sync
 }
 
+  
 async function loadSimilarProducts(currentDocId, currentCategory, currentTitle, currentPrice) {
     const similarSection = document.getElementById("similarProductsSection");
     const similarGrid = document.getElementById("similarProductsGrid");
@@ -5904,27 +5939,33 @@ async function loadSimilarProducts(currentDocId, currentCategory, currentTitle, 
     similarSection.style.display = "none";
     
     try {
-        // Get all products from the current category page
+        // Get all products from multiple related categories
         let allProducts = [];
         
-        // Define which pages to search based on current category
-        const searchPages = [currentCategory]; // Start with current category
+        // Define which pages to search - expand beyond just current category
+        const searchPages = [currentCategory];
         
-        // You can expand this to search other related categories
-        if (currentCategory === 'shirtsPage') {
-            searchPages.push('tshirtsPage');
-        } else if (currentCategory === 'tshirtsPage') {
-            searchPages.push('shirtsPage');
-        } else if (currentCategory === 'pantsPage') {
-            searchPages.push('cargosPage');
-        } else if (currentCategory === 'cargosPage') {
-            searchPages.push('pantsPage');
+        // Add related categories based on current category
+        if (currentCategory === 'shirtsPage' || currentCategory === 'tshirtsPage') {
+            searchPages.push('shirtsPage', 'tshirtsPage');
+        } else if (currentCategory === 'pantsPage' || currentCategory === 'cargosPage') {
+            searchPages.push('pantsPage', 'cargosPage');
+        } else {
+            // For other categories, search all main categories
+            searchPages.push('shirtsPage', 'tshirtsPage', 'pantsPage', 'cargosPage');
         }
         
+        // Remove duplicates
+        const uniquePages = [...new Set(searchPages)];
+        
         // Collect products from all search pages
-        searchPages.forEach(pageId => {
-            const pageProducts = getAllProductsFromPage(pageId);
-            allProducts = allProducts.concat(pageProducts);
+        uniquePages.forEach(pageId => {
+            try {
+                const pageProducts = getAllProductsFromPage(pageId);
+                allProducts = allProducts.concat(pageProducts);
+            } catch (error) {
+                console.warn(`Could not load products from ${pageId}:`, error);
+            }
         });
         
         // Create current product object for comparison
@@ -5935,7 +5976,7 @@ async function loadSimilarProducts(currentDocId, currentCategory, currentTitle, 
             category: currentCategory
         };
         
-        // Find similar products
+        // Find similar products (now with random selection)
         const similarProducts = findSimilarProducts(currentProduct, allProducts, 4);
         
         if (similarProducts.length > 0) {
@@ -5953,6 +5994,7 @@ async function loadSimilarProducts(currentDocId, currentCategory, currentTitle, 
         similarSection.style.display = "none";
     }
 }
+
   
 function buyNow() {
   /* ── 0 · prelim checks ─────────────────────────────────────────── */
