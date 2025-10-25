@@ -5022,20 +5022,20 @@
   <!-- Logo -->
   <img src="https://see.fontimg.com/api/rf5/woG33/N2Y3Y2RhYTdiOGMwNGVjOGE5MWE1MTFiNGJjM2E4Y2Iub3Rm/UFJPRklMRQ/redtrap-expanded-puo.png?r=fs&h=30&w=1000&fg=000000&bg=FFFFFF&tb=1&s=30" style="display: block; margin-left: auto; margin-right: auto;"><br><br>
 
-  <!-- In your profilePage HTML, ensure guest view has proper buttons -->
-<div id="guestProfileView" style="display: none;">
-  <div style="text-align: center; padding: 20px;">
-    <p style="font-size: 16px; color: #666; margin-bottom: 30px;">Sign in to access your profile, orders, and preferences</p>
-    
-    <button onclick="showSignupPage()" style="width: 100%; padding: 14px; background-color: #000; color: white; border: none; border-radius: 0px; font-size: 16px; font-weight: bold; cursor: pointer; margin-bottom: 15px;">
-      SIGN UP
-    </button>
-    
-    <button onclick="showLoginPage()" style="width: 100%; padding: 14px; background-color: #f8f9fa; color: #000; border: 1px solid #ddd; border-radius: 0px; font-size: 16px; font-weight: bold; cursor: pointer;">
-      SIGN IN
-    </button>
+  <!-- Guest View (shown when not logged in) -->
+  <div id="guestProfileView" style="display: none;">
+    <div style="text-align: center; padding: 20px;">
+      <p style="font-size: 16px; color: #666; margin-bottom: 30px;">Sign in to access your profile, orders, and preferences</p>
+      
+      <button onclick="showSignupPage()" style="width: 100%; padding: 14px; background-color: #000; color: white; border: none; border-radius: 0px; font-size: 16px; font-weight: bold; cursor: pointer; margin-bottom: 15px;">
+        SIGN UP
+      </button>
+      
+      <button onclick="showLoginPage()" style="width: 100%; padding: 14px; background-color: #f8f9fa; color: #000; border: 1px solid #ddd; border-radius: 0px; font-size: 16px; font-weight: bold; cursor: pointer;">
+        SIGN IN
+      </button>
+    </div>
   </div>
-</div>
 
   <!-- User View (shown when logged in) -->
   <div id="userProfileView" style="display: none;">
@@ -5993,7 +5993,8 @@ async function loadSimilarProducts(currentDocId, currentCategory, currentTitle, 
     }
 }
 
-  function buyNow() {
+  
+function buyNow() {
   /* ── 0 · prelim checks ─────────────────────────────────────────── */
   const docId = document.getElementById("descName").dataset.docid;
   const size = document.getElementById("selectedSize")?.value || "";
@@ -6028,17 +6029,13 @@ async function loadSimilarProducts(currentDocId, currentCategory, currentTitle, 
     docId
   }];
 
-  /* ── 4 · Save cart and redirect to signup page ─────────────────── */
-  localStorage.setItem("cart", JSON.stringify(cart));
+  /* ── 4 · proceed directly to checkout ──────────────────────────── */
+  showCartToast("Proceeding to checkout...");
   
-  // Set checkout intent for after signup
-  sessionStorage.setItem('checkoutIntent', 'true');
-  sessionStorage.setItem('pendingCheckoutCart', JSON.stringify(cart));
-  
-  // Show signup page
-  showSignupPage();
-  
-  showCartToast("Please sign up to complete your purchase");
+  // Small delay to show the toast message
+  setTimeout(() => {
+    handleCheckout();
+  }, 800);
 }
 
 
@@ -6571,8 +6568,7 @@ function completeSwitchToLogin() {
 let loginConfirmationResultGlobal = null;
 let loginOtpResendTimer = null;
 
-// Modified loginSendOTP function
-async function loginSendOTP() {
+function loginSendOTP() {
   const mobile = document.getElementById("loginMobile").value.trim();
 
   if (!mobile) {
@@ -6585,28 +6581,21 @@ async function loginSendOTP() {
     return;
   }
 
-  // Check if user exists
-  const userExists = await checkUserExists(mobile);
-  
-  if (!userExists) {
-    // User doesn't exist, show signup page
-    showCartToast("No account found. Please sign up.");
-    document.getElementById("signupMobile").value = mobile;
-    showSignupPage();
-    return;
-  }
-
-  // Continue with login flow if user exists
+  // Show OTP section immediately
   document.getElementById("loginOtpSection").style.display = "block";
   document.getElementById("loginSendOtpBtn").style.display = "none";
+
+  // Start the resend timer immediately
   loginStartResendTimer();
 
   const phoneNumber = "+91" + mobile;
 
+  // Create invisible reCAPTCHA
   window.loginRecaptchaVerifier = new firebase.auth.RecaptchaVerifier('loginRecaptchaContainer', {
     'size': 'invisible'
   });
 
+  // Send OTP directly
   firebase.auth().signInWithPhoneNumber(phoneNumber, window.loginRecaptchaVerifier)
     .then((confirmationResult) => {
       loginConfirmationResultGlobal = confirmationResult;
@@ -6615,7 +6604,9 @@ async function loginSendOTP() {
     .catch((error) => {
       console.error(error);
       
+      // If there's a reCAPTCHA challenge, you might need to handle it
       if (error.code === 'auth/recaptcha-not-enabled') {
+        // Try alternative approach
         sendOTPDirectly(phoneNumber, 'login');
       } else {
         showCartToast("Error sending OTP: " + error.message);
@@ -6724,7 +6715,7 @@ function loginVerifyOTP() {
           sessionStorage.removeItem('pendingCheckoutCart');
         }
         
-        // ✅ REDIRECT TO CHECKOUT PAGE AFTER LOGIN
+        // ✅ FIX: Redirect to checkout/details page
         setTimeout(() => {
           goToDetailsPage(); // This goes to the checkout page
           sessionStorage.removeItem('checkoutIntent');
@@ -6838,21 +6829,6 @@ function startResendTimer() {
 // Firebase OTP Send
 let confirmationResultGlobal = null;
 
-// Function to check if user exists and handle page navigation
-async function checkUserExists(mobileNumber) {
-  try {
-    const usersSnapshot = await db.collection("users")
-      .where("mobileNumber", "==", mobileNumber)
-      .get();
-
-    return !usersSnapshot.empty;
-  } catch (error) {
-    console.error("Error checking user existence:", error);
-    return false;
-  }
-}
-
-// Modified sendOTP function for signup
 async function sendOTP() {
   const name = document.getElementById("signupName").value.trim();
   const mobile = document.getElementById("signupMobile").value.trim();
@@ -6867,24 +6843,42 @@ async function sendOTP() {
     return;
   }
 
-  // Check if user exists
-  const userExists = await checkUserExists(mobile);
-  
-  if (userExists) {
-    // User exists, show login page
-    showCartToast("Account already exists. Please sign in.");
-    document.getElementById("loginMobile").value = mobile;
-    showLoginPage();
-    return;
+  // First check if user exists in Firestore
+  try {
+    const usersSnapshot = await db.collection("users")
+      .where("mobileNumber", "==", mobile)
+      .get();
+
+    if (!usersSnapshot.empty) {
+      // Mobile number exists, automatically switch to login with OTP
+      showCartToast("Mobile number exists. Signing you in...");
+      
+      // Pre-fill login form
+      document.getElementById("loginMobile").value = mobile;
+      
+      // Automatically trigger login OTP sending
+      showLoginPage();
+      
+      // Small delay to ensure login page is loaded, then trigger OTP
+      setTimeout(() => {
+        loginSendOTP();
+      }, 500);
+      
+      return;
+    }
+  } catch (error) {
+    console.error("Error checking user existence:", error);
+    // Continue with signup if there's an error checking
   }
 
-  // Continue with signup flow if user doesn't exist
+  // Rest of the signup flow
   document.getElementById("otpSection").style.display = "block";
   document.getElementById("sendOtpBtn").style.display = "none";
   startResendTimer();
 
   const phoneNumber = "+91" + mobile;
 
+  // Use invisible reCAPTCHA for signup as well
   window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
     'size': 'invisible',
     'callback': function(response) {
@@ -6892,15 +6886,18 @@ async function sendOTP() {
     }
   });
 
+  // Execute the reCAPTCHA automatically
   window.recaptchaVerifier.verify().then(() => {
     // This will trigger the callback above
   }).catch((error) => {
     console.error("reCAPTCHA error:", error);
+    // Fallback: try to send OTP directly
     sendOTPAfterRecaptcha(phoneNumber, 'signup');
   });
 }
 
- function verifyOTP() {
+
+  function verifyOTP() {
   const otpCode = document.getElementById("otpCode").value.trim();
   const name = document.getElementById("signupName").value.trim();
   const mobile = document.getElementById("signupMobile").value.trim();
@@ -6946,7 +6943,7 @@ async function sendOTP() {
           sessionStorage.removeItem('pendingCheckoutCart');
         }
         
-        // ✅ REDIRECT TO CHECKOUT PAGE AFTER SIGNUP
+        // ✅ FIX: Redirect to checkout/details page instead of profile
         setTimeout(() => {
           goToDetailsPage(); // This goes to the checkout page
           sessionStorage.removeItem('checkoutIntent');
@@ -7345,7 +7342,6 @@ function proceedWithCOD() {
 }
 
 
-// Enhanced showProfilePage function
 function showProfilePage() {
   const user = auth.currentUser;
 
@@ -7361,6 +7357,7 @@ function showProfilePage() {
     if (element) element.style.display = "none";
   });
 
+  // Ensure profile page exists and is visible
   const profilePage = document.getElementById("profilePage");
   if (!profilePage) {
     console.error("Profile page element not found!");
@@ -7375,7 +7372,7 @@ function showProfilePage() {
   const userView = document.getElementById("userProfileView");
   
   if (!user) {
-    // User is not signed in, show guest view
+    // User is not signed in, show guest view with signin/signup buttons
     if (guestView) guestView.style.display = "block";
     if (userView) userView.style.display = "none";
   } else {
@@ -7682,16 +7679,16 @@ function handleCheckout() {
   
   if (user) {
     // User is signed in, proceed to checkout
+    console.log("Proceeding to details page");
     goToDetailsPage();
   } else {
-    // User is not signed in, redirect to login/signup
-    showCartToast("Please sign in to checkout");
+    // User is not signed in, show signup page
+    console.log("Showing signup page");
     
     // Store checkout intent and current cart state
     sessionStorage.setItem('checkoutIntent', 'true');
     sessionStorage.setItem('pendingCheckoutCart', JSON.stringify(cart));
     
-    // Show signup page (you can change this to showLoginPage() if preferred)
     showSignupPage();
   }
 }
@@ -7797,16 +7794,6 @@ document.addEventListener("DOMContentLoaded", function() {
     sessionStorage.removeItem('checkoutIntent');
     sessionStorage.removeItem('pendingCheckoutCart');
   }
-  // Clean up any stale session storage on page load
-  const checkoutIntent = sessionStorage.getItem('checkoutIntent');
-  const user = auth.currentUser;
-  
-  if (checkoutIntent && !user) {
-    // User refreshed page during checkout flow but is not logged in
-    sessionStorage.removeItem('checkoutIntent');
-    sessionStorage.removeItem('pendingCheckoutCart');
-  }
-  
 });
 
 // ============ ADD MISSING ELEMENTS TO HTML ============
@@ -7833,18 +7820,12 @@ function addMissingElements() {
 setTimeout(addMissingElements, 100);
 
 // ============ FIXED AUTH STATE HANDLER ============
-// Enhanced auth state handler
 auth.onAuthStateChanged((user) => {
   if (user) {
     console.log("User is signed in:", user.uid);
     
-    // Update profile page if visible
+    // If profile page is currently visible, refresh the data
     if (document.getElementById("profilePage") && document.getElementById("profilePage").style.display === "block") {
-      const guestView = document.getElementById("guestProfileView");
-      const userView = document.getElementById("userProfileView");
-      
-      if (guestView) guestView.style.display = "none";
-      if (userView) userView.style.display = "block";
       loadUserProfileAndOrders();
     }
     
@@ -7856,24 +7837,11 @@ auth.onAuthStateChanged((user) => {
         sessionStorage.removeItem('checkoutIntent');
       }, 1000);
     }
-    
-    // If on login/signup pages, redirect to profile
-    if (document.getElementById("loginPage") && document.getElementById("loginPage").style.display === "block") {
-      showProfilePage();
-    }
-    if (document.getElementById("signupPage") && document.getElementById("signupPage").style.display === "block") {
-      showProfilePage();
-    }
-    
   } else {
     console.log("User is signed out");
     // If profile page is visible and user logs out, update to guest view
     if (document.getElementById("profilePage") && document.getElementById("profilePage").style.display === "block") {
-      const guestView = document.getElementById("guestProfileView");
-      const userView = document.getElementById("userProfileView");
-      
-      if (guestView) guestView.style.display = "block";
-      if (userView) userView.style.display = "none";
+      showProfilePage();
     }
   }
 });
