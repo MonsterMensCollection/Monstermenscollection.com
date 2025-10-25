@@ -7354,7 +7354,14 @@ function showProfilePage() {
     if (element) element.style.display = "none";
   });
 
-  // Ensure profile page exists and is visible
+  // Check if user is logged in
+  if (!user) {
+    // User is not logged in, show signup page
+    showSignupPage();
+    return;
+  }
+
+  // User is logged in, show profile page
   const profilePage = document.getElementById("profilePage");
   if (!profilePage) {
     console.error("Profile page element not found!");
@@ -7364,20 +7371,14 @@ function showProfilePage() {
   
   profilePage.style.display = "block";
   
-  // Show appropriate view based on authentication status
+  // Show user profile view
   const guestView = document.getElementById("guestProfileView");
   const userView = document.getElementById("userProfileView");
   
-  if (!user) {
-    // User is not signed in, show guest view with signin/signup buttons
-    if (guestView) guestView.style.display = "block";
-    if (userView) userView.style.display = "none";
-  } else {
-    // User is signed in, show user profile view
-    if (guestView) guestView.style.display = "none";
-    if (userView) userView.style.display = "block";
-    loadUserProfileAndOrders();
-  }
+  if (guestView) guestView.style.display = "none";
+  if (userView) userView.style.display = "block";
+  
+  loadUserProfileAndOrders();
 }
 
 // Debug function - call this from browser console to check user data
