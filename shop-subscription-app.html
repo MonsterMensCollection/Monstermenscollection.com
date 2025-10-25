@@ -6507,8 +6507,7 @@ function showSignupPage() {
       <img src="https://see.fontimg.com/api/rf5/woG33/N2Y3Y2RhYTdiOGMwNGVjOGE5MWE1MTFiNGJjM2E4Y2Iub3Rm/U0lHTiBVUA/redtrap-expanded-puo.png?r=fs&h=30&w=1000&fg=000000&bg=FFFFFF&tb=1&s=30" 
            style="display: block; margin-left: auto; margin-right: auto;">
       <br><br>
-      <input type="text" id="signupName" placeholder="Full Name"
-             style="padding: 12px; width: 100%; margin-bottom: 15px;  border: 1px solid #ccc; border-radius: 0px; box-sizing: border-box;" />
+      
       <input type="tel" id="signupMobile" placeholder="Mobile Number"
              style="padding: 12px; width: 100%; margin-bottom: 15px;  border: 1px solid #ccc; border-radius: 0px; box-sizing: border-box;" />
 
@@ -6830,10 +6829,10 @@ function startResendTimer() {
 let confirmationResultGlobal = null;
 
 async function sendOTP() {
-  const name = document.getElementById("signupName").value.trim();
+ 
   const mobile = document.getElementById("signupMobile").value.trim();
 
-  if (!name || !mobile) {
+  if (!mobile) {
     showCartToast("Please fill in all fields");
     return;
   }
