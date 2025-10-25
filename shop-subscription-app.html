@@ -7470,6 +7470,9 @@ function showProfilePage() {
     // User is not logged in - show guest view (login/signup options)
     document.getElementById("guestProfileView").style.display = "block";
     document.getElementById("userProfileView").style.display = "none";
+    
+    // Also show the login page directly
+    showLoginPage();
   } else {
     // User is logged in - show profile information
     document.getElementById("guestProfileView").style.display = "none";
@@ -7480,7 +7483,7 @@ function showProfilePage() {
   // Update history state
   history.pushState({ page: "profilePage" }, "", "#profile");
 }
-
+  
 // Debug function - call this from browser console to check user data
 function debugUser() {
   const user = auth.currentUser;
