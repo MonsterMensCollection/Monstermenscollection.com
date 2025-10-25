@@ -7165,7 +7165,8 @@ function startResendTimer() {
 // Firebase OTP Send
 let confirmationResultGlobal = null;
 
-async function sendOTP() {
+
+  async function sendOTP() {
   const name = document.getElementById("signupName").value.trim();
   const mobile = document.getElementById("signupMobile").value.trim();
 
@@ -7174,12 +7175,16 @@ async function sendOTP() {
     return;
   }
 
-  if (mobile.length !== 10) {
+  if (mobile.length !== 10 || !/^\d+$/.test(mobile)) {
     showCartToast("Enter a valid 10-digit mobile number");
     return;
   }
 
   try {
+    // Show loading state
+    document.getElementById("sendOtpBtn").disabled = true;
+    document.getElementById("sendOtpBtn").textContent = "Checking...";
+
     // First check if user exists in Firestore by mobile number
     const usersSnapshot = await db.collection("users")
       .where("mobileNumber", "==", mobile)
@@ -7192,6 +7197,10 @@ async function sendOTP() {
       
       // Store the entered name for potential use in login
       sessionStorage.setItem('pendingSignupName', name);
+      
+      // Reset button
+      document.getElementById("sendOtpBtn").disabled = false;
+      document.getElementById("sendOtpBtn").textContent = "SEND OTP";
       return;
     }
 
@@ -7202,30 +7211,77 @@ async function sendOTP() {
 
     const phoneNumber = "+91" + mobile;
 
-    // Use invisible reCAPTCHA
+    // Reset any existing reCAPTCHA
+    if (window.recaptchaVerifier) {
+      window.recaptchaVerifier.clear();
+    }
+
+    // Create new reCAPTCHA verifier
     window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
       'size': 'invisible',
       'callback': function(response) {
-        sendOTPAfterRecaptcha(phoneNumber, 'signup');
+        // reCAPTCHA solved, send OTP
+        sendOTPToFirebase(phoneNumber);
+      },
+      'expired-callback': function() {
+        showCartToast("reCAPTCHA expired. Please try again.");
+        resetOTPUI();
       }
     });
 
-    // Execute the reCAPTCHA automatically
-    window.recaptchaVerifier.verify().then(() => {
-      // This will trigger the callback above
-    }).catch((error) => {
-      console.error("reCAPTCHA error:", error);
-      sendOTPAfterRecaptcha(phoneNumber, 'signup');
-    });
+    // Render reCAPTCHA and automatically execute
+    const recaptchaResponse = await window.recaptchaVerifier.render();
+    await window.recaptchaVerifier.verify();
 
   } catch (error) {
-    console.error("Error checking user existence:", error);
-    showCartToast("Error checking user. Please try again.");
+    console.error("Error in sendOTP:", error);
+    resetOTPUI();
+    
+    if (error.code === 'auth/too-many-requests') {
+      showCartToast("Too many attempts. Please try again later.");
+    } else if (error.code === 'auth/invalid-phone-number') {
+      showCartToast("Invalid phone number format.");
+    } else {
+      showCartToast("Error sending OTP. Please try again.");
+    }
   }
 }
 
+// Helper function to send OTP after reCAPTCHA is solved
+function sendOTPToFirebase(phoneNumber) {
+  firebase.auth().signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier)
+    .then((confirmationResult) => {
+      confirmationResultGlobal = confirmationResult;
+      showCartToast("OTP sent successfully!");
+    })
+    .catch((error) => {
+      console.error("OTP sending error:", error);
+      resetOTPUI();
+      
+      if (error.code === 'auth/too-many-requests') {
+        showCartToast("Too many attempts. Please try again later.");
+      } else if (error.code === 'auth/invalid-phone-number') {
+        showCartToast("Invalid phone number format.");
+      } else {
+        showCartToast("Error sending OTP: " + error.message);
+      }
+    });
+}
 
-  function verifyOTP() {
+// Helper function to reset OTP UI
+function resetOTPUI() {
+  document.getElementById("sendOtpBtn").disabled = false;
+  document.getElementById("sendOtpBtn").textContent = "SEND OTP";
+  document.getElementById("sendOtpBtn").style.display = "block";
+  document.getElementById("otpSection").style.display = "none";
+  document.getElementById("resendOtpSection").style.display = "none";
+  
+  if (otpResendTimer) {
+    clearInterval(otpResendTimer);
+  }
+}
+
+function verifyOTP() {
   const otpCode = document.getElementById("otpCode").value.trim();
   const name = document.getElementById("signupName").value.trim();
   const mobile = document.getElementById("signupMobile").value.trim();
@@ -7234,6 +7290,15 @@ async function sendOTP() {
     showCartToast("Please enter the OTP");
     return;
   }
+
+  if (!confirmationResultGlobal) {
+    showCartToast("OTP session expired. Please request a new OTP.");
+    return;
+  }
+
+  // Show loading state
+  document.getElementById("verifyOtpBtn").disabled = true;
+  document.getElementById("verifyOtpBtn").textContent = "Verifying...";
 
   confirmationResultGlobal.confirm(otpCode)
     .then((result) => {
@@ -7256,37 +7321,55 @@ async function sendOTP() {
     .then(() => {
       showCartToast("Account created successfully!");
       
-      // Check if user was trying to checkout
+      // Clear reCAPTCHA
+      if (window.recaptchaVerifier) {
+        window.recaptchaVerifier.clear();
+      }
+      
+      // Handle checkout intent or go to profile
       const checkoutIntent = sessionStorage.getItem('checkoutIntent');
       if (checkoutIntent === 'true') {
-        // Restore cart from session storage if needed
-        const pendingCart = sessionStorage.getItem('pendingCheckoutCart');
-        if (pendingCart) {
-          try {
-            cart = JSON.parse(pendingCart);
-            localStorage.setItem("cart", JSON.stringify(cart));
-          } catch (e) {
-            console.error("Error restoring cart:", e);
-          }
-          sessionStorage.removeItem('pendingCheckoutCart');
-        }
-        
-        // ✅ FIX: Redirect to checkout/details page instead of profile
-        setTimeout(() => {
-          goToDetailsPage(); // This goes to the checkout page
-          sessionStorage.removeItem('checkoutIntent');
-        }, 1000);
+        handlePostSignupCheckout();
       } else {
-        // Default behavior - go to profile (only when NOT checking out)
         showProfilePage();
       }
     })
     .catch((error) => {
       console.error("Error during signup:", error);
-      showCartToast("Invalid OTP or error: " + error.message);
+      
+      // Reset button
+      document.getElementById("verifyOtpBtn").disabled = false;
+      document.getElementById("verifyOtpBtn").textContent = "VERIFY OTP";
+      
+      if (error.code === 'auth/invalid-verification-code') {
+        showCartToast("Invalid OTP. Please try again.");
+      } else if (error.code === 'auth/code-expired') {
+        showCartToast("OTP expired. Please request a new one.");
+      } else {
+        showCartToast("Error verifying OTP: " + error.message);
+      }
     });
 }
 
+  function handlePostSignupCheckout() {
+  // Restore cart from session storage if needed
+  const pendingCart = sessionStorage.getItem('pendingCheckoutCart');
+  if (pendingCart) {
+    try {
+      cart = JSON.parse(pendingCart);
+      localStorage.setItem("cart", JSON.stringify(cart));
+    } catch (e) {
+      console.error("Error restoring cart:", e);
+    }
+    sessionStorage.removeItem('pendingCheckoutCart');
+  }
+  
+  // Redirect to checkout/details page
+  setTimeout(() => {
+    goToDetailsPage();
+    sessionStorage.removeItem('checkoutIntent');
+  }, 1000);
+}
 // Authentication functions
 // Replace the createAccount function
 
