@@ -7272,66 +7272,74 @@ async function checkoutCart() {
   new Razorpay(options).open();        // snapshot is already in sessionStorage
 
   /* ────────── 5. Success callback stays unchanged ────────── */
-  async function handleSuccessfulPayment (response) {
-    const user = auth.currentUser;
-    if (!user) return;
 
-    const orderData = {
-  uid: user.uid, // Make sure this is consistent
-  name: name,
-  address: address,
-  pincode: pincode,
-  mobilenumber: mobileNumber,
-  cart: [...cart],
-  totalUSD: subtotalUSD,
-  total: grandTotalSelected,
-  currency: currentCurrency,
-  paymentId: response.razorpay_payment_id,
-  paymentMode: "Razorpay",
-  timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-  orderNumber: `ORD-${Date.now()}`,
-  status: "Processing",
-  userEmail: user.email // Add email for verification
-};
+async function handleSuccessfulPayment (response) {
+  const user = auth.currentUser;
+  if (!user) return;
 
-    try {
-      await finalizeOrderStock(cart);                 // lock inventory
-      await db.collection("orders").add(orderData);   // record order
-      sessionStorage.removeItem("pendingOrder");      // 🔑 clear snapshot
+  const orderData = {
+    uid: user.uid,
+    name: name,
+    address: address,
+    pincode: pincode,
+    mobilenumber: mobileNumber,
+    cart: [...cart],
+    totalUSD: subtotalUSD,
+    total: grandTotalSelected,
+    currency: currentCurrency,
+    paymentId: response.razorpay_payment_id,
+    paymentMode: "Razorpay",
+    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+    orderNumber: `ORD-${Date.now()}`,
+    status: "Processing",
+    userEmail: user.email
+  };
 
-      /* success UI (unchanged) */
-      [
-        "descriptionPage","productList","shirtsPage","pantsPage",
-        "sliderSection","cartPage","profilePage","tshirtsPage",
-        "cargosPage","detailsPage"
-      ].forEach(id => (document.getElementById(id).style.display = "none"));
+  try {
+    await finalizeOrderStock(cart);                 // lock inventory
+    await db.collection("orders").add(orderData);   // record order
+    sessionStorage.removeItem("pendingOrder");      // clear snapshot
 
-      document.getElementById("paymentSuccessPage").style.display = "block";
-      document.getElementById("successPaymentId").textContent =
-        response.razorpay_payment_id;
-
-      cart = [];   // clear local cart
-
-      setTimeout(() => {
-        document.getElementById("paymentSuccessPage").style.display = "none";
-        document.getElementById("productList").style.display        = "block";
-        document.getElementById("sliderSection").style.display      = "block";
-      }, 5000);
-
-    } catch (err) {
-      console.error("Checkout finalisation failed:", err);
-      alert(
-        "Payment received but an item just sold out. " +
-        "A full refund will be issued automatically."
-      );
+    // ✅ EMPTY THE CART HERE
+    cart = [];   
+    localStorage.setItem("cart", JSON.stringify(cart)); // Clear from localStorage
+    
+    // Update cart UI if cart page is visible
+    if (document.getElementById("cartPage").style.display !== "none") {
+      showCart();
     }
+
+    /* success UI */
+    [
+      "descriptionPage","productList","shirtsPage","pantsPage",
+      "sliderSection","cartPage","profilePage","tshirtsPage",
+      "cargosPage","detailsPage"
+    ].forEach(id => (document.getElementById(id).style.display = "none"));
+
+    document.getElementById("paymentSuccessPage").style.display = "block";
+    document.getElementById("successPaymentId").textContent =
+      response.razorpay_payment_id;
+
+    setTimeout(() => {
+      document.getElementById("paymentSuccessPage").style.display = "none";
+      document.getElementById("productList").style.display        = "block";
+      document.getElementById("sliderSection").style.display      = "block";
+    }, 5000);
+
+  } catch (err) {
+    console.error("Checkout finalisation failed:", err);
+    alert(
+      "Payment received but an item just sold out. " +
+      "A full refund will be issued automatically."
+    );
   }
+}  
 }
 
 function checkoutCOD() {
   const name = document.getElementById("checkoutName").value.trim();
   const address = document.getElementById("checkoutAddress").value.trim();
-   const pincode = document.getElementById("checkoutPincode").value.trim();
+  const pincode = document.getElementById("checkoutPincode").value.trim();
   const mobilenumber  = document.getElementById("checkoutMobileNumber").value.trim();
 
   if (!name || !address) {
@@ -7364,38 +7372,61 @@ function checkoutCOD() {
     paymentMode: "Cash on Delivery",
     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
     orderNumber: `ORD-${Date.now()}`,
-      status: "Processing"
+    status: "Processing"
   };
 
   db.collection("orders").add(orderData).then(() => {
+    // ✅ EMPTY THE CART AFTER SUCCESSFUL COD ORDER
+    cart = [];
+    localStorage.setItem("cart", JSON.stringify(cart));
+    
+    // Update cart UI if cart page is visible
+    if (document.getElementById("cartPage").style.display !== "none") {
+      showCart();
+    }
 
-      //  UI changes after successful order
-          document.getElementById("descriptionPage").style.display = "none";
-          document.getElementById("productList").style.display = "none";
-          document.getElementById("shirtsPage").style.display = "none";
-          document.getElementById("pantsPage").style.display = "none";
-          document.getElementById("sliderSection").style.display = "none";
-          document.getElementById("cartPage").style.display = "none";
-          document.getElementById("profilePage").style.display = "none";
-            document.getElementById("tshirtsPage").style.display = "none";
-             document.getElementById("cargosPage").style.display = "none";
+    // UI changes after successful order
+    document.getElementById("descriptionPage").style.display = "none";
+    document.getElementById("productList").style.display = "none";
+    document.getElementById("shirtsPage").style.display = "none";
+    document.getElementById("pantsPage").style.display = "none";
+    document.getElementById("sliderSection").style.display = "none";
+    document.getElementById("cartPage").style.display = "none";
+    document.getElementById("profilePage").style.display = "none";
+    document.getElementById("tshirtsPage").style.display = "none";
+    document.getElementById("cargosPage").style.display = "none";
 
-          // Show success page
-          document.getElementById("paymentSuccessPageCOD").style.display = "block";
+    // Show success page
+    document.getElementById("paymentSuccessPageCOD").style.display = "block";
 
-          // Hide after 5 seconds and go back to products
-          setTimeout(() => {
-            document.getElementById("paymentSuccessPageCOD").style.display = "none";
-            document.getElementById("productList").style.display = "block";
-            document.getElementById("sliderSection").style.display = "block";
-          }, 5000);
-    cart = []; // Return to main page
+    // Hide after 5 seconds and go back to products
+    setTimeout(() => {
+      document.getElementById("paymentSuccessPageCOD").style.display = "none";
+      document.getElementById("productList").style.display = "block";
+      document.getElementById("sliderSection").style.display = "block";
+    }, 5000);
+    
   }).catch(error => {
     console.error("Error placing COD order:", error);
     alert("Error placing order. Please try again.");
   });
 }
 
+  function clearCart() {
+  cart = [];
+  localStorage.setItem("cart", JSON.stringify(cart));
+  
+  // Update UI if cart page is visible
+  if (document.getElementById("cartPage").style.display !== "none") {
+    showCart();
+  }
+  
+  // Update cart amounts display
+  updateCartAmounts();
+  
+  console.log("Cart cleared successfully");
+}
+  
 function confirmCOD() {
   document.getElementById("codConfirmationModal").style.display = "block";
 }
