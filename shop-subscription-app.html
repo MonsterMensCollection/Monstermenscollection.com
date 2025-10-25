@@ -7442,8 +7442,6 @@ function proceedWithCOD() {
 
 
 function showProfilePage() {
-  const user = auth.currentUser;
-
   // Hide ALL pages first
   const allPages = [
     "descriptionPage", "productList", "shirtsPage", "pantsPage",
@@ -7466,20 +7464,21 @@ function showProfilePage() {
   
   profilePage.style.display = "block";
   
-  // Show appropriate view based on authentication status
-  const guestView = document.getElementById("guestProfileView");
-  const userView = document.getElementById("userProfileView");
+  const user = auth.currentUser;
   
   if (!user) {
-    // User is not signed in, show guest view with signin/signup buttons
-    if (guestView) guestView.style.display = "block";
-    if (userView) userView.style.display = "none";
+    // User is not logged in - show guest view (login/signup options)
+    document.getElementById("guestProfileView").style.display = "block";
+    document.getElementById("userProfileView").style.display = "none";
   } else {
-    // User is signed in, show user profile view
-    if (guestView) guestView.style.display = "none";
-    if (userView) userView.style.display = "block";
+    // User is logged in - show profile information
+    document.getElementById("guestProfileView").style.display = "none";
+    document.getElementById("userProfileView").style.display = "block";
     loadUserProfileAndOrders();
   }
+  
+  // Update history state
+  history.pushState({ page: "profilePage" }, "", "#profile");
 }
 
 // Debug function - call this from browser console to check user data
@@ -7508,46 +7507,34 @@ function debugUser() {
   });
 }
 
-  
-function loadUserProfileAndOrders() {
+  function loadUserProfileAndOrders() {
   const user = auth.currentUser;
   if (!user) {
-    // User is not logged in, show guest view
-    document.getElementById("profileName").textContent = "Guest User";
-    document.getElementById("profileMobile").textContent = "Sign in to view";
-    
-    const orderList = document.getElementById("orderList");
-    orderList.innerHTML = "<div style='text-align: center; padding: 20px; color: #777;'>Sign in to view order history</div>";
+    console.log("No user logged in");
     return;
   }
 
-  // Try to get user data from Firestore
+  // Load user profile data
   db.collection("users").doc(user.uid).get().then((doc) => {
-    let name = "Loading...";
-    let mobileNumber = "Loading...";
-    
     if (doc.exists) {
       const userData = doc.data();
-      name = userData.name || user.displayName || "Not set";
-      mobileNumber = userData.mobileNumber || "Not available";
+      document.getElementById("profileName").textContent = userData.name || "Not set";
+      document.getElementById("profileMobile").textContent = userData.mobileNumber || "Not available";
     } else {
-      // If no user document exists, use auth data
-      name = user.displayName || "Not set";
-      mobileNumber = user.phoneNumber || "Not available";
+      // Fallback to auth data
+      document.getElementById("profileName").textContent = user.displayName || "User";
+      document.getElementById("profileMobile").textContent = user.phoneNumber || "Not available";
     }
-    
-    document.getElementById("profileName").textContent = name;
-    document.getElementById("profileMobile").textContent = mobileNumber;
   }).catch((error) => {
     console.error("Error loading user profile:", error);
-    // Fallback to auth user data
-    document.getElementById("profileName").textContent = user.displayName || "Error loading";
-    document.getElementById("profileMobile").textContent = user.phoneNumber || "Error loading";
+    document.getElementById("profileName").textContent = "Error loading";
+    document.getElementById("profileMobile").textContent = "Error loading";
   });
 
   // Load user orders
   loadUserOrders();
 }
+
 
 function loadUserOrders() {
   const user = auth.currentUser;
@@ -7702,17 +7689,15 @@ const auth = firebase.auth();
 // Listen for auth state changes
 // Listen for auth state changes
 // ============ FIXED AUTH STATE HANDLER ============
+// ============ FIXED AUTH STATE HANDLER ============
 auth.onAuthStateChanged((user) => {
   if (user) {
     console.log("User is signed in:", user.uid);
     
-    // If profile page is currently visible, update the view
+    // If profile page is currently visible, update it to show user info
     if (document.getElementById("profilePage") && document.getElementById("profilePage").style.display === "block") {
-      const guestView = document.getElementById("guestProfileView");
-      const userView = document.getElementById("userProfileView");
-      
-      if (guestView) guestView.style.display = "none";
-      if (userView) userView.style.display = "block";
+      document.getElementById("guestProfileView").style.display = "none";
+      document.getElementById("userProfileView").style.display = "block";
       loadUserProfileAndOrders();
     }
     
@@ -7728,11 +7713,8 @@ auth.onAuthStateChanged((user) => {
     console.log("User is signed out");
     // If profile page is visible and user logs out, update to guest view
     if (document.getElementById("profilePage") && document.getElementById("profilePage").style.display === "block") {
-      const guestView = document.getElementById("guestProfileView");
-      const userView = document.getElementById("userProfileView");
-      
-      if (guestView) guestView.style.display = "block";
-      if (userView) userView.style.display = "none";
+      document.getElementById("guestProfileView").style.display = "block";
+      document.getElementById("userProfileView").style.display = "none";
     }
   }
 });
