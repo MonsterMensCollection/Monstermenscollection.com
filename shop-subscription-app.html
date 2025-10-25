@@ -5993,8 +5993,7 @@ async function loadSimilarProducts(currentDocId, currentCategory, currentTitle, 
     }
 }
 
-  
-function buyNow() {
+  function buyNow() {
   /* ── 0 · prelim checks ─────────────────────────────────────────── */
   const docId = document.getElementById("descName").dataset.docid;
   const size = document.getElementById("selectedSize")?.value || "";
@@ -6029,8 +6028,7 @@ function buyNow() {
     docId
   }];
 
-  /* ── 4 · proceed directly to checkout ──────────────────────────── */
- /* ── 4 · Save cart and redirect to signup page ─────────────────── */
+  /* ── 4 · Save cart and redirect to signup page ─────────────────── */
   localStorage.setItem("cart", JSON.stringify(cart));
   
   // Set checkout intent for after signup
@@ -6042,6 +6040,7 @@ function buyNow() {
   
   showCartToast("Please sign up to complete your purchase");
 }
+
 
 
   function createSimilarProductCard(product) {
@@ -6725,7 +6724,7 @@ function loginVerifyOTP() {
           sessionStorage.removeItem('pendingCheckoutCart');
         }
         
-        // ✅ FIX: Redirect to checkout/details page
+        // ✅ REDIRECT TO CHECKOUT PAGE AFTER LOGIN
         setTimeout(() => {
           goToDetailsPage(); // This goes to the checkout page
           sessionStorage.removeItem('checkoutIntent');
@@ -6901,7 +6900,7 @@ async function sendOTP() {
   });
 }
 
-  function verifyOTP() {
+ function verifyOTP() {
   const otpCode = document.getElementById("otpCode").value.trim();
   const name = document.getElementById("signupName").value.trim();
   const mobile = document.getElementById("signupMobile").value.trim();
@@ -6947,7 +6946,7 @@ async function sendOTP() {
           sessionStorage.removeItem('pendingCheckoutCart');
         }
         
-        // ✅ FIX: Redirect to checkout/details page instead of profile
+        // ✅ REDIRECT TO CHECKOUT PAGE AFTER SIGNUP
         setTimeout(() => {
           goToDetailsPage(); // This goes to the checkout page
           sessionStorage.removeItem('checkoutIntent');
@@ -7685,15 +7684,15 @@ function handleCheckout() {
     // User is signed in, proceed to checkout
     goToDetailsPage();
   } else {
-    // User is not signed in, redirect to login
+    // User is not signed in, redirect to login/signup
     showCartToast("Please sign in to checkout");
     
     // Store checkout intent and current cart state
     sessionStorage.setItem('checkoutIntent', 'true');
     sessionStorage.setItem('pendingCheckoutCart', JSON.stringify(cart));
     
-    // Show login page
-    showLoginPage();
+    // Show signup page (you can change this to showLoginPage() if preferred)
+    showSignupPage();
   }
 }
 // ============ END OF AUTH CODE ============
@@ -7798,6 +7797,16 @@ document.addEventListener("DOMContentLoaded", function() {
     sessionStorage.removeItem('checkoutIntent');
     sessionStorage.removeItem('pendingCheckoutCart');
   }
+  // Clean up any stale session storage on page load
+  const checkoutIntent = sessionStorage.getItem('checkoutIntent');
+  const user = auth.currentUser;
+  
+  if (checkoutIntent && !user) {
+    // User refreshed page during checkout flow but is not logged in
+    sessionStorage.removeItem('checkoutIntent');
+    sessionStorage.removeItem('pendingCheckoutCart');
+  }
+  
 });
 
 // ============ ADD MISSING ELEMENTS TO HTML ============
